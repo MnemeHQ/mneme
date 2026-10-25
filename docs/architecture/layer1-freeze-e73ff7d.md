@@ -1285,6 +1285,76 @@ C2b Amendment 1 freeze amendments, and the G1 F-1 record, remain unchanged.
 
 ---
 
+## Amendment — record G2-1 charter §5.1 erratum: explicit `source_file` expected input (2026-10-24)
+
+> This is a **record of a narrow owner ruling (G2C-R1)**. It adds one
+> validator value and one test adapter within the G2-1 authorization above,
+> and corrects that amendment's description of default callers. It
+> authorizes nothing else.
+
+**What happened.** The G2-1 amendment above says the shared
+`assess_verdict` default "keeps every existing caller's coherent results
+unchanged" and lists those callers. The list, and charter §5.1's premise that
+no current consumer sends `--source-file`, both left out an existing caller:
+the ADR-034 M4 scoring child, `benchmarks/adr034_m4/m4_child.py` (`trust`
+command). It applies the default validator to G1 `--source-file` payloads
+(`complete_source_file`). The G2-1 implementation PR
+([#637](https://github.com/MnemeHQ/mneme/pull/637), draft) found this as
+3 failures in `tests/test_adr034_m4_harness.py`.
+
+**Ruling (charter §5.1 erratum, option (c)).**
+
+- **New value, explicit only.** `assess_verdict` gains
+  `expected_input="source_file"`, which accepts only `complete_source_file`,
+  and only when the caller requests it explicitly. The caller decides from
+  its own invocation, never from the payload.
+- **Defaults unchanged.** The default `"input"` stays strict: no subject, or
+  `unverified_input`. Routed writes keep `"proposed_new_file"`.
+- **M4 untouched.** The M4 instrument (`benchmarks/adr034_m4/`, its corpus,
+  criteria, pins and results) is not changed. M4's PASS (#628) stands for
+  the build it pinned.
+- **Current-build regression.** A separately identified post-M4
+  compatibility adapter under `tests/` covers current builds. It is never M4
+  blind scoring or G2 validation evidence.
+- **Historical tests kept.** The existing M4 end-to-end tests that call the
+  trust validator through the unmodified child are marked as historical
+  pinned-build validation, with a reason that cites the erratum. They are
+  not deleted and not edited to pass.
+
+**Sections referenced:** the ADR-034 G2-1 amendment above, the Freeze Anchor
+**Status** clause, and the Amendment Procedure below.
+
+**Rationale (Amendment Procedure §3(a) and §3(b)).**
+
+- **(a)** The G2-1 amendment's list of default callers, and the charter
+  premise it relied on, are defective against the repository as merged.
+  This record corrects that description.
+- **(b)** The owner ruling was already made and is recorded as a dated
+  erratum in charter §5.1, merged with this record.
+
+No implemented behavior is justified after the fact. #637 is a draft, and the
+ruling is recorded before the implementation changes.
+
+**Consequence for the default caller.** On post-G2 builds, the unmodified M4
+child's default call treats `complete_source_file` payloads as untrusted. This
+is accepted. M4 is closed, its instrument is pinned, and current-build
+coverage moves to the compatibility adapter.
+
+### Not authorized by this record
+
+- Any change to `benchmarks/adr034_m4/`, the M4 corpus, criteria, pins or
+  results, or any re-scoring of M4.
+- Adding `complete_source_file` to the default `expected_input`, or letting a
+  payload select its own trusted input kind.
+- Counting the compatibility adapter as blind validation or G2 evidence.
+- Anything else beyond the G2-1 amendment above.
+
+The existing DG1B1, DG1F-C1a, #260, T-08 slice-1, C2a, C2b, ADR-034 G1,
+C2b Amendment 1 and ADR-034 G2-1 freeze amendments, and the G1 F-1 record,
+remain unchanged.
+
+---
+
 ## Amendment Procedure
 
 This document is frozen at `e73ff7d`. To amend it:

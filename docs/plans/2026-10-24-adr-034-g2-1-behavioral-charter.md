@@ -335,6 +335,57 @@ payload they can legitimately receive.
 that receives an unrequested `proposed_new_source` payload rejects it
 through this default. That is the mechanism the draft lacked.
 
+**Erratum (owner ruling G2C-R1, 2026-10-24).** The premise above, "No
+current consumer sends `--source-file`", is false. The merged ADR-034 M4
+scoring child, `benchmarks/adr034_m4/m4_child.py` (`trust` command, lines
+100–104), calls the default `assess_verdict` on G1 `--source-file`
+payloads, whose subject kind is `complete_source_file`. Under the table
+above, every M4 case would become untrusted on a post-G2 build. The
+implementation PR (#637) found this as 3 failures in
+`tests/test_adr034_m4_harness.py`.
+
+The owner ruled for option (c): **explicit source-file trust, with M4
+preserved.**
+
+1. **A third `expected_input` value, `"source_file"`.** It accepts only a
+   `complete_source_file` subject, and only when the caller asks for it
+   explicitly. The §5.2 coherence rules apply as before, so rule 2 still
+   forbids `INCOMPLETE_SOURCE_INPUT` on that subject. The caller decides
+   which transport it used, from how it invoked the checker. A payload never
+   authorizes its own input kind.
+2. **The default `"input"` is unchanged and strict:** no subject, or
+   `unverified_input`. `complete_source_file` is **not** added to the
+   default (option (b) was rejected). Routed Claude Code writes keep using
+   `"proposed_new_file"`.
+3. **The M4 instrument stays as it is.** `benchmarks/adr034_m4/`
+   (including `m4_child.py`), the sealed corpus, the scoring criteria, the
+   pins and the results record do not change (option (a) was rejected). M4's
+   PASS (#628) stands as evidence about the build it pinned.
+4. **A separately identified post-M4 compatibility adapter.**
+   - **Where:** under `tests/`, outside `benchmarks/adr034_m4/`.
+   - **What it does:** it runs synthetic `--source-file` cases through the
+     current build. It passes `expected_input="source_file"`, taken from its
+     own invocation metadata and never from the returned payload.
+   - **What it proves:** that complete-source results stay trusted after G2.
+   - **What it is not:** it never counts as M4 blind scoring or as G2
+     validation evidence.
+5. **The existing M4 end-to-end tests become historical pinned-build
+   validation.**
+   - On post-G2 builds, the end-to-end cases in
+     `tests/test_adr034_m4_harness.py` that invoke the shipped trust
+     validator through the unmodified `m4_child.py` are marked as pinned to
+     the M4 build, with an explicit reason that cites this erratum.
+   - They are not deleted, and not edited to pass.
+   - The pure scoring and gate tests in that file keep running unchanged.
+   - The compatibility adapter (item 4) is the current-build regression.
+
+§8.C.6 (consumer trust) gains these cases:
+
+- the `"source_file"` value accepts `complete_source_file` and rejects every
+  other kind;
+- the default and `"proposed_new_file"` both reject `complete_source_file`;
+- the compatibility adapter passes on the current build.
+
 ### 5.2 Subject-kind / matcher-reason coherence (G2C-F1)
 
 These rules apply on every call, whatever `expected_input` is. They cover
