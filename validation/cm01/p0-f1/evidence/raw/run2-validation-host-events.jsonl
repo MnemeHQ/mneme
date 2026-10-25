@@ -1,0 +1,2 @@
+{"ts":"2026-10-25T00:24:13.405Z","type":"host_call_started","callId":1,"provider":"codemode","method":"decision_get"}
+{"ts":"2026-10-25T00:24:13.407Z","type":"host_call_settled","callId":1,"provider":"codemode","method":"decision_get","outcome":"rejected","errorName":"Error","errorMessage":"Argument validation failed for decision.get: [{\"instancePath\":\"/record_id\",\"schemaPath\":\"#/properties/record_id/type\",\"keyword\":\"type\",\"params\":{\"type\":\"string\"},\"message\":\"must be string\"}]"}

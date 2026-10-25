@@ -1,0 +1,70 @@
+CM-01-P0-01-F1 exact commands
+
+Worktree:
+  C:\dev\mneme\.worktrees\feat-cm01-p0-f1-cancellation
+
+Directory:
+  validation/cm01/p0-f1
+
+Baseline:
+  adf50933d0beac255ac2a134e00ee13d40442302
+
+Setup:
+  npm install --ignore-scripts --no-audit --no-fund
+
+Run:
+  node run-f1.mjs
+
+Observed:
+  run1: PASS, 20/20 checks
+  run2: PASS, 20/20 checks
+  repeatable: true
+  preservation: true
+  P0 comparison: true
+  unhandled rejections: 0
+
+Measured cancellation latency:
+  provisional grace: 100 ms
+  calibration samples: 16
+  calibration max: 3 ms
+  final grace: 50 ms
+  final-run max: 4 ms
+  final-run mean: 1.5625 ms
+
+Key corrected observations:
+  timeout: client rejected McpError -32001
+  cancellation notifications: exactly 1, matching request id
+  completed calls: 0 cancellation notifications
+  late withheld response: ignored; no revival
+  transport close: McpError -32000, 0 cancellations
+  genuine server cancellation frame: observed after withheld response
+  synthetic async server: signal_aborted true, handler_returned aborted true,
+    response_expected false, no response after cancel
+
+Preservation:
+  S1-A1 digest before/after: cc7f884866e6e94255b100de57b82eec4a51660aadaf51c6464198131030af57
+  frozen S1-A1/P0 diff: empty
+  frozen executor: 4b960124e9218ed124ed34e3b3595b648477b9dab6540c4ce1609d2efaf31313
+  M4 guard: pass before/after
+
+Packaged versions:
+  Node 24.13.1
+  @cloudflare/codemode 0.5.5
+  @modelcontextprotocol/sdk 1.32.2
+  ajv 8.17.1
+  quickjs-emscripten 0.32.0
+  zod 4.6.7
+  Python 3.12.10
+  mneme 0.10.0
+  mcp 2.2.0
+
+Evidence:
+  evidence/run1.json
+  evidence/run2.json
+  evidence/verdict.json
+  evidence/measurements.json
+  evidence/calibration-100ms.json
+  evidence/calibration-100ms-measurements.json
+  evidence/versions.json
+  evidence/raw/
+

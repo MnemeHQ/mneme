@@ -1,0 +1,21 @@
+{
+  "name": "mneme-cm01-p0-f1",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "CM-01-P0-01-F1: isolated cancellation correction and regression validation.",
+  "scripts": {
+    "f1": "node run-f1.mjs",
+    "synthetic-server": "node synthetic-server.mjs"
+  },
+  "dependencies": {
+    "@cloudflare/codemode": "0.5.5",
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "ajv": "8.17.1",
+    "quickjs-emscripten": "0.32.0",
+    "zod": "4.6.7"
+  },
+  "engines": {
+    "node": "24.13.1"
+  }
+}
