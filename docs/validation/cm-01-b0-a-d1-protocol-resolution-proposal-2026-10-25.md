@@ -4,8 +4,8 @@
 
 **Date:** 2026-10-25  
 **Workstream:** CM-01, parallel optional orchestration interoperability; [tracker #640](https://github.com/MnemeHQ/mneme/issues/640).  
-**Design baseline:** `8250aa09cfedf99b392ccabff597beca1b4d2055` (roadmap reconciliation PR #653).  
-**D0 proposal:** PR #654, commit `6220b482f7f12260b284bcca571abee52a2efbc6`.  
+**Design baseline:** `8060b9bc318e0a0cb206d0cc9d3e6833977e367c` (D0 proposal PR #654 squash merge; roadmap reconciliation PR #653 at `8250aa09cfedf99b392ccabff597beca1b4d2055`).  
+**D0 proposal:** PR #654, reviewed head `6220b482f7f12260b284bcca571abee52a2efbc6`, squash-merged at `8060b9bc318e0a0cb206d0cc9d3e6833977e367c`.  
 **Predecessors:** S1-A1 PR #627; P0-01 FAIL PR #633 (`adf50933`); F1 PASS / VERIFIED PR #642 (`f8591102`); B0-M PASS / supplemental VERIFIED PR #650 (`34d75bec`).
 
 This document resolves, as far as possible without new measurements, the eight D1 areas left open by the D0 review. It is a design-resolution proposal, not a protocol freeze. It does not authorize a model/API call, pilot, confirmatory run, benchmark implementation, production integration, new MCP capability, B0-A execution or S1-A2 work.
@@ -305,7 +305,20 @@ A pilot is required before confirmatory sample-size determination. It is not con
 
 ### 5.3 Prospective power formula
 
-Let `sigma_f` be the standard deviation of the planned scenario-level log ratio `ell_s` within family `f`, after the fixed `R` repetitions are averaged. The pilot estimates between-scenario and within-scenario residual variance separately, then derives the `sigma_f` appropriate to the planned `R`; it does not treat repetitions as independent scenarios. Let `theta_alt = log(1 - delta_material)`, which is negative for a token reduction. Let `z_a = z_{1-alpha}` for one-sided `alpha` and `z_b = z_{1-beta}` for power `1-beta`.
+The power calculation must be for the actual decision rule: demonstrate that the true improvement is **greater than the material threshold**, not merely greater than zero. The old zero-centered formula is not sufficient.
+
+Let:
+
+```text
+theta = log(C / D)                              (negative favors Code Mode)
+theta0 = log(1 - delta_material)                (null boundary: improvement = material threshold)
+theta1 = log(1 - delta_planning)                (true planning effect; delta_planning > delta_material)
+gamma = theta0 - theta1                         (positive effect gap above the threshold)
+```
+
+`delta_planning` is a separately approved planning effect strictly above `delta_material`. It is **not chosen here**, must be fixed before confirmatory execution, and must not be selected to make the sample size convenient or changed after confirmatory data are observed. If `delta_planning <= delta_material`, the study is at or below the null boundary, where rejection probability is at most `alpha` (5% at the boundary), not the intended power; no finite `N` is claimed and D1 remains blocked.
+
+Let `sigma_f` be the standard deviation of the planned scenario-level log ratio `ell_s` within family `f`, after the fixed `R` repetitions are averaged. The pilot estimates between-scenario and within-scenario residual variance separately, then derives the `sigma_f` appropriate to the planned `R`; it does not treat repetitions as independent scenarios. Let `z_a = z_{1-alpha}` for one-sided `alpha` and `z_b = z_{1-beta}` for power `1-beta`.
 
 For equal `N` scenarios per family and equal family weights, the approximate variance of `theta_hat` is:
 
@@ -313,17 +326,25 @@ For equal `N` scenarios per family and equal family weights, the approximate var
 Var(theta_hat) = (1/16) * sum_f (sigma_f^2 / N)
 ```
 
-The prospective equal-`N` plan is:
+The one-sided test rejects the null boundary when the upper confidence bound satisfies `theta_U < theta0`, equivalently when the lower improvement bound exceeds `delta_material`. At true effect `theta1`, the approximate power is:
 
 ```text
-N = ceil( ((z_a + z_b)^2 * sum_f sigma_f^2) / (16 * theta_alt^2) )
+power = Phi( gamma / SE - z_a )
+```
+
+`Phi` is the standard normal cumulative distribution function.
+
+Setting `power = 1 - beta` gives `SE = gamma / (z_a + z_b)`. The prospective equal-`N` plan is therefore:
+
+```text
+N = ceil( ((z_a + z_b)^2 * sum_f sigma_f^2) / (16 * gamma^2) )
 ```
 
 with a minimum of two complete scenarios per family for the cluster interval. Two is a computability floor, not an adequacy claim; the approved power plan determines the real `N`.
 
-The pilot must estimate `sigma_f` with a predeclared method that separates between-scenario variance from within-scenario residual variance and derives the scenario-level value for the planned `R`. Use a conservative upper confidence bound for `sigma_f`, not the pilot point estimate, so the plan is not optimistically underpowered. The formula is a planning approximation; the confirmatory analysis remains the scenario-cluster bootstrap. If the pilot cannot estimate `sigma_f` adequately, D1 remains blocked and no `N` is claimed.
+The pilot must estimate `sigma_f` with a predeclared method that separates between-scenario variance from within-scenario residual variance and derives the scenario-level value for the planned `R`. Use a conservative upper confidence bound for `sigma_f`, not the pilot point estimate, so the plan is not optimistically underpowered. The pilot may inform `delta_planning`, but the pilot effect estimate is not confirmatory evidence and cannot be used to tune the endpoint or threshold. The formula is a planning approximation; the confirmatory analysis remains the scenario-cluster bootstrap. If the pilot cannot estimate `sigma_f` adequately, D1 remains blocked and no `N` is claimed.
 
-Proposed, not ratified: one-sided `alpha = 0.05`, power `0.80`, `delta_material = 0.15`. These values are approval items. They are not used to claim power or a numeric sample size in this document.
+Proposed, not ratified: one-sided `alpha = 0.05`, power `0.80`, `delta_material = 0.15`. `delta_planning` is **TBD** and strictly greater than `delta_material`. These values are approval items; none is used to claim power or a numeric sample size in this document.
 
 ### 5.4 Repetitions
 
@@ -340,7 +361,7 @@ Before any confirmatory run, a separate D1-C preregistration must freeze:
 
 - exact model snapshot, endpoint, region, parameters and tool-use mode;
 - token mapping and caching policy;
-- `delta_material`, `alpha`, power target, `N_f`, `R`, seed and analysis code;
+- `delta_material`, `delta_planning`, `alpha`, power target, `N_f`, `R`, seed and analysis code;
 - corpus, scenario list, prompts, expected answers, evaluator and hashes;
 - security host image/config and red-team results;
 - exclusions, retries, stop rules and reviewer roles.
@@ -388,7 +409,7 @@ The primary endpoint uses T5-T8 only. T1-T4 can fail correctness/authority/secur
 Before freezing the confirmatory corpus, all of the following must pass:
 
 1. **Exact uniqueness.** Canonicalized prompt + parameters + expected answer is unique by SHA-256. Zero exact duplicates.
-2. **Near-duplicate control.** A predeclared normalized-token shingle/Jaccard threshold is approved; every pair below the similarity limit or all near-duplicates are reviewed. The threshold is a D1 parameter (**TBD**).
+2. **Near-duplicate control.** Normalize each scenario's model-visible prompt and parameters with Unicode NFKC, lowercase and whitespace collapse; tokenize on whitespace and form 5-token shingles. For every unordered pair of confirmatory scenarios, compute Jaccard `J = |A intersect B| / |A union B|` on the shingle sets. Jaccard is symmetric; higher values mean greater similarity. Acceptance is: `J < 0.60` pass; `0.60 <= J < 0.80` requires documented corpus-reviewer approval with rationale; `J >= 0.80` reject and do not freeze. Exact duplicates are always rejected. The `k=5` shingle size and the `0.60`/`0.80` thresholds are proposed for approval and must be ratified before corpus freeze; otherwise D1 remains blocked. Separately, any scenario or expected answer that is identical or near-identical to a B0-M example is rejected; B0-M is not a B0-A source.
 3. **Answer leakage.** Expected decision IDs, version IDs, content digests, rule IDs and evidence selectors do not appear in the prompt, tool descriptions or model-visible context unless the task explicitly requires them.
 4. **Multi-step dependency.** For T5-T8, a deterministic structural check proves that at least one later-call argument is determined by an earlier tool result and is not fully present in the prompt.
 5. **Diversity quotas.** Predeclared minimum counts cover scopes, lifecycle states, cardinality bins, lineage-present/absent cases, active/inactive filters and ambiguity. The actual quotas are **TBD** pending corpus design.
@@ -627,12 +648,13 @@ The table is the D1 parameter register. "Proposed" means the value or method is 
 | Token total definition | All non-overlapping provider categories, cached tokens included | Provider documentation | Statistics/model reviewer | Proposed | Provider usage mapping |
 | Cache policy | Disable if symmetric; otherwise symmetric and fully reported | Provider capability | Model/statistics reviewer | Proposed | Symmetric capability evidence |
 | Material threshold | 15% total-token reduction | D0 proposal | Human owner/statistics | Proposed | Human approval |
+| Planning effect | TBD; strictly greater than the material threshold | Pilot/statistics | Statistics/human owner | Blocked | No approved `delta_planning` |
 | Alpha / power | One-sided 0.05 / 80% | This proposal | Statistics reviewer | Proposed | Human approval |
 | `N_f` / decisions / `R` | TBD | Pilot variance | Statistics reviewer | Blocked | No pilot data |
 | Pilot protocol | Separate, non-confirmatory, disjoint scenarios | This proposal | Statistics/human owner | Blocked | Explicit pilot authorization |
 | Scenario corpus | New synthetic corpus, not B0-M | This proposal | Corpus reviewer | Blocked | Corpus not built/frozen |
 | Corpus quotas/diversity | Checklist in Section 6 | This proposal | Corpus reviewer | Proposed | Corpus review |
-| Duplicate/leakage thresholds | TBD after corpus design | Corpus checks | Corpus reviewer | Blocked | Threshold approval |
+| Duplicate/leakage thresholds | Exact duplicates reject; 5-token Jaccard `J >= 0.80` reject; `0.60 <= J < 0.80` review; `J < 0.60` pass | This proposal | Corpus reviewer | Proposed | Threshold approval |
 | Ground-truth evaluator | Independent deterministic implementation | This proposal | Corpus/statistics reviewer | Blocked | Implementation/review |
 | Pilot/confirmatory hashes | Required | This proposal | Evidence reviewer | Blocked | Corpus/evaluator freeze |
 | Security host architecture | Disposable container + broker + F1 in guest | Section 7 | Security reviewer | Proposed | Design review |
@@ -672,8 +694,8 @@ Register categories:
 - The primary estimand, repetition aggregation, family weighting and clustered interval procedure.
 - The primary token-total definition, cache treatment and missing-usage verdict.
 - The outcome table, one-sided bounds, material threshold, equivalence rule, latency guardrail and precedence.
-- The prospective power formula and the requirement that pilot variance, not invention, determines `N_f` and `R`.
-- The corpus separation, measurable adequacy checks and freeze requirements.
+- The threshold-relative prospective power formula and the requirement that pilot variance and an approved planning effect, not invention, determine `N_f` and `R`.
+- The corpus separation, measurable adequacy checks, symmetric 5-token Jaccard near-duplicate rule and freeze requirements.
 - The threat model, smallest restricted-host architecture, F1 reuse rule and pre-pilot security demonstrations.
 - The failure taxonomy, retry policy and no-artificial-efficiency rules.
 - The evidence, reproduction and authorization register.
@@ -684,10 +706,10 @@ D1 preregistration is **BLOCKED** by:
 
 1. **Model authority:** no approved provider snapshot, endpoint, parameters, credentials or budget.
 2. **Token evidence:** provider usage/caching categories and mapping are not yet verified.
-3. **Statistical evidence:** no pilot variance, so `N_f`, `R` and achieved power are not known.
+3. **Statistical evidence:** no pilot variance and no approved `delta_planning`, so `N_f`, `R` and achieved power are not known.
 4. **Corpus evidence:** no B0-A corpus, scenario list, evaluator or adequacy review exists yet.
 5. **Security evidence:** no restricted host is built, red-teamed or independently reviewed.
-6. **Human approvals:** `delta_material`, alpha/power, retry policy, latency guardrail and reviewer roles are not ratified.
+6. **Human approvals:** `delta_material`, `delta_planning`, alpha/power, retry policy, latency guardrail and reviewer roles are not ratified.
 7. **Pre-registration:** no immutable D1-C document, hashes and analysis code have been frozen.
 
 ### 11.3 Recommendation
@@ -717,6 +739,6 @@ The next gate is a read-only D1 review of this proposal. It must resolve the aut
 - F1 runner: `55a40f182df80bf7f3828e165601758298912eaa7f6285ef0772cc967103e830`.
 - F1 harness: `3b2a7591614dd19532e3d7a5064e403ea4d58e73e73e305009b9d67385ba8076`.
 - Frozen S1-A1 executor: `4b960124e9218ed124ed34e3b3595b648477b9dab6540c4ce1609d2efaf31313`.
-- D0 design proposal: PR #654 (`6220b482f7f12260b284bcca571abee52a2efbc6`).
+- D0 design proposal: PR #654, reviewed head `6220b482f7f12260b284bcca571abee52a2efbc6`, squash-merged at `8060b9bc318e0a0cb206d0cc9d3e6833977e367c`.
 
 All cited experimental claims are prior results. No B0-A model-mediated trial has been run.
