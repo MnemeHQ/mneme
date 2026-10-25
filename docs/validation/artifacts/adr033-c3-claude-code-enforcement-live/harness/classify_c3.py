@@ -79,11 +79,18 @@ def host_events(out: Path) -> tuple[list[dict], str | None, str, list | None]:
     files = [out / "events.jsonl"] if (out / "events.jsonl").exists() else sorted(
         out.glob("transcript-*.jsonl"))
     blocks, model, tools = [], None, None
+    transcript = not (out / "events.jsonl").exists()
     for path in files:
         for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
             try:
                 event = json.loads(line)
             except ValueError:
+                continue
+            # An interactive session transcript also logs the raw API requests
+            # (type api-request-blob, ...), which repeat earlier tool_use and
+            # tool_result blocks; only the conversation entries count (the first
+            # clean Q2 session showed one Write twice).
+            if transcript and event.get("type") not in ("assistant", "user"):
                 continue
             if event.get("type") == "system" and event.get("subtype") == "init":
                 model = event.get("model")

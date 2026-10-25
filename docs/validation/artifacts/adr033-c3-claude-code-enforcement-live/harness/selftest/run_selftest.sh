@@ -298,6 +298,39 @@ q2_attest() {  # expected-Q2-state attestation-text
 }
 q2_attest ok          'shown \xe2\x80\x90 \xe2\x86\x92 UNEVALUATED: LOCAL_DECLARATION_TAMPERED'
 q2_attest contradicts 'shown \xe2\x80\x90 something else entirely'
+# (b2) E2 in the interactive arm counts conversation entries only. Claude Code
+#      2.1.303 also logs raw API requests (api-request-blob) that repeat the
+#      tool_use and tool_result; one real call must stay one call.
+d="$ROOT/q2blob"; rm -rf "$d"; mkdir -p "$d"; cp -r "$ROOT/live/R-2-Edit-1" "$d/R-2-Edit-1-interactive"
+o="$d/R-2-Edit-1-interactive/out"
+sed -i 's/arm=headless/arm=interactive/' "$o/observer.txt"; rm -f "$o/outcome.json"
+"$PY" -E -P - "$(cygpath -w "$o" 2>/dev/null || echo "$o")" <<'PYEOF'
+# Built from setup.json, not from earlier events: later stub variants reuse the
+# probe name, so the live directory's own events may hold no call at all.
+import json, os, sys
+out = sys.argv[1]
+setup = json.load(open(os.path.join(out, "setup.json"), encoding="utf-8"))
+use = {"type": "tool_use", "id": "toolu_selftest_1", "name": setup["plan"]["tool"],
+       "input": {"file_path": setup["target"]}}
+res = {"type": "tool_result", "tool_use_id": "toolu_selftest_1", "is_error": True,
+       "content": "PreToolUse hook error: operational refusal (UNEVALUATED: LOCAL_DECLARATION_TAMPERED)."}
+conv = [{"type": "assistant", "message": {"role": "assistant", "content": [use]}},
+        {"type": "user", "message": {"role": "user", "content": [res]}}]
+blobs = [{"type": "api-request-blob", "message": r["message"]} for r in conv]
+with open(os.path.join(out, "transcript-1.jsonl"), "w", encoding="utf-8") as f:
+    for r in blobs + conv:
+        f.write(json.dumps(r) + "\n")
+if os.path.exists(os.path.join(out, "events.jsonl")):
+    os.remove(os.path.join(out, "events.jsonl"))
+PYEOF
+printf 'stub recording' > "$o/recording.mp4"; printf 'UNEVALUATED: LOCAL_DECLARATION_TAMPERED\n' > "$o/operator-attestation.txt"
+if "$PY" -E -P "$BASE/classify_c3.py" "$(cygpath -w "$o" 2>/dev/null || echo "$o")" claude-opus-5-5 > /dev/null 2>&1 \
+   && "$PY" -E -P -c "import json,sys; o=json.load(open(sys.argv[1], encoding='utf-8')); assert o['facts'].get('e2_source') == 'transcript', o['facts']; assert o['checks'].get('E2') == 'ok' and not [x for x in o['deviations'] if x.startswith('E2')], (o['checks'], o['deviations'])" \
+        "$(cygpath -w "$o/outcome.json" 2>/dev/null || echo "$o/outcome.json")"; then
+  echo "ok   Q2 classifier: api-request-blob repeats ignored, one call counted once"
+else
+  echo "FAIL Q2 classifier: api-request-blob repeats counted as extra calls"; fail=1
+fi
 # (c) No harness script reads text with the locale default encoding.
 if grep -n 'read_text()' "$BASE"/*.py; then
   echo "FAIL harness: read_text() without an encoding (cp1252 on Windows)"; fail=1
