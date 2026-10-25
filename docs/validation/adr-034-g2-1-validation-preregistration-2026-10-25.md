@@ -1,6 +1,7 @@
 # ADR-034 G2-1 validation pre-registration (§8.B live host, §8.D blind validation)
 
 **Date:** 2026-10-25
+**Amended:** 2026-10-25, Amendment 1 (clarifications from the owner's ambiguity rulings; see the end of this file)
 **Status:** PROPOSED. Once merged, this pre-registration is frozen. Changing
 it afterwards needs a dated, owner-approved amendment that is merged
 **before** decryption. No change is allowed after unblinding.
@@ -273,3 +274,150 @@ G2-1 closes only on a PASS results record.
 - Any enforcement, "relevant enforcement observed" or production claim
   before step 6 passes.
 - Activating `FORBID_NUMERIC_ABOVE` in this repository's memory.
+
+## Amendment 1: clarifications from the owner's ambiguity rulings (2026-10-25)
+
+**Status:** this amendment must merge **before sealing**, and therefore
+before any decryption.
+
+**What it does.** It clarifies how the frozen gates apply. No gate is
+loosened, and no floor is lowered. It rests on the owner's rulings on the
+corpus author's sanitized ambiguity brief (AMB-01 to AMB-13), which were
+made without opening any corpus material.
+
+**What came from where.** Every rule below comes from those owner
+rulings. A1.4 also adds a diagnostic-only traceback analysis. That analysis
+never changes a gate result (review finding G2V-F5).
+
+### A1.1 Routing, trusted source and evidence are three separate facts (AMB-01, AMB-02, AMB-07)
+
+| Fact | Definition |
+|---|---|
+| **Hook routed** | The hook selected `--proposed-new-file` for the event, under the charter §4.1 conditions, evaluated in the hook's own order. See "When the hook routes" below |
+| **Trusted proposed source** | The checker reports `subject.input_kind == "proposed_new_source"`, and at least one numeric rule is `APPLIED` |
+| **Relevant enforcement** | Defined in A1.3 |
+
+**When the hook routes.**
+- Memory discovery comes first. If there is no memory, the existing
+  missing-memory behavior applies: the hook runs no check and writes no
+  record.
+- The hook then routes only when all of these hold:
+  - the event is a `Write`;
+  - the target is absolute;
+  - the target ends in `.py`;
+  - `lstat` raises `FileNotFoundError` for the target;
+  - the parent exists and is a directory (G2C-O4, G2I-F1);
+  - the content encodes as strict UTF-8;
+  - the content has at least one non-blank line (A1.2).
+
+**A checker fallback does not undo routing.** A routed event whose checker
+fails its own preconditions and returns the legacy result was still
+**routed**.
+
+**How this applies to the classes:**
+
+- **L class: "no trusted proposed source".** Each L case is labelled routed
+  or unrouted using the hook conditions above. It must not be assumed
+  unrouted just because the checker falls back. A link component, for
+  example, can be routed and still fall back in the checker.
+- **Missing parent stays unrouted** (G2C-O4).
+- **G6, restated.** When the evidence seam is enabled:
+  - every **routed** case has exactly one G2 record. That includes routed X,
+    P and fallback cases;
+  - every unrouted case has none;
+  - a routed case with no `APPLIED` numeric rule has a record with
+    `relevant_enforcement_observed == false`.
+- **G5 hook-level parity** covers both routed and unrouted L, X and P
+  cases, keeping the CR exception from revision 2.
+
+### A1.2 Blank content: the legacy skip comes first (AMB-03)
+
+ADR-018 §5's skip for an edit that introduces no non-blank lines comes
+**before** G2 routing. The G2-1 charter does not authorize changing that
+gate.
+
+For a `Write` whose content has no non-blank line:
+- hook exit 0;
+- no checker call;
+- no G2 record;
+- no matcher result from that event.
+
+Calling `--proposed-new-file` directly on the checker with empty, valid
+source is a separate checker-level case. If a numeric rule applies, its
+missing declared sources give `SOURCE_NOT_FOUND`.
+
+### A1.3 Evidence attribution (AMB-04)
+
+`relevant_enforcement_observed` needs complete ADR-029 bindings **and** an
+outcome that can be attributed to the numeric rule:
+
+| Scenario | Expected value |
+|---|---|
+| Recognized `NO_VIOLATION`, event proceeds | `true` (complete binding) |
+| Numeric violation, strict refusal | `true` |
+| Numeric violation, warn deferral | `true` |
+| `PARTIAL` with an established violation and an attributable refusal or deferral | `true`, without claiming complete source recognition |
+| `MATCHER_UNEVALUATED` | `false` |
+| Numeric `NO_VIOLATION`, refusal caused only by a literal rule | `false` (not attributable to the numeric rule) |
+| No record (unrouted, skipped, or no memory) | `null` as the scoring expectation |
+
+**Synthetic values are not live evidence.** In §8.D the scorer computes
+these values using the pinned host identity from §8.B. A synthetic
+`true` is never evidence that a live host enforced anything. Only §8.B and
+the final claim review can establish that.
+
+### A1.4 Legacy operational behavior and scoring (AMB-08)
+
+This applies to cases outside G2 routing whose legacy behavior is not a
+clean proceed, such as content with a lone surrogate.
+
+**Scoring:**
+- **The case is executed and scored.** Its expected stdout, stderr and exit
+  status are **observed from the pinned pre-G2 baseline**, on the same
+  scenario. The corpus does not fix an exit code for it.
+- **Gates:**
+  - G5 parity applies;
+  - G6 expects no record;
+  - G2 does **not** apply. An error identical to the baseline's is not a
+    false block, and it is not a new numeric block.
+
+**G8, clarified.** Two outcomes must be kept apart:
+- **A scoring-process failure** counts as a case failure. Examples: the
+  harness crashes, times out, has an environment error, or cannot capture
+  the output.
+- **A legacy error that was successfully captured and matches the baseline**
+  is an observed outcome. It is scored under G5.
+
+**G5 stays a raw byte comparison (G2V-F5).** For these cases too, G5
+compares stdout, stderr and exit status **byte for byte** against the pinned
+pre-G2 baseline. The only exception is the routed-CR case from revision 2.
+
+- **No traceback exception.** If the two pinned builds give different stderr
+  bytes, that case **fails G5**, and the results record reports the failure.
+  This holds even when the only differences are traceback frame paths or line
+  numbers.
+- **Diagnostic analysis only.** For each such case the scorer records the full
+  raw stderr diff, plus a normalized comparison: traceback frame lines
+  removed, and the final exception line and all non-traceback lines
+  compared.
+  - This analysis explains a G5 failure.
+  - It never turns a raw parity failure into a PASS, and it is not counted
+    in any gate.
+
+### A1.5 Confirmed as written
+
+These rulings confirm the author's interpretation:
+- **AMB-05:** a warn-mode `PARTIAL` violation defers;
+- **AMB-06:** an include selector that doesn't match gives `EXCLUDED`;
+- **AMB-09:** the routed CR parity exception applies;
+- **AMB-10:** a direct bare-name call inside a function body is a source.
+
+AMB-02 and AMB-07 follow A1.1. AMB-11 to AMB-13 stay as documented
+noncoverage or information only.
+
+### A1.6 Reconciliation before sealing
+
+The corpus author reconciles the affected labels against this amendment
+(A1.1 lists the affected classes). It then rechecks every concealed class
+floor and reports counts only. Sealing waits for this amendment to merge and
+for that report.
