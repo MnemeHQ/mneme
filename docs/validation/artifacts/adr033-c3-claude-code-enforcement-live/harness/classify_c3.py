@@ -357,7 +357,7 @@ def main() -> int:
                 failures.append(f"E4: verifier endpoints {sorted(urls)}, env extras {sorted(bad_env)}")
             sni = out / "netcap-sni.txt"
             if sni.exists():
-                hosts = {line.strip().lower() for line in sni.read_text().splitlines() if line.strip()}
+                hosts = {line.strip().lower() for line in sni.read_text(encoding="utf-8", errors="replace").splitlines() if line.strip()}
                 ok = not any(h.split(":")[0] in hosts for h in matrix.FORBIDDEN_HOSTS)
                 checks["E4_os_capture"] = "ok" if ok else "contradicts"
                 if not ok:
@@ -459,7 +459,7 @@ def main() -> int:
     if arm == "interactive":
         recordings = list(out.glob("recording.*"))
         attestation = out / "operator-attestation.txt"
-        if not recordings or not attestation.exists() or not attestation.read_text().strip():
+        if not recordings or not attestation.exists() or not attestation.read_text(encoding="utf-8", errors="replace").strip():
             missing.append("Q2 recording and operator attestation")
         else:
             facts["recording_sha256"] = hashlib.sha256(recordings[0].read_bytes()).hexdigest()
