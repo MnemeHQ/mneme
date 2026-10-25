@@ -10,6 +10,20 @@ characterization) and §8.D (independent blind validation), in separate
 sessions isolated from the implementation session, starting with this
 pre-scoring record.
 
+**Revision 2** (2026-10-25) responds to the pre-merge review, which
+requested changes. The four corrections tighten the validation contract.
+They change neither ADR-034 nor implementation behavior, and none is based
+on any case content.
+
+- **G2V-F1:** every case expected to block that is observed proceeding is an
+  unsafe pass, whatever its labels (§5 G1).
+- **G2V-F2:** symlink capability is required for a full PASS. Without it, the
+  result is INCOMPLETE, never a narrowed PASS (§5).
+- **G2V-F3:** hook parity includes stderr. The charter's exception for routed
+  content containing CR is kept, together with checker-level parity (§5 G5).
+- **G2V-F4:** the class floors and the 104 total apply to **concealed, scored**
+  cases. Public smoke cases come on top of them (§4).
+
 **What this record is.** The G2-1 charter §8.D requires "a pre-scoring
 record [that] states denominators and a failure policy before unblinding, as
 M4 did (#625)". This record states them **before any corpus exists**, which
@@ -131,8 +145,11 @@ Expected labels are written from ADR-034 and the charter only:
 
 **Distribution rules:**
 
-- The author chooses the exact counts at or above each floor, and the freeze
-  record states them.
+- **The floors count concealed cases only (G2V-F4).** Every class floor and
+  the 104 total apply to **concealed, scored** cases. Public smoke cases come
+  on top and never count toward a floor.
+- The author chooses the exact counts at or above each floor. The freeze
+  record states the concealed and public counts per class separately.
 - Byte-contract variety (LF, CRLF, lone CR, non-ASCII, empty content) must
   appear across V, C and L, at least 2 cases each where they apply.
 
@@ -154,22 +171,25 @@ Expected labels are written from ADR-034 and the charter only:
 
 | Gate | Requirement |
 |---|---|
-| **G1 Unsafe pass** | 0 cases where the expected result is a block or a non-clean result, but the observed result is exit 0 with a numeric `NO_VIOLATION`, or a numeric-attributed relevant evidence claim |
+| **G1 Unsafe pass** | 0 unsafe passes. Each of these counts as one, **whatever the matcher or evidence labels** (G2V-F1): (a) any case expected to block (every strict V and VP case, and any LIT case expected to block) that is observed with exit 0 or any non-refusing disposition; (b) any case expected to have a non-clean numeric result that is observed with numeric `NO_VIOLATION`; (c) a numeric-attributed relevant evidence claim where none is expected |
 | **G2 False block** | 0 cases expected to proceed (C, US, UF, UP, X, L, W, P under open) that are observed with exit 2, except where a `FORBID_LITERAL` violation is expected (LIT) |
 | **G3 No mutation** | The target is absent after every observed block. The hook never creates or changes the target in any case |
 | **G4 Reasons** | Every unevaluated case (US, UF, UP, VP unknown sources) has the expected primary reason |
-| **G5 Parity** | 100% of P, X and L cases are byte-identical (stdout and exit) to the pinned pre-G2 baseline hook. All P and X cases are also byte-identical to `--input` on the same carrier |
+| **G5 Parity** | Two levels (G2V-F3). **Hook level:** 100% of P, X and L cases are byte-identical to the pinned pre-G2 baseline hook in **stdout, stderr and exit status**. The only exception is a routed case whose content contains CR: under charter §4.1 / ADR-034 §7a no historical hook-level parity is claimed for it, and it is scored at checker level only. **Checker level:** every routed P and X case gives stdout and exit status byte-identical to `--input` on the same carrier and target (charter §3.3 / §3.5) |
 | **G6 Evidence** | Every routed case has a complete record that joins by digest and path, with the expected cause, mode and `relevant_enforcement_observed`. No unrouted case has a G2 record |
 | **G7 Determinism** | Two full runs in one environment are byte-identical |
 | **G8 Completeness** | Every concealed case is scored. Any operational failure counts as a failure of that case, never as an exclusion |
 
-**Symlink capability.**
+**Symlink capability is required for PASS (G2V-F2).**
 
-- The scoring environment must be able to create symlinks, and the
-  completion record must state that it can.
-- If it cannot, the symlink-dependent L cases are reported as **not run**,
-  and the claim excludes them explicitly.
-- They are never silently dropped.
+- The scoring environment must be able to create symlinks. The completion
+  record must state this and show it with a probe run before decryption.
+- If symlinks cannot be created, the run cannot PASS. Symlink-dependent
+  cases that cannot run are scored as failures under G8, and the result is
+  recorded as **INCOMPLETE** (a validation FAIL).
+- The claim is never narrowed to exclude them, and they are never dropped.
+- The remedy is to rescore in a capable environment, before any results
+  record claims PASS.
 
 ## 6. Failure policy
 
