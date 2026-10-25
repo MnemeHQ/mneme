@@ -14,6 +14,7 @@ from __future__ import annotations
 import difflib
 import json
 import os
+import stat
 import subprocess
 import sys
 import tempfile
@@ -1037,6 +1038,14 @@ def _route_new_file(event: ToolEvent) -> Optional[_RoutedWrite]:
     else:
         return None
     try:
+        # G2C-O4 (charter §3.2, §7): a file in a directory that does not
+        # exist yet stays on the legacy path; never routed.
+        parent_mode = os.stat(Path(target).parent).st_mode
+    except (OSError, ValueError):
+        return None
+    if not stat.S_ISDIR(parent_mode):
+        return None
+    try:
         carrier = content.encode("utf-8")
     except UnicodeEncodeError:
         # A lone surrogate: not routed; today's path is unchanged.
@@ -1133,6 +1142,7 @@ def build_evidence_record(
     payload = assessment.payload if assessment is not None else None
     subject = None
     rules: list = []
+    violations: list = []
     if payload is not None and _subject_kind(payload) == _INPUT_KIND_PROPOSED_NEW:
         raw = payload["subject"]
         subject = {
@@ -1150,10 +1160,17 @@ def build_evidence_record(
                 "matcher_status": item.get("matcher_status"),
                 "matcher_outcome": item.get("matcher_outcome"),
                 "primary_reason": item.get("primary_reason"),
+                "subject_sha256": item.get("subject_sha256"),
             }
             for item in payload.get("applicability") or []
             if item.get("rule_type") == _NUMERIC_RULE_TYPE
             and item.get("outcome") == "APPLIED"
+        ]
+        # Identities only: which rules the checker reported violated, so a
+        # refusal can be attributed (or not) to the numeric rule.
+        violations = [
+            {"rule_id": v.get("rule_id"), "rule_type": v.get("rule_type")}
+            for v in payload.get("violations") or []
         ]
     return {
         "schema": _EVIDENCE_SCHEMA,
@@ -1173,8 +1190,41 @@ def build_evidence_record(
             "subject": subject,
         },
         "rules": rules,
+        "violations": violations,
         "hook_outcome": hook_outcome,
     }
+
+
+def _decided_numeric_rule(rule: Any, subject: Dict[str, Any], digest: str) -> bool:
+    """One APPLIED numeric rule record is complete, coherent and decided."""
+    if not isinstance(rule, dict):
+        return False
+    if not (_nonempty_str(rule.get("rule_id")) and _nonempty_str(rule.get("decision_version_id"))):
+        return False
+    if rule.get("applicability") != "APPLIED":
+        return False
+    if rule.get("governed_path") != subject.get("governed_path"):
+        return False
+    if rule.get("subject_sha256") != digest:
+        return False
+    if not all(key in rule for key in ("matcher_status", "matcher_outcome", "primary_reason")):
+        return False
+    status, outcome, reason = (
+        rule["matcher_status"], rule["matcher_outcome"], rule["primary_reason"]
+    )
+    if status == "RECOGNIZED":
+        return outcome in ("VIOLATION", "NO_VIOLATION") and reason is None
+    if status == "PARTIAL":
+        # A recognized exceeding source is established; the unknown
+        # sources stay unknown (never "fully verified").
+        return (
+            outcome == "VIOLATION"
+            and isinstance(reason, str)
+            and reason in _MATCHER_REASON_PRIORITY
+            and reason != "INCOMPLETE_SOURCE_INPUT"
+        )
+    # MATCHER_UNEVALUATED (or anything else) decides nothing.
+    return False
 
 
 def relevant_enforcement_observed(
@@ -1183,11 +1233,25 @@ def relevant_enforcement_observed(
 ) -> bool:
     """Can this record support "relevant enforcement observed" (ADR-029)?
 
-    Fail closed: only a complete record from this surface, carrying the
-    pinned host identity ``(version, executable_sha256)``, whose carrier
-    digest joins a trusted ``proposed_new_source`` subject with at least one
-    bound APPLIED numeric rule. Anything else stays at "execution observed"
-    or below. Recording the identity does not authenticate it.
+    Fail closed (ADR-029 §2, ADR-034 §7a, G2-1 charter §5.2/§6.2). Every
+    binding must be present and coherent:
+
+    - this surface and schema, and the pinned host identity
+      ``(version, executable_sha256)``;
+    - a ``Write`` event whose target (``file_path``, resolved against the
+      recorded ``cwd`` when relative) is the subject's verified-absent target;
+    - a trusted ``proposed_new_source`` subject whose digest, and every
+      numeric rule's digest, equal the carrier digest;
+    - every APPLIED numeric rule complete, coherent and decided: an
+      unevaluated rule never counts just because it applied;
+    - the reported numeric violations are exactly the rules whose matcher
+      outcome is VIOLATION, and the hook disposition is attributable to them:
+      ``refused``/``deferred`` only with a numeric violation, ``proceeded``
+      only with none. A refusal caused only by another rule is never
+      attributed to the numeric rule.
+
+    Anything else stays at "execution observed" or below. Recording the
+    identity does not authenticate it.
     """
     try:
         pinned_version, pinned_sha256 = pinned_host
@@ -1207,7 +1271,8 @@ def relevant_enforcement_observed(
             return False
         if not isinstance(event.get("identifiers"), dict):
             return False
-        if record.get("hook_outcome") not in _HOOK_OUTCOMES:
+        outcome = record.get("hook_outcome")
+        if outcome not in _HOOK_OUTCOMES:
             return False
         checker = record["checker"]
         subject = checker.get("subject")
@@ -1220,19 +1285,35 @@ def relevant_enforcement_observed(
             return False
         if subject.get("absence_verified") is not True:
             return False
+        # Host-event target <-> checked subject target.
+        file_path = Path(event["file_path"])
+        if not file_path.is_absolute():
+            if not _nonempty_str(event.get("cwd")):
+                return False
+            file_path = Path(event["cwd"]) / file_path
+        target_path = subject.get("target_path")
+        if not isinstance(target_path, str) or os.path.normcase(
+            str(file_path.resolve())
+        ) != os.path.normcase(target_path):
+            return False
         rules = record["rules"]
         if not isinstance(rules, list) or not rules:
             return False
-        return all(
-            isinstance(rule, dict)
-            and _nonempty_str(rule.get("rule_id"))
-            and _nonempty_str(rule.get("decision_version_id"))
-            and rule.get("applicability") == "APPLIED"
-            and _nonempty_str(rule.get("matcher_status"))
-            and rule.get("governed_path") == subject.get("governed_path")
-            for rule in rules
-        )
-    except (AttributeError, KeyError, TypeError, ValueError):
+        if not all(_decided_numeric_rule(rule, subject, digest) for rule in rules):
+            return False
+        violated = {r["rule_id"] for r in rules if r["matcher_outcome"] == "VIOLATION"}
+        reported = record["violations"]
+        if not isinstance(reported, list) or not all(isinstance(v, dict) for v in reported):
+            return False
+        reported_numeric = {
+            v.get("rule_id") for v in reported if v.get("rule_type") == _NUMERIC_RULE_TYPE
+        }
+        if reported_numeric != violated:
+            return False
+        if outcome in ("refused", "deferred"):
+            return bool(violated)
+        return not violated and not reported
+    except (AttributeError, KeyError, TypeError, ValueError, OSError):
         return False
 
 

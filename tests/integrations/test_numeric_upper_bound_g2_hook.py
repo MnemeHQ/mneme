@@ -272,14 +272,40 @@ def test_missing_content_is_not_routed(project, calls):
     assert all(call["carrier"] is None for call in calls)
 
 
-def test_missing_parent_directory_is_routed_by_the_hook_but_legacy_in_the_checker(project, calls):
-    """The hook probe is advisory; precondition 2 fails in the checker (G2C-O4)."""
-    rc, _, err = _hook(project, "src/not_yet/new.py", ABOVE)
+@pytest.mark.parametrize("rel", ["src/not_yet/new.py", "src/a/b/new.py"])
+def test_g2i_f1_missing_parent_directory_is_not_routed(project, calls, rel):
+    """G2I-F1 / G2C-O4: a new file in a missing directory keeps the legacy
+    --input path at the hook's routing step, with exactly one checker call."""
+    rc, out, err = _hook(project, rel, ABOVE)
     call, = calls
+    assert call["carrier"] is None and call["flag"] == "--input"
+    assert "--proposed-new-file" not in call["argv"]
     payload = _payload(call)
     assert payload["subject"]["input_kind"] == "unverified_input"
     assert _numeric(payload)["primary_reason"] == "INCOMPLETE_SOURCE_INPUT"
-    assert rc == 0 and "not evaluated on this input" in err
+    assert rc == 0 and out == ""
+    assert "not evaluated on this input" in err
+    assert not (project / rel).parent.exists()
+
+
+def test_g2i_f1_parent_that_is_a_file_is_not_routed(project, calls):
+    (project / "src" / "mod.py").write_text("X = 1\n", encoding="utf-8")
+    _hook(project, "src/mod.py/new.py", ABOVE)
+    assert all(call["carrier"] is None for call in calls)
+
+
+def test_g2i_f1_missing_parent_writes_no_evidence_record(project, evidence):
+    _hook(project, "src/not_yet/new.py", ABOVE)
+    assert not evidence.exists()
+
+
+def test_g2i_f1_existing_parent_still_routes(project, calls, evidence):
+    (project / "src" / "pkg").mkdir()
+    rc, _, _ = _hook(project, "src/pkg/new.py", ABOVE)
+    call, = calls
+    assert call["flag"] == "--proposed-new-file" and rc == 2
+    record, = _records(evidence)
+    assert record["checker"]["subject"]["governed_path"] == "src/pkg/new.py"
 
 
 def test_race_file_created_after_the_hook_probe_gives_the_legacy_result(project, monkeypatch):
@@ -821,6 +847,8 @@ def test_evidence_record_is_complete_and_joins_by_digest(project, evidence):
     assert rule["governed_path"] == "src/new.py"
     assert rule["applicability"] == "APPLIED"
     assert (rule["matcher_status"], rule["matcher_outcome"]) == ("RECOGNIZED", "VIOLATION")
+    assert rule["primary_reason"] is None and rule["subject_sha256"] == digest
+    assert record["violations"] == [{"rule_id": NUMERIC_ID, "rule_type": NUMERIC.type}]
     assert record["hook_outcome"] == "refused"
     assert hook.relevant_enforcement_observed(record, HOST)
     line = evidence.read_text(encoding="utf-8")
@@ -889,6 +917,37 @@ TAMPERED_RECORDS = {
     "bad_outcome": lambda r: r.update(hook_outcome="allowed"),
     "missing_host": lambda r: r.pop("host"),
     "missing_event": lambda r: r.pop("event"),
+    # G2I-F2: complete, coherent matcher records.
+    "missing_matcher_outcome": lambda r: r["rules"][0].pop("matcher_outcome"),
+    "missing_matcher_status": lambda r: r["rules"][0].pop("matcher_status"),
+    "missing_primary_reason": lambda r: r["rules"][0].pop("primary_reason"),
+    "empty_matcher_status": lambda r: r["rules"][0].update(matcher_status=""),
+    "status_outcome_contradiction": lambda r: r["rules"][0].update(matcher_outcome="UNEVALUATED"),
+    "recognized_with_reason": lambda r: r["rules"][0].update(primary_reason="SOURCE_NOT_FOUND"),
+    "partial_without_reason": lambda r: r["rules"][0].update(matcher_status="PARTIAL"),
+    "partial_incomplete_input": lambda r: r["rules"][0].update(
+        matcher_status="PARTIAL", primary_reason="INCOMPLETE_SOURCE_INPUT"),
+    "unevaluated": lambda r: r["rules"][0].update(
+        matcher_status="MATCHER_UNEVALUATED", matcher_outcome="UNEVALUATED",
+        primary_reason="SOURCE_NOT_FOUND"),
+    "unknown_status": lambda r: r["rules"][0].update(matcher_status="DONE"),
+    # G2I-F2: host-event target bound to the subject target.
+    "other_event_target": lambda r: r["event"].update(
+        file_path=str(Path(r["event"]["file_path"]).with_name("other.py"))),
+    "other_subject_target": lambda r: r["checker"]["subject"].update(
+        target_path=str(Path(r["checker"]["subject"]["target_path"]).with_name("other.py"))),
+    "no_subject_target": lambda r: r["checker"]["subject"].pop("target_path"),
+    "relative_path_without_cwd": lambda r: r["event"].update(file_path="src/new.py", cwd=""),
+    "relative_path_other_cwd": lambda r: r["event"].update(
+        file_path="src/new.py", cwd=str(Path(r["event"]["cwd"]) / "elsewhere")),
+    # G2I-F2: digest, governed path and rule identity.
+    "rule_digest": lambda r: r["rules"][0].update(subject_sha256="0" * 64),
+    "rule_without_digest": lambda r: r["rules"][0].pop("subject_sha256"),
+    "reported_violation_other_rule": lambda r: r["violations"][0].update(rule_id="ADR-X:FORBID_NUMERIC_ABOVE:0"),
+    "reported_violation_missing": lambda r: r.update(violations=[]),
+    "missing_violations": lambda r: r.pop("violations"),
+    # G2I-F2: disposition attributable to the evidence.
+    "violation_but_proceeded": lambda r: r.update(hook_outcome="proceeded"),
 }
 
 
@@ -907,9 +966,17 @@ def test_missing_or_malformed_records_never_count(record):
     assert not hook.relevant_enforcement_observed(record, HOST)
 
 
-def test_legacy_routed_result_never_supports_the_claim(project, evidence):
-    """A race or failed precondition yields an unverified subject."""
-    _hook(project, "src/not_yet/new.py", ABOVE)
+def test_legacy_routed_result_never_supports_the_claim(project, evidence, monkeypatch):
+    """A file appearing after the hook probe yields an unverified subject."""
+    target = project / "src" / "new.py"
+    real = hook._invoke_check_inprocess
+
+    def racing(argv):
+        target.write_text("RACE = 1\n", encoding="utf-8")
+        return real(argv)
+
+    monkeypatch.setattr(hook, "_invoke_check_inprocess", racing)
+    _hook(project, "src/new.py", ABOVE)
     record, = _records(evidence)
     assert record["checker"]["subject"] is None and record["rules"] == []
     assert not hook.relevant_enforcement_observed(record, HOST)
@@ -1025,3 +1092,84 @@ def test_lone_surrogate_is_not_routed_and_keeps_todays_behavior(project, calls):
         _hook(project, "src/new.py", content)
     call, = calls
     assert call["carrier"] is None
+
+
+# ── G2I-F2: disposition attribution on real records ─────────────────────────
+
+
+def test_g2i_f2_recognized_violation_with_refusal_is_relevant(project, evidence):
+    rc, _, _ = _hook(project, "src/new.py", ABOVE)
+    record, = _records(evidence)
+    assert rc == 2 and record["hook_outcome"] == "refused"
+    assert hook.relevant_enforcement_observed(record, HOST)
+
+
+def test_g2i_f2_recognized_non_violation_with_proceed_is_relevant(project, evidence):
+    rc, _, _ = _hook(project, "src/new.py", WITHIN)
+    record, = _records(evidence)
+    assert rc == 0 and record["hook_outcome"] == "proceeded"
+    assert record["rules"][0]["matcher_outcome"] == "NO_VIOLATION"
+    assert hook.relevant_enforcement_observed(record, HOST)
+    contradicted = copy.deepcopy(record)
+    contradicted["hook_outcome"] = "refused"
+    assert not hook.relevant_enforcement_observed(contradicted, HOST)
+
+
+def test_g2i_f2_refusal_by_another_rule_is_never_attributed_to_numeric(project, evidence):
+    rc, _, err = _hook(project, "src/new.py", LITERAL_WITHIN)
+    record, = _records(evidence)
+    assert rc == 2 and "LIT-1" in err
+    assert record["hook_outcome"] == "refused"
+    assert record["rules"][0]["matcher_outcome"] == "NO_VIOLATION"
+    assert not hook.relevant_enforcement_observed(record, HOST)
+
+
+def test_g2i_f2_unevaluated_numeric_rule_is_never_relevant(project, evidence):
+    rc, _, _ = _hook(project, "src/new.py", MISSING_CALL)
+    record, = _records(evidence)
+    assert rc == 0 and record["rules"][0]["matcher_status"] == "MATCHER_UNEVALUATED"
+    assert not hook.relevant_enforcement_observed(record, HOST)
+
+
+def test_g2i_f2_closed_refusal_of_an_unevaluated_rule_is_never_relevant(closed, evidence):
+    rc, _, err = _hook(closed, "src/new.py", MISSING_CALL)
+    record, = _records(evidence)
+    assert rc == 2 and "operational refusal" in err
+    assert record["hook_outcome"] == "refused"
+    assert not hook.relevant_enforcement_observed(record, HOST)
+
+
+def test_g2i_f2_partial_keeps_its_behavior_and_claims_only_the_established_violation(
+    project, evidence,
+):
+    rc, _, _ = _hook(project, "src/new.py", "ROUTER_DEADLINE_S = 60\nclassify(x, y)\n")
+    record, = _records(evidence)
+    rule, = record["rules"]
+    assert rc == 2 and record["hook_outcome"] == "refused"
+    assert (rule["matcher_status"], rule["matcher_outcome"], rule["primary_reason"]) == (
+        "PARTIAL", "VIOLATION", "UNRECOGNIZED_FORM"
+    )
+    # The recognized exceeding source is established and the refusal is
+    # attributable to it; the unknown source stays recorded, never verified.
+    assert hook.relevant_enforcement_observed(record, HOST)
+
+
+def test_g2i_f2_warn_deferral_is_attributable_only_to_a_numeric_violation(
+    project, evidence, monkeypatch,
+):
+    monkeypatch.setenv("MNEME_HOOK_MODE", "warn")
+    _hook(project, "src/new.py", ABOVE)
+    _hook(project, "src/new.py", LITERAL_WITHIN)
+    numeric, literal = _records(evidence)
+    assert numeric["hook_outcome"] == literal["hook_outcome"] == "deferred"
+    assert hook.relevant_enforcement_observed(numeric, HOST)
+    assert not hook.relevant_enforcement_observed(literal, HOST)
+
+
+def test_g2i_f2_relative_file_path_binds_through_the_recorded_cwd(project, evidence):
+    envelope = _envelope(project, "x", ABOVE)
+    envelope["tool_input"]["file_path"] = "src/new.py"
+    hook.handle_event(envelope, stderr=io.StringIO(), stdout=io.StringIO())
+    record, = _records(evidence)
+    assert record["event"]["file_path"] == "src/new.py"
+    assert hook.relevant_enforcement_observed(record, HOST)
