@@ -68,7 +68,7 @@ The B0 `.gitattributes` applies only within this package:
 - `supplemental/**`: `-text`.
 - Markdown: `text eol=lf`.
 
-A nested package was committed and cloned with `core.autocrlf=true`. The clone preserved all 129 package files byte-for-byte, including the 111 original evidence files, the fixture, tasks, package lock, source scripts and supplemental record. The cloned evidence manifest remained `94dd0ee381fba2e9775634e0fc8f005dfeb59c9b874fd022227c6fcb92ed17ac`, and the clone had a clean worktree.
+A nested package was committed and cloned with `core.autocrlf=true`. The clone preserved all 129 package files byte-for-byte, including the 112 files under `evidence/` (111 covered by the original manifest plus `verification.json`), the fixture, tasks, package lock, source scripts and supplemental record. The cloned evidence manifest remained `94dd0ee381fba2e9775634e0fc8f005dfeb59c9b874fd022227c6fcb92ed17ac`, and the clone had a clean worktree.
 
 ## Fresh reproduction
 
