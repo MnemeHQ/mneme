@@ -538,19 +538,105 @@ def test_g4_primary_reason_is_scored_for_unevaluated_classes_only():
     assert not h.score_case(make_case("C", **expected), obs_of(wrong), HOST)["gates"]["G4"]["applies"]
 
 
-def test_g5_hook_level_is_a_raw_byte_comparison_with_a_diagnostic_only_normalization():
-    tb = lambda path, line: (f'Traceback (most recent call last):\n  File "{path}", line {line}, '
-                             'in f\n    x()\n    ^^^\nValueError: boom\n').encode()
-    impl = hook_obs(1, "error", stderr=tb("/a/hook.py", 920))
-    base = hook_obs(1, "error", stderr=tb("/b/hook.py", 797))
-    result = h.score_case(make_case("L", expected_from_baseline=True,
-                                    target_after_hook="absent"), obs_of(impl, base), HOST)
+def tb(path: str, line: int, message: str = "boom", exc: str = "ValueError") -> str:
+    return (f'Traceback (most recent call last):\n  File "{path}", line {line}, in f\n'
+            f'    x()\n    ^^^\n{exc}: {message}\n')
+
+
+CHAINED = ("\nDuring handling of the above exception, another exception occurred:\n\n")
+A2_CASE = dict(expected_from_baseline=True, target_after_hook="absent")
+
+
+def test_g5_out_of_scope_stays_raw_bytes_with_a_diagnostic_only_normalization():
+    # Baseline exits 0 (no uncaught exception): A2.1 does not apply, raw bytes decide.
+    impl = hook_obs(0, stderr=b"note: " + tb("/a/hook.py", 920).encode())
+    base = hook_obs(0, stderr=b"note: " + tb("/b/hook.py", 797).encode())
+    result = h.score_case(make_case("L"), obs_of(impl, base), HOST)
+    assert "amendment_2" not in result["diagnostics"]
     assert "hook_stderr" in result["gates"]["G5"]["why"]
-    assert result["diagnostics"]["stderr"]["normalized_equal"] is True
     assert result["diagnostics"]["stderr"]["gating"] is False
-    other = hook_obs(1, "error", stderr=tb("/a/hook.py", 920).replace(b"boom", b"other"))
-    diag = h.score_case(make_case("L"), obs_of(other, base), HOST)["diagnostics"]["stderr"]
-    assert diag["normalized_equal"] is False
+    # Nonzero exit but no traceback block: also out of scope.
+    plain = h.score_case(make_case("L"), obs_of(hook_obs(1, stderr=b"a\n"),
+                                                hook_obs(1, stderr=b"b\n")), HOST)
+    assert "amendment_2" not in plain["diagnostics"] and failing(plain, "G5")
+
+
+def test_a2_surrogate_style_case_in_scope_passes_on_frame_only_differences():
+    stderr_impl = tb("/venv-impl/hook.py", 920, "'utf-8' codec can't encode", "UnicodeEncodeError")
+    stderr_base = tb("/venv-base/hook.py", 797, "'utf-8' codec can't encode", "UnicodeEncodeError")
+    impl, base = hook_obs(1, "error", stderr=stderr_impl.encode()), \
+        hook_obs(1, "error", stderr=stderr_base.encode())
+    result = h.score_case(make_case("L", **A2_CASE), obs_of(impl, base), HOST)
+    assert result["gates"]["G5"]["applies"] and result["gates"]["G5"]["pass"]
+    a2 = result["diagnostics"]["amendment_2"]
+    assert a2["in_scope"] and a2["pass"] and a2["raw_bytes_identical"] is False
+    assert a2["raw_stderr_diff"]  # the raw diff is recorded (A2.3)
+
+
+def test_a2_message_mismatch_fails():
+    impl = hook_obs(1, "error", stderr=tb("/a", 920, "other").encode())
+    base = hook_obs(1, "error", stderr=tb("/b", 797).encode())
+    why = h.score_case(make_case("L", **A2_CASE), obs_of(impl, base), HOST)["gates"]["G5"]["why"]
+    assert why == ["a2:exception_summaries"]
+
+
+def test_a2_chained_exception_mismatch_fails():
+    base_err = tb("/b", 1) + CHAINED + tb("/b", 2, "second", "KeyError")
+    impl_err = tb("/a", 9) + CHAINED + tb("/a", 8, "second", "TypeError")
+    result = h.score_case(make_case("L", **A2_CASE),
+                          obs_of(hook_obs(1, stderr=impl_err.encode()),
+                                 hook_obs(1, stderr=base_err.encode())), HOST)
+    assert result["gates"]["G5"]["why"] == ["a2:exception_summaries"]
+    cause = base_err.replace("During handling of the above exception, another exception "
+                             "occurred:", "The above exception was the direct cause of the "
+                             "following exception:")
+    sep = h.score_case(make_case("L", **A2_CASE),
+                       obs_of(hook_obs(1, stderr=cause.replace("/b", "/a").encode()),
+                              hook_obs(1, stderr=base_err.encode())), HOST)
+    assert "a2:chain_separators" in sep["gates"]["G5"]["why"]
+    same = h.score_case(make_case("L", **A2_CASE),
+                        obs_of(hook_obs(1, stderr=base_err.replace("/b", "/a").encode()),
+                               hook_obs(1, stderr=base_err.encode())), HOST)
+    assert same["gates"]["G5"]["pass"]
+
+
+def test_a2_only_the_baseline_raised_fails():
+    base = hook_obs(1, "error", stderr=tb("/b", 797).encode())
+    for impl in (hook_obs(0), hook_obs(1, "error", stderr=b"ValueError: boom\n")):
+        why = h.score_case(make_case("L", **A2_CASE), obs_of(impl, base), HOST)["gates"]["G5"]["why"]
+        assert "a2:current_build_did_not_raise" in why
+
+
+def test_a2_only_the_current_build_raised_is_raw_bytes():
+    impl = hook_obs(1, "error", stderr=tb("/a", 920).encode())
+    result = h.score_case(make_case("L"), obs_of(impl, hook_obs(0)), HOST)
+    assert "amendment_2" not in result["diagnostics"]
+    assert {"hook_exit", "hook_stderr"} <= set(result["gates"]["G5"]["why"])
+
+
+def test_a2_non_traceback_stderr_and_stdout_are_compared():
+    base = hook_obs(1, stderr=("mneme-hook: x\n" + tb("/b", 1)).encode(), stdout=b"o")
+    impl = hook_obs(1, stderr=("mneme-hook: y\n" + tb("/a", 2)).encode(), stdout=b"p")
+    why = h.score_case(make_case("L", **A2_CASE), obs_of(impl, base), HOST)["gates"]["G5"]["why"]
+    assert set(why) == {"a2:non_traceback_stderr", "a2:stdout"}
+
+
+def test_a2_summary_counts_in_scope_cases_by_class(tmp_path, monkeypatch):
+    base = hook_obs(1, stderr=tb("/b", 1).encode())
+    observations = {"g2h-0000000000": obs_of(hook_obs(1, stderr=tb("/b", 1).encode()), base),
+                    "g2h-3333333333": obs_of(hook_obs(1, stderr=tb("/a", 2).encode()), base)}
+    cases = [make_case("L", **A2_CASE),
+             dataclasses.replace(make_case("L", **A2_CASE), case_id="g2h-3333333333"),
+             dataclasses.replace(make_case("C"), case_id="g2h-4444444444")]
+    monkeypatch.setattr(h, "execute_case", lambda case, ctx: observations.get(
+        case.case_id, obs_of(hook_obs(0))))
+    ctx = h.Context(sys.executable, sys.executable, *HOST, tmp_path / "w")
+    summary = h.run_pass(cases, ctx, HOST, tmp_path / "run")
+    a2 = summary["amendment_2"]
+    assert a2["applied"] is True
+    assert a2["in_scope_by_class"] == {"L": {"cases": 2, "raw_bytes_identical": 1, "a2_pass": 2}}
+    assert "Amendment 2" in a2["comparison"]
+    assert summary["gates"]["G5"]["pass"]
 
 
 def test_g5_routed_cr_exception_keeps_checker_level_parity():
@@ -644,6 +730,8 @@ def test_end_to_end_synthetic_corpus_passes_every_gate(corpus, tmp_path):
     assert result["label_conformance_mismatches"] == {}
     assert result["gates"]["G5"]["applicable"] >= 6
     assert result["gates"]["G4"]["applicable"] == 2
+    assert result["amendment_2"]["in_scope_by_class"] == {
+        "L": {"cases": 1, "raw_bytes_identical": 1, "a2_pass": 1}}  # the lone-surrogate case
     lines = (tmp_path / "out" / "run-1" / "cases.jsonl").read_text().splitlines()
     by_label = {json.loads(line)["case_id"]: json.loads(line) for line in lines}
     surrogate = by_label[syn.case_id("l-surrogate")]

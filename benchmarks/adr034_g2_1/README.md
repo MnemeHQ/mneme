@@ -6,7 +6,7 @@ pre-write numeric check for new-file `Write`
 It scores the implementation pin `6e26c534` against the sealed held-out
 corpus under the frozen
 [pre-registration](../../docs/validation/adr-034-g2-1-validation-preregistration-2026-10-25.md)
-(revision 2 plus Amendment 1): gates G1-G8, the G2V-F2 symlink rule and the
+(revision 2, Amendment 1, and Amendment 2 from #652): gates G1-G8, the G2V-F2 symlink rule and the
 §6 failure policy. No gate, class, denominator or definition is changed.
 
 It was written by the scorer session before decryption. Sources read:
@@ -154,7 +154,7 @@ in the same passes but written to separate files (`smoke_cases.jsonl`,
 | **G2** | classes C, US, UF, UP, X, L, W, P; not `expected_from_baseline`; no expected literal violation | observed exit 2 |
 | **G3** | every case | after an exit 2 the target exists; the target state changed at all; or the `target_after_hook` label does not hold (`absent`, `unchanged`, `unchanged_link_and_referent`, `unchanged_dangling_link`) |
 | **G4** | classes US, UF, UP, VP | for a rule with an expected primary reason: no observed trace, or any trace with a different `primary_reason` |
-| **G5** hook level | P, X, L except routed with CR content; plus any case labelled `parity_with_baseline_hook` or `expected_from_baseline` | the implementation and baseline hooks differ in exit, raw stdout bytes or raw stderr bytes. For a stderr difference, a traceback-normalized comparison is recorded as a diagnostic (`gating: false`) |
+| **G5** hook level | P, X, L except routed with CR content; plus any case labelled `parity_with_baseline_hook` or `expected_from_baseline` | **Amendment 2 scope** (the baseline's own run exited nonzero with at least one traceback block): the builds differ in stdout, exit, the ordered exception summary lines, the ordered chain separators, or any stderr line outside a traceback block, or the current build did not raise. **Otherwise:** they differ in exit, raw stdout bytes or raw stderr bytes; a traceback-normalized comparison is then recorded as a diagnostic (`gating: false`) |
 | **G5** checker level | routed P and X; plus any case labelled `parity_with_input_carrier` | `--proposed-new-file` and `--input` differ in exit or stdout bytes |
 | **G6** | every case | routed (`g2_evidence_record_expected`): not exactly one record; any binding problem; `hook_outcome` differs from the observed disposition or the label; `disposition.mode` differs from the case mode; `disposition.cause` differs from the expected cause; relevance differs from the label, for the case or per rule. Unrouted: any record |
 | **G7** | the run | the two passes' `cases.jsonl` or `summary.json` differ in any byte |
@@ -166,6 +166,22 @@ in the same passes but written to separate files (`smoke_cases.jsonl`,
 - INCOMPLETE (a validation FAIL) if the symlink probe fails, whatever the
   gates show;
 - otherwise PASS only if all eight gates pass, and FAIL if not.
+
+**Amendment 2 (G5, #652).** Scope is decided only by the pinned baseline's
+observed run of the case, never by the labels or the current build. A
+traceback block runs from `Traceback (most recent call last):` to its
+summary line, the first following line that is not indented. Only the
+lines between the two (the frames) are left out. For every case in scope
+the harness records:
+
+- both builds' raw stdout and stderr;
+- the raw stdout and stderr diffs;
+- the A2.2 result and its failure reasons.
+
+The summary's `amendment_2` block gives the cases in scope per class, how
+many had identical raw bytes, and how many passed A2.2, plus a description
+of the comparison. A case where only the current build raised is out of
+scope and stays raw-byte.
 
 **Binding problems (G6)**, checked against the substituted envelope and the
 host input:
@@ -226,6 +242,10 @@ See open question Q1.
 - `tests/test_adr034_g2_1_harness.py` (main-only) covers:
   - every gate, failing and passing, on hand-built observations;
   - the A1.3 relevance table and every binding mismatch;
+  - Amendment 2: an in-scope pass on frame-only differences, a message
+    mismatch, a chained-exception mismatch, "only the baseline raised",
+    "only the current build raised", out-of-scope raw bytes, and the
+    per-class summary;
   - preconditions and refusals;
   - envelope substitution byte preservation, fixture materialization, and
     the symlink G8 path;
@@ -272,16 +292,13 @@ until ruled otherwise. A ruling that changes scoring means a harness change
   environment: the locale encoding (no `PYTHONIOENCODING`/`PYTHONUTF8`; cp1252
   on the pinned Windows host), the envelope `cwd` as process cwd, and
   per-run `TEMP`. The completion record should state these.
-- **Q8 (A1.4 lone-surrogate cases: predicted G5 FAIL).** On public material
-  alone: a lone-surrogate `Write` is unrouted, and on **both** builds the hook
-  raises `UnicodeEncodeError` with a traceback. The two tracebacks differ in
-  frame line numbers (for example `_invoke_check` at line 920 against 797)
-  and in call-site text, because `hook.py` changed between the pins. They
-  also differ in site-packages paths, because the builds live in separate
-  environments. Under A1.4 ("no traceback exception"), every such case
-  **fails G5**, and the pre-registration requires at least 2 of them in L.
-  So G2-1 §8.D will FAIL on G5 by construction, whatever else passes.
-  Is that the intended outcome, or should the owner rule before decryption?
+- **Q8 (lone-surrogate cases): resolved by Amendment 2 (#652).** Both
+  builds raise `UnicodeEncodeError` on lone-surrogate content, with frames
+  that differ (line 920 against 797, and different site-packages paths).
+  Under raw-byte A1.4 every such case would have failed G5 by construction.
+  The owner adopted Amendment 2 before decryption, and the harness
+  implements it. On the pinned wheels, a synthetic lone-surrogate case is
+  now in scope: its raw stderr differs, and it passes A2.2.
 - **Q9 (symlinks).** This machine cannot create symlinks without privilege
   (`WinError 1314`). Scoring here would be INCOMPLETE. The scoring
   environment needs Developer Mode or an elevated shell, shown by

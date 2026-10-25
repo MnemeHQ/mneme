@@ -115,6 +115,10 @@ DISCLOSURES = (
     "synthetic replay: it is never evidence that a live host enforced anything.",
     "Public smoke cases are run and reported separately; they are never in a gate "
     "denominator (G2V-F4).",
+    "G5 implements pre-registration Amendment 2 (#652): where the pinned baseline's "
+    "own run raised an uncaught exception, only traceback frame lines are left out of "
+    "the hook-level comparison; the raw bytes, the raw diff and the result are recorded "
+    "per case, and the summary counts in-scope cases by class.",
 )
 
 
@@ -1168,6 +1172,82 @@ def _strip_traceback_frames(text: str) -> list[str]:
     return out
 
 
+TRACEBACK_HEADER = "Traceback (most recent call last):"
+CHAIN_SEPARATORS = (
+    "During handling of the above exception, another exception occurred:",
+    "The above exception was the direct cause of the following exception:",
+)
+
+
+def parse_tracebacks(stderr: bytes) -> dict:
+    """Split stderr into traceback blocks and everything else (Amendment 2).
+
+    A block starts at ``Traceback (most recent call last):`` and ends at its
+    exception summary line, the first following line that is not indented.
+    Only the lines strictly between the two (the frames) are dropped; the
+    summary lines, the chain separators and every line outside a block are
+    kept, in order. Bytes that are not UTF-8 survive through
+    ``surrogateescape``, so equal results mean equal bytes.
+    """
+    text = stderr.decode("utf-8", "surrogateescape")
+    summaries: list[str | None] = []
+    separators: list[str] = []
+    outside: list[str] = []
+    in_block = False
+    for line in text.splitlines():
+        if in_block:
+            if line[:1] in (" ", "\t") or line == "":
+                continue  # a frame line
+            summaries[-1] = line
+            in_block = False
+            continue
+        if line == TRACEBACK_HEADER:
+            summaries.append(None)  # replaced by its summary line
+            in_block = True
+            continue
+        if line in CHAIN_SEPARATORS:
+            separators.append(line)
+        outside.append(line)
+    return {"blocks": len(summaries), "summaries": summaries, "separators": separators,
+            "outside": outside, "unterminated_block": in_block}
+
+
+def a2_in_scope(base: dict) -> bool:
+    """A2.1: the pinned baseline's own run exited nonzero with a traceback."""
+    if base.get("exit") in (0, None):
+        return False
+    return parse_tracebacks(base64.b64decode(base["stderr_b64"]))["blocks"] > 0
+
+
+def a2_compare(impl: dict, base: dict) -> dict:
+    """A2.2 for a case in scope: everything but the frame lines, byte for byte."""
+    impl_stderr = base64.b64decode(impl["stderr_b64"])
+    base_stderr = base64.b64decode(base["stderr_b64"])
+    mine, theirs = parse_tracebacks(impl_stderr), parse_tracebacks(base_stderr)
+    failures = []
+    if impl["exit"] in (0, None) or mine["blocks"] == 0:
+        failures.append("a2:current_build_did_not_raise")
+    if impl["stdout_sha256"] != base["stdout_sha256"]:
+        failures.append("a2:stdout")
+    if impl["exit"] != base["exit"]:
+        failures.append("a2:exit")
+    if mine["summaries"] != theirs["summaries"]:
+        failures.append("a2:exception_summaries")
+    if mine["separators"] != theirs["separators"]:
+        failures.append("a2:chain_separators")
+    if mine["outside"] != theirs["outside"]:
+        failures.append("a2:non_traceback_stderr")
+    raw = {"stdout": impl["stdout_sha256"] == base["stdout_sha256"],
+           "stderr": impl_stderr == base_stderr, "exit": impl["exit"] == base["exit"]}
+    return {"in_scope": True, "pass": not failures, "failures": failures,
+            "raw_bytes_identical": all(raw.values()), "raw": raw,
+            "raw_stderr_diff": stderr_diagnostic(impl_stderr, base_stderr)["raw_diff"],
+            "raw_stdout_diff": list(difflib.unified_diff(
+                base64.b64decode(base["stdout_b64"]).decode("utf-8", "replace").splitlines(),
+                base64.b64decode(impl["stdout_b64"]).decode("utf-8", "replace").splitlines(),
+                "baseline", "implementation", lineterm=""))}
+
+
 def stderr_diagnostic(impl: bytes, base: bytes) -> dict:
     a = impl.decode("utf-8", "replace")
     b = base.decode("utf-8", "replace")
@@ -1273,17 +1353,23 @@ def score_case(case: Case, obs: dict, host: tuple[str, str]) -> dict:
             if not got or any(g != want for g in got):
                 fail("G4", "primary_reason")
 
-    # G5 parity: hook level raw bytes; checker level stdout + exit.
+    # G5 parity: hook level raw bytes, or Amendment 2 where the baseline raised;
+    # checker level stdout + exit.
     if hook_parity_applies(case, bool(facts.get("content_has_cr"))):
         gates["G5"]["applies"] = True
-        if impl["exit"] != base["exit"]:
-            fail("G5", "hook_exit")
-        if impl["stdout_sha256"] != base["stdout_sha256"]:
-            fail("G5", "hook_stdout")
-        if impl["stderr_sha256"] != base["stderr_sha256"]:
-            fail("G5", "hook_stderr")
-            diagnostics["stderr"] = stderr_diagnostic(
-                base64.b64decode(impl["stderr_b64"]), base64.b64decode(base["stderr_b64"]))
+        if a2_in_scope(base):
+            diagnostics["amendment_2"] = a2_compare(impl, base)
+            for why in diagnostics["amendment_2"]["failures"]:
+                fail("G5", why)
+        else:
+            if impl["exit"] != base["exit"]:
+                fail("G5", "hook_exit")
+            if impl["stdout_sha256"] != base["stdout_sha256"]:
+                fail("G5", "hook_stdout")
+            if impl["stderr_sha256"] != base["stderr_sha256"]:
+                fail("G5", "hook_stderr")
+                diagnostics["stderr"] = stderr_diagnostic(
+                    base64.b64decode(impl["stderr_b64"]), base64.b64decode(base["stderr_b64"]))
     if checker_parity_applies(case):
         gates["G5"]["applies"] = True
         pair = obs.get("checker_pair")
@@ -1391,6 +1477,34 @@ def aggregate(scored: list[tuple[Case, dict]]) -> dict:
 
 # ── passes ───────────────────────────────────────────────────────────────────
 
+A2_COMPARISON = (
+    "Amendment 2 (pre-registration, A2.1-A2.3): a G5 hook-level case is in scope only "
+    "when the pinned baseline's own run exited nonzero with at least one Python "
+    "traceback block on stderr. For it, stdout, the exit status, the ordered exception "
+    "summary lines (chained ones included), the ordered chain separator lines and every "
+    "stderr line outside a traceback block must be byte-identical between the builds; "
+    "only the frame lines between 'Traceback (most recent call last):' and the summary "
+    "line are left out. A current build that did not raise fails. Every other case "
+    "keeps raw-byte G5."
+)
+
+
+def amendment_2_summary(scored: list[tuple[Case, dict]]) -> dict:
+    """A2.3: cases in scope by class, and whether their raw bytes matched."""
+    by_class: dict[str, dict[str, int]] = {}
+    for case, result in scored:
+        a2 = result["diagnostics"].get("amendment_2")
+        if a2 is None:
+            continue
+        row = by_class.setdefault(case.klass, {"cases": 0, "raw_bytes_identical": 0,
+                                               "a2_pass": 0})
+        row["cases"] += 1
+        row["raw_bytes_identical"] += bool(a2["raw_bytes_identical"])
+        row["a2_pass"] += bool(a2["pass"])
+    return {"applied": bool(by_class), "in_scope_by_class": dict(sorted(by_class.items())),
+            "comparison": A2_COMPARISON}
+
+
 def run_pass(cases: list[Case], ctx: Context, host: tuple[str, str], out_dir: Path) -> dict:
     out_dir.mkdir(parents=True)
     scored: list[tuple[Case, dict]] = []
@@ -1414,7 +1528,8 @@ def run_pass(cases: list[Case], ctx: Context, host: tuple[str, str], out_dir: Pa
     smoke_conformance = Counter(
         item for c, s in smoke for item in s["diagnostics"].get("conformance", []))
     smoke_summary = {"cases": len(smoke), "gating": False, "gates": aggregate(smoke),
-                     "label_conformance_mismatches": dict(sorted(smoke_conformance.items()))}
+                     "label_conformance_mismatches": dict(sorted(smoke_conformance.items())),
+                     "amendment_2": amendment_2_summary(smoke)}
     (out_dir / "smoke_summary.json").write_text(dump_json(smoke_summary), encoding="ascii",
                                                 newline="\n")
     summary = {
@@ -1426,6 +1541,7 @@ def run_pass(cases: list[Case], ctx: Context, host: tuple[str, str], out_dir: Pa
             {"case_id": c.case_id, "class": c.klass,
              "normalized_equal": s["diagnostics"]["stderr"]["normalized_equal"]}
             for c, s in concealed if "stderr" in s["diagnostics"]],
+        "amendment_2": amendment_2_summary(concealed),
     }
     (out_dir / "summary.json").write_text(dump_json(summary), encoding="ascii", newline="\n")
     return dict(summary, public_smoke=smoke_summary)
@@ -1554,6 +1670,7 @@ def score_passes(cases: list[Case], ctx: Context, root: Path, out_dir: Path) -> 
         "public_smoke": summaries[0]["public_smoke"],
         "label_conformance_mismatches": summaries[0]["label_conformance_mismatches"],
         "g5_stderr_diagnostics": summaries[0]["g5_stderr_diagnostics"],
+        "amendment_2": summaries[0]["amendment_2"],
     }
 
 
