@@ -1,0 +1,5 @@
+api.anthropic.com
+api.github.com
+downloads.claude.ai
+github.com
+# 2 other host(s) observed, not published

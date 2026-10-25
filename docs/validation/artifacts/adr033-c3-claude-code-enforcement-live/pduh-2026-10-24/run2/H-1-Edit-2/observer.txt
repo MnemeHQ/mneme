@@ -1,0 +1,30 @@
+probe=H-1 tool=Edit rep=2 arm=headless
+launch_id=4ef22460-b73d-417e-8875-da3f9a396fee
+date=2026-10-25T00:22:05Z
+fixture=https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture golden_phase=AUTHORIZED golden={"phase": "AUTHORIZED", "tip": "5125231076fb5a8e537a483c84850de99c25ba57", "url": "https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture", "date": "2026-10-25T00:12:07Z"}
+claude=2.1.303 (Claude Code) claude_bin=<HOME>/AppData/Roaming/npm/claude model_pin=claude-opus-5-5
+mneme_src=<MNEME_SRC> head=7480b1f57915d7e09c17fcdb2e26f2f0d2d11d4f mneme_dir_equals_pin=yes
+harness_head=7480b1f57915d7e09c17fcdb2e26f2f0d2d11d4f harness_dirty=no
+git=git version 2.47.1.windows.2 os=MINGW64_NT-10.0-26300 3.5.4-395fda67.x86_64
+setting_sources=project row_env_keys=
+network_blocked_required=no
+BEFORE target               05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea
+BEFORE app.py               05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea
+BEFORE memory               3bc7b765de36e316f8c5bfa546cd0f29259f149772119fb1919a0cad13f5c4ad
+BEFORE declaration          05460c4364c1407ca5782233f2ab81ba39314809881399ab28b6f26c06a857a1
+BEFORE project_settings     c451393228df01588a038ad8b4704cea04b2adb9f7410789d758c968eace5080
+BEFORE project_local        absent
+BEFORE user_settings        099d1e051711e5fff1230b41666a7091a2f7f7e39966eda202ad66e4645c462f
+BEFORE user_local           absent
+BEFORE managed_settings     absent
+claude_exit=0
+transcript_collected=yes
+AFTER target               05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea
+AFTER app.py               05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea
+AFTER memory               3bc7b765de36e316f8c5bfa546cd0f29259f149772119fb1919a0cad13f5c4ad
+AFTER declaration          05460c4364c1407ca5782233f2ab81ba39314809881399ab28b6f26c06a857a1
+AFTER project_settings     c451393228df01588a038ad8b4704cea04b2adb9f7410789d758c968eace5080
+AFTER project_local        absent
+AFTER user_settings        099d1e051711e5fff1230b41666a7091a2f7f7e39966eda202ad66e4645c462f
+AFTER user_local           absent
+AFTER managed_settings     absent

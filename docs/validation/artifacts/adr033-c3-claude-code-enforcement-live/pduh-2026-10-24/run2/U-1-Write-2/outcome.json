@@ -1,0 +1,111 @@
+{
+  "probe": "U-1",
+  "tool": "Write",
+  "rep": "2",
+  "arm": "headless",
+  "selftest": false,
+  "expect": "proceed",
+  "verifier_expect": "UNVERIFIABLE:NETWORK|DNS|TIMEOUT",
+  "label": "PASS",
+  "delivery": "not_applicable",
+  "diagnostic": {
+    "expected": "delivered",
+    "user_visible": "not_tested",
+    "locations": [
+      {
+        "source": "events",
+        "entry_type": "assistant",
+        "attachment_type": null,
+        "json_path": "message.content[0].text",
+        "category": "echo"
+      },
+      {
+        "source": "events",
+        "entry_type": "result",
+        "attachment_type": null,
+        "json_path": "result",
+        "category": "echo"
+      },
+      {
+        "source": "transcript",
+        "entry_type": "attachment",
+        "attachment_type": "hook_success",
+        "json_path": "attachment.stdout",
+        "category": "host_output"
+      },
+      {
+        "source": "transcript",
+        "entry_type": "attachment",
+        "attachment_type": "hook_additional_context",
+        "json_path": "attachment.content[0]",
+        "category": "model_bound"
+      },
+      {
+        "source": "transcript",
+        "entry_type": "attachment",
+        "attachment_type": "hook_additional_context",
+        "json_path": "rendered[0].content",
+        "category": "unclassified"
+      },
+      {
+        "source": "transcript",
+        "entry_type": "api-request-blob",
+        "attachment_type": null,
+        "json_path": "message.content[0].text",
+        "category": "unclassified"
+      },
+      {
+        "source": "transcript",
+        "entry_type": "assistant",
+        "attachment_type": null,
+        "json_path": "message.content[0].text",
+        "category": "echo"
+      }
+    ],
+    "emitted": "observed",
+    "host_output": "observed",
+    "model_delivered": "observed"
+  },
+  "checks": {
+    "E1": "ok",
+    "E2": "ok",
+    "E3": "ok",
+    "verifier": "ok",
+    "E4_wrapper": "ok",
+    "E4_os_capture": "ok",
+    "FR2_emitted": "ok",
+    "FR2_model_bound": "ok"
+  },
+  "failures": [],
+  "missing": [],
+  "deviations": [],
+  "facts": {
+    "target_changed": true,
+    "e2_source": "stream-json",
+    "tool_result_is_error": false,
+    "tool_result_excerpt": "File created successfully at: <LIVE>\\U-1-Write-2\\repo\\service.py (file state is current in your context \u2014 no need to Read it back)",
+    "tool_use_id": "toolu_01Tdw7cH9WX5vvDEuPfbdPRn",
+    "hook_records": 1,
+    "hook_exit": 0,
+    "hook_seconds": 0.81,
+    "verifications": [
+      {
+        "authorization": "AUTHORIZATION_UNVERIFIABLE",
+        "reason": "NETWORK",
+        "detail": "fatal: unable to access 'https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture/': Failed to connect to github.com port 443 after 20 ms: Could not connect to server",
+        "url": "https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture",
+        "branch": "",
+        "tip": "",
+        "seconds": 0.318
+      }
+    ],
+    "host_system": {
+      "subtypes": [],
+      "indicators": {}
+    },
+    "transcript_collected": true,
+    "diagnostic_text_expected": "Mneme availability: authorization could not be verified (AUTHORIZATION_UNVERIFIABLE, reason NETWORK). This edit proceeded without fail-closed availability enforcement.",
+    "init_model": "claude-opus-5-5",
+    "host_offers_tool": true
+  }
+}
