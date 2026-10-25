@@ -9,7 +9,9 @@
 # through ABSENT -> AUTHORIZED -> REVOKED, and runs probes through the real
 # runner with the stub `claude`. The verifier runs for real against the
 # file:// remote (allowed only in self-test mode). Batch U (network block),
-# H-2 timing and both interactive arms are live-only and not exercised here.
+# H-2 timing and the interactive sessions themselves are live-only and not
+# exercised here; the interactive arm's transcript selection and attestation
+# reading are (Q2 cases at the end).
 set -u
 set -o pipefail
 HERE=$(cd "$(dirname "$0")" && pwd)
@@ -235,6 +237,60 @@ then
   echo "ok   collect_redacted: no live paths, home path or user name"
 else
   echo "FAIL collect_redacted left a live path, home path or user name"; fail=1
+fi
+# Q2 (interactive arm), offline parts. The live session stays live-only.
+# (a) The collector copies only transcripts whose working directory is the probe
+#     repo: an agent chat that merely mentions the repo path, a session from
+#     before the window, and a mixed-cwd file are never copied.
+Q2="$ROOT/q2"; Q2HOME="$Q2/claude-home"; mkdir -p "$Q2/repo" "$Q2/out" "$Q2HOME/projects"/{op,chat,old,mixed}
+Q2REPO=$(cygpath -w "$Q2/repo" 2>/dev/null || echo "$Q2/repo")
+"$PY" -E -P - "$(cygpath -w "$Q2HOME" 2>/dev/null || echo "$Q2HOME")" "$Q2REPO" <<'PYEOF'
+import json, os, sys, time
+home, repo = sys.argv[1:3]
+p = os.path.join(home, "projects")
+def write(sub, rows, mtime=None):
+    path = os.path.join(p, sub, "s.jsonl")
+    with open(path, "w", encoding="utf-8") as f:
+        f.write("".join(json.dumps(r) + "\n" for r in rows))
+    if mtime: os.utime(path, (mtime, mtime))
+write("op", [{"type": "user", "cwd": repo}, {"type": "assistant", "cwd": repo}])
+write("chat", [{"type": "user", "cwd": r"C:\elsewhere", "message": {"content": f"look at {repo}"}}])
+write("old", [{"type": "user", "cwd": repo}], mtime=time.time() - 3600)
+write("mixed", [{"type": "user", "cwd": repo}, {"type": "user", "cwd": r"C:\elsewhere"}])
+PYEOF
+if C3_SELFTEST_CLAUDE_HOME=$(cygpath -w "$Q2HOME" 2>/dev/null || echo "$Q2HOME") \
+     "$PY" -E -P "$BASE/collect_transcript.py" "$Q2REPO" "$(( $(date +%s) - 60 ))" \
+     "$(cygpath -w "$Q2/out" 2>/dev/null || echo "$Q2/out")" > /dev/null \
+   && [ "$(ls "$Q2/out")" = "transcript-1.jsonl" ] \
+   && cmp -s "$Q2/out/transcript-1.jsonl" "$Q2HOME/projects/op/s.jsonl"; then
+  echo "ok   Q2 collector: only the probe-repo session copied (chat, old and mixed-cwd skipped)"
+else
+  echo "FAIL Q2 collector: copied $(ls "$Q2/out" | tr '\n' ' ')"; fail=1
+fi
+# (b) The classifier reads the operator attestation as UTF-8: a character that
+#     cp1252 cannot decode (U+2010, byte 0x90) must not crash it, and the key
+#     text is still found; without the key text, delivery is contradicted.
+q2_attest() {  # expected-Q2-state attestation-text
+  local d="$ROOT/q2cls" o
+  rm -rf "$d"; mkdir -p "$d"; cp -r "$ROOT/live/R-2-Edit-1" "$d/R-2-Edit-1-interactive"
+  o="$d/R-2-Edit-1-interactive/out"
+  sed -i 's/arm=headless/arm=interactive/' "$o/observer.txt"; rm -f "$o/outcome.json"
+  printf 'stub recording' > "$o/recording.mp4"; printf '%b\n' "$2" > "$o/operator-attestation.txt"
+  if "$PY" -E -P "$BASE/classify_c3.py" "$(cygpath -w "$o" 2>/dev/null || echo "$o")" claude-opus-5-5 > /dev/null 2>&1 \
+     && "$PY" -E -P -c "import json,sys; o=json.load(open(sys.argv[1], encoding='utf-8')); assert o['checks'].get('Q2_user_delivery') == sys.argv[2], o['checks']" \
+          "$(cygpath -w "$o/outcome.json" 2>/dev/null || echo "$o/outcome.json")" "$1"; then
+    echo "ok   Q2 classifier: UTF-8 attestation read, user delivery $1"
+  else
+    echo "FAIL Q2 classifier: UTF-8 attestation ($1 expected)"; fail=1
+  fi
+}
+q2_attest ok          'shown \xe2\x80\x90 \xe2\x86\x92 UNEVALUATED: LOCAL_DECLARATION_TAMPERED'
+q2_attest contradicts 'shown \xe2\x80\x90 something else entirely'
+# (c) No harness script reads text with the locale default encoding.
+if grep -n 'read_text()' "$BASE"/*.py; then
+  echo "FAIL harness: read_text() without an encoding (cp1252 on Windows)"; fail=1
+else
+  echo "ok   harness: every read_text() names its encoding"
 fi
 echo "selftest root: $ROOT"
 [ $fail -eq 0 ] && echo "SELFTEST OK (not live evidence)" || echo "SELFTEST FAILED"
