@@ -1,0 +1,10 @@
+# Preserve byte-identical validation inputs and raw evidence.
+/.gitattributes -text
+/.gitignore -text
+*.json -text
+*.md text eol=lf
+*.mjs -text
+*.py -text
+**/evidence/** -text
+**/fixture/** -text
+supplemental/** -text

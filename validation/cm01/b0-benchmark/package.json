@@ -1,0 +1,21 @@
+{
+  "name": "mneme-cm01-b0m-mechanical-benchmark",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "CM-01-B0-M: model-free mechanical benchmark for direct MCP vs Code Mode.",
+  "scripts": {
+    "b0m": "node run-b0m.mjs",
+    "verify": "node verify-b0m-evidence.mjs"
+  },
+  "dependencies": {
+    "@cloudflare/codemode": "0.5.5",
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "ajv": "8.17.1",
+    "quickjs-emscripten": "0.32.0",
+    "zod": "4.6.7"
+  },
+  "engines": {
+    "node": "24.13.1"
+  }
+}
