@@ -1,0 +1,27 @@
+{"seq":1,"ts":"2026-10-25T00:23:49.078Z","pid":22964,"type":"relay_start","mode":"delay","delay_ms":300,"withhold_tools":["decision.get"],"upstream_pid":42856,"control_port":54981,"event_log":"C:\\dev\\mneme\\.worktrees\\feat-cm01-p0-f1-cancellation\\validation\\cm01\\p0-f1\\evidence\\raw\\run2-race-boundary-relay.jsonl"}
+{"seq":2,"ts":"2026-10-25T00:23:51.281Z","pid":22964,"type":"upstream_message_forwarded_downstream","requestId":0}
+{"seq":3,"ts":"2026-10-25T00:23:51.286Z","pid":22964,"type":"upstream_message_forwarded_downstream","requestId":1}
+{"seq":1,"ts":"2026-10-25T00:23:51.317Z","pid":22964,"type":"tools_call_from_client","requestId":2,"tool":"decision.get"}
+{"seq":5,"ts":"2026-10-25T00:23:51.319Z","pid":22964,"type":"target_request_seen","requestId":2,"tool":"decision.get","mode":"delay","delayMs":300}
+{"seq":6,"ts":"2026-10-25T00:23:51.319Z","pid":22964,"type":"target_request_forwarded","requestId":2}
+{"seq":7,"ts":"2026-10-25T00:23:51.325Z","pid":22964,"type":"upstream_response_received","requestId":2,"tool":"decision.get","has_result":true,"has_error":false}
+{"seq":8,"ts":"2026-10-25T00:23:51.325Z","pid":22964,"type":"response_delayed","requestId":2,"tool":"decision.get","delayMs":300}
+{"seq":9,"ts":"2026-10-25T00:23:51.639Z","pid":22964,"type":"cancel_from_client","requestId":2,"reason":"Error: Code Mode execution exceeded 300ms"}
+{"seq":10,"ts":"2026-10-25T00:23:51.642Z","pid":22964,"type":"response_forwarded_downstream","requestId":2,"how":"delay"}
+{"seq":2,"ts":"2026-10-25T00:23:51.834Z","pid":22964,"type":"tools_call_from_client","requestId":3,"tool":"decision.get"}
+{"seq":12,"ts":"2026-10-25T00:23:51.835Z","pid":22964,"type":"target_request_seen","requestId":3,"tool":"decision.get","mode":"delay","delayMs":300}
+{"seq":13,"ts":"2026-10-25T00:23:51.835Z","pid":22964,"type":"target_request_forwarded","requestId":3}
+{"seq":14,"ts":"2026-10-25T00:23:51.840Z","pid":22964,"type":"upstream_response_received","requestId":3,"tool":"decision.get","has_result":true,"has_error":false}
+{"seq":15,"ts":"2026-10-25T00:23:51.841Z","pid":22964,"type":"response_delayed","requestId":3,"tool":"decision.get","delayMs":300}
+{"seq":16,"ts":"2026-10-25T00:23:52.148Z","pid":22964,"type":"response_forwarded_downstream","requestId":3,"how":"delay"}
+{"seq":17,"ts":"2026-10-25T00:23:52.150Z","pid":22964,"type":"cancel_from_client","requestId":3,"reason":"Error: Code Mode execution exceeded 300ms"}
+{"seq":3,"ts":"2026-10-25T00:23:52.341Z","pid":22964,"type":"tools_call_from_client","requestId":4,"tool":"decision.get"}
+{"seq":19,"ts":"2026-10-25T00:23:52.342Z","pid":22964,"type":"target_request_seen","requestId":4,"tool":"decision.get","mode":"delay","delayMs":300}
+{"seq":20,"ts":"2026-10-25T00:23:52.342Z","pid":22964,"type":"target_request_forwarded","requestId":4}
+{"seq":21,"ts":"2026-10-25T00:23:52.350Z","pid":22964,"type":"upstream_response_received","requestId":4,"tool":"decision.get","has_result":true,"has_error":false}
+{"seq":22,"ts":"2026-10-25T00:23:52.351Z","pid":22964,"type":"response_delayed","requestId":4,"tool":"decision.get","delayMs":300}
+{"seq":23,"ts":"2026-10-25T00:23:52.642Z","pid":22964,"type":"cancel_from_client","requestId":4,"reason":"Error: Code Mode execution exceeded 300ms"}
+{"seq":24,"ts":"2026-10-25T00:23:52.658Z","pid":22964,"type":"response_forwarded_downstream","requestId":4,"how":"delay"}
+{"seq":25,"ts":"2026-10-25T00:23:52.817Z","pid":22964,"type":"relay_finishing","reason":"control_shutdown","held_request_ids":[],"withheld_discarded":0}
+{"seq":26,"ts":"2026-10-25T00:23:53.096Z","pid":22964,"type":"child_exit","code":0,"signal":null,"upstream_pid":42856,"observed_by":"top_level"}
+{"seq":27,"ts":"2026-10-25T00:23:53.098Z","pid":22964,"type":"client_stdin_end","held_request_ids":[]}

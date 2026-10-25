@@ -1,0 +1,13 @@
+[f1-relay] {"seq":1,"ts":"2026-10-25T00:23:14.299Z","pid":61428,"type":"relay_start","mode":"delay","delay_ms":700,"withhold_tools":["decision.get"],"upstream_pid":20736,"control_port":53832,"event_log":"C:\\dev\\mneme\\.worktrees\\feat-cm01-p0-f1-cancellation\\validation\\cm01\\p0-f1\\evidence\\raw\\run1-race-after-relay.jsonl"}
+[f1-relay] {"seq":2,"ts":"2026-10-25T00:23:16.598Z","pid":61428,"type":"upstream_message_forwarded_downstream","requestId":0}
+[f1-relay] {"seq":3,"ts":"2026-10-25T00:23:16.603Z","pid":61428,"type":"upstream_message_forwarded_downstream","requestId":1}
+[f1-relay] {"seq":1,"ts":"2026-10-25T00:23:16.632Z","pid":61428,"type":"tools_call_from_client","requestId":2,"tool":"decision.get"}
+[f1-relay] {"seq":5,"ts":"2026-10-25T00:23:16.633Z","pid":61428,"type":"target_request_seen","requestId":2,"tool":"decision.get","mode":"delay","delayMs":700}
+[f1-relay] {"seq":6,"ts":"2026-10-25T00:23:16.634Z","pid":61428,"type":"target_request_forwarded","requestId":2}
+[f1-relay] {"seq":7,"ts":"2026-10-25T00:23:16.640Z","pid":61428,"type":"upstream_response_received","requestId":2,"tool":"decision.get","has_result":true,"has_error":false}
+[f1-relay] {"seq":8,"ts":"2026-10-25T00:23:16.640Z","pid":61428,"type":"response_delayed","requestId":2,"tool":"decision.get","delayMs":700}
+[f1-relay] {"seq":9,"ts":"2026-10-25T00:23:16.941Z","pid":61428,"type":"cancel_from_client","requestId":2,"reason":"Error: Code Mode execution exceeded 300ms"}
+[f1-relay] {"seq":10,"ts":"2026-10-25T00:23:17.344Z","pid":61428,"type":"response_forwarded_downstream","requestId":2,"how":"delay"}
+[f1-relay] {"seq":11,"ts":"2026-10-25T00:23:17.501Z","pid":61428,"type":"relay_finishing","reason":"control_shutdown","held_request_ids":[],"withheld_discarded":0}
+[f1-relay] {"seq":12,"ts":"2026-10-25T00:23:17.751Z","pid":61428,"type":"child_exit","code":0,"signal":null,"upstream_pid":20736,"observed_by":"top_level"}
+[f1-relay] {"seq":13,"ts":"2026-10-25T00:23:17.753Z","pid":61428,"type":"client_stdin_end","held_request_ids":[]}

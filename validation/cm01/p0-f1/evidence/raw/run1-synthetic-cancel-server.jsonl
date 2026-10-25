@@ -1,0 +1,4 @@
+{"seq":1,"ts":"2026-10-25T00:23:38.902Z","type":"server_start","pid":34536}
+{"seq":2,"ts":"2026-10-25T00:23:38.933Z","type":"tool_started","tool":"slow.echo","delayMs":1000,"requestId":2}
+{"seq":3,"ts":"2026-10-25T00:23:39.084Z","type":"signal_aborted","tool":"slow.echo","requestId":2,"elapsedMs":151}
+{"seq":4,"ts":"2026-10-25T00:23:39.085Z","type":"handler_returned","tool":"slow.echo","requestId":2,"aborted":true,"elapsedMs":152,"response_expected":false}

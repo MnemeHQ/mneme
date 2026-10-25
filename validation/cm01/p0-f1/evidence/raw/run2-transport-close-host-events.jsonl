@@ -1,0 +1,2 @@
+{"ts":"2026-10-25T00:24:08.677Z","type":"host_call_started","callId":1,"provider":"codemode","method":"decision_get"}
+{"ts":"2026-10-25T00:24:09.016Z","type":"host_call_settled","callId":1,"provider":"codemode","method":"decision_get","outcome":"rejected","errorName":"Error","errorMessage":"MCP decision.get error: MCP error -32000: Connection closed"}

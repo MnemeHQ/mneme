@@ -1,0 +1,20 @@
+{"seq":1,"ts":"2026-10-25T00:23:20.813Z","pid":27524,"type":"relay_start","mode":"withhold","delay_ms":0,"withhold_tools":["decision.trace"],"upstream_pid":12616,"control_port":53841,"event_log":"C:\\dev\\mneme\\.worktrees\\feat-cm01-p0-f1-cancellation\\validation\\cm01\\p0-f1\\evidence\\raw\\run1-sequential-fourth-relay.jsonl"}
+{"seq":2,"ts":"2026-10-25T00:23:23.082Z","pid":27524,"type":"upstream_message_forwarded_downstream","requestId":0}
+{"seq":3,"ts":"2026-10-25T00:23:23.088Z","pid":27524,"type":"upstream_message_forwarded_downstream","requestId":1}
+{"seq":1,"ts":"2026-10-25T00:23:23.130Z","pid":27524,"type":"tools_call_from_client","requestId":2,"tool":"decision.get"}
+{"seq":5,"ts":"2026-10-25T00:23:23.140Z","pid":27524,"type":"upstream_message_forwarded_downstream","requestId":2}
+{"seq":2,"ts":"2026-10-25T00:23:23.144Z","pid":27524,"type":"tools_call_from_client","requestId":3,"tool":"decision.search"}
+{"seq":7,"ts":"2026-10-25T00:23:23.151Z","pid":27524,"type":"upstream_message_forwarded_downstream","requestId":3}
+{"seq":3,"ts":"2026-10-25T00:23:23.154Z","pid":27524,"type":"tools_call_from_client","requestId":4,"tool":"decision.applicable_to"}
+{"seq":9,"ts":"2026-10-25T00:23:23.160Z","pid":27524,"type":"upstream_message_forwarded_downstream","requestId":4}
+{"seq":4,"ts":"2026-10-25T00:23:23.163Z","pid":27524,"type":"tools_call_from_client","requestId":5,"tool":"decision.trace"}
+{"seq":11,"ts":"2026-10-25T00:23:23.163Z","pid":27524,"type":"target_request_seen","requestId":5,"tool":"decision.trace","mode":"withhold","delayMs":0}
+{"seq":12,"ts":"2026-10-25T00:23:23.164Z","pid":27524,"type":"target_request_forwarded","requestId":5}
+{"seq":13,"ts":"2026-10-25T00:23:23.171Z","pid":27524,"type":"upstream_response_received","requestId":5,"tool":"decision.trace","has_result":true,"has_error":false}
+{"seq":14,"ts":"2026-10-25T00:23:23.172Z","pid":27524,"type":"response_withheld","requestId":5,"tool":"decision.trace"}
+{"seq":15,"ts":"2026-10-25T00:23:23.646Z","pid":27524,"type":"cancel_from_client","requestId":5,"reason":"Error: Code Mode execution exceeded 500ms"}
+{"seq":16,"ts":"2026-10-25T00:23:23.650Z","pid":27524,"type":"response_released_downstream","requestId":5,"tool":"decision.trace"}
+{"seq":17,"ts":"2026-10-25T00:23:23.651Z","pid":27524,"type":"release_ack","requestIds":[5],"command_at":"2026-10-25T00:23:23.651Z"}
+{"seq":18,"ts":"2026-10-25T00:23:23.865Z","pid":27524,"type":"relay_finishing","reason":"control_shutdown","held_request_ids":[],"withheld_discarded":0}
+{"seq":19,"ts":"2026-10-25T00:23:24.140Z","pid":27524,"type":"child_exit","code":0,"signal":null,"upstream_pid":12616,"observed_by":"top_level"}
+{"seq":20,"ts":"2026-10-25T00:23:24.143Z","pid":27524,"type":"client_stdin_end","held_request_ids":[]}

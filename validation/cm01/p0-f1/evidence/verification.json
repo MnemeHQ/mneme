@@ -1,0 +1,2946 @@
+{
+  "schema": "mneme.cm01.p0-f1.verification/v1",
+  "generated_at": "2026-10-25T01:33:30.600Z",
+  "task": "CM-01-P0-01-F1 evidence verification",
+  "verification_status": "VERIFIED",
+  "read_only": true,
+  "original_verdict": "PASS",
+  "original_verdict_changed": false,
+  "head": "adf50933d0beac255ac2a134e00ee13d40442302",
+  "baseline": "adf50933d0beac255ac2a134e00ee13d40442302",
+  "canonical_evidence": {
+    "files": [
+      "calibration-100ms-measurements.json",
+      "calibration-100ms.json",
+      "commands.txt",
+      "measurements.json",
+      "raw/run1-control-direct-child-stderr.log",
+      "raw/run1-control-direct-harness.jsonl",
+      "raw/run1-control-direct-host-events.jsonl",
+      "raw/run1-control-relay-child-events.jsonl",
+      "raw/run1-control-relay-child-stderr.log",
+      "raw/run1-control-relay-harness.jsonl",
+      "raw/run1-control-relay-host-events.jsonl",
+      "raw/run1-control-relay-relay-stderr.log",
+      "raw/run1-control-relay-relay.jsonl",
+      "raw/run1-mcp-error-child-stderr.log",
+      "raw/run1-mcp-error-harness.jsonl",
+      "raw/run1-mcp-error-host-events.jsonl",
+      "raw/run1-parallel-child-events.jsonl",
+      "raw/run1-parallel-child-stderr.log",
+      "raw/run1-parallel-harness.jsonl",
+      "raw/run1-parallel-host-events.jsonl",
+      "raw/run1-parallel-relay-stderr.log",
+      "raw/run1-parallel-relay.jsonl",
+      "raw/run1-race-after-child-events.jsonl",
+      "raw/run1-race-after-child-stderr.log",
+      "raw/run1-race-after-harness.jsonl",
+      "raw/run1-race-after-host-events.jsonl",
+      "raw/run1-race-after-relay-stderr.log",
+      "raw/run1-race-after-relay.jsonl",
+      "raw/run1-race-before-child-events.jsonl",
+      "raw/run1-race-before-child-stderr.log",
+      "raw/run1-race-before-harness.jsonl",
+      "raw/run1-race-before-host-events.jsonl",
+      "raw/run1-race-before-relay-stderr.log",
+      "raw/run1-race-before-relay.jsonl",
+      "raw/run1-race-boundary-0-host-events.jsonl",
+      "raw/run1-race-boundary-1-host-events.jsonl",
+      "raw/run1-race-boundary-2-host-events.jsonl",
+      "raw/run1-race-boundary-child-events.jsonl",
+      "raw/run1-race-boundary-child-stderr.log",
+      "raw/run1-race-boundary-harness.jsonl",
+      "raw/run1-race-boundary-relay-stderr.log",
+      "raw/run1-race-boundary-relay.jsonl",
+      "raw/run1-repeated-0-host-events.jsonl",
+      "raw/run1-repeated-1-host-events.jsonl",
+      "raw/run1-repeated-2-host-events.jsonl",
+      "raw/run1-repeated-child-events.jsonl",
+      "raw/run1-repeated-child-stderr.log",
+      "raw/run1-repeated-harness.jsonl",
+      "raw/run1-repeated-relay-stderr.log",
+      "raw/run1-repeated-relay.jsonl",
+      "raw/run1-sequential-fourth-child-events.jsonl",
+      "raw/run1-sequential-fourth-child-stderr.log",
+      "raw/run1-sequential-fourth-harness.jsonl",
+      "raw/run1-sequential-fourth-host-events.jsonl",
+      "raw/run1-sequential-fourth-relay-stderr.log",
+      "raw/run1-sequential-fourth-relay.jsonl",
+      "raw/run1-synthetic-cancel-harness.jsonl",
+      "raw/run1-synthetic-cancel-host-events.jsonl",
+      "raw/run1-synthetic-cancel-server.jsonl",
+      "raw/run1-timeout-then-close-child-events.jsonl",
+      "raw/run1-timeout-then-close-child-stderr.log",
+      "raw/run1-timeout-then-close-harness.jsonl",
+      "raw/run1-timeout-then-close-host-events.jsonl",
+      "raw/run1-timeout-then-close-relay-stderr.log",
+      "raw/run1-timeout-then-close-relay.jsonl",
+      "raw/run1-timeout-withhold-child-events.jsonl",
+      "raw/run1-timeout-withhold-child-stderr.log",
+      "raw/run1-timeout-withhold-harness.jsonl",
+      "raw/run1-timeout-withhold-host-events.jsonl",
+      "raw/run1-timeout-withhold-relay-stderr.log",
+      "raw/run1-timeout-withhold-relay.jsonl",
+      "raw/run1-transport-close-child-events.jsonl",
+      "raw/run1-transport-close-child-stderr.log",
+      "raw/run1-transport-close-harness.jsonl",
+      "raw/run1-transport-close-host-events.jsonl",
+      "raw/run1-transport-close-relay-stderr.log",
+      "raw/run1-transport-close-relay.jsonl",
+      "raw/run1-validation-child-stderr.log",
+      "raw/run1-validation-harness.jsonl",
+      "raw/run1-validation-host-events.jsonl",
+      "raw/run2-control-direct-child-stderr.log",
+      "raw/run2-control-direct-harness.jsonl",
+      "raw/run2-control-direct-host-events.jsonl",
+      "raw/run2-control-relay-child-events.jsonl",
+      "raw/run2-control-relay-child-stderr.log",
+      "raw/run2-control-relay-harness.jsonl",
+      "raw/run2-control-relay-host-events.jsonl",
+      "raw/run2-control-relay-relay-stderr.log",
+      "raw/run2-control-relay-relay.jsonl",
+      "raw/run2-mcp-error-child-stderr.log",
+      "raw/run2-mcp-error-harness.jsonl",
+      "raw/run2-mcp-error-host-events.jsonl",
+      "raw/run2-parallel-child-events.jsonl",
+      "raw/run2-parallel-child-stderr.log",
+      "raw/run2-parallel-harness.jsonl",
+      "raw/run2-parallel-host-events.jsonl",
+      "raw/run2-parallel-relay-stderr.log",
+      "raw/run2-parallel-relay.jsonl",
+      "raw/run2-race-after-child-events.jsonl",
+      "raw/run2-race-after-child-stderr.log",
+      "raw/run2-race-after-harness.jsonl",
+      "raw/run2-race-after-host-events.jsonl",
+      "raw/run2-race-after-relay-stderr.log",
+      "raw/run2-race-after-relay.jsonl",
+      "raw/run2-race-before-child-events.jsonl",
+      "raw/run2-race-before-child-stderr.log",
+      "raw/run2-race-before-harness.jsonl",
+      "raw/run2-race-before-host-events.jsonl",
+      "raw/run2-race-before-relay-stderr.log",
+      "raw/run2-race-before-relay.jsonl",
+      "raw/run2-race-boundary-0-host-events.jsonl",
+      "raw/run2-race-boundary-1-host-events.jsonl",
+      "raw/run2-race-boundary-2-host-events.jsonl",
+      "raw/run2-race-boundary-child-events.jsonl",
+      "raw/run2-race-boundary-child-stderr.log",
+      "raw/run2-race-boundary-harness.jsonl",
+      "raw/run2-race-boundary-relay-stderr.log",
+      "raw/run2-race-boundary-relay.jsonl",
+      "raw/run2-repeated-0-host-events.jsonl",
+      "raw/run2-repeated-1-host-events.jsonl",
+      "raw/run2-repeated-2-host-events.jsonl",
+      "raw/run2-repeated-child-events.jsonl",
+      "raw/run2-repeated-child-stderr.log",
+      "raw/run2-repeated-harness.jsonl",
+      "raw/run2-repeated-relay-stderr.log",
+      "raw/run2-repeated-relay.jsonl",
+      "raw/run2-sequential-fourth-child-events.jsonl",
+      "raw/run2-sequential-fourth-child-stderr.log",
+      "raw/run2-sequential-fourth-harness.jsonl",
+      "raw/run2-sequential-fourth-host-events.jsonl",
+      "raw/run2-sequential-fourth-relay-stderr.log",
+      "raw/run2-sequential-fourth-relay.jsonl",
+      "raw/run2-synthetic-cancel-harness.jsonl",
+      "raw/run2-synthetic-cancel-host-events.jsonl",
+      "raw/run2-synthetic-cancel-server.jsonl",
+      "raw/run2-timeout-then-close-child-events.jsonl",
+      "raw/run2-timeout-then-close-child-stderr.log",
+      "raw/run2-timeout-then-close-harness.jsonl",
+      "raw/run2-timeout-then-close-host-events.jsonl",
+      "raw/run2-timeout-then-close-relay-stderr.log",
+      "raw/run2-timeout-then-close-relay.jsonl",
+      "raw/run2-timeout-withhold-child-events.jsonl",
+      "raw/run2-timeout-withhold-child-stderr.log",
+      "raw/run2-timeout-withhold-harness.jsonl",
+      "raw/run2-timeout-withhold-host-events.jsonl",
+      "raw/run2-timeout-withhold-relay-stderr.log",
+      "raw/run2-timeout-withhold-relay.jsonl",
+      "raw/run2-transport-close-child-events.jsonl",
+      "raw/run2-transport-close-child-stderr.log",
+      "raw/run2-transport-close-harness.jsonl",
+      "raw/run2-transport-close-host-events.jsonl",
+      "raw/run2-transport-close-relay-stderr.log",
+      "raw/run2-transport-close-relay.jsonl",
+      "raw/run2-validation-child-stderr.log",
+      "raw/run2-validation-harness.jsonl",
+      "raw/run2-validation-host-events.jsonl",
+      "run1.json",
+      "run2.json",
+      "verdict.json",
+      "versions.json"
+    ],
+    "digest_before": "5a2d98d5213fa9bc3163b92a1a3f2b361617895e83748395f23982bcdd6097b6",
+    "digest_after": "5a2d98d5213fa9bc3163b92a1a3f2b361617895e83748395f23982bcdd6097b6",
+    "unchanged": true
+  },
+  "checks": [
+    {
+      "id": "F1-ORIGINAL-VERDICT",
+      "pass": true,
+      "detail": {
+        "verdict": "PASS",
+        "runs": [
+          {
+            "run": "run1",
+            "verdict": "PASS",
+            "checks": 20,
+            "failed": []
+          },
+          {
+            "run": "run2",
+            "verdict": "PASS",
+            "checks": 20,
+            "failed": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "F1-CHECK-MATRIX",
+      "pass": true,
+      "detail": {
+        "expected": [
+          "F1-N1-CONTROL-DIRECT",
+          "F1-N2-CONTROL-RELAY",
+          "F1-T1-TIMEOUT-SETTLES",
+          "F1-T2-LATE-NO-REVIVAL",
+          "F1-C1-RACE-BEFORE",
+          "F1-C2-RACE-BOUNDARY",
+          "F1-C3-RACE-AFTER",
+          "F1-C3-PARALLEL",
+          "F1-R1-SEQUENTIAL",
+          "F1-R2-REPEATED",
+          "F1-F1-TRANSPORT-CLOSE",
+          "F1-F2-TIMEOUT-THEN-CLOSE",
+          "F1-A1-VALIDATION",
+          "F1-A2-MCP-ISERROR",
+          "F1-A3-PROPOSALS",
+          "F1-S1-GENUINE-CANCEL-FRAME",
+          "F1-S2-SYNTHETIC-CANCEL",
+          "F1-P1-CLEANUP",
+          "F1-P1-NO-POST-DISPOSAL",
+          "F1-NO-UNHANDLED"
+        ],
+        "actual": [
+          [
+            "F1-N1-CONTROL-DIRECT",
+            "F1-N2-CONTROL-RELAY",
+            "F1-T1-TIMEOUT-SETTLES",
+            "F1-T2-LATE-NO-REVIVAL",
+            "F1-C1-RACE-BEFORE",
+            "F1-C2-RACE-BOUNDARY",
+            "F1-C3-RACE-AFTER",
+            "F1-C3-PARALLEL",
+            "F1-R1-SEQUENTIAL",
+            "F1-R2-REPEATED",
+            "F1-F1-TRANSPORT-CLOSE",
+            "F1-F2-TIMEOUT-THEN-CLOSE",
+            "F1-A1-VALIDATION",
+            "F1-A2-MCP-ISERROR",
+            "F1-A3-PROPOSALS",
+            "F1-S1-GENUINE-CANCEL-FRAME",
+            "F1-S2-SYNTHETIC-CANCEL",
+            "F1-P1-CLEANUP",
+            "F1-P1-NO-POST-DISPOSAL",
+            "F1-NO-UNHANDLED"
+          ],
+          [
+            "F1-N1-CONTROL-DIRECT",
+            "F1-N2-CONTROL-RELAY",
+            "F1-T1-TIMEOUT-SETTLES",
+            "F1-T2-LATE-NO-REVIVAL",
+            "F1-C1-RACE-BEFORE",
+            "F1-C2-RACE-BOUNDARY",
+            "F1-C3-RACE-AFTER",
+            "F1-C3-PARALLEL",
+            "F1-R1-SEQUENTIAL",
+            "F1-R2-REPEATED",
+            "F1-F1-TRANSPORT-CLOSE",
+            "F1-F2-TIMEOUT-THEN-CLOSE",
+            "F1-A1-VALIDATION",
+            "F1-A2-MCP-ISERROR",
+            "F1-A3-PROPOSALS",
+            "F1-S1-GENUINE-CANCEL-FRAME",
+            "F1-S2-SYNTHETIC-CANCEL",
+            "F1-P1-CLEANUP",
+            "F1-P1-NO-POST-DISPOSAL",
+            "F1-NO-UNHANDLED"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "F1-REPEATABLE",
+      "pass": true,
+      "detail": {
+        "recorded": true,
+        "derived": true
+      }
+    },
+    {
+      "id": "F1-SOURCE-HASHES",
+      "pass": true,
+      "detail": {
+        "f1_executor": true,
+        "f1_adapter": true,
+        "f1_relay": true,
+        "f1_synthetic_server": true,
+        "f1_runner": true,
+        "package_lock": true,
+        "fixture": true,
+        "p0_fixture": true,
+        "p0_verdict": true,
+        "p0_run1": true,
+        "p0_run2": true,
+        "frozen_executor": true
+      }
+    },
+    {
+      "id": "F1-VERSIONS",
+      "pass": true,
+      "detail": {
+        "recorded": {
+          "node": "v24.13.1",
+          "npm": "11.8.0",
+          "codemode": "0.5.5",
+          "sdk": "1.32.2",
+          "ajv": "8.17.1",
+          "quickjs": "0.32.0",
+          "zod": "4.6.7",
+          "python": "3.12.10",
+          "mneme": "0.10.0",
+          "mcp": "2.2.0"
+        },
+        "installed": {
+          "codemode": "0.5.5",
+          "sdk": "1.32.2",
+          "ajv": "8.17.1",
+          "quickjs": "0.32.0",
+          "zod": "4.6.7"
+        },
+        "python": {
+          "python": "3.12.10",
+          "mneme": "0.10.0",
+          "mcp": "2.2.0"
+        },
+        "package": {
+          "@cloudflare/codemode": "0.5.5",
+          "@modelcontextprotocol/sdk": "1.32.2",
+          "ajv": "8.17.1",
+          "quickjs-emscripten": "0.32.0",
+          "zod": "4.6.7"
+        }
+      }
+    },
+    {
+      "id": "F1-FIXTURES",
+      "pass": true,
+      "detail": {
+        "m4": true,
+        "m1": true,
+        "m4_baseline": true,
+        "m1_baseline": true
+      }
+    },
+    {
+      "id": "F1-GRACE-AND-LATENCY",
+      "pass": true,
+      "detail": {
+        "grace_is_50": true,
+        "provisional_is_100": true,
+        "final_is_50": true,
+        "calibration_present": true,
+        "calibration_max_3": true,
+        "samples_match": true,
+        "max_match": true,
+        "min_match": true,
+        "mean_match": true,
+        "all_within_grace": true,
+        "measurements_file_matches": true,
+        "recorded": {
+          "samples": 16,
+          "max_ms": 4,
+          "min_ms": 1,
+          "mean_ms": 1.5625
+        },
+        "recomputed": {
+          "samples": 16,
+          "max_ms": 4,
+          "min_ms": 1,
+          "mean_ms": 1.5625
+        }
+      }
+    },
+    {
+      "id": "F1-N1-CONTROL-DIRECT",
+      "pass": true,
+      "detail": [
+        {
+          "get": true,
+          "search": true,
+          "applicable": true,
+          "trace": true,
+          "capabilities": true
+        },
+        {
+          "get": true,
+          "search": true,
+          "applicable": true,
+          "trace": true,
+          "capabilities": true
+        }
+      ]
+    },
+    {
+      "id": "F1-N2-CONTROL-RELAY",
+      "pass": true,
+      "detail": [
+        {
+          "run": "run1",
+          "targetForwarded": 4,
+          "upstreamResponses": 4,
+          "withheld": 0,
+          "cancellations": 0
+        },
+        {
+          "run": "run2",
+          "targetForwarded": 4,
+          "upstreamResponses": 4,
+          "withheld": 0,
+          "cancellations": 0
+        }
+      ]
+    },
+    {
+      "id": "F1-T1-TIMEOUT-SETTLES",
+      "pass": true,
+      "detail": [
+        {
+          "run": "run1",
+          "phase": {
+            "name": "timeout-withhold",
+            "started_at": "2026-10-25T00:23:01.606Z",
+            "ok": true,
+            "connected": true,
+            "withheld": {
+              "seq": 8,
+              "ts": "2026-10-25T00:23:04.365Z",
+              "pid": 33504,
+              "type": "response_withheld",
+              "requestId": 2,
+              "tool": "decision.get"
+            },
+            "outcome": {
+              "result": null,
+              "error": "Code execution failed: execution exceeded 300ms",
+              "errorName": "Error",
+              "stats": {
+                "hostCalls": 1,
+                "resolvedCalls": 0,
+                "failedCalls": 0,
+                "rejectedCalls": 1,
+                "cancelledCalls": 1,
+                "cancelledRejections": 1,
+                "cancelledLateSuccess": 0,
+                "cancelledSettled": 1,
+                "cancelledUnsettled": 0,
+                "lateHostSettlements": 0,
+                "timedOut": true,
+                "interrupted": true,
+                "pendingAtEnd": 0,
+                "deferredDisposed": 1,
+                "drainMs": 2,
+                "hostCancellationGraceMs": 50,
+                "cleanupErrors": [],
+                "durationMs": 313
+              }
+            },
+            "stateAtReturn": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-9901"
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-25T00:23:04.354Z",
+              "pending": false,
+              "outcome": "rejected",
+              "settledAt": "2026-10-25T00:23:04.661Z",
+              "errorName": "McpError",
+              "errorCode": -32001,
+              "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 300ms",
+              "cancellationSentAt": "2026-10-25T00:23:04.657Z",
+              "cancellationSeen": true,
+              "signalAborted": true
+            },
+            "pendingAtDeadline": true,
+            "pendingAtExecutionReturn": false,
+            "settled": {
+              "found": true,
+              "state": {
+                "seq": 1,
+                "name": "decision.get",
+                "args": {
+                  "record_id": "ADR-9901"
+                },
+                "requestId": 2,
+                "startedAt": "2026-10-25T00:23:04.354Z",
+                "pending": false,
+                "outcome": "rejected",
+                "settledAt": "2026-10-25T00:23:04.661Z",
+                "errorName": "McpError",
+                "errorCode": -32001,
+                "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 300ms",
+                "cancellationSentAt": "2026-10-25T00:23:04.657Z",
+                "cancellationSeen": true,
+                "signalAborted": true
+              },
+              "elapsedMs": 0
+            },
+            "cancel": {
+              "requestId": 2,
+              "count": 1,
+              "events": [
+                {
+                  "ts": "2026-10-25T00:23:04.657Z",
+                  "requestId": 2,
+                  "reason": "Error: Code Mode execution exceeded 300ms"
+                }
+              ]
+            },
+            "controlCancellation": {
+              "seq": 9,
+              "ts": "2026-10-25T00:23:04.657Z",
+              "pid": 33504,
+              "type": "cancel_from_client",
+              "requestId": 2,
+              "reason": "Error: Code Mode execution exceeded 300ms"
+            },
+            "serverResponseBeforeCancel": true,
+            "status": {
+              "seq": 10,
+              "ts": "2026-10-25T00:23:04.664Z",
+              "pid": 33504,
+              "type": "status",
+              "child_alive": true,
+              "upstream_pid": 29704,
+              "held_request_ids": [
+                2
+              ],
+              "delayed_request_ids": [],
+              "pending_target_request_ids": [],
+              "cancellation_events": [
+                {
+                  "requestId": 2,
+                  "reason": "Error: Code Mode execution exceeded 300ms"
+                }
+              ],
+              "mode": "withhold",
+              "delay_ms": 0,
+              "withhold_tools": [
+                "decision.get"
+              ],
+              "requested_at": "2026-10-25T00:23:04.665Z"
+            },
+            "lateResponsesBeforeRelease": 0,
+            "released": {
+              "seq": 11,
+              "ts": "2026-10-25T00:23:04.666Z",
+              "pid": 33504,
+              "type": "response_released_downstream",
+              "requestId": 2,
+              "tool": "decision.get"
+            },
+            "stateAfterRelease": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-9901"
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-25T00:23:04.354Z",
+              "pending": false,
+              "outcome": "rejected",
+              "settledAt": "2026-10-25T00:23:04.661Z",
+              "errorName": "McpError",
+              "errorCode": -32001,
+              "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 300ms",
+              "cancellationSentAt": "2026-10-25T00:23:04.657Z",
+              "cancellationSeen": true,
+              "signalAborted": true
+            },
+            "lateResponsesAfterRelease": 1,
+            "cancelAfterRelease": {
+              "requestId": 2,
+              "count": 1,
+              "events": [
+                {
+                  "ts": "2026-10-25T00:23:04.657Z",
+                  "requestId": 2,
+                  "reason": "Error: Code Mode execution exceeded 300ms"
+                }
+              ]
+            },
+            "childCancellationFrame": {
+              "seq": 9,
+              "ts": "2026-10-25T00:23:04.658Z",
+              "upstream_pid": 29704,
+              "type": "child_stdin_line",
+              "line": "{\"jsonrpc\":\"2.0\",\"method\":\"notifications/cancelled\",\"params\":{\"requestId\":2,\"reason\":\"Error: Code Mode execution exceeded 300ms\"}}"
+            },
+            "clientErrors": [
+              "Received a response for an unknown message ID: {\"jsonrpc\":\"2.0\",\"id\":2,\"result\":{\"content\":[{\"text\":\"{\\n  \\\"record_type\\\": \\\"canonical_decision\\\",\\n  \\\"canonical_decision\\\": {\\n    \\\"decision_id\\\": \\\"ADR-9901\\\",\\n    \\\"version\\\": \\\"1\\\",\\n    \\\"version_id\\\": \\\"dver-3c2da75d06c5a5ce73807f025fc1d5c9\\\",\\n    \\\"decision_version_id\\\": \\\"dver-3c2da75d06c5a5ce73807f025fc1d5c9\\\",\\n    \\\"content_digest\\\": \\\"662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650\\\",\\n    \\\"decision_class\\\": \\\"architecture\\\",\\n    \\\"statement\\\": \\\"Synthetic M1 cache adapter uses the in-memory backend.\\\",\\n    \\\"rationale\\\": \\\"Inventory and stdio handshake fixture only.\\\",\\n    \\\"lifecycle_status\\\": \\\"active\\\",\\n    \\\"owner\\\": \\\"\\\",\\n    \\\"decided_at\\\": \\\"2026-01-01T00:00:00Z\\\",\\n    \\\"updated_at\\\": \\\"2026-01-01T00:00:00Z\\\",\\n    \\\"context_scope\\\": [\\n      \\\"cache\\\"\\n    ],\\n    \\\"targets\\\": [],\\n    \\\"constraints\\\": [\\n      \\\"no external cache service\\\"\\n    ],\\n    \\\"anti_patterns\\\": [\\n      \\\"external_cache_client\\\"\\n    ],\\n    \\\"source_evidence\\\": [\\n      {\\n        \\\"source_type\\\": \\\"runtime\\\",\\n        \\\"source_locator\\\": \\\"\\\",\\n        \\\"source_revision\\\": \\\"\\\",\\n        \\\"observed_at\\\": \\\"\\\"\\n      }\\n    ],\\n    \\\"test_evidence\\\": [],\\n    \\\"relationships\\\": [],\\n    \\\"derived_rule_ids\\\": [\\n      \\\"ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584\\\"\\n    ]\\n  }\\n}\",\"type\":\"text\"}],\"isError\":false,\"structuredContent\":{\"record_type\":\"canonical_decision\",\"canonical_decision\":{\"decision_id\":\"ADR-9901\",\"version\":\"1\",\"version_id\":\"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\"decision_version_id\":\"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\"content_digest\":\"662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650\",\"decision_class\":\"architecture\",\"statement\":\"Synthetic M1 cache adapter uses the in-memory backend.\",\"rationale\":\"Inventory and stdio handshake fixture only.\",\"lifecycle_status\":\"active\",\"owner\":\"\",\"decided_at\":\"2026-01-01T00:00:00Z\",\"updated_at\":\"2026-01-01T00:00:00Z\",\"context_scope\":[\"cache\"],\"targets\":[],\"constraints\":[\"no external cache service\"],\"anti_patterns\":[\"external_cache_client\"],\"source_evidence\":[{\"source_type\":\"runtime\",\"source_locator\":\"\",\"source_revision\":\"\",\"observed_at\":\"\"}],\"test_evidence\":[],\"relationships\":[],\"derived_rule_ids\":[\"ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584\"]}}}}"
+            ],
+            "hostEvents": [
+              {
+                "ts": "2026-10-25T00:23:04.353Z",
+                "type": "host_call_started",
+                "callId": 1,
+                "provider": "codemode",
+                "method": "decision_get"
+              },
+              {
+                "ts": "2026-10-25T00:23:04.658Z",
+                "type": "host_call_aborted",
+                "callId": 1,
+                "provider": "codemode",
+                "method": "decision_get",
+                "abortedAt": 1792887784657,
+                "reason": "Error: Code Mode execution exceeded 300ms"
+              },
+              {
+                "ts": "2026-10-25T00:23:04.661Z",
+                "type": "host_call_settled_after_abort",
+                "callId": 1,
+                "provider": "codemode",
+                "method": "decision_get",
+                "outcome": "rejected",
+                "errorName": "HostCancelledError",
+                "errorMessage": "MCP decision.get cancelled: MCP error -32001: Error: Code Mode execution exceeded 300ms",
+                "afterAbortMs": 4
+              }
+            ],
+            "stats": {
+              "hostCalls": 1,
+              "resolvedCalls": 0,
+              "failedCalls": 0,
+              "rejectedCalls": 1,
+              "cancelledCalls": 1,
+              "cancelledRejections": 1,
+              "cancelledLateSuccess": 0,
+              "cancelledSettled": 1,
+              "cancelledUnsettled": 0,
+              "lateHostSettlements": 0,
+              "timedOut": true,
+              "interrupted": true,
+              "pendingAtEnd": 0,
+              "deferredDisposed": 1,
+              "drainMs": 2,
+              "hostCancellationGraceMs": 50,
+              "cleanupErrors": [],
+              "durationMs": 313
+            },
+            "settlementLatencyMs": 4,
+            "cleanup": {
+              "kind": "relay",
+              "phase": "timeout-withhold",
+              "errors": [],
+              "relay_pid": 33504,
+              "upstream_pid": 29704,
+              "child_exit_event": {
+                "seq": 14,
+                "ts": "2026-10-25T00:23:05.377Z",
+                "pid": 33504,
+                "type": "child_exit",
+                "code": 0,
+                "signal": null,
+                "upstream_pid": 29704,
+                "observed_by": "top_level"
+              },
+              "child_exit_observed": true,
+              "relay_exit_observed": true,
+              "relay_alive_after": false,
+              "upstream_exit_observed": true,
+              "upstream_alive_after": false
+            },
+            "finished_at": "2026-10-25T00:23:05.451Z"
+          },
+          "requestId": 2,
+          "withheldEvent": {
+            "seq": 8,
+            "ts": "2026-10-25T00:23:04.365Z",
+            "pid": 33504,
+            "type": "response_withheld",
+            "requestId": 2,
+            "tool": "decision.get"
+          },
+          "cancelEvent": {
+            "seq": 9,
+            "ts": "2026-10-25T00:23:04.657Z",
+            "pid": 33504,
+            "type": "cancel_from_client",
+            "requestId": 2,
+            "reason": "Error: Code Mode execution exceeded 300ms"
+          },
+          "releaseEvent": {
+            "seq": 11,
+            "ts": "2026-10-25T00:23:04.666Z",
+            "pid": 33504,
+            "type": "response_released_downstream",
+            "requestId": 2,
+            "tool": "decision.get"
+          },
+          "childCancel": {
+            "seq": 9,
+            "ts": "2026-10-25T00:23:04.658Z",
+            "upstream_pid": 29704,
+            "type": "child_stdin_line",
+            "line": "{\"jsonrpc\":\"2.0\",\"method\":\"notifications/cancelled\",\"params\":{\"requestId\":2,\"reason\":\"Error: Code Mode execution exceeded 300ms\"}}"
+          },
+          "aborted": {
+            "ts": "2026-10-25T00:23:04.658Z",
+            "type": "host_call_aborted",
+            "callId": 1,
+            "provider": "codemode",
+            "method": "decision_get",
+            "abortedAt": 1792887784657,
+            "reason": "Error: Code Mode execution exceeded 300ms"
+          },
+          "settledAfterAbort": {
+            "ts": "2026-10-25T00:23:04.661Z",
+            "type": "host_call_settled_after_abort",
+            "callId": 1,
+            "provider": "codemode",
+            "method": "decision_get",
+            "outcome": "rejected",
+            "errorName": "HostCancelledError",
+            "errorMessage": "MCP decision.get cancelled: MCP error -32001: Error: Code Mode execution exceeded 300ms",
+            "afterAbortMs": 4
+          },
+          "settledBeforeFinish": true
+        },
+        {
+          "run": "run2",
+          "phase": {
+            "name": "timeout-withhold",
+            "started_at": "2026-10-25T00:23:43.486Z",
+            "ok": true,
+            "connected": true,
+            "withheld": {
+              "seq": 8,
+              "ts": "2026-10-25T00:23:45.262Z",
+              "pid": 49740,
+              "type": "response_withheld",
+              "requestId": 2,
+              "tool": "decision.get"
+            },
+            "outcome": {
+              "result": null,
+              "error": "Code execution failed: execution exceeded 300ms",
+              "errorName": "Error",
+              "stats": {
+                "hostCalls": 1,
+                "resolvedCalls": 0,
+                "failedCalls": 0,
+                "rejectedCalls": 1,
+                "cancelledCalls": 1,
+                "cancelledRejections": 1,
+                "cancelledLateSuccess": 0,
+                "cancelledSettled": 1,
+                "cancelledUnsettled": 0,
+                "lateHostSettlements": 0,
+                "timedOut": true,
+                "interrupted": true,
+                "pendingAtEnd": 0,
+                "deferredDisposed": 1,
+                "drainMs": 1,
+                "hostCancellationGraceMs": 50,
+                "cleanupErrors": [],
+                "durationMs": 321
+              }
+            },
+            "stateAtReturn": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-9901"
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-25T00:23:45.255Z",
+              "pending": false,
+              "outcome": "rejected",
+              "settledAt": "2026-10-25T00:23:45.572Z",
+              "errorName": "McpError",
+              "errorCode": -32001,
+              "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 300ms",
+              "cancellationSentAt": "2026-10-25T00:23:45.570Z",
+              "cancellationSeen": true,
+              "signalAborted": true
+            },
+            "pendingAtDeadline": true,
+            "pendingAtExecutionReturn": false,
+            "settled": {
+              "found": true,
+              "state": {
+                "seq": 1,
+                "name": "decision.get",
+                "args": {
+                  "record_id": "ADR-9901"
+                },
+                "requestId": 2,
+                "startedAt": "2026-10-25T00:23:45.255Z",
+                "pending": false,
+                "outcome": "rejected",
+                "settledAt": "2026-10-25T00:23:45.572Z",
+                "errorName": "McpError",
+                "errorCode": -32001,
+                "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 300ms",
+                "cancellationSentAt": "2026-10-25T00:23:45.570Z",
+                "cancellationSeen": true,
+                "signalAborted": true
+              },
+              "elapsedMs": 0
+            },
+            "cancel": {
+              "requestId": 2,
+              "count": 1,
+              "events": [
+                {
+                  "ts": "2026-10-25T00:23:45.570Z",
+                  "requestId": 2,
+                  "reason": "Error: Code Mode execution exceeded 300ms"
+                }
+              ]
+            },
+            "controlCancellation": {
+              "seq": 9,
+              "ts": "2026-10-25T00:23:45.569Z",
+              "pid": 49740,
+              "type": "cancel_from_client",
+              "requestId": 2,
+              "reason": "Error: Code Mode execution exceeded 300ms"
+            },
+            "serverResponseBeforeCancel": true,
+            "status": {
+              "seq": 10,
+              "ts": "2026-10-25T00:23:45.574Z",
+              "pid": 49740,
+              "type": "status",
+              "child_alive": true,
+              "upstream_pid": 25140,
+              "held_request_ids": [
+                2
+              ],
+              "delayed_request_ids": [],
+              "pending_target_request_ids": [],
+              "cancellation_events": [
+                {
+                  "requestId": 2,
+                  "reason": "Error: Code Mode execution exceeded 300ms"
+                }
+              ],
+              "mode": "withhold",
+              "delay_ms": 0,
+              "withhold_tools": [
+                "decision.get"
+              ],
+              "requested_at": "2026-10-25T00:23:45.574Z"
+            },
+            "lateResponsesBeforeRelease": 0,
+            "released": {
+              "seq": 11,
+              "ts": "2026-10-25T00:23:45.575Z",
+              "pid": 49740,
+              "type": "response_released_downstream",
+              "requestId": 2,
+              "tool": "decision.get"
+            },
+            "stateAfterRelease": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-9901"
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-25T00:23:45.255Z",
+              "pending": false,
+              "outcome": "rejected",
+              "settledAt": "2026-10-25T00:23:45.572Z",
+              "errorName": "McpError",
+              "errorCode": -32001,
+              "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 300ms",
+              "cancellationSentAt": "2026-10-25T00:23:45.570Z",
+              "cancellationSeen": true,
+              "signalAborted": true
+            },
+            "lateResponsesAfterRelease": 1,
+            "cancelAfterRelease": {
+              "requestId": 2,
+              "count": 1,
+              "events": [
+                {
+                  "ts": "2026-10-25T00:23:45.570Z",
+                  "requestId": 2,
+                  "reason": "Error: Code Mode execution exceeded 300ms"
+                }
+              ]
+            },
+            "childCancellationFrame": {
+              "seq": 9,
+              "ts": "2026-10-25T00:23:45.570Z",
+              "upstream_pid": 25140,
+              "type": "child_stdin_line",
+              "line": "{\"jsonrpc\":\"2.0\",\"method\":\"notifications/cancelled\",\"params\":{\"requestId\":2,\"reason\":\"Error: Code Mode execution exceeded 300ms\"}}"
+            },
+            "clientErrors": [
+              "Received a response for an unknown message ID: {\"jsonrpc\":\"2.0\",\"id\":2,\"result\":{\"content\":[{\"text\":\"{\\n  \\\"record_type\\\": \\\"canonical_decision\\\",\\n  \\\"canonical_decision\\\": {\\n    \\\"decision_id\\\": \\\"ADR-9901\\\",\\n    \\\"version\\\": \\\"1\\\",\\n    \\\"version_id\\\": \\\"dver-3c2da75d06c5a5ce73807f025fc1d5c9\\\",\\n    \\\"decision_version_id\\\": \\\"dver-3c2da75d06c5a5ce73807f025fc1d5c9\\\",\\n    \\\"content_digest\\\": \\\"662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650\\\",\\n    \\\"decision_class\\\": \\\"architecture\\\",\\n    \\\"statement\\\": \\\"Synthetic M1 cache adapter uses the in-memory backend.\\\",\\n    \\\"rationale\\\": \\\"Inventory and stdio handshake fixture only.\\\",\\n    \\\"lifecycle_status\\\": \\\"active\\\",\\n    \\\"owner\\\": \\\"\\\",\\n    \\\"decided_at\\\": \\\"2026-01-01T00:00:00Z\\\",\\n    \\\"updated_at\\\": \\\"2026-01-01T00:00:00Z\\\",\\n    \\\"context_scope\\\": [\\n      \\\"cache\\\"\\n    ],\\n    \\\"targets\\\": [],\\n    \\\"constraints\\\": [\\n      \\\"no external cache service\\\"\\n    ],\\n    \\\"anti_patterns\\\": [\\n      \\\"external_cache_client\\\"\\n    ],\\n    \\\"source_evidence\\\": [\\n      {\\n        \\\"source_type\\\": \\\"runtime\\\",\\n        \\\"source_locator\\\": \\\"\\\",\\n        \\\"source_revision\\\": \\\"\\\",\\n        \\\"observed_at\\\": \\\"\\\"\\n      }\\n    ],\\n    \\\"test_evidence\\\": [],\\n    \\\"relationships\\\": [],\\n    \\\"derived_rule_ids\\\": [\\n      \\\"ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584\\\"\\n    ]\\n  }\\n}\",\"type\":\"text\"}],\"isError\":false,\"structuredContent\":{\"record_type\":\"canonical_decision\",\"canonical_decision\":{\"decision_id\":\"ADR-9901\",\"version\":\"1\",\"version_id\":\"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\"decision_version_id\":\"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\"content_digest\":\"662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650\",\"decision_class\":\"architecture\",\"statement\":\"Synthetic M1 cache adapter uses the in-memory backend.\",\"rationale\":\"Inventory and stdio handshake fixture only.\",\"lifecycle_status\":\"active\",\"owner\":\"\",\"decided_at\":\"2026-01-01T00:00:00Z\",\"updated_at\":\"2026-01-01T00:00:00Z\",\"context_scope\":[\"cache\"],\"targets\":[],\"constraints\":[\"no external cache service\"],\"anti_patterns\":[\"external_cache_client\"],\"source_evidence\":[{\"source_type\":\"runtime\",\"source_locator\":\"\",\"source_revision\":\"\",\"observed_at\":\"\"}],\"test_evidence\":[],\"relationships\":[],\"derived_rule_ids\":[\"ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584\"]}}}}"
+            ],
+            "hostEvents": [
+              {
+                "ts": "2026-10-25T00:23:45.254Z",
+                "type": "host_call_started",
+                "callId": 1,
+                "provider": "codemode",
+                "method": "decision_get"
+              },
+              {
+                "ts": "2026-10-25T00:23:45.570Z",
+                "type": "host_call_aborted",
+                "callId": 1,
+                "provider": "codemode",
+                "method": "decision_get",
+                "abortedAt": 1792887825570,
+                "reason": "Error: Code Mode execution exceeded 300ms"
+              },
+              {
+                "ts": "2026-10-25T00:23:45.572Z",
+                "type": "host_call_settled_after_abort",
+                "callId": 1,
+                "provider": "codemode",
+                "method": "decision_get",
+                "outcome": "rejected",
+                "errorName": "HostCancelledError",
+                "errorMessage": "MCP decision.get cancelled: MCP error -32001: Error: Code Mode execution exceeded 300ms",
+                "afterAbortMs": 2
+              }
+            ],
+            "stats": {
+              "hostCalls": 1,
+              "resolvedCalls": 0,
+              "failedCalls": 0,
+              "rejectedCalls": 1,
+              "cancelledCalls": 1,
+              "cancelledRejections": 1,
+              "cancelledLateSuccess": 0,
+              "cancelledSettled": 1,
+              "cancelledUnsettled": 0,
+              "lateHostSettlements": 0,
+              "timedOut": true,
+              "interrupted": true,
+              "pendingAtEnd": 0,
+              "deferredDisposed": 1,
+              "drainMs": 1,
+              "hostCancellationGraceMs": 50,
+              "cleanupErrors": [],
+              "durationMs": 321
+            },
+            "settlementLatencyMs": 2,
+            "cleanup": {
+              "kind": "relay",
+              "phase": "timeout-withhold",
+              "errors": [],
+              "relay_pid": 49740,
+              "upstream_pid": 25140,
+              "child_exit_event": {
+                "seq": 14,
+                "ts": "2026-10-25T00:23:46.150Z",
+                "pid": 49740,
+                "type": "child_exit",
+                "code": 0,
+                "signal": null,
+                "upstream_pid": 25140,
+                "observed_by": "top_level"
+              },
+              "child_exit_observed": true,
+              "relay_exit_observed": true,
+              "relay_alive_after": false,
+              "upstream_exit_observed": true,
+              "upstream_alive_after": false
+            },
+            "finished_at": "2026-10-25T00:23:46.219Z"
+          },
+          "requestId": 2,
+          "withheldEvent": {
+            "seq": 8,
+            "ts": "2026-10-25T00:23:45.262Z",
+            "pid": 49740,
+            "type": "response_withheld",
+            "requestId": 2,
+            "tool": "decision.get"
+          },
+          "cancelEvent": {
+            "seq": 9,
+            "ts": "2026-10-25T00:23:45.569Z",
+            "pid": 49740,
+            "type": "cancel_from_client",
+            "requestId": 2,
+            "reason": "Error: Code Mode execution exceeded 300ms"
+          },
+          "releaseEvent": {
+            "seq": 11,
+            "ts": "2026-10-25T00:23:45.575Z",
+            "pid": 49740,
+            "type": "response_released_downstream",
+            "requestId": 2,
+            "tool": "decision.get"
+          },
+          "childCancel": {
+            "seq": 9,
+            "ts": "2026-10-25T00:23:45.570Z",
+            "upstream_pid": 25140,
+            "type": "child_stdin_line",
+            "line": "{\"jsonrpc\":\"2.0\",\"method\":\"notifications/cancelled\",\"params\":{\"requestId\":2,\"reason\":\"Error: Code Mode execution exceeded 300ms\"}}"
+          },
+          "aborted": {
+            "ts": "2026-10-25T00:23:45.570Z",
+            "type": "host_call_aborted",
+            "callId": 1,
+            "provider": "codemode",
+            "method": "decision_get",
+            "abortedAt": 1792887825570,
+            "reason": "Error: Code Mode execution exceeded 300ms"
+          },
+          "settledAfterAbort": {
+            "ts": "2026-10-25T00:23:45.572Z",
+            "type": "host_call_settled_after_abort",
+            "callId": 1,
+            "provider": "codemode",
+            "method": "decision_get",
+            "outcome": "rejected",
+            "errorName": "HostCancelledError",
+            "errorMessage": "MCP decision.get cancelled: MCP error -32001: Error: Code Mode execution exceeded 300ms",
+            "afterAbortMs": 2
+          },
+          "settledBeforeFinish": true
+        }
+      ]
+    },
+    {
+      "id": "F1-T2-LATE-NO-REVIVAL",
+      "pass": true,
+      "detail": [
+        {
+          "seq": 1,
+          "name": "decision.get",
+          "args": {
+            "record_id": "ADR-9901"
+          },
+          "requestId": 2,
+          "startedAt": "2026-10-25T00:23:04.354Z",
+          "pending": false,
+          "outcome": "rejected",
+          "settledAt": "2026-10-25T00:23:04.661Z",
+          "errorName": "McpError",
+          "errorCode": -32001,
+          "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 300ms",
+          "cancellationSentAt": "2026-10-25T00:23:04.657Z",
+          "cancellationSeen": true,
+          "signalAborted": true
+        },
+        {
+          "seq": 1,
+          "name": "decision.get",
+          "args": {
+            "record_id": "ADR-9901"
+          },
+          "requestId": 2,
+          "startedAt": "2026-10-25T00:23:45.255Z",
+          "pending": false,
+          "outcome": "rejected",
+          "settledAt": "2026-10-25T00:23:45.572Z",
+          "errorName": "McpError",
+          "errorCode": -32001,
+          "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 300ms",
+          "cancellationSentAt": "2026-10-25T00:23:45.570Z",
+          "cancellationSeen": true,
+          "signalAborted": true
+        }
+      ]
+    },
+    {
+      "id": "F1-ZERO-CANCEL-COMPLETED",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "F1-RACES",
+      "pass": true,
+      "detail": {
+        "runs": [
+          {
+            "before": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-9901"
+              },
+              "options": {
+                "signal": {}
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-25T00:23:08.231Z",
+              "startedMs": 1792887788231,
+              "pending": false,
+              "outcome": "fulfilled",
+              "settledAt": "2026-10-25T00:23:08.358Z",
+              "settledMs": 1792887788358,
+              "errorName": null,
+              "errorCode": null,
+              "errorMessage": null,
+              "cancellationSentAt": null,
+              "cancellationSeen": false,
+              "promise": {},
+              "value": {
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "{\n  \"record_type\": \"canonical_decision\",\n  \"canonical_decision\": {\n    \"decision_id\": \"ADR-9901\",\n    \"version\": \"1\",\n    \"version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n    \"decision_version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n    \"content_digest\": \"662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650\",\n    \"decision_class\": \"architecture\",\n    \"statement\": \"Synthetic M1 cache adapter uses the in-memory backend.\",\n    \"rationale\": \"Inventory and stdio handshake fixture only.\",\n    \"lifecycle_status\": \"active\",\n    \"owner\": \"\",\n    \"decided_at\": \"2026-01-01T00:00:00Z\",\n    \"updated_at\": \"2026-01-01T00:00:00Z\",\n    \"context_scope\": [\n      \"cache\"\n    ],\n    \"targets\": [],\n    \"constraints\": [\n      \"no external cache service\"\n    ],\n    \"anti_patterns\": [\n      \"external_cache_client\"\n    ],\n    \"source_evidence\": [\n      {\n        \"source_type\": \"runtime\",\n        \"source_locator\": \"\",\n        \"source_revision\": \"\",\n        \"observed_at\": \"\"\n      }\n    ],\n    \"test_evidence\": [],\n    \"relationships\": [],\n    \"derived_rule_ids\": [\n      \"ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584\"\n    ]\n  }\n}"
+                  }
+                ],
+                "structuredContent": {
+                  "record_type": "canonical_decision",
+                  "canonical_decision": {
+                    "decision_id": "ADR-9901",
+                    "version": "1",
+                    "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+                    "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+                    "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+                    "decision_class": "architecture",
+                    "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+                    "rationale": "Inventory and stdio handshake fixture only.",
+                    "lifecycle_status": "active",
+                    "owner": "",
+                    "decided_at": "2026-01-01T00:00:00Z",
+                    "updated_at": "2026-01-01T00:00:00Z",
+                    "context_scope": [
+                      "cache"
+                    ],
+                    "targets": [],
+                    "constraints": [
+                      "no external cache service"
+                    ],
+                    "anti_patterns": [
+                      "external_cache_client"
+                    ],
+                    "source_evidence": [
+                      {
+                        "source_type": "runtime",
+                        "source_locator": "",
+                        "source_revision": "",
+                        "observed_at": ""
+                      }
+                    ],
+                    "test_evidence": [],
+                    "relationships": [],
+                    "derived_rule_ids": [
+                      "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+                    ]
+                  }
+                },
+                "isError": false
+              }
+            },
+            "after": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-9901"
+              },
+              "options": {
+                "signal": {}
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-25T00:23:16.631Z",
+              "startedMs": 1792887796631,
+              "pending": false,
+              "outcome": "rejected",
+              "settledAt": "2026-10-25T00:23:16.943Z",
+              "settledMs": 1792887796943,
+              "errorName": "McpError",
+              "errorCode": -32001,
+              "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 300ms",
+              "cancellationSentAt": "2026-10-25T00:23:16.941Z",
+              "cancellationSeen": true,
+              "promise": {}
+            },
+            "boundary": [
+              {
+                "outcome": "rejected",
+                "cancel": 1
+              },
+              {
+                "outcome": "rejected",
+                "cancel": 1
+              },
+              {
+                "outcome": "rejected",
+                "cancel": 1
+              }
+            ]
+          },
+          {
+            "before": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-9901"
+              },
+              "options": {
+                "signal": {}
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-25T00:23:48.329Z",
+              "startedMs": 1792887828329,
+              "pending": false,
+              "outcome": "fulfilled",
+              "settledAt": "2026-10-25T00:23:48.443Z",
+              "settledMs": 1792887828443,
+              "errorName": null,
+              "errorCode": null,
+              "errorMessage": null,
+              "cancellationSentAt": null,
+              "cancellationSeen": false,
+              "promise": {},
+              "value": {
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "{\n  \"record_type\": \"canonical_decision\",\n  \"canonical_decision\": {\n    \"decision_id\": \"ADR-9901\",\n    \"version\": \"1\",\n    \"version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n    \"decision_version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n    \"content_digest\": \"662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650\",\n    \"decision_class\": \"architecture\",\n    \"statement\": \"Synthetic M1 cache adapter uses the in-memory backend.\",\n    \"rationale\": \"Inventory and stdio handshake fixture only.\",\n    \"lifecycle_status\": \"active\",\n    \"owner\": \"\",\n    \"decided_at\": \"2026-01-01T00:00:00Z\",\n    \"updated_at\": \"2026-01-01T00:00:00Z\",\n    \"context_scope\": [\n      \"cache\"\n    ],\n    \"targets\": [],\n    \"constraints\": [\n      \"no external cache service\"\n    ],\n    \"anti_patterns\": [\n      \"external_cache_client\"\n    ],\n    \"source_evidence\": [\n      {\n        \"source_type\": \"runtime\",\n        \"source_locator\": \"\",\n        \"source_revision\": \"\",\n        \"observed_at\": \"\"\n      }\n    ],\n    \"test_evidence\": [],\n    \"relationships\": [],\n    \"derived_rule_ids\": [\n      \"ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584\"\n    ]\n  }\n}"
+                  }
+                ],
+                "structuredContent": {
+                  "record_type": "canonical_decision",
+                  "canonical_decision": {
+                    "decision_id": "ADR-9901",
+                    "version": "1",
+                    "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+                    "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+                    "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+                    "decision_class": "architecture",
+                    "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+                    "rationale": "Inventory and stdio handshake fixture only.",
+                    "lifecycle_status": "active",
+                    "owner": "",
+                    "decided_at": "2026-01-01T00:00:00Z",
+                    "updated_at": "2026-01-01T00:00:00Z",
+                    "context_scope": [
+                      "cache"
+                    ],
+                    "targets": [],
+                    "constraints": [
+                      "no external cache service"
+                    ],
+                    "anti_patterns": [
+                      "external_cache_client"
+                    ],
+                    "source_evidence": [
+                      {
+                        "source_type": "runtime",
+                        "source_locator": "",
+                        "source_revision": "",
+                        "observed_at": ""
+                      }
+                    ],
+                    "test_evidence": [],
+                    "relationships": [],
+                    "derived_rule_ids": [
+                      "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+                    ]
+                  }
+                },
+                "isError": false
+              }
+            },
+            "after": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-9901"
+              },
+              "options": {
+                "signal": {}
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-25T00:23:55.270Z",
+              "startedMs": 1792887835270,
+              "pending": false,
+              "outcome": "rejected",
+              "settledAt": "2026-10-25T00:23:55.585Z",
+              "settledMs": 1792887835585,
+              "errorName": "McpError",
+              "errorCode": -32001,
+              "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 300ms",
+              "cancellationSentAt": "2026-10-25T00:23:55.584Z",
+              "cancellationSeen": true,
+              "promise": {}
+            },
+            "boundary": [
+              {
+                "outcome": "rejected",
+                "cancel": 1
+              },
+              {
+                "outcome": "rejected",
+                "cancel": 1
+              },
+              {
+                "outcome": "rejected",
+                "cancel": 1
+              }
+            ]
+          }
+        ],
+        "raw": [
+          {
+            "run": "run1",
+            "beforeDelayed": 1,
+            "afterDelayed": 1,
+            "afterCancel": 1
+          },
+          {
+            "run": "run2",
+            "beforeDelayed": 1,
+            "afterDelayed": 1,
+            "afterCancel": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "F1-PARALLEL",
+      "pass": true,
+      "detail": [
+        {
+          "run": "run1",
+          "cancellations": 1,
+          "withheld": 1,
+          "withheldTool": "decision.search"
+        },
+        {
+          "run": "run2",
+          "cancellations": 1,
+          "withheld": 1,
+          "withheldTool": "decision.search"
+        }
+      ]
+    },
+    {
+      "id": "F1-SEQUENTIAL",
+      "pass": true,
+      "detail": [
+        {
+          "run": "run1",
+          "cancellations": 1,
+          "withheldTool": "decision.trace"
+        },
+        {
+          "run": "run2",
+          "cancellations": 1,
+          "withheldTool": "decision.trace"
+        }
+      ]
+    },
+    {
+      "id": "F1-REPEATED",
+      "pass": true,
+      "detail": [
+        3,
+        3
+      ]
+    },
+    {
+      "id": "F1-TRANSPORT-CLOSE",
+      "pass": true,
+      "detail": [
+        {
+          "seq": 1,
+          "name": "decision.get",
+          "args": {
+            "record_id": "ADR-9901"
+          },
+          "requestId": 2,
+          "startedAt": "2026-10-25T00:23:30.123Z",
+          "pending": false,
+          "outcome": "rejected",
+          "settledAt": "2026-10-25T00:23:30.463Z",
+          "errorName": "McpError",
+          "errorCode": -32000,
+          "errorMessage": "MCP error -32000: Connection closed",
+          "cancellationSentAt": null,
+          "cancellationSeen": false,
+          "signalAborted": false
+        },
+        {
+          "seq": 1,
+          "name": "decision.get",
+          "args": {
+            "record_id": "ADR-9901"
+          },
+          "requestId": 2,
+          "startedAt": "2026-10-25T00:24:08.678Z",
+          "pending": false,
+          "outcome": "rejected",
+          "settledAt": "2026-10-25T00:24:09.015Z",
+          "errorName": "McpError",
+          "errorCode": -32000,
+          "errorMessage": "MCP error -32000: Connection closed",
+          "cancellationSentAt": null,
+          "cancellationSeen": false,
+          "signalAborted": false
+        }
+      ]
+    },
+    {
+      "id": "F1-TIMEOUT-THEN-CLOSE",
+      "pass": true,
+      "detail": [
+        {
+          "seq": 1,
+          "name": "decision.get",
+          "args": {
+            "record_id": "ADR-9901"
+          },
+          "requestId": 2,
+          "startedAt": "2026-10-25T00:23:32.826Z",
+          "pending": false,
+          "outcome": "rejected",
+          "settledAt": "2026-10-25T00:23:33.078Z",
+          "errorName": "McpError",
+          "errorCode": -32001,
+          "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 250ms",
+          "cancellationSentAt": "2026-10-25T00:23:33.076Z",
+          "cancellationSeen": true,
+          "signalAborted": true
+        },
+        {
+          "seq": 1,
+          "name": "decision.get",
+          "args": {
+            "record_id": "ADR-9901"
+          },
+          "requestId": 2,
+          "startedAt": "2026-10-25T00:24:10.786Z",
+          "pending": false,
+          "outcome": "rejected",
+          "settledAt": "2026-10-25T00:24:11.051Z",
+          "errorName": "McpError",
+          "errorCode": -32001,
+          "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 250ms",
+          "cancellationSentAt": "2026-10-25T00:24:11.050Z",
+          "cancellationSeen": true,
+          "signalAborted": true
+        }
+      ]
+    },
+    {
+      "id": "F1-VALIDATION",
+      "pass": true,
+      "detail": [
+        "Code execution failed: Error: Argument validation failed for decision.get: [{\"instancePath\":\"/record_id\",\"schemaPath\":\"#/properties/record_id/type\",\"keyword\":\"type\",\"params\":{\"type\":\"string\"},\"message\":\"must be string\"}]",
+        "Code execution failed: Error: Argument validation failed for decision.get: [{\"instancePath\":\"/record_id\",\"schemaPath\":\"#/properties/record_id/type\",\"keyword\":\"type\",\"params\":{\"type\":\"string\"},\"message\":\"must be string\"}]"
+      ]
+    },
+    {
+      "id": "F1-MCP-ERROR",
+      "pass": true,
+      "detail": [
+        [
+          {
+            "seq": 1,
+            "tool": "decision.search",
+            "args": {
+              "canonical_lifecycle_status": "bogus"
+            },
+            "outcome": "fulfilled",
+            "cancelled": false,
+            "isError": true,
+            "structuredContent": null,
+            "toolResult": null,
+            "text": "Error executing tool decision.search: 1 validation error for decision_searchArguments\ncanonical_lifecycle_status\n  Input should be 'active', 'superseded', 'deprecated' or 'inactive' [type=literal_error, input_value='bogus', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/literal_error",
+            "signalAborted": false
+          }
+        ],
+        [
+          {
+            "seq": 1,
+            "tool": "decision.search",
+            "args": {
+              "canonical_lifecycle_status": "bogus"
+            },
+            "outcome": "fulfilled",
+            "cancelled": false,
+            "isError": true,
+            "structuredContent": null,
+            "toolResult": null,
+            "text": "Error executing tool decision.search: 1 validation error for decision_searchArguments\ncanonical_lifecycle_status\n  Input should be 'active', 'superseded', 'deprecated' or 'inactive' [type=literal_error, input_value='bogus', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/literal_error",
+            "signalAborted": false
+          }
+        ]
+      ]
+    },
+    {
+      "id": "F1-PROPOSALS",
+      "pass": true,
+      "detail": [
+        {
+          "propose": "undefined",
+          "propose_batch": "undefined"
+        },
+        {
+          "propose": "undefined",
+          "propose_batch": "undefined"
+        }
+      ]
+    },
+    {
+      "id": "F1-S1-GENUINE-CANCEL-FRAME",
+      "pass": true,
+      "detail": [
+        {
+          "requestId": 2,
+          "childCancel": {
+            "seq": 9,
+            "ts": "2026-10-25T00:23:04.658Z",
+            "upstream_pid": 29704,
+            "type": "child_stdin_line",
+            "line": "{\"jsonrpc\":\"2.0\",\"method\":\"notifications/cancelled\",\"params\":{\"requestId\":2,\"reason\":\"Error: Code Mode execution exceeded 300ms\"}}"
+          },
+          "serverResponseBeforeCancel": true
+        },
+        {
+          "requestId": 2,
+          "childCancel": {
+            "seq": 9,
+            "ts": "2026-10-25T00:23:45.570Z",
+            "upstream_pid": 25140,
+            "type": "child_stdin_line",
+            "line": "{\"jsonrpc\":\"2.0\",\"method\":\"notifications/cancelled\",\"params\":{\"requestId\":2,\"reason\":\"Error: Code Mode execution exceeded 300ms\"}}"
+          },
+          "serverResponseBeforeCancel": true
+        }
+      ]
+    },
+    {
+      "id": "F1-S2-SYNTHETIC-CANCEL",
+      "pass": true,
+      "detail": [
+        {
+          "seq": 4,
+          "ts": "2026-10-25T00:23:39.085Z",
+          "type": "handler_returned",
+          "tool": "slow.echo",
+          "requestId": 2,
+          "aborted": true,
+          "elapsedMs": 152,
+          "response_expected": false
+        },
+        {
+          "seq": 4,
+          "ts": "2026-10-25T00:24:16.646Z",
+          "type": "handler_returned",
+          "tool": "slow.echo",
+          "requestId": 2,
+          "aborted": true,
+          "elapsedMs": 153,
+          "response_expected": false
+        }
+      ]
+    },
+    {
+      "id": "F1-CLEANUP",
+      "pass": true,
+      "detail": [
+        {
+          "run": "run1",
+          "failures": []
+        },
+        {
+          "run": "run2",
+          "failures": []
+        }
+      ]
+    },
+    {
+      "id": "F1-POST-DISPOSAL",
+      "pass": true,
+      "detail": [
+        {
+          "run": "run1",
+          "hostEvents": 26,
+          "unsettled": [],
+          "late": []
+        },
+        {
+          "run": "run2",
+          "hostEvents": 26,
+          "unsettled": [],
+          "late": []
+        }
+      ]
+    },
+    {
+      "id": "F1-UNHANDLED",
+      "pass": true,
+      "detail": {
+        "verdict": [],
+        "runs": [
+          [],
+          []
+        ]
+      }
+    },
+    {
+      "id": "F1-P0-EVIDENCE",
+      "pass": true,
+      "detail": {
+        "p0_verdict": "FAIL",
+        "p0_verification": "VERIFIED",
+        "p0_classification": {
+          "genuine_upstream_request": true,
+          "timeout_error_returned": true,
+          "timeout_error": "Code execution failed: execution exceeded 1500ms",
+          "cancellation_notifications_sent": 0,
+          "cancellation_observed_by_relay": 0,
+          "pending_immediately_after_timeout": true,
+          "pending_after_observation_window": true,
+          "observation_end_reason": "window_elapsed",
+          "late_response_settled_request": true,
+          "required_harness_release_to_settle": true,
+          "transport_open_after_timeout": true,
+          "client_closed_after_timeout": false,
+          "relay_upstream_alive_at_observation": true,
+          "direct_response_delivered_after_release": true
+        },
+        "files_match_head": true
+      }
+    },
+    {
+      "id": "F1-PRESERVATION",
+      "pass": true,
+      "detail": {
+        "s1a_digest": "cc7f884866e6e94255b100de57b82eec4a51660aadaf51c6464198131030af57",
+        "frozenStatus": [],
+        "frozenDiff": [],
+        "m4Guard": true
+      }
+    },
+    {
+      "id": "F1-CANONICAL-MEMORY-PRODUCTION",
+      "pass": true,
+      "detail": {
+        "canonical_memory_match": true,
+        "productionDiff": []
+      }
+    },
+    {
+      "id": "F1-M4-UNTOUCHED",
+      "pass": true,
+      "detail": {
+        "guard": true,
+        "violations": [],
+        "m4Diff": []
+      }
+    },
+    {
+      "id": "F1-ONLY-P0F1",
+      "pass": true,
+      "detail": {
+        "status": [
+          "?? validation/cm01/p0-f1/.gitattributes",
+          "?? validation/cm01/p0-f1/.gitignore",
+          "?? validation/cm01/p0-f1/README.md",
+          "?? validation/cm01/p0-f1/VERIFICATION.md",
+          "?? validation/cm01/p0-f1/adapter.mjs",
+          "?? validation/cm01/p0-f1/evidence/calibration-100ms-measurements.json",
+          "?? validation/cm01/p0-f1/evidence/calibration-100ms.json",
+          "?? validation/cm01/p0-f1/evidence/commands.txt",
+          "?? validation/cm01/p0-f1/evidence/measurements.json",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-control-direct-child-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-control-direct-harness.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-control-direct-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-control-relay-child-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-control-relay-child-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-control-relay-harness.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-control-relay-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-control-relay-relay-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-control-relay-relay.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-mcp-error-child-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-mcp-error-harness.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-mcp-error-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-parallel-child-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-parallel-child-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-parallel-harness.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-parallel-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-parallel-relay-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-parallel-relay.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-race-after-child-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-race-after-child-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-race-after-harness.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-race-after-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-race-after-relay-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-race-after-relay.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-race-before-child-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-race-before-child-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-race-before-harness.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-race-before-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-race-before-relay-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-race-before-relay.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-race-boundary-0-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-race-boundary-1-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-race-boundary-2-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-race-boundary-child-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-race-boundary-child-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-race-boundary-harness.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-race-boundary-relay-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-race-boundary-relay.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-repeated-0-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-repeated-1-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-repeated-2-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-repeated-child-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-repeated-child-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-repeated-harness.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-repeated-relay-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-repeated-relay.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-sequential-fourth-child-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-sequential-fourth-child-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-sequential-fourth-harness.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-sequential-fourth-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-sequential-fourth-relay-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-sequential-fourth-relay.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-synthetic-cancel-harness.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-synthetic-cancel-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-synthetic-cancel-server.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-timeout-then-close-child-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-timeout-then-close-child-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-timeout-then-close-harness.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-timeout-then-close-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-timeout-then-close-relay-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-timeout-then-close-relay.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-timeout-withhold-child-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-timeout-withhold-child-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-timeout-withhold-harness.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-timeout-withhold-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-timeout-withhold-relay-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-timeout-withhold-relay.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-transport-close-child-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-transport-close-child-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-transport-close-harness.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-transport-close-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-transport-close-relay-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-transport-close-relay.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-validation-child-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-validation-harness.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run1-validation-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-control-direct-child-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-control-direct-harness.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-control-direct-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-control-relay-child-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-control-relay-child-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-control-relay-harness.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-control-relay-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-control-relay-relay-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-control-relay-relay.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-mcp-error-child-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-mcp-error-harness.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-mcp-error-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-parallel-child-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-parallel-child-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-parallel-harness.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-parallel-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-parallel-relay-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-parallel-relay.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-race-after-child-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-race-after-child-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-race-after-harness.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-race-after-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-race-after-relay-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-race-after-relay.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-race-before-child-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-race-before-child-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-race-before-harness.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-race-before-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-race-before-relay-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-race-before-relay.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-race-boundary-0-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-race-boundary-1-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-race-boundary-2-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-race-boundary-child-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-race-boundary-child-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-race-boundary-harness.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-race-boundary-relay-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-race-boundary-relay.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-repeated-0-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-repeated-1-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-repeated-2-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-repeated-child-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-repeated-child-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-repeated-harness.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-repeated-relay-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-repeated-relay.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-sequential-fourth-child-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-sequential-fourth-child-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-sequential-fourth-harness.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-sequential-fourth-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-sequential-fourth-relay-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-sequential-fourth-relay.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-synthetic-cancel-harness.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-synthetic-cancel-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-synthetic-cancel-server.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-timeout-then-close-child-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-timeout-then-close-child-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-timeout-then-close-harness.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-timeout-then-close-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-timeout-then-close-relay-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-timeout-then-close-relay.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-timeout-withhold-child-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-timeout-withhold-child-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-timeout-withhold-harness.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-timeout-withhold-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-timeout-withhold-relay-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-timeout-withhold-relay.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-transport-close-child-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-transport-close-child-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-transport-close-harness.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-transport-close-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-transport-close-relay-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-transport-close-relay.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-validation-child-stderr.log",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-validation-harness.jsonl",
+          "?? validation/cm01/p0-f1/evidence/raw/run2-validation-host-events.jsonl",
+          "?? validation/cm01/p0-f1/evidence/run1.json",
+          "?? validation/cm01/p0-f1/evidence/run2.json",
+          "?? validation/cm01/p0-f1/evidence/verdict.json",
+          "?? validation/cm01/p0-f1/evidence/verification.json",
+          "?? validation/cm01/p0-f1/evidence/versions.json",
+          "?? validation/cm01/p0-f1/harness.mjs",
+          "?? validation/cm01/p0-f1/package-lock.json",
+          "?? validation/cm01/p0-f1/package.json",
+          "?? validation/cm01/p0-f1/quickjs-executor.mjs",
+          "?? validation/cm01/p0-f1/relay.mjs",
+          "?? validation/cm01/p0-f1/run-f1.mjs",
+          "?? validation/cm01/p0-f1/synthetic-server.mjs",
+          "?? validation/cm01/p0-f1/verify-f1-evidence.mjs"
+        ],
+        "nonF1Status": []
+      }
+    },
+    {
+      "id": "F1-EVIDENCE-UNCHANGED",
+      "pass": true,
+      "detail": {
+        "before": "5a2d98d5213fa9bc3163b92a1a3f2b361617895e83748395f23982bcdd6097b6",
+        "after": "5a2d98d5213fa9bc3163b92a1a3f2b361617895e83748395f23982bcdd6097b6"
+      }
+    }
+  ],
+  "reproduction": {
+    "performed": true,
+    "temp_worktree": "C:\\Users\\hi\\AppData\\Local\\Temp\\opencode\\f1-verify-1792891898779",
+    "head": "adf50933d0beac255ac2a134e00ee13d40442302",
+    "steps": [
+      {
+        "step": "worktree_add",
+        "ok": true
+      },
+      {
+        "step": "copy_sources",
+        "ok": true,
+        "files": [
+          "quickjs-executor.mjs",
+          "adapter.mjs",
+          "relay.mjs",
+          "synthetic-server.mjs",
+          "harness.mjs",
+          "run-f1.mjs",
+          "package.json",
+          "package-lock.json",
+          ".gitignore",
+          ".gitattributes",
+          "README.md"
+        ]
+      },
+      {
+        "step": "npm_ci",
+        "ok": true
+      },
+      {
+        "step": "run",
+        "ok": true,
+        "status": 0
+      }
+    ],
+    "checks": [
+      {
+        "id": "REPRO-VERDICT",
+        "pass": true,
+        "detail": {
+          "verdict": "PASS",
+          "runs": [
+            "PASS",
+            "PASS"
+          ],
+          "repeatable": true,
+          "p0_comparison": true,
+          "preservation": true,
+          "unhandled": []
+        }
+      },
+      {
+        "id": "REPRO-CHECK-MATRIX",
+        "pass": true,
+        "detail": {
+          "temp": [
+            {
+              "id": "F1-N1-CONTROL-DIRECT",
+              "pass": true
+            },
+            {
+              "id": "F1-N2-CONTROL-RELAY",
+              "pass": true
+            },
+            {
+              "id": "F1-T1-TIMEOUT-SETTLES",
+              "pass": true
+            },
+            {
+              "id": "F1-T2-LATE-NO-REVIVAL",
+              "pass": true
+            },
+            {
+              "id": "F1-C1-RACE-BEFORE",
+              "pass": true
+            },
+            {
+              "id": "F1-C2-RACE-BOUNDARY",
+              "pass": true
+            },
+            {
+              "id": "F1-C3-RACE-AFTER",
+              "pass": true
+            },
+            {
+              "id": "F1-C3-PARALLEL",
+              "pass": true
+            },
+            {
+              "id": "F1-R1-SEQUENTIAL",
+              "pass": true
+            },
+            {
+              "id": "F1-R2-REPEATED",
+              "pass": true
+            },
+            {
+              "id": "F1-F1-TRANSPORT-CLOSE",
+              "pass": true
+            },
+            {
+              "id": "F1-F2-TIMEOUT-THEN-CLOSE",
+              "pass": true
+            },
+            {
+              "id": "F1-A1-VALIDATION",
+              "pass": true
+            },
+            {
+              "id": "F1-A2-MCP-ISERROR",
+              "pass": true
+            },
+            {
+              "id": "F1-A3-PROPOSALS",
+              "pass": true
+            },
+            {
+              "id": "F1-S1-GENUINE-CANCEL-FRAME",
+              "pass": true
+            },
+            {
+              "id": "F1-S2-SYNTHETIC-CANCEL",
+              "pass": true
+            },
+            {
+              "id": "F1-P1-CLEANUP",
+              "pass": true
+            },
+            {
+              "id": "F1-P1-NO-POST-DISPOSAL",
+              "pass": true
+            },
+            {
+              "id": "F1-NO-UNHANDLED",
+              "pass": true
+            }
+          ],
+          "canonical": [
+            {
+              "id": "F1-N1-CONTROL-DIRECT",
+              "pass": true
+            },
+            {
+              "id": "F1-N2-CONTROL-RELAY",
+              "pass": true
+            },
+            {
+              "id": "F1-T1-TIMEOUT-SETTLES",
+              "pass": true
+            },
+            {
+              "id": "F1-T2-LATE-NO-REVIVAL",
+              "pass": true
+            },
+            {
+              "id": "F1-C1-RACE-BEFORE",
+              "pass": true
+            },
+            {
+              "id": "F1-C2-RACE-BOUNDARY",
+              "pass": true
+            },
+            {
+              "id": "F1-C3-RACE-AFTER",
+              "pass": true
+            },
+            {
+              "id": "F1-C3-PARALLEL",
+              "pass": true
+            },
+            {
+              "id": "F1-R1-SEQUENTIAL",
+              "pass": true
+            },
+            {
+              "id": "F1-R2-REPEATED",
+              "pass": true
+            },
+            {
+              "id": "F1-F1-TRANSPORT-CLOSE",
+              "pass": true
+            },
+            {
+              "id": "F1-F2-TIMEOUT-THEN-CLOSE",
+              "pass": true
+            },
+            {
+              "id": "F1-A1-VALIDATION",
+              "pass": true
+            },
+            {
+              "id": "F1-A2-MCP-ISERROR",
+              "pass": true
+            },
+            {
+              "id": "F1-A3-PROPOSALS",
+              "pass": true
+            },
+            {
+              "id": "F1-S1-GENUINE-CANCEL-FRAME",
+              "pass": true
+            },
+            {
+              "id": "F1-S2-SYNTHETIC-CANCEL",
+              "pass": true
+            },
+            {
+              "id": "F1-P1-CLEANUP",
+              "pass": true
+            },
+            {
+              "id": "F1-P1-NO-POST-DISPOSAL",
+              "pass": true
+            },
+            {
+              "id": "F1-NO-UNHANDLED",
+              "pass": true
+            }
+          ]
+        }
+      },
+      {
+        "id": "REPRO-NORMALIZED-OUTCOMES",
+        "pass": true,
+        "detail": {
+          "canonical": {
+            "checks": [
+              {
+                "id": "F1-N1-CONTROL-DIRECT",
+                "pass": true
+              },
+              {
+                "id": "F1-N2-CONTROL-RELAY",
+                "pass": true
+              },
+              {
+                "id": "F1-T1-TIMEOUT-SETTLES",
+                "pass": true
+              },
+              {
+                "id": "F1-T2-LATE-NO-REVIVAL",
+                "pass": true
+              },
+              {
+                "id": "F1-C1-RACE-BEFORE",
+                "pass": true
+              },
+              {
+                "id": "F1-C2-RACE-BOUNDARY",
+                "pass": true
+              },
+              {
+                "id": "F1-C3-RACE-AFTER",
+                "pass": true
+              },
+              {
+                "id": "F1-C3-PARALLEL",
+                "pass": true
+              },
+              {
+                "id": "F1-R1-SEQUENTIAL",
+                "pass": true
+              },
+              {
+                "id": "F1-R2-REPEATED",
+                "pass": true
+              },
+              {
+                "id": "F1-F1-TRANSPORT-CLOSE",
+                "pass": true
+              },
+              {
+                "id": "F1-F2-TIMEOUT-THEN-CLOSE",
+                "pass": true
+              },
+              {
+                "id": "F1-A1-VALIDATION",
+                "pass": true
+              },
+              {
+                "id": "F1-A2-MCP-ISERROR",
+                "pass": true
+              },
+              {
+                "id": "F1-A3-PROPOSALS",
+                "pass": true
+              },
+              {
+                "id": "F1-S1-GENUINE-CANCEL-FRAME",
+                "pass": true
+              },
+              {
+                "id": "F1-S2-SYNTHETIC-CANCEL",
+                "pass": true
+              },
+              {
+                "id": "F1-P1-CLEANUP",
+                "pass": true
+              },
+              {
+                "id": "F1-P1-NO-POST-DISPOSAL",
+                "pass": true
+              },
+              {
+                "id": "F1-NO-UNHANDLED",
+                "pass": true
+              }
+            ],
+            "controlDirect": {
+              "parity": {
+                "get": true,
+                "search": true,
+                "applicable": true,
+                "trace": true,
+                "capabilities": true
+              },
+              "order": [
+                "decision.get",
+                "decision.search",
+                "decision.applicable_to",
+                "decision.trace"
+              ],
+              "ok": true
+            },
+            "controlRelay": {
+              "parity": {
+                "get": true,
+                "search": true,
+                "applicable": true,
+                "trace": true,
+                "capabilities": true
+              },
+              "relayEvents": {
+                "targetSeen": 4,
+                "targetForwarded": 4,
+                "upstreamResponses": 4,
+                "withheld": 0,
+                "cancellations": 0
+              },
+              "ok": true
+            },
+            "timeout": {
+              "ok": true,
+              "pendingAtDeadline": true,
+              "pendingAtExecutionReturn": false,
+              "outcome": "rejected",
+              "errorCode": -32001,
+              "cancelCount": 1,
+              "cancelAfterRelease": 1,
+              "lateAfterRelease": 1,
+              "stateAfterRelease": "rejected",
+              "cancelledCalls": 1,
+              "cancelledSettled": 1,
+              "cancelledUnsettled": 0,
+              "failedCalls": 0
+            },
+            "raceBefore": {
+              "label": "before",
+              "outcome": "fulfilled",
+              "errorCode": null,
+              "pending": false,
+              "cancelCount": 0,
+              "timedOut": false,
+              "cancelledCalls": 0,
+              "cancelledUnsettled": 0
+            },
+            "raceAfter": {
+              "label": "after",
+              "outcome": "rejected",
+              "errorCode": -32001,
+              "pending": false,
+              "cancelCount": 1,
+              "timedOut": true,
+              "cancelledCalls": 1,
+              "cancelledUnsettled": 0
+            },
+            "raceBoundary": {
+              "ok": true,
+              "invalid": 0,
+              "count": 3
+            },
+            "parallel": {
+              "ok": true,
+              "getOutcome": "fulfilled",
+              "searchOutcome": "rejected",
+              "searchError": -32001,
+              "getCancel": 0,
+              "searchCancel": 1,
+              "cancelledCalls": 1,
+              "resolvedCalls": 1
+            },
+            "sequential": {
+              "ok": true,
+              "outcomes": {
+                "decision.get": "fulfilled",
+                "decision.search": "fulfilled",
+                "decision.applicable_to": "fulfilled",
+                "decision.trace": "rejected"
+              },
+              "cancellations": {
+                "decision.get": 0,
+                "decision.search": 0,
+                "decision.applicable_to": 0,
+                "decision.trace": 1
+              },
+              "cancelledCalls": 1,
+              "resolvedCalls": 3
+            },
+            "repeated": {
+              "ok": true,
+              "iterations": [
+                {
+                  "outcome": "rejected",
+                  "errorCode": -32001,
+                  "cancelCount": 1,
+                  "cancelledSettled": 1,
+                  "cancelledUnsettled": 0
+                },
+                {
+                  "outcome": "rejected",
+                  "errorCode": -32001,
+                  "cancelCount": 1,
+                  "cancelledSettled": 1,
+                  "cancelledUnsettled": 0
+                },
+                {
+                  "outcome": "rejected",
+                  "errorCode": -32001,
+                  "cancelCount": 1,
+                  "cancelledSettled": 1,
+                  "cancelledUnsettled": 0
+                }
+              ]
+            },
+            "transportClose": {
+              "ok": true,
+              "outcome": "rejected",
+              "errorCode": -32000,
+              "cancelCount": 0,
+              "timedOut": false,
+              "cancelledCalls": 0,
+              "failedCalls": 1
+            },
+            "timeoutThenClose": {
+              "ok": true,
+              "errorCode": -32001,
+              "cancelCount": 1,
+              "afterCloseError": -32001
+            },
+            "validation": {
+              "ok": true,
+              "trackedCalls": 0,
+              "cancelledCalls": 0
+            },
+            "mcpError": {
+              "ok": true,
+              "stateOutcome": "fulfilled",
+              "isError": true,
+              "cancelCount": 0
+            },
+            "synthetic": {
+              "ok": true,
+              "stateOutcome": "rejected",
+              "errorCode": -32001,
+              "cancelCount": 1,
+              "aborted": true,
+              "responseExpected": false,
+              "responseAfterCancel": 0
+            },
+            "p0_comparison": {
+              "original": {
+                "verdict": "FAIL",
+                "pending_at_timeout": true,
+                "pending_after_window": true,
+                "cancellation_notifications_sent": 0,
+                "late_response_settled_request": true
+              },
+              "corrected": {
+                "pending_at_deadline": true,
+                "pending_at_execution_return": false,
+                "pending_after_grace": false,
+                "cancellation_notifications_sent": 1,
+                "late_response_settled_request": false,
+                "client_outcome": "rejected",
+                "client_error_code": -32001
+              }
+            },
+            "unhandled": []
+          },
+          "reproduced": {
+            "checks": [
+              {
+                "id": "F1-N1-CONTROL-DIRECT",
+                "pass": true
+              },
+              {
+                "id": "F1-N2-CONTROL-RELAY",
+                "pass": true
+              },
+              {
+                "id": "F1-T1-TIMEOUT-SETTLES",
+                "pass": true
+              },
+              {
+                "id": "F1-T2-LATE-NO-REVIVAL",
+                "pass": true
+              },
+              {
+                "id": "F1-C1-RACE-BEFORE",
+                "pass": true
+              },
+              {
+                "id": "F1-C2-RACE-BOUNDARY",
+                "pass": true
+              },
+              {
+                "id": "F1-C3-RACE-AFTER",
+                "pass": true
+              },
+              {
+                "id": "F1-C3-PARALLEL",
+                "pass": true
+              },
+              {
+                "id": "F1-R1-SEQUENTIAL",
+                "pass": true
+              },
+              {
+                "id": "F1-R2-REPEATED",
+                "pass": true
+              },
+              {
+                "id": "F1-F1-TRANSPORT-CLOSE",
+                "pass": true
+              },
+              {
+                "id": "F1-F2-TIMEOUT-THEN-CLOSE",
+                "pass": true
+              },
+              {
+                "id": "F1-A1-VALIDATION",
+                "pass": true
+              },
+              {
+                "id": "F1-A2-MCP-ISERROR",
+                "pass": true
+              },
+              {
+                "id": "F1-A3-PROPOSALS",
+                "pass": true
+              },
+              {
+                "id": "F1-S1-GENUINE-CANCEL-FRAME",
+                "pass": true
+              },
+              {
+                "id": "F1-S2-SYNTHETIC-CANCEL",
+                "pass": true
+              },
+              {
+                "id": "F1-P1-CLEANUP",
+                "pass": true
+              },
+              {
+                "id": "F1-P1-NO-POST-DISPOSAL",
+                "pass": true
+              },
+              {
+                "id": "F1-NO-UNHANDLED",
+                "pass": true
+              }
+            ],
+            "controlDirect": {
+              "parity": {
+                "get": true,
+                "search": true,
+                "applicable": true,
+                "trace": true,
+                "capabilities": true
+              },
+              "order": [
+                "decision.get",
+                "decision.search",
+                "decision.applicable_to",
+                "decision.trace"
+              ],
+              "ok": true
+            },
+            "controlRelay": {
+              "parity": {
+                "get": true,
+                "search": true,
+                "applicable": true,
+                "trace": true,
+                "capabilities": true
+              },
+              "relayEvents": {
+                "targetSeen": 4,
+                "targetForwarded": 4,
+                "upstreamResponses": 4,
+                "withheld": 0,
+                "cancellations": 0
+              },
+              "ok": true
+            },
+            "timeout": {
+              "ok": true,
+              "pendingAtDeadline": true,
+              "pendingAtExecutionReturn": false,
+              "outcome": "rejected",
+              "errorCode": -32001,
+              "cancelCount": 1,
+              "cancelAfterRelease": 1,
+              "lateAfterRelease": 1,
+              "stateAfterRelease": "rejected",
+              "cancelledCalls": 1,
+              "cancelledSettled": 1,
+              "cancelledUnsettled": 0,
+              "failedCalls": 0
+            },
+            "raceBefore": {
+              "label": "before",
+              "outcome": "fulfilled",
+              "errorCode": null,
+              "pending": false,
+              "cancelCount": 0,
+              "timedOut": false,
+              "cancelledCalls": 0,
+              "cancelledUnsettled": 0
+            },
+            "raceAfter": {
+              "label": "after",
+              "outcome": "rejected",
+              "errorCode": -32001,
+              "pending": false,
+              "cancelCount": 1,
+              "timedOut": true,
+              "cancelledCalls": 1,
+              "cancelledUnsettled": 0
+            },
+            "raceBoundary": {
+              "ok": true,
+              "invalid": 0,
+              "count": 3
+            },
+            "parallel": {
+              "ok": true,
+              "getOutcome": "fulfilled",
+              "searchOutcome": "rejected",
+              "searchError": -32001,
+              "getCancel": 0,
+              "searchCancel": 1,
+              "cancelledCalls": 1,
+              "resolvedCalls": 1
+            },
+            "sequential": {
+              "ok": true,
+              "outcomes": {
+                "decision.get": "fulfilled",
+                "decision.search": "fulfilled",
+                "decision.applicable_to": "fulfilled",
+                "decision.trace": "rejected"
+              },
+              "cancellations": {
+                "decision.get": 0,
+                "decision.search": 0,
+                "decision.applicable_to": 0,
+                "decision.trace": 1
+              },
+              "cancelledCalls": 1,
+              "resolvedCalls": 3
+            },
+            "repeated": {
+              "ok": true,
+              "iterations": [
+                {
+                  "outcome": "rejected",
+                  "errorCode": -32001,
+                  "cancelCount": 1,
+                  "cancelledSettled": 1,
+                  "cancelledUnsettled": 0
+                },
+                {
+                  "outcome": "rejected",
+                  "errorCode": -32001,
+                  "cancelCount": 1,
+                  "cancelledSettled": 1,
+                  "cancelledUnsettled": 0
+                },
+                {
+                  "outcome": "rejected",
+                  "errorCode": -32001,
+                  "cancelCount": 1,
+                  "cancelledSettled": 1,
+                  "cancelledUnsettled": 0
+                }
+              ]
+            },
+            "transportClose": {
+              "ok": true,
+              "outcome": "rejected",
+              "errorCode": -32000,
+              "cancelCount": 0,
+              "timedOut": false,
+              "cancelledCalls": 0,
+              "failedCalls": 1
+            },
+            "timeoutThenClose": {
+              "ok": true,
+              "errorCode": -32001,
+              "cancelCount": 1,
+              "afterCloseError": -32001
+            },
+            "validation": {
+              "ok": true,
+              "trackedCalls": 0,
+              "cancelledCalls": 0
+            },
+            "mcpError": {
+              "ok": true,
+              "stateOutcome": "fulfilled",
+              "isError": true,
+              "cancelCount": 0
+            },
+            "synthetic": {
+              "ok": true,
+              "stateOutcome": "rejected",
+              "errorCode": -32001,
+              "cancelCount": 1,
+              "aborted": true,
+              "responseExpected": false,
+              "responseAfterCancel": 0
+            },
+            "p0_comparison": {
+              "original": {
+                "verdict": "FAIL",
+                "pending_at_timeout": true,
+                "pending_after_window": true,
+                "cancellation_notifications_sent": 0,
+                "late_response_settled_request": true
+              },
+              "corrected": {
+                "pending_at_deadline": true,
+                "pending_at_execution_return": false,
+                "pending_after_grace": false,
+                "cancellation_notifications_sent": 1,
+                "late_response_settled_request": false,
+                "client_outcome": "rejected",
+                "client_error_code": -32001
+              }
+            },
+            "unhandled": []
+          }
+        }
+      },
+      {
+        "id": "REPRO-SOURCE-HASHES",
+        "pass": true,
+        "detail": {
+          "f1_executor": {
+            "canonical": "0d81093b20fa0b77a3fc9f2e6b4a90bf184668d0377242c3e4f37e64afd9d2b1",
+            "reproduced": "0d81093b20fa0b77a3fc9f2e6b4a90bf184668d0377242c3e4f37e64afd9d2b1"
+          },
+          "f1_adapter": {
+            "canonical": "3d8123975bc9f67147fec90ff3e6911a08e40a7f2dc4bd7b43da14b0530cb08c",
+            "reproduced": "3d8123975bc9f67147fec90ff3e6911a08e40a7f2dc4bd7b43da14b0530cb08c"
+          },
+          "f1_relay": {
+            "canonical": "536f32e7869fc407782b1c1db7d55afc3bd383bc0ede405f40d6f08b45e0f5e5",
+            "reproduced": "536f32e7869fc407782b1c1db7d55afc3bd383bc0ede405f40d6f08b45e0f5e5"
+          },
+          "f1_synthetic_server": {
+            "canonical": "b1469f6ed676ab3b057a92e6329096336a62456f1604317c46d70f6941833063",
+            "reproduced": "b1469f6ed676ab3b057a92e6329096336a62456f1604317c46d70f6941833063"
+          },
+          "f1_runner": {
+            "canonical": "55a40f182df80bf7f3828e165601758298912eaa7f6285ef0772cc967103e830",
+            "reproduced": "55a40f182df80bf7f3828e165601758298912eaa7f6285ef0772cc967103e830"
+          },
+          "package_lock": {
+            "canonical": "4f4f81b24f31490ff1a1d3f5c1a33fd359d1545567f91daffaa56abaa8e63167",
+            "reproduced": "4f4f81b24f31490ff1a1d3f5c1a33fd359d1545567f91daffaa56abaa8e63167"
+          }
+        }
+      },
+      {
+        "id": "REPRO-LATENCY-BOUND",
+        "pass": true,
+        "detail": {
+          "samples": 16,
+          "max_ms": 11
+        }
+      }
+    ],
+    "exit_code": 0,
+    "stdout_tail": [
+      "{\"run\":\"run1\",\"verdict\":\"PASS\",\"failed\":[]}",
+      "[f1] starting run2",
+      "{\"run\":\"run2\",\"verdict\":\"PASS\",\"failed\":[]}",
+      "{\"verdict\":\"PASS\",\"repeatable\":true,\"preservation\":true,\"p0_comparison\":true,\"failed_checks\":[],\"latency\":{\"samples\":16,\"max_ms\":11,\"mean_ms\":2.125}}"
+    ],
+    "stderr_tail": [],
+    "verdict": "PASS",
+    "repeatable": true,
+    "cleaned_worktree": true
+  },
+  "summary": {
+    "total_checks": 32,
+    "failed_checks": [],
+    "reproduced": true,
+    "verification_status": "VERIFIED"
+  },
+  "errors": [],
+  "latency": {
+    "grace_ms": 50,
+    "provisional_ms": 100,
+    "final_ms": 50,
+    "recorded": {
+      "samples": 16,
+      "max_ms": 4,
+      "min_ms": 1,
+      "mean_ms": 1.5625
+    },
+    "recomputed": {
+      "samples": 16,
+      "max_ms": 4,
+      "min_ms": 1,
+      "mean_ms": 1.5625
+    },
+    "samples": [
+      {
+        "run": "run1",
+        "scenario": "timeout-withhold",
+        "abortToSettlementMs": 4
+      },
+      {
+        "run": "run1",
+        "scenario": "repeated-0",
+        "abortToSettlementMs": 1
+      },
+      {
+        "run": "run1",
+        "scenario": "repeated-1",
+        "abortToSettlementMs": 2
+      },
+      {
+        "run": "run1",
+        "scenario": "repeated-2",
+        "abortToSettlementMs": 1
+      },
+      {
+        "run": "run1",
+        "scenario": "parallel-search",
+        "abortToSettlementMs": 1
+      },
+      {
+        "run": "run1",
+        "scenario": "sequential-trace",
+        "abortToSettlementMs": 2
+      },
+      {
+        "run": "run1",
+        "scenario": "timeout-then-close",
+        "abortToSettlementMs": 2
+      },
+      {
+        "run": "run1",
+        "scenario": "synthetic",
+        "abortToSettlementMs": 1
+      },
+      {
+        "run": "run2",
+        "scenario": "timeout-withhold",
+        "abortToSettlementMs": 2
+      },
+      {
+        "run": "run2",
+        "scenario": "repeated-0",
+        "abortToSettlementMs": 1
+      },
+      {
+        "run": "run2",
+        "scenario": "repeated-1",
+        "abortToSettlementMs": 1
+      },
+      {
+        "run": "run2",
+        "scenario": "repeated-2",
+        "abortToSettlementMs": 2
+      },
+      {
+        "run": "run2",
+        "scenario": "parallel-search",
+        "abortToSettlementMs": 2
+      },
+      {
+        "run": "run2",
+        "scenario": "sequential-trace",
+        "abortToSettlementMs": 1
+      },
+      {
+        "run": "run2",
+        "scenario": "timeout-then-close",
+        "abortToSettlementMs": 1
+      },
+      {
+        "run": "run2",
+        "scenario": "synthetic",
+        "abortToSettlementMs": 1
+      }
+    ],
+    "note": "Latency is environment-specific. The 50 ms bound is not generalized beyond this tested environment."
+  },
+  "preservation": {
+    "s1a_digest": "cc7f884866e6e94255b100de57b82eec4a51660aadaf51c6464198131030af57",
+    "frozen_status": [],
+    "frozen_diff": [],
+    "m4_guard_pass": true,
+    "canonical_memory_matches_head": true,
+    "production_diff": [],
+    "status": [
+      "?? validation/cm01/p0-f1/.gitattributes",
+      "?? validation/cm01/p0-f1/.gitignore",
+      "?? validation/cm01/p0-f1/README.md",
+      "?? validation/cm01/p0-f1/VERIFICATION.md",
+      "?? validation/cm01/p0-f1/adapter.mjs",
+      "?? validation/cm01/p0-f1/evidence/calibration-100ms-measurements.json",
+      "?? validation/cm01/p0-f1/evidence/calibration-100ms.json",
+      "?? validation/cm01/p0-f1/evidence/commands.txt",
+      "?? validation/cm01/p0-f1/evidence/measurements.json",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-control-direct-child-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-control-direct-harness.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-control-direct-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-control-relay-child-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-control-relay-child-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-control-relay-harness.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-control-relay-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-control-relay-relay-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-control-relay-relay.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-mcp-error-child-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-mcp-error-harness.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-mcp-error-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-parallel-child-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-parallel-child-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-parallel-harness.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-parallel-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-parallel-relay-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-parallel-relay.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-race-after-child-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-race-after-child-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-race-after-harness.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-race-after-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-race-after-relay-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-race-after-relay.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-race-before-child-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-race-before-child-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-race-before-harness.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-race-before-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-race-before-relay-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-race-before-relay.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-race-boundary-0-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-race-boundary-1-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-race-boundary-2-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-race-boundary-child-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-race-boundary-child-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-race-boundary-harness.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-race-boundary-relay-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-race-boundary-relay.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-repeated-0-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-repeated-1-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-repeated-2-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-repeated-child-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-repeated-child-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-repeated-harness.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-repeated-relay-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-repeated-relay.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-sequential-fourth-child-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-sequential-fourth-child-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-sequential-fourth-harness.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-sequential-fourth-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-sequential-fourth-relay-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-sequential-fourth-relay.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-synthetic-cancel-harness.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-synthetic-cancel-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-synthetic-cancel-server.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-timeout-then-close-child-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-timeout-then-close-child-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-timeout-then-close-harness.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-timeout-then-close-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-timeout-then-close-relay-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-timeout-then-close-relay.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-timeout-withhold-child-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-timeout-withhold-child-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-timeout-withhold-harness.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-timeout-withhold-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-timeout-withhold-relay-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-timeout-withhold-relay.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-transport-close-child-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-transport-close-child-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-transport-close-harness.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-transport-close-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-transport-close-relay-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-transport-close-relay.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-validation-child-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-validation-harness.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run1-validation-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-control-direct-child-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-control-direct-harness.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-control-direct-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-control-relay-child-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-control-relay-child-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-control-relay-harness.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-control-relay-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-control-relay-relay-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-control-relay-relay.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-mcp-error-child-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-mcp-error-harness.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-mcp-error-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-parallel-child-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-parallel-child-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-parallel-harness.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-parallel-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-parallel-relay-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-parallel-relay.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-race-after-child-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-race-after-child-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-race-after-harness.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-race-after-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-race-after-relay-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-race-after-relay.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-race-before-child-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-race-before-child-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-race-before-harness.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-race-before-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-race-before-relay-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-race-before-relay.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-race-boundary-0-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-race-boundary-1-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-race-boundary-2-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-race-boundary-child-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-race-boundary-child-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-race-boundary-harness.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-race-boundary-relay-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-race-boundary-relay.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-repeated-0-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-repeated-1-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-repeated-2-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-repeated-child-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-repeated-child-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-repeated-harness.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-repeated-relay-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-repeated-relay.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-sequential-fourth-child-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-sequential-fourth-child-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-sequential-fourth-harness.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-sequential-fourth-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-sequential-fourth-relay-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-sequential-fourth-relay.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-synthetic-cancel-harness.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-synthetic-cancel-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-synthetic-cancel-server.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-timeout-then-close-child-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-timeout-then-close-child-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-timeout-then-close-harness.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-timeout-then-close-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-timeout-then-close-relay-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-timeout-then-close-relay.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-timeout-withhold-child-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-timeout-withhold-child-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-timeout-withhold-harness.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-timeout-withhold-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-timeout-withhold-relay-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-timeout-withhold-relay.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-transport-close-child-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-transport-close-child-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-transport-close-harness.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-transport-close-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-transport-close-relay-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-transport-close-relay.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-validation-child-stderr.log",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-validation-harness.jsonl",
+      "?? validation/cm01/p0-f1/evidence/raw/run2-validation-host-events.jsonl",
+      "?? validation/cm01/p0-f1/evidence/run1.json",
+      "?? validation/cm01/p0-f1/evidence/run2.json",
+      "?? validation/cm01/p0-f1/evidence/verdict.json",
+      "?? validation/cm01/p0-f1/evidence/verification.json",
+      "?? validation/cm01/p0-f1/evidence/versions.json",
+      "?? validation/cm01/p0-f1/harness.mjs",
+      "?? validation/cm01/p0-f1/package-lock.json",
+      "?? validation/cm01/p0-f1/package.json",
+      "?? validation/cm01/p0-f1/quickjs-executor.mjs",
+      "?? validation/cm01/p0-f1/relay.mjs",
+      "?? validation/cm01/p0-f1/run-f1.mjs",
+      "?? validation/cm01/p0-f1/synthetic-server.mjs",
+      "?? validation/cm01/p0-f1/verify-f1-evidence.mjs"
+    ]
+  }
+}
