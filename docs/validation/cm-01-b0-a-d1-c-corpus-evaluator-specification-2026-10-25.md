@@ -170,6 +170,18 @@ Each scenario is a frozen JSON object. Proposed minimum fields:
 
 The manifest is an ordered list of scenarios plus a SHA-256 manifest of all scenario objects, prompts, expected answers, corpus, generator version and evaluator version. Scenario order is frozen before execution and never selected by model output.
 
+### 4.1 Model-visible projection — required data-flow boundary
+
+The scenario manifest above is a **private orchestration/evaluator artifact**, not a model prompt. In particular, `expected`, `dependency_graph`, `leakage_checks`, `duplicate_checks`, oracle-derived identities, fixture paths and reviewer records are **never** supplied to either model arm. The host MUST build a separately serialized, allowlisted `model_task_payload` consisting only of:
+
+- user-facing task objective/prompt and explicitly permitted input parameters;
+- the same frozen required-final-answer JSON schema and task-operation constraints for both arms;
+- arm-specific tool interface descriptions (four direct read tools or one Code Mode interface) whose differences are included in the measured intervention.
+
+The `model_task_payload` MUST be generated from a dedicated projection schema, **not** by serializing the full scenario and deleting known secret fields. The prompt, system/developer instructions, tool definitions, model-facing wrapper and submitted request body must be inspected as a whole, after all interpolation, before dispatch. The expected-answer record and evaluator/oracle only enter the trusted scorer **after** the model response. Genuine MCP tool results may legitimately disclose identities retrieved at runtime; the prohibition is on advance disclosure through scenario metadata or prompts. Explicit IDs for T1/T4 remain allowed, while T5-T8 subsequent target IDs remain withheld until the preceding MCP result.
+
+**Mandatory preflight (synthetic, no model/API call):** place a unique secret canary only in the private `expected`/oracle metadata of a test scenario; render both Direct and Code Mode model-facing requests; assert that the canary and all forbidden metadata keys are absent from every request component and tool description. Assert that any attempt to pass the full scenario object, any unknown projection key, or a leaked subsequent `record_id` for T5-T8 fails closed. Preserve projection-schema hash, rendered-request hashes, allowlist tests and leakage-verifier results. These are specifications for future tests, **not** completed evidence. The model-facing projection is distinct from the actual Decision MCP fixture, which remains available only through the genuine MCP read methods.
+
 ## 5. Corpus adequacy and coverage
 
 The corpus must be adequate for the approved D1 power plan, not merely large. Adequacy is a review decision, not a count invented here.
@@ -293,7 +305,7 @@ For every scenario:
 - expected decision IDs, version IDs, digests, rule IDs and evidence selectors must not appear in prompt or tool descriptions unless the task explicitly requires the ID;
 - no later-call argument may be pre-filled in the prompt for T5-T8;
 - no expected answer may be recoverable from a prompt-only string match;
-- the dependency proof in Section 3.1 must pass;
+- the dependency proof in Section 3.2 and the model-visible projection in Section 4.1 must pass;
 - the model must not receive a hidden answer file, prior transcript or evaluator output.
 
 ### 7.4 B0-M overlap
