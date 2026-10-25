@@ -285,13 +285,9 @@ loosened, and no floor is lowered. It rests on the owner's rulings on the
 corpus author's sanitized ambiguity brief (AMB-01 to AMB-13), which were
 made without opening any corpus material.
 
-**What came from where.**
-- Every rule below comes from those owner rulings, except the
-  traceback-frame comparison rule in **A1.4**.
-- The orchestrator added the A1.4 rule because a baseline traceback contains
-  build-specific paths and line numbers, so a byte-for-byte comparison of
-  it could never match. It needs reviewer confirmation before this amendment
-  merges.
+**What came from where.** Every rule below comes from those owner
+rulings. A1.4 also adds a diagnostic-only traceback analysis. That analysis
+never changes a gate result (review finding G2V-F5).
 
 ### A1.1 Routing, trusted source and evidence are three separate facts (AMB-01, AMB-02, AMB-07)
 
@@ -392,18 +388,21 @@ clean proceed, such as content with a lone surrogate.
 - **A legacy error that was successfully captured and matches the baseline**
   is an observed outcome. It is scored under G5.
 
-**Traceback-frame rule (added by the orchestrator, needs reviewer
-confirmation).**
-- If the baseline's stderr contains a Python traceback, its frame lines
-  (`File "...", line N, in ...`) depend on the build: install path and line
-  numbers. They cannot match byte for byte across builds.
-- For such cases, G5 requires all of the following to be identical:
-  - stdout;
-  - exit status;
-  - the traceback's final exception line (type and message);
-  - every stderr line outside the traceback.
-- The scorer records the full raw stderr diff for disclosure.
-- This exception applies to traceback frames only.
+**G5 stays a raw byte comparison (G2V-F5).** For these cases too, G5
+compares stdout, stderr and exit status **byte for byte** against the pinned
+pre-G2 baseline. The only exception is the routed-CR case from revision 2.
+
+- **No traceback exception.** If the two pinned builds give different stderr
+  bytes, that case **fails G5**, and the results record reports the failure.
+  This holds even when the only differences are traceback frame paths or line
+  numbers.
+- **Diagnostic analysis only.** For each such case the scorer records the full
+  raw stderr diff, plus a normalized comparison: traceback frame lines
+  removed, and the final exception line and all non-traceback lines
+  compared.
+  - This analysis explains a G5 failure.
+  - It never turns a raw parity failure into a PASS, and it is not counted
+    in any gate.
 
 ### A1.5 Confirmed as written
 
