@@ -226,6 +226,25 @@ This surface remains distinct from the generic hosted MCP / HTTP control plane l
 
 See proposed [ADR-027](../adr/ADR-027-decision-mcp-proposal-ingestion-and-authority-boundary.md) and issue #362.
 
+### P1 (parallel) — Code Mode orchestration and software-factory interoperability (CM-01)
+
+Maintain **Code Mode as a parallel, optional Decision MCP consumer integration** for orchestration efficiency, programmable decision-context composition, and software-factory interoperability. This workstream supports—not gates or replaces—the Decision Index, `DecisionRetriever`, `ConflictDetector`, deterministic enforcement, or independent architecture benchmarks. See [CM-01 tracker #640](https://github.com/MnemeHQ/mneme/issues/640).
+
+**Recorded status (2026-10-24):**
+
+- **S1-A1:** merged local OSS compatibility experiment using a sandboxed QuickJS executor and the four read-only Decision MCP methods. M7 demonstrated data-dependent `search → get → trace` composition within one Code Mode execution with output parity; model-turn, token and end-to-end efficiency gains are **not yet measured**.
+- **P0-01:** genuine MCP cancellation defect reproduced; original **FAIL** preserved with independently verified evidence, merged in [PR #633](https://github.com/MnemeHQ/mneme/pull/633) (`adf50933`).
+- **P0-01-F1:** isolated per-call cancellation correction **PASS** (20/20 checks in each of two local runs); independent evidence verification **VERIFIED** (32 static and 5 reproduction checks, zero discrepancies). F1 remains **uncommitted/unmerged** pending a separate evidence-record PR. Its 50 ms cleanup grace is a tested-environment result, not a cross-platform guarantee. The original P0 FAIL remains unchanged. **S1-A2 stays blocked** until separately authorized.
+
+**Sequential gates (authorize one at a time):**
+
+1. Record F1 verified evidence in a separate PR, preserving frozen S1-A1/P0 files, hashes and the original failure.
+2. Benchmark direct MCP versus Code Mode on pinned, representative read-only decision workflows. Measure **model turns, tokens/context transferred, wall-clock latency, MCP requests, correctness/decision identity, error recovery, and cleanup**; retain a no-benefit outcome if overhead outweighs gains.
+3. Evaluate one portable agent-orchestrator/software-factory reference integration only after the benchmark shows a defensible benefit. Validate reliable cancellation, method allowlisting, argument checks, parity, and host isolation. No support or production-readiness claim from local compatibility alone.
+4. Reassess MCP capability gaps as DG1/DG2 and decision-linked evidence mature (for example effective-decision explanations, protection/evidence reads, version history, or read-only conflict findings). **Prefer composition of existing tools** first; any new MCP method requires an independent, versioned ADR-027 authority/capability review and protocol validation.
+
+**Architectural constraints:** ADR-023 keeps the Decision Index canonical; ADR-027 freezes the **current six-tool** MCP capability inventory (four reads and two non-authoritative proposal methods). Code Mode cannot accept/activate/supersede decisions, grant waivers, create trusted evidence, or become a second resolver/enforcer. Existing CLI, hook, CI and direct MCP flows remain authoritative and usable without Code Mode. No implication of server-side execution termination, hosted Workers compatibility, mutation enforcement, or universal sandbox/process isolation.
+
 ### P1 — Reference review consumer validation
 
 Validate one external review system against the Decision MCP surface after the surface exists. CodeRabbit is a strong candidate because its current product supports custom MCP context during code review.
