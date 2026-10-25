@@ -267,6 +267,18 @@ if C3_SELFTEST_CLAUDE_HOME=$(cygpath -w "$Q2HOME" 2>/dev/null || echo "$Q2HOME")
 else
   echo "FAIL Q2 collector: copied $(ls "$Q2/out" | tr '\n' ' ')"; fail=1
 fi
+#     Two recent sessions in the same probe repo cannot be told apart: the
+#     collector fails closed and copies nothing (no selection by order).
+mkdir -p "$Q2HOME/projects/op2" "$Q2/out2"; cp "$Q2HOME/projects/op/s.jsonl" "$Q2HOME/projects/op2/s.jsonl"
+if C3_SELFTEST_CLAUDE_HOME=$(cygpath -w "$Q2HOME" 2>/dev/null || echo "$Q2HOME") \
+     "$PY" -E -P "$BASE/collect_transcript.py" "$Q2REPO" "$(( $(date +%s) - 60 ))" \
+     "$(cygpath -w "$Q2/out2" 2>/dev/null || echo "$Q2/out2")" > /dev/null 2>&1; then
+  echo "FAIL Q2 collector: accepted two same-repo sessions ($(ls "$Q2/out2" | tr '\n' ' '))"; fail=1
+elif [ -n "$(ls "$Q2/out2")" ]; then
+  echo "FAIL Q2 collector: failed but copied $(ls "$Q2/out2" | tr '\n' ' ')"; fail=1
+else
+  echo "ok   Q2 collector: two same-repo sessions -> harness failure, nothing copied"
+fi
 # (b) The classifier reads the operator attestation as UTF-8: a character that
 #     cp1252 cannot decode (U+2010, byte 0x90) must not crash it, and the key
 #     text is still found; without the key text, delivery is contradicted.

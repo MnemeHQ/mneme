@@ -5,12 +5,14 @@ usage: collect_transcript.py <repo> <start-epoch> <out>     (interactive arm, sc
 
 Claude Code stores each session as JSONL under ``~/.claude/projects/<dir>/``.
 
-Interactive: copies every transcript modified after ``<start-epoch>`` whose
+Interactive: copies the one transcript modified after ``<start-epoch>`` whose
 entries all have ``<repo>`` as their working directory (``cwd``) to
-``<out>/transcript-<n>.jsonl``, and fails if there is none. A transcript that
-only mentions the repo path, such as an agent chat that discussed the probe, is
-not the operator's session and is never copied (first live Q2 attempts). The
-transcript stands in for headless stream-json (E2) in that arm.
+``<out>/transcript-1.jsonl``. It fails closed, copying nothing, if there is
+none or more than one: two qualifying sessions cannot be told apart, so neither
+is chosen by order. A transcript that only mentions the repo path, such as an
+agent chat that discussed the probe, is not the operator's session and never
+qualifies (first live Q2 attempts). The transcript stands in for headless
+stream-json (E2) in that arm.
 
 Headless: copies the one transcript of the ``claude -p`` session to
 ``<out>/transcript.jsonl``, beside stream-json (which stays the E2 source).
@@ -89,13 +91,12 @@ def interactive(repo: str, start: float, out: Path) -> int:
         cwds = {e["cwd"] for e in jsonl(path) if isinstance(e.get("cwd"), str)}
         if cwds and all(same_dir(cwd, repo) for cwd in cwds):
             found.append(path)
-    if not found:
-        print(f"no transcript under {root} has only {repo} as its working directory after {start}",
-              file=sys.stderr)
+    if len(found) != 1:
+        print(f"{len(found)} transcripts under {root} have only {repo} as their working directory"
+              f" after {start}; need exactly one: {[str(p) for p in found]}", file=sys.stderr)
         return 1
-    for index, path in enumerate(found, 1):
-        shutil.copyfile(path, out / f"transcript-{index}.jsonl")
-    print(f"copied {len(found)} transcript(s)")
+    shutil.copyfile(found[0], out / "transcript-1.jsonl")
+    print(f"copied the probe-repo session transcript {found[0].name}")
     return 0
 
 
