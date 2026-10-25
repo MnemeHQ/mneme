@@ -399,7 +399,8 @@ _NON_SOURCE_RECORD = {
 # ── ADR-034 G2-1 consumer trust (charter §5) ─────────────────────────────────
 _INPUT_KIND_UNVERIFIED = "unverified_input"
 _INPUT_KIND_PROPOSED_NEW = "proposed_new_source"
-_COMPLETE_SOURCE_KINDS = frozenset({"complete_source_file", _INPUT_KIND_PROPOSED_NEW})
+_INPUT_KIND_COMPLETE_SOURCE = "complete_source_file"
+_COMPLETE_SOURCE_KINDS = frozenset({_INPUT_KIND_COMPLETE_SOURCE, _INPUT_KIND_PROPOSED_NEW})
 
 # §5.1: the subject kinds each requested input may legitimately receive.
 # ``None`` is a payload with no subject record.
@@ -408,6 +409,8 @@ _ACCEPTED_SUBJECT_KINDS = {
     "proposed_new_file": frozenset({
         None, _INPUT_KIND_UNVERIFIED, _INPUT_KIND_PROPOSED_NEW,
     }),
+    # §5.1 erratum (owner ruling G2C-R1): explicit --source-file callers only.
+    "source_file": frozenset({_INPUT_KIND_COMPLETE_SOURCE}),
 }
 
 
@@ -717,8 +720,11 @@ def assess_verdict(
     ``expected_input`` names the check input the caller requested (ADR-034
     G2-1 charter §5.1): ``"input"`` (every ``--input`` caller) accepts no
     subject or ``unverified_input``; ``"proposed_new_file"`` (routed Claude
-    Code ``Write`` events only) also accepts ``proposed_new_source``. Any
-    other subject kind is untrusted.
+    Code ``Write`` events only) also accepts ``proposed_new_source``;
+    ``"source_file"`` (a caller that itself ran ``--source-file``, §5.1
+    erratum G2C-R1) accepts only ``complete_source_file``. The caller states
+    the transport it used; a payload never authorizes its own input kind.
+    Any other subject kind is untrusted.
     """
     if expected_input not in _ACCEPTED_SUBJECT_KINDS:
         raise ValueError(f"unknown expected_input {expected_input!r}")

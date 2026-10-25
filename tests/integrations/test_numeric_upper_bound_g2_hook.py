@@ -421,6 +421,11 @@ def payloads(project):
     ("unverified_input", "proposed_new_file", True),
     ("proposed_new_source", "proposed_new_file", True),
     ("complete_source_file", "proposed_new_file", False),
+    # §5.1 erratum (G2C-R1): explicit source-file trust only.
+    ("none", "source_file", False),
+    ("unverified_input", "source_file", False),
+    ("proposed_new_source", "source_file", False),
+    ("complete_source_file", "source_file", True),
 ])
 def test_expected_input_contract(payloads, kind, expected_input, trusted):
     stdout, code = payloads[kind]
@@ -432,7 +437,7 @@ def test_expected_input_contract(payloads, kind, expected_input, trusted):
         assert hook.assess_verdict(stdout, code, "strict") == assessment
 
 
-@pytest.mark.parametrize("expected_input", ["input", "proposed_new_file"])
+@pytest.mark.parametrize("expected_input", ["input", "proposed_new_file", "source_file"])
 @pytest.mark.parametrize("subject", [{"input_kind": "other"}, {"input_kind": 3}, "x", []])
 def test_unknown_or_malformed_subject_kind_is_untrusted(payloads, expected_input, subject):
     stdout, code = payloads["none"]
@@ -448,7 +453,7 @@ def test_expected_input_is_keyword_only_and_validated(payloads):
     with pytest.raises(TypeError):
         hook.assess_verdict(stdout, code, "strict", "input")
     with pytest.raises(ValueError):
-        hook.assess_verdict(stdout, code, "strict", expected_input="source_file")
+        hook.assess_verdict(stdout, code, "strict", expected_input="complete_source_file")
     signature = inspect.signature(hook.assess_verdict)
     assert signature.parameters["expected_input"].default == "input"
 
@@ -550,7 +555,7 @@ def _tamper_payload(payloads, kind="proposed_new_source"):
      [{"kind": "symbol", "line": 1, "reason": "UNRECOGNIZED_FORM"}]),
 ])
 @pytest.mark.parametrize("declared", [True, False])
-@pytest.mark.parametrize("expected_input", ["input", "proposed_new_file"])
+@pytest.mark.parametrize("expected_input", ["input", "proposed_new_file", "source_file"])
 def test_rule1_unverified_subject_never_claims_source_evaluation(
     payloads, reason, status, outcome, sources, declared, expected_input,
 ):
@@ -592,7 +597,7 @@ def test_rule2_complete_source_is_never_incomplete_input(payloads, kind, where):
             {"kind": "call", "line": 2, "reason": "UNRECOGNIZED_FORM"},
         ]
     payload["evaluation_complete"] = False
-    for expected_input in ("input", "proposed_new_file"):
+    for expected_input in ("input", "proposed_new_file", "source_file"):
         assessment = hook.assess_verdict(json.dumps(payload), 2, "strict",
                                          expected_input=expected_input)
         assert assessment.payload is None and assessment.inconsistent

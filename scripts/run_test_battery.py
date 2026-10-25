@@ -113,6 +113,7 @@ GATE_CORE_PATHS: tuple[str, ...] = (
     "tests/test_check_json.py",
     "tests/test_numeric_upper_bound_g1.py",
     "tests/test_numeric_upper_bound_g2_prewrite.py",
+    "tests/test_adr034_post_m4_source_file_compat.py",
     "tests/test_ci1_contract_fixtures.py",
     "tests/test_ci1_contract_matrix.py",
     "tests/test_ci1_evaluator_preflight.py",
