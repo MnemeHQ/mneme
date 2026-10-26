@@ -1,0 +1,11 @@
+pins verified
+== pytest-adr033-c4: env MNEME_C4_EVALUATOR_PYTHON=/work/evaluator/bin/python /work/harness/bin/python -m pytest tests/test_adr033_c4_ci_gate.py -v -rs -p no:cacheprovider --junitxml=/out/junit-adr033-c4.xml
+   exit 0
+== ci1-replay: /work/harness/bin/python /in/c4_gate2_ci1_replay.py /work/core /work/evaluator /in/mneme_hq-0.10.0-py3-none-any.whl /work/ci1-replay-work /out/ci1-replay.json
+   exit 0
+== pytest-ci1-contract: /work/harness/bin/python -m pytest tests/test_ci1_contract_fixtures.py tests/test_ci1_contract_matrix.py -q -rs -p no:cacheprovider --junitxml=/out/junit-ci1-contract.xml
+   exit 0
+== benchmark-evaluator: /work/evaluator/bin/python -I -m mneme.cli benchmark examples/benchmarks/ --memory examples/project_memory.json
+   exit 0
+== benchmark-tree: /work/harness/bin/python -m mneme.cli benchmark examples/benchmarks/ --memory examples/project_memory.json
+   exit 0
