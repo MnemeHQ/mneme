@@ -259,9 +259,149 @@ def test_live_requires_exact_confirmations(tmp_path, monkeypatch, capsys):
     assert C.main(["--live", "--out", str(tmp_path / "b"), "--confirm-requests", "150", "--confirm-usd", "30"]) == 2
 
 
-def test_live_requires_api_key(tmp_path, monkeypatch):
+_LIVE_OK = ["--confirm-requests", "150", "--confirm-usd", "25", "--attest-workspace-spend-limit-usd", "25"]
+
+
+def test_live_requires_api_key(tmp_path, monkeypatch, capsys):
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
-    assert C.main(["--live", "--out", str(tmp_path / "a"), "--confirm-requests", "150", "--confirm-usd", "25"]) == 2
+    assert C.main(["--live", "--out", str(tmp_path / "a"), *_LIVE_OK]) == 2
+    assert "ANTHROPIC_API_KEY is not set" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("limit", [None, "0", "-1", "25.01", "100"])
+def test_live_requires_attested_provider_spend_limit_within_cap(tmp_path, monkeypatch, capsys, limit):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-test-SECRET")
+    args = ["--live", "--out", str(tmp_path / "a"), "--confirm-requests", "150", "--confirm-usd", "25"]
+    if limit is not None:
+        args += ["--attest-workspace-spend-limit-usd", limit]
+    assert C.main(args) == 2
+    assert "attest-workspace-spend-limit-usd" in capsys.readouterr().err
+
+
+def test_live_transport_headers_include_workspace_only_when_set():
+    with_ws = C.LiveTransport("sk-test-SECRET", "wrkspc_cal").headers()
+    without_ws = C.LiveTransport("sk-test-SECRET").headers()
+    assert with_ws["anthropic-workspace-id"] == "wrkspc_cal"
+    assert "anthropic-workspace-id" not in without_ws
+    assert with_ws["anthropic-version"] == T.ANTHROPIC_VERSION
+    assert with_ws["Authorization"] == "Bearer sk-test-SECRET"
+
+
+def test_live_transport_sends_headers_without_network(monkeypatch):
+    captured = {}
+
+    class _Response:
+        status = 200
+
+        def __init__(self):
+            self.headers = {"request-id": "req_x"}
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_exc):
+            return False
+
+        def read(self):
+            return b'{"type": "message"}'
+
+    def fake_urlopen(request, timeout):
+        captured["headers"] = {k.lower(): v for k, v in request.header_items()}
+        return _Response()
+
+    monkeypatch.setattr(C.urllib.request, "urlopen", fake_urlopen)
+    result = C.LiveTransport("sk-test-SECRET", "wrkspc_cal").send(T.API_URL, b"{}")
+    assert result.status == 200 and result.request_id == "req_x"
+    assert captured["headers"]["anthropic-workspace-id"] == "wrkspc_cal"
+
+
+# ── K1 probes fail closed ─────────────────────────────────────────────────────
+
+
+def _err(status):
+    return C.HttpResult(status, "r", {"type": "error", "error": {"type": "x", "message": "y"}}, 0.0)
+
+
+def _probe_ok():
+    return _ok(_usage(output_tokens=16))
+
+
+def test_valid_baseline_probe_failure_stops_run(tmp_path):
+    runner = _runner(tmp_path, _ScriptedTransport([_err(400)]))
+    with pytest.raises(C.ProbeStop):
+        runner.run_probes()
+    assert runner.probes[0]["expectation_met"] is False
+
+
+def test_invalid_probes_rejected_as_expected_are_recorded_not_failed(tmp_path):
+    runner = _runner(tmp_path, _ScriptedTransport([_probe_ok(), _err(400), _err(400), _err(400)]))
+    runner.run_probes()
+    assert [p["expectation_met"] for p in runner.probes] == [True, True, True, True]
+
+
+def test_invalid_probe_unexpectedly_accepted_is_recorded_without_stopping(tmp_path):
+    runner = _runner(tmp_path, _ScriptedTransport([_probe_ok(), _probe_ok(), _err(400), _err(400)]))
+    runner.run_probes()
+    assert runner.probes[1]["purpose"] == "K1-temperature"
+    assert runner.probes[1]["expectation_met"] is False
+
+
+# ── K4 requires a demonstrated tool loop ─────────────────────────────────────
+
+
+def _turn(seq, stop):
+    return {"seq": seq, "status": 200, "stop_reason": stop, "latency_s": 0.0}
+
+
+def _loop(name, *, tool_call, valid=True, passback=(True,)):
+    turns = [_turn(1, "tool_use"), _turn(2, "end_turn")] if tool_call else [_turn(1, "end_turn")]
+    return {
+        "loop": name,
+        "structured": True,
+        "turns": turns,
+        "tool_calls": [{"turn": 0, "name": "x", "via": "genuine_mcp", "ok": True}] if tool_call else [],
+        "passback_identical": list(passback) if tool_call else [],
+        "end": "end_turn",
+        "final": {"parsed": True, "schema_valid": valid},
+    }
+
+
+def _all_cells(**kwargs):
+    return [
+        C.k4_cell(_loop(f"{task}/{arm}/json_schema", **kwargs))
+        for task in T.TASKS
+        for arm in ("direct", "codemode")
+    ]
+
+
+def test_k4_immediate_valid_json_without_tool_call_cannot_pass():
+    cell = C.k4_cell(_loop("CAL-T5/direct/json_schema", tool_call=False))
+    assert cell["status"] == "INCONCLUSIVE"
+    assert C.k4_status(_all_cells(tool_call=False)) == "INCONCLUSIVE"
+
+
+def test_k4_passes_only_with_tool_call_continuation_and_valid_answer():
+    assert C.k4_status(_all_cells(tool_call=True)) == "PASS"
+
+
+def test_k4_requires_every_arm_and_schema_cell():
+    cells = _all_cells(tool_call=True)[:-1]
+    assert C.k4_status(cells) == "INCONCLUSIVE"
+
+
+def test_k4_invalid_final_answer_fails():
+    assert C.k4_cell(_loop("CAL-T5/direct/json_schema", tool_call=True, valid=False))["status"] == "FAIL"
+
+
+def test_k4_altered_passback_fails():
+    cell = C.k4_cell(_loop("CAL-T5/direct/json_schema", tool_call=True, passback=(False,)))
+    assert cell["status"] == "FAIL"
+
+
+def test_k4_tool_call_without_continuation_is_inconclusive():
+    loop = _loop("CAL-T5/direct/json_schema", tool_call=True)
+    loop["turns"] = [_turn(1, "tool_use")]
+    assert C.k4_cell(loop)["status"] == "INCONCLUSIVE"
 
 
 def test_refuses_non_empty_output_directory(tmp_path):
@@ -285,7 +425,15 @@ def test_dry_run_end_to_end_without_network(tmp_path, monkeypatch):
     assert summary["run_status"] == "completed"
     assert summary["budget"]["requests_used"] <= C.REQUEST_CAP
     assert set(summary["checks"]) == {f"K{i}" for i in range(1, 10)}
-    assert summary["checks"]["K4"]["status"] == "PASS"
+    assert summary["metadata"]["mode"] == "dry_run"
+    k4 = summary["checks"]["K4"]
+    assert k4["status"] == "PASS" and len(k4["cells"]) == 6
+    assert all(c["successful_tool_calls"] >= 1 and c["continued_after_tool_result"] for c in k4["cells"])
+    assert {v for c in k4["cells"] for v in c["tool_call_via"]} == {"genuine_mcp", "fixed_stub"}
+    k6 = summary["checks"]["K6"]
+    assert k6["status"] == "DESCRIPTIVE"
+    assert all(p["schema_sha256"] and p["tools_sha256"] and p["first_sent_utc"] for p in k6["pairs"])
+    assert len({p["tools_sha256"] for p in k6["pairs"]}) == 2
 
     mcp_calls = [json.loads(line) for line in (out / "mcp.jsonl").read_text(encoding="utf-8").splitlines()]
     assert mcp_calls and all(call["method"] in T.READ_TOOLS for call in mcp_calls)

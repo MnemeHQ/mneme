@@ -7,14 +7,17 @@ ratified A2 configuration (K1-K9 in README.md). Boundaries:
   a fixed result precomputed from the genuine MCP, whatever code it receives;
 - the direct arm calls the genuine pinned Decision MCP on the frozen B0-M
   fixture, exposing only the four ADR-027 read methods;
-- requests run strictly sequentially under a hard request cap and USD cap that
-  count every attempt, retry, warm-up and probe;
+- requests run strictly sequentially under script caps on requests and USD that
+  count every attempt, retry, warm-up and probe. The USD cap is a pre-request
+  estimate; a live run also requires an owner-attested provider-side workspace
+  spend limit, which is the hard guarantee;
 - the API key is read from ANTHROPIC_API_KEY, sent only in the request header
   and never written to evidence.
 
 Usage:
     python calibration.py --dry-run --out <empty dir>
-    python calibration.py --live --out <empty dir> --confirm-requests 150 --confirm-usd 25
+    python calibration.py --live --out <empty dir> --confirm-requests 150 --confirm-usd 25 \\
+        --attest-workspace-spend-limit-usd <v <= 25>
 """
 
 from __future__ import annotations
@@ -76,8 +79,20 @@ class AuthStop(RunStop):
     reason = "auth_error"
 
 
+class ProbeStop(RunStop):
+    reason = "unexpected_probe_response"
+
+
 class RedactionError(RuntimeError):
     pass
+
+
+def _sha(obj: Any) -> str:
+    return hashlib.sha256(json.dumps(obj, ensure_ascii=False, sort_keys=True).encode("utf-8")).hexdigest()
+
+
+def _utc_now() -> str:
+    return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
 
 # ── Usage accounting ──────────────────────────────────────────────────────────
@@ -222,21 +237,23 @@ class Transport(Protocol):
 class LiveTransport:
     """Sequential HTTPS transport. The key lives only in this object."""
 
-    def __init__(self, api_key: str, timeout_s: float = 600.0) -> None:
+    def __init__(self, api_key: str, workspace_id: str | None = None, timeout_s: float = 600.0) -> None:
         self._key = api_key
+        self._workspace_id = workspace_id
         self._timeout = timeout_s
 
+    def headers(self) -> dict[str, str]:
+        headers = {
+            "content-type": "application/json",
+            "anthropic-version": T.ANTHROPIC_VERSION,
+            "Authorization": f"Bearer {self._key}",
+        }
+        if self._workspace_id:
+            headers["anthropic-workspace-id"] = self._workspace_id
+        return headers
+
     def send(self, url: str, body_bytes: bytes) -> HttpResult:
-        request = urllib.request.Request(
-            url,
-            data=body_bytes,
-            method="POST",
-            headers={
-                "content-type": "application/json",
-                "anthropic-version": T.ANTHROPIC_VERSION,
-                "Authorization": f"Bearer {self._key}",
-            },
-        )
+        request = urllib.request.Request(url, data=body_bytes, method="POST", headers=self.headers())
         started = time.perf_counter()
         try:
             with urllib.request.urlopen(request, timeout=self._timeout) as response:
@@ -461,6 +478,7 @@ class Runner:
     counts: list[dict[str, Any]] = field(default_factory=list)
     warm: list[dict[str, Any]] = field(default_factory=list)
     stop: dict[str, Any] | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def send_message(self, body: dict[str, Any], purpose: str) -> dict[str, Any]:
         """Send one Messages request with fixed infrastructure retries.
@@ -474,7 +492,8 @@ class Runner:
         for attempt in range(len(INFRA_BACKOFF_SECONDS) + 1):
             input_upper, usd_upper = self.budget.authorize(body_bytes, body["max_tokens"])
             self.seq += 1
-            self.evidence.append("requests.jsonl", {"seq": self.seq, "purpose": purpose, "attempt": attempt, "body_sha256": body_sha, "body": body})
+            sent_utc = _utc_now()
+            self.evidence.append("requests.jsonl", {"seq": self.seq, "purpose": purpose, "attempt": attempt, "sent_utc": sent_utc, "body_sha256": body_sha, "body": body})
             result = self.transport.send(T.API_URL, body_bytes)
             usage = result.body.get("usage") if isinstance(result.body, dict) else None
             charged = self.budget.charge(result.status, usage, usd_upper)
@@ -483,6 +502,7 @@ class Runner:
                 "seq": self.seq,
                 "purpose": purpose,
                 "attempt": attempt,
+                "sent_utc": sent_utc,
                 "status": result.status,
                 "request_id": result.request_id,
                 "latency_s": result.latency_s,
@@ -528,17 +548,30 @@ class Runner:
     def run_probes(self) -> None:
         base = [{"role": "user", "content": "Reply with the single word: ok"}]
         no_tools = {"tools": None, "tool_choice": None}
+        # (purpose, overrides, valid): a valid baseline probe must succeed or the
+        # run stops; deliberately invalid probes are expected to be rejected and
+        # their outcome is only recorded.
         cases = [
-            ("K1-max_tokens", {**no_tools, "max_tokens": 16}),
-            ("K1-temperature", {**no_tools, "temperature": 0.5}),
-            ("K1-forced_tool", {"tool_choice": {"type": "any"}}),
-            ("K1-between_tools_xhigh", {**no_tools, "thinking": {"type": "between_tools"}, "output_config": {"effort": "xhigh"}}),
+            ("K1-max_tokens", {**no_tools, "max_tokens": 16}, True),
+            ("K1-temperature", {**no_tools, "temperature": 0.5}, False),
+            ("K1-forced_tool", {"tool_choice": {"type": "any"}}, False),
+            ("K1-between_tools_xhigh", {**no_tools, "thinking": {"type": "between_tools"}, "output_config": {"effort": "xhigh"}}, False),
         ]
-        for purpose, overrides in cases:
+        for purpose, overrides, valid in cases:
             tools = [T.codemode_tool()] if purpose == "K1-forced_tool" else []
             body = T.build_request(tools=tools, messages=base, schema_key=None, overrides=overrides)
             record = self.send_message(body, purpose)
-            self.probes.append({"purpose": purpose, "status": record["status"], "response": record["response"]})
+            status = record["status"]
+            expected = status == 200 if valid else (status is not None and 400 <= status < 500)
+            self.probes.append({
+                "purpose": purpose,
+                "valid_request": valid,
+                "status": status,
+                "expectation_met": expected,
+                "response": record["response"],
+            })
+            if valid and not expected:
+                raise ProbeStop(f"{purpose}: valid baseline probe returned {status}")
 
     async def run_loop(self, task_id: str, arm: str, structured: bool, warm_repeat: bool) -> None:
         task = T.TASKS[task_id]
@@ -553,19 +586,41 @@ class Runner:
                 tools = [T.codemode_tool()]
                 stub = await self._reference_stub(bridge, task)
             messages: list[dict[str, Any]] = [{"role": "user", "content": task["prompt"]}]
-            loop = {"loop": loop_id, "task": task_id, "arm": arm, "structured": structured, "turns": [], "final": None}
+            loop = {
+                "loop": loop_id,
+                "task": task_id,
+                "arm": arm,
+                "structured": structured,
+                "turns": [],
+                "tool_calls": [],
+                "passback_identical": [],
+                "final": None,
+            }
             self.loops.append(loop)
+            previous_content_sha: str | None = None
             for turn in range(LOOP_TURN_CAP):
                 body = T.build_request(tools=tools, messages=messages, schema_key=schema_key)
+                if previous_content_sha is not None:
+                    sent = body["messages"][-2]
+                    loop["passback_identical"].append(
+                        sent["role"] == "assistant" and _sha(sent["content"]) == previous_content_sha
+                    )
                 record = self.send_message(body, f"loop:{loop_id}:turn{turn}")
                 loop["turns"].append(self._turn_summary(record, body))
                 if turn == 0 and warm_repeat and record["status"] == 200:
                     repeat = self.send_message(body, f"warm:{loop_id}")
-                    self.warm.append({"loop": loop_id, "cold": self._turn_summary(record, body), "warm": self._turn_summary(repeat, body)})
+                    self.warm.append({
+                        "loop": loop_id,
+                        "schema_sha256": _sha(body["output_config"].get("format")),
+                        "tools_sha256": _sha(body["tools"]),
+                        "first": self._turn_summary(record, body),
+                        "repeat": self._turn_summary(repeat, body),
+                    })
                 if record["status"] != 200:
                     loop["end"] = f"http_{record['status']}"
                     return
                 response = record["response"]
+                previous_content_sha = _sha(response["content"])
                 messages.append({"role": "assistant", "content": response["content"]})
                 if response.get("stop_reason") != "tool_use":
                     loop["end"] = response.get("stop_reason")
@@ -579,8 +634,11 @@ class Runner:
                     if arm == "direct":
                         mcp_name = T.TOOL_NAME_TO_MCP.get(block["name"], block["name"])
                         ok, payload = await bridge.call(mcp_name, block.get("input") or {})
+                        via = "genuine_mcp"
                     else:
                         ok, payload = True, stub
+                        via = "fixed_stub"
+                    loop["tool_calls"].append({"turn": turn, "name": block["name"], "via": via, "ok": ok})
                     results.append({
                         "type": "tool_result",
                         "tool_use_id": block["id"],
@@ -620,6 +678,7 @@ class Runner:
         )
         return {
             "seq": record["seq"],
+            "sent_utc": record.get("sent_utc"),
             "status": record["status"],
             "latency_s": record["latency_s"],
             "stop_reason": response.get("stop_reason"),
@@ -679,6 +738,44 @@ class Runner:
 # ── Checks ────────────────────────────────────────────────────────────────────
 
 
+def k4_cell(loop: dict[str, Any]) -> dict[str, Any]:
+    """One arm x schema tool-loop compatibility cell."""
+    final = loop.get("final") or {}
+    ok_calls = [c for c in loop.get("tool_calls", []) if c["ok"]]
+    first_call_turn = min((c["turn"] for c in ok_calls), default=None)
+    continued = first_call_turn is not None and any(
+        t["status"] == 200 for t in loop["turns"][first_call_turn + 1:]
+    )
+    passback_ok = all(loop.get("passback_identical", []))
+    answered = loop.get("end") == "end_turn" and final.get("schema_valid", False)
+    if not answered or not passback_ok:
+        status = "FAIL"
+    elif not continued:
+        status = "INCONCLUSIVE"
+    else:
+        status = "PASS"
+    return {
+        "loop": loop["loop"],
+        "status": status,
+        "end": loop.get("end"),
+        "schema_valid": final.get("schema_valid", False),
+        "successful_tool_calls": len(ok_calls),
+        "tool_call_via": sorted({c["via"] for c in ok_calls}),
+        "continued_after_tool_result": continued,
+        "passback_identical": passback_ok,
+    }
+
+
+def k4_status(cells: list[dict[str, Any]]) -> str:
+    """PASS only when every arm x schema cell demonstrated a real tool loop."""
+    expected = {f"{task}/{arm}/json_schema" for task in T.TASKS for arm in ("direct", "codemode")}
+    if any(c["status"] == "FAIL" for c in cells):
+        return "FAIL"
+    if {c["loop"] for c in cells} == expected and all(c["status"] == "PASS" for c in cells):
+        return "PASS"
+    return "INCONCLUSIVE"
+
+
 def compute_checks(runner: Runner) -> dict[str, Any]:
     turns = [turn for loop in runner.loops for turn in loop["turns"]]
     ok_turns = [t for t in turns if t["status"] == 200]
@@ -690,7 +787,13 @@ def compute_checks(runner: Runner) -> dict[str, Any]:
         "successful_responses": len(ok_turns),
         "usage_incomplete_seqs": incomplete,
         "probes_observed": [
-            {"purpose": p["purpose"], "status": p["status"], "has_usage": isinstance(p["response"], dict) and "usage" in p["response"]}
+            {
+                "purpose": p["purpose"],
+                "valid_request": p["valid_request"],
+                "status": p["status"],
+                "expectation_met": p["expectation_met"],
+                "has_usage": isinstance(p["response"], dict) and "usage" in p["response"],
+            }
             for p in runner.probes
         ],
         "note": "Error responses without usage are observed API errors, not calibration failures.",
@@ -719,16 +822,24 @@ def compute_checks(runner: Runner) -> dict[str, Any]:
         k3 = "PASS"
     checks["K3"] = {"status": k3, "groups": groups, "note": "PASS needs equal input totals across at least two different cache splits."}
 
-    structured = [loop for loop in runner.loops if loop["structured"]]
-    k4_cells = [
-        {"loop": loop["loop"], "end": loop.get("end"), "schema_valid": (loop["final"] or {}).get("schema_valid", False)}
-        for loop in structured
-    ]
-    k4_ok = bool(k4_cells) and all(c["end"] == "end_turn" and c["schema_valid"] for c in k4_cells)
+    k4_cells = [k4_cell(loop) for loop in runner.loops if loop["structured"]]
+    k4 = k4_status(k4_cells)
     checks["K4"] = {
-        "status": "PASS" if k4_ok else "FAIL",
+        "status": k4,
         "cells": k4_cells,
-        "consequence": "Enable output_config.format in both arms" if k4_ok else "Fall back to evaluator-validated JSON in both arms",
+        "consequence": {
+            "PASS": "Enable output_config.format in both arms",
+            "FAIL": "Fall back to evaluator-validated JSON in both arms",
+            "INCONCLUSIVE": (
+                "Tool-loop compatibility not demonstrated; do not enable structured "
+                "outputs on this evidence (fall back unless a targeted re-run is authorized)"
+            ),
+        }[k4],
+        "note": (
+            "A cell passes only with a real tool call (genuine MCP for direct, fixed "
+            "stub for Code Mode), its tool_result, a continuation turn, unchanged "
+            "passed-back content and a schema-valid final answer."
+        ),
     }
 
     k5 = []
@@ -745,12 +856,25 @@ def compute_checks(runner: Runner) -> dict[str, Any]:
     checks["K5"] = {"status": "RECORDED" if k5 else "INCONCLUSIVE", "estimates": k5, "note": "count_tokens returns estimates; actual accounting is taken from Messages responses."}
 
     checks["K6"] = {
-        "status": "RECORDED" if runner.warm else "INCONCLUSIVE",
+        "status": "DESCRIPTIVE" if runner.warm else "INCONCLUSIVE",
         "pairs": [
-            {"loop": w["loop"], "cold_latency_s": w["cold"]["latency_s"], "warm_latency_s": w["warm"]["latency_s"]}
+            {
+                "loop": w["loop"],
+                "schema_sha256": w["schema_sha256"],
+                "tools_sha256": w["tools_sha256"],
+                "first_sent_utc": w["first"]["sent_utc"],
+                "first_latency_s": w["first"]["latency_s"],
+                "repeat_sent_utc": w["repeat"]["sent_utc"],
+                "repeat_latency_s": w["repeat"]["latency_s"],
+            }
             for w in runner.warm
         ],
-        "note": "Cold is cold only if this arm and schema pair was not compiled in the previous 24 hours.",
+        "note": (
+            "Descriptive only: it does not prove the first request was a cold compile, "
+            "nor that a schema or tool-set change invalidated a compiled grammar; that "
+            "needs a separate controlled sequence. Schema/tool hashes and timestamps are "
+            "kept so a scored run can schedule and evidence its warm-up."
+        ),
     }
 
     models = {t["model"] for t in ok_turns}
@@ -794,7 +918,7 @@ async def run_plan(runner: Runner) -> None:
 
 
 def execute(runner: Runner) -> dict[str, Any]:
-    started = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    started = _utc_now()
     try:
         anyio.run(run_plan, runner)
         status = "completed"
@@ -807,7 +931,7 @@ def execute(runner: Runner) -> dict[str, Any]:
     summary = {
         "run_status": status,
         "started_utc": started,
-        "finished_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "finished_utc": _utc_now(),
         "budget": {
             "request_cap": runner.budget.request_cap,
             "usd_cap": runner.budget.usd_cap,
@@ -815,6 +939,7 @@ def execute(runner: Runner) -> dict[str, Any]:
             "usd_spent_estimate": round(runner.budget.spent_usd, 6),
             "count_tokens_calls": runner.budget.count_calls,
         },
+        "metadata": runner.metadata,
         "loops": runner.loops,
         "checks": compute_checks(runner),
         "stop": runner.stop,
@@ -838,6 +963,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--out", required=True, help="new or empty evidence directory")
     parser.add_argument("--confirm-requests", type=int)
     parser.add_argument("--confirm-usd", type=float)
+    parser.add_argument(
+        "--attest-workspace-spend-limit-usd",
+        type=float,
+        help=(
+            "owner attestation that the key's dedicated workspace has a provider-side "
+            "spend limit of this many USD, at most the script cap"
+        ),
+    )
     args = parser.parse_args(argv)
 
     out = Path(args.out)
@@ -850,13 +983,29 @@ def main(argv: list[str] | None = None) -> int:
         if args.confirm_requests != REQUEST_CAP or args.confirm_usd != USD_CAP:
             print(f"live run requires --confirm-requests {REQUEST_CAP} --confirm-usd {USD_CAP:g}", file=sys.stderr)
             return 2
+        limit = args.attest_workspace_spend_limit_usd
+        if limit is None or not 0 < limit <= USD_CAP:
+            print(
+                f"live run requires --attest-workspace-spend-limit-usd <v> with 0 < v <= {USD_CAP:g}: "
+                "the script cap is a pre-request estimate; the provider-side workspace limit is the hard guarantee",
+                file=sys.stderr,
+            )
+            return 2
         key = os.environ.get("ANTHROPIC_API_KEY")
         if not key:
             print("ANTHROPIC_API_KEY is not set", file=sys.stderr)
             return 2
-        runner = Runner(LiveTransport(key), Evidence(out, key))
+        workspace_id = os.environ.get("ANTHROPIC_WORKSPACE_ID") or None
+        runner = Runner(LiveTransport(key, workspace_id), Evidence(out, key))
+        runner.metadata = {
+            "mode": "live",
+            "attested_workspace_spend_limit_usd": limit,
+            "workspace_id_header": workspace_id,
+            "script_caps": {"requests": REQUEST_CAP, "usd": USD_CAP},
+        }
     else:
         runner = Runner(FakeTransport(), Evidence(out, None), sleep=lambda _s: None)
+        runner.metadata = {"mode": "dry_run", "script_caps": {"requests": REQUEST_CAP, "usd": USD_CAP}}
 
     summary = execute(runner)
     print(json.dumps({
