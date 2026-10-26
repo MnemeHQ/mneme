@@ -4,7 +4,7 @@
 **Date checked:** 2026-10-25.
 **Scope:** CM-01 B0-A issue #656, parent #640.
 **Governance:** D0 #654 (merged `8060b9bc`); D1 design-resolution #655 (merged `4b8471149d49f6f4a2a4ddfd0d3601d59355c337`); ADR-017/022/023/027; B0-M remains mechanical-only PASS/VERIFIED.
-**Sources:** official provider API documentation as available on the date above. This is documentary evidence, **not** a verified production/provider response, availability confirmation or permission to access credentials.
+**Sources:** official provider API documentation as available on the date above. This is documentary evidence, **not** a verified production/provider response, availability confirmation or permission to access credentials. The merged [D1 Erratum 1](./cm-01-b0-a-d1-erratum-1-proposal-2026-10-25.md) (PR #664) governs E-2 hard-gate attribution and E-4 cache-invariant token accounting; this document remains an unverified provider mapping review.
 
 ## 1. What the primary endpoint needs
 
@@ -24,7 +24,7 @@ normalized_input_total, normalized_output_total, normalized_total,
 cache_input_read, cache_input_written, thinking_or_reasoning_subset,
 stop_reason, response_complete, mapping_version, mapping_errors`
 
-The primary per-arm total is the sum of `normalized_total` across **all attempted provider requests** associated with that arm execution. If any attempted request has incomplete or irreconcilable usage, flag the arm and planned pair incomplete; `BENEFIT` and `NO-BENEFIT` cannot be awarded. Do not interpret missing usage as zero. If a mandatory identity/security/reliability gate has already failed, retain its higher-precedence `FAIL` status per D1.
+The primary per-arm total is the sum of `normalized_total` across **all attempted provider requests** associated with that arm execution. If any attempted request has incomplete or irreconcilable usage, flag the arm and planned pair incomplete; `BENEFIT` and `NO-BENEFIT` cannot be awarded. Do not interpret missing usage as zero. Use the three-class failure attribution and correctness non-inferiority rule in accepted D1 Erratum 1, E-2: harness-integrity failure (either arm) and treatment-attributable fabrication retain zero tolerance; ordinary wrong/missing identity and format errors use the paired correctness gate. Preserve the raw token ledger regardless of answer correctness.
 
 ## 2. Provider-specific mapping: documentary candidates
 
@@ -90,7 +90,7 @@ Before any model-mediated pilot, independent model/metrics review must approve:
 2. Raw-usage source retention and field-level normalized mapping with **no overlaps**.
 3. Complete provider-reported usage for successful, tool-use, incomplete, streamed and failed response classes. Unreported failed-request tokens produce `INCONCLUSIVE`, not zero.
 4. Token subtotal reconciliation; cache and reasoning subcategories do not exceed their parent totals; missing required components fail mapping.
-5. Same model snapshot, same model parameters and symmetric caching policy in D/C arms, with cache read/write volumes recorded individually. If asymmetric and unfixable, no confirmatory verdict.
+5. Same model snapshot, same model parameters and symmetric caching policy in D/C arms, with cache read/write volumes recorded individually. A cache-hit asymmetry alone does not invalidate the primary *token-volume* endpoint if every cache category is accounted exactly once; require identical configured cache policy and an independently verified cache-invariance reconciliation (accepted D1 Erratum 1, E-4). If mapping is not invariant or complete, the primary metric is INCONCLUSIVE.
 6. Every model-generated code attempt, tool-call turn, retry and final-answer request included once in the arm ledger; zero post-hoc omissions.
 7. Equivalent model-visible functional affordances, while deliberately recording inherent direct-tool vs Code Mode wrapper/tool-schema differences as part of the bundled interface intervention.
 8. Identical response schema/quality rules across both arms; exact decision identity remains a harder gate than efficiency.
