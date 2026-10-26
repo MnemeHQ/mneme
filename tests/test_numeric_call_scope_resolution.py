@@ -396,6 +396,79 @@ def test_dynamic_construct_never_yields_clean_without_any_call():
     )
 
 
+# ── Indirect module-namespace mutation (review D2R-F1) ───────────────────────
+
+
+@pytest.mark.parametrize("mutation", [
+    # setattr / delattr on a module object, however it is reached.
+    "from importlib import import_module\n"
+    "setattr(import_module(__name__), 'classify', other)",
+    "import importlib\nsetattr(importlib.import_module(__name__), 'classify', other)",
+    "setattr(__import__(__name__), 'classify', other)",
+    "import me\nsetattr(me, 'classify', other)",
+    "import me\ndelattr(me, 'classify')",
+    "setattr(target, attr_name, other)",
+    "setattr(target, *pair)",
+    # Attribute writes of the governed name on a possible module object.
+    "import me\nme.classify = other",
+    "import me\ndel me.classify",
+    "import me\nme.classify += other",
+    "def patch(module):\n    module.classify = other",
+    # Module __dict__ / namespace-exposing attributes.
+    "import me\nme.__dict__['classify'] = other",
+    "m = __import__(__name__)\nm.__dict__.update(classify=other)",
+    "import me\nvars(me)['classify'] = other",
+    "def g():\n    pass\ng.__globals__['classify'] = other",
+    "import sys\nsys._getframe().f_globals['classify'] = other",
+    "import me\nme.__setattr__('classify', other)",
+    "import types\ntypes.ModuleType.__setattr__(me, 'classify', other)",
+    "ns = getattr(me, '__dict__')",
+    "ns = getattr(me, attr_name)",
+    # sys.modules under any spelling.
+    "import sys as s\ns.modules[__name__].classify = other",
+    "from sys import modules\nmodules[__name__].classify = other",
+    # Module loaders with a computed name, and the builtins passed as values.
+    "mod = import_module(__name__)",
+    "mod = __import__(name)",
+    "patcher = setattr",
+    "fetch = getattr",
+])
+def test_indirect_module_namespace_mutation_is_ambiguous(mutation):
+    source = DECL + mutation + "\nclassify(x, 2)\n"
+    status, outcome, unknown, exceeding = _run(source)
+    assert (status, outcome, exceeding) == ("MATCHER_UNEVALUATED", "UNEVALUATED", [])
+    assert [(kind, reason) for kind, _, reason in unknown] == [("call", AMB)]
+    assert unknown[0][1] >= 3
+
+
+def test_indirect_mutation_never_hides_a_violation_as_clean():
+    source = (
+        DECL
+        + "from importlib import import_module\n"
+        "setattr(import_module(__name__), 'classify', other)\n"
+        "classify(x, 9)\n"
+    )
+    assert _run(source)[0] == "MATCHER_UNEVALUATED"
+
+
+@pytest.mark.parametrize("unrelated", [
+    "setattr(obj, 'retries', 3)",
+    "delattr(obj, 'retries')",
+    "value = getattr(obj, 'retries', None)",
+    "obj.retries = 3",
+    "obj.classify_count = 3",
+    "label = obj.classify",
+    "import json\njson.loads('{}')",
+    "from importlib import import_module\nmod = import_module('json')",
+    "mod = __import__('json')",
+    "import sys\nsys.exit",
+    "if __name__ == '__main__':\n    main()",
+])
+def test_unrelated_attribute_use_creates_no_false_ambiguity(unrelated):
+    source = DECL + unrelated + "\nclassify(x, 2)\n"
+    assert _run(source) == ("RECOGNIZED", "NO_VIOLATION", [], [])
+
+
 # ── Unchanged surfaces ───────────────────────────────────────────────────────
 
 

@@ -730,6 +730,16 @@ _DYNAMIC_NAMES = frozenset({
     "exec", "eval", "globals", "locals", "vars", "__builtins__",
 })
 _DYNAMIC_MODULES = frozenset({"builtins", "__builtin__"})
+# Attributes that expose or mutate a namespace (a module's included) as an
+# object or mapping: ``module.__dict__``, ``func.__globals__``, frames, ...
+_NAMESPACE_ATTRS = frozenset({
+    "__dict__", "__setattr__", "__delattr__", "__getattribute__",
+    "__globals__", "__builtins__", "f_globals", "f_locals", "f_builtins",
+})
+# Builtins that read or write an attribute named by an argument.
+_ATTRIBUTE_BUILTINS = frozenset({"setattr", "delattr", "getattr"})
+# Ways to obtain a module object by a computed name.
+_MODULE_LOADERS = frozenset({"__import__", "import_module"})
 _COMPREHENSIONS = (ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)
 
 
@@ -772,6 +782,12 @@ class _CallScopeResolver:
         self.fail_lines: list[int] = []
         self.calls: list[tuple[ast.Call, _Scope]] = []
         self.loads: list[tuple[int, _Scope]] = []
+        # Local names for ``sys``, whose ``modules`` reaches every module.
+        self._sys_names = {
+            alias.asname or "sys"
+            for node in ast.walk(module) if isinstance(node, ast.Import)
+            for alias in node.names if alias.name == "sys"
+        }
         self._stmts(module.body, self.module_scope)
 
     # ── Collection ──────────────────────────────────────────────────────────
@@ -848,7 +864,12 @@ class _CallScopeResolver:
                 self._bind(target, node.lineno)
             self._visit(node.value, scope)
         elif isinstance(node, ast.Name):
-            if node.id in _DYNAMIC_NAMES:
+            if node.id in _DYNAMIC_NAMES or (
+                # Passed around rather than called directly: its effect on
+                # the module namespace cannot be bounded.
+                node.id in _ATTRIBUTE_BUILTINS | _MODULE_LOADERS
+                and isinstance(node.ctx, ast.Load)
+            ):
                 self.fail_lines.append(node.lineno)
             if node.id != name:
                 return
@@ -859,10 +880,17 @@ class _CallScopeResolver:
                     self.fail_lines.append(node.lineno)
                 self._bind(scope, node.lineno)
         elif isinstance(node, ast.Call):
-            if isinstance(node.func, ast.Name) and node.func.id == name:
+            func = node.func
+            if isinstance(func, ast.Name) and func.id == name:
                 self.calls.append((node, scope))
+            elif isinstance(func, ast.Name) and func.id in _ATTRIBUTE_BUILTINS:
+                self._attribute_builtin(node, func.id)
+            elif isinstance(func, ast.Name) and func.id in _MODULE_LOADERS:
+                self._module_loader(node)
             else:
-                self._visit(node.func, scope)
+                if isinstance(func, ast.Attribute) and func.attr in _MODULE_LOADERS:
+                    self._module_loader(node)
+                self._visit(func, scope)
             for arg in node.args:
                 self._visit(arg, scope)
             for kw in node.keywords:
@@ -874,7 +902,15 @@ class _CallScopeResolver:
             if isinstance(node, ast.ImportFrom) and node.module in _DYNAMIC_MODULES:
                 self.fail_lines.append(node.lineno)
             for alias in node.names:
-                if alias.name == "*" or alias.name in _DYNAMIC_MODULES:
+                if (
+                    alias.name == "*"
+                    or alias.name in _DYNAMIC_MODULES
+                    or (
+                        isinstance(node, ast.ImportFrom)
+                        and node.module == "sys"
+                        and alias.name == "modules"
+                    )
+                ):
                     self.fail_lines.append(node.lineno)
                     continue
                 if alias.asname is not None:
@@ -905,15 +941,53 @@ class _CallScopeResolver:
                 self._bind(scope, node.lineno)
         elif isinstance(node, ast.Attribute):
             if (
-                node.attr == "modules"
-                and isinstance(node.value, ast.Name)
-                and node.value.id == "sys"
+                node.attr in _NAMESPACE_ATTRS
+                # Any object may be this module (a self-import,
+                # ``import_module(__name__)``): an attribute write of the
+                # name can rebind the declaration indirectly.
+                or (node.attr == name and not isinstance(node.ctx, ast.Load))
+                or (
+                    # sys.modules reaches the module namespace as an object.
+                    node.attr == "modules"
+                    and isinstance(node.value, ast.Name)
+                    and node.value.id in self._sys_names
+                )
             ):
-                # sys.modules reaches the module namespace as an object.
                 self.fail_lines.append(node.lineno)
             self._visit(node.value, scope)
+        elif isinstance(node, ast.Constant):
+            # ``getattr(m, "__dict__")``, ``attrgetter("__globals__")``, ...
+            if isinstance(node.value, str) and node.value in _NAMESPACE_ATTRS:
+                self.fail_lines.append(node.lineno)
         else:
             self._generic(node, scope)
+
+    def _attribute_builtin(self, node: ast.Call, builtin: str) -> None:
+        """``setattr``/``delattr``/``getattr``: safe only for a constant name.
+
+        The target object may be this module, so a write is harmless only
+        when it provably names another attribute; a read is harmless unless
+        it can fetch a namespace (checked on the constant itself).
+        """
+        args = node.args
+        attr = args[1] if len(args) >= 2 else None
+        safe = (
+            not any(isinstance(arg, ast.Starred) for arg in args)
+            and not any(kw.arg is None for kw in node.keywords)
+            and isinstance(attr, ast.Constant)
+            and isinstance(attr.value, str)
+            and (builtin == "getattr" or attr.value != self.name)
+        )
+        if not safe:
+            self.fail_lines.append(node.lineno)
+
+    def _module_loader(self, node: ast.Call) -> None:
+        # A computed module name (``import_module(__name__)``) may be this
+        # module; a constant names a module this source can only reach
+        # through the attribute writes and namespace accesses checked above.
+        first = node.args[0] if node.args else None
+        if not (isinstance(first, ast.Constant) and isinstance(first.value, str)):
+            self.fail_lines.append(node.lineno)
 
     def _generic(self, node: ast.AST, scope: _Scope) -> None:
         for child in ast.iter_child_nodes(node):
