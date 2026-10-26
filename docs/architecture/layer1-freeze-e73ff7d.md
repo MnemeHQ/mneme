@@ -1649,7 +1649,9 @@ equivalence check).
 | S3 | add **one** new workflow under `.github/workflows/` derived from the reviewed lab workflow [`bootstrap-ci1-trusted-gate.yml`](../validation/adr033-c4-gate3-live-2026-10-26/bootstrap-ci1-trusted-gate.yml), by a normal reviewed PR | `pull_request_target`; adapter pinned to `c51729f7`, blob `5feedf60`, SHA-256 `afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9`; evaluator commit `0b74d410b45e7b3efcf08d00ce58e7bd7017b757`, wheel SHA-256 `e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51`; violation mode a workflow constant; actions SHA-pinned; repository-specific edits limited to names, protected-surface paths and check identity. **Not** a required check |
 | S3 | create repository variable `MNEME_CI_AVAILABILITY=closed` | only `open` / `closed` |
 | S3 | an Actions event policy permitting `pull_request_target` for that workflow | **only if** S3 shows GitHub's post-2026-11-02 behavior requires it; recorded with before/after state |
-| S4 | create staging branch `r0/recovery-staging` from `main` after S3, a copy of the gate ruleset targeting it (same bypass actor, gate required, strict up-to-date), and test PRs into it, including test-only `.mneme/` changes | never merged to `main`; `.mneme/project_memory.json` on `main` untouched; posture flips and required-check removal/restore only as the charter §7 S4 cases (a)-(e); staging ruleset and branch removed after S4 is recorded |
+| S4 | create staging branch `r0/recovery-staging` from `main` after S3, a copy of the gate ruleset targeting it (same bypass actor, gate required, strict up-to-date), and test PRs into it, including test-only `.mneme/` changes | never merged to `main`; `.mneme/project_memory.json` on `main` untouched; posture flips and required-check removal/restore only as the charter §7 S4 cases (a)-(e) |
+| S4 | create a **temporary staging-only equivalent** of the applicable `main-pr-only` protections (its required checks with the same contexts and app ids, PR rule, squash-only, deletion and non-fast-forward rules, no bypass actors) as a separate ruleset targeting `r0/recovery-staging` | solely to validate ruleset layering and bypass isolation (charter §7 S4 case (b)): a bypass of the staging gate ruleset must leave these checks enforced. The production `main-pr-only` ruleset is **not changed**. The staging ruleset is snapshotted and compared field by field with production `main-pr-only` before the S4 cases run (equivalence shown, not assumed), and any difference is recorded |
+| S4 | remove the staging gate ruleset, the staging `main-pr-only` equivalent and the staging branch | after the S4 record, with snapshots showing removal |
 | S4→S5 | read-only configuration snapshots and diff | no change |
 | S5 | in the `main` gate ruleset: add the gate check as required and turn on strict up-to-date; in `main-pr-only`: remove `mneme check --mode warn` from the required checks (R5); posture `closed` | one recorded change set with before/after snapshots |
 | S6 | ordinary compliant PRs; bypass merges of refused PRs | each bypass carries the charter §5.2 record |
@@ -1673,7 +1675,8 @@ comment.
   is required).
 - **No other repository, branch or setting:** no other workflow, ruleset,
   variable, secret, Actions permission or organization setting; no change to
-  `main-pr-only` beyond the S5 removal; no `bypass_mode: always`; no second
+  the production `main-pr-only` ruleset beyond the S5 removal (the S4
+  staging equivalent is a separate, temporary ruleset); no `bypass_mode: always`; no second
   bypass actor.
 - **No lab work.** `MnemeHQ/mneme-ci1-lab` stays archived.
 - **No reinterpretation.** C4 verdicts, CI1 P7/P8, governed-update, evidence
