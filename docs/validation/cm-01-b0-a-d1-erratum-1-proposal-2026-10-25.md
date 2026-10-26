@@ -24,31 +24,72 @@ D1 describes T5-T8 by *call sequence* ("search result determines later ID", "rep
 - `decision.get` returns the same `canonical_record_to_transport` record. For canonical decisions it never adds information beyond search.
 - An empty `query` matches every record (`DecisionIndexService.search`: "An empty query matches everything"). One `decision.search` call with an optional `canonical_lifecycle_status` filter therefore returns every canonical record field for the whole fixture.
 - `decision.trace` (canonical) returns `canonical_record` (the same full record), `declared_test_evidence` (equal to the record's `test_evidence`), `missing_links` (derived only from whether `derived_rules` and `test_evidence` are empty, plus a constant `enforcement_links` entry), and `derived_rules`.
-- The only canonical data available from no tool except `decision.trace` is part of the **`derived_rules` objects** (`rule_to_transport`): `rule_payload`, `applicability` and rule-level `lifecycle_status`, plus `decision_version_id` / `decision_version` where a carried-forward binding points at a version other than the record's current one. Search does not index rule payloads. Two rule fields are **not** trace-only: `rule_type` is encoded in the `rule_id` string (`<decision_id>:<RULE_TYPE>:<hash>`, `decision_index_persistence.rule_id_of`), and `sequence` equals the position in the record's ordered `derived_rule_ids` (the trace integrity check requires the two orders to match).
+- The only canonical data available from no tool except `decision.trace` is **`rule_payload` and `applicability`** inside the `derived_rules` objects (`rule_to_transport`). Search does not index rule payloads or rule applicability, and `decision.applicable_to` matches `context_scope` only, never rule applicability.
+- The other rule fields can be derived from the search record:
+  - `rule_type` is encoded in the `rule_id` string (`<decision_id>:<RULE_TYPE>:<hash>`, `decision_index_persistence.rule_id_of`);
+  - `sequence` equals the position in the record's ordered `derived_rule_ids` (the trace integrity check requires the two orders to match);
+  - rule `lifecycle_status` is inherited from the owning decision (`CanonicalRuleRecord`, `mneme/decision_index.py`);
+  - `decision_version_id` always equals the record's `version_id`, because canonical rules are loaded only from the active version (`rules_by_version[active_version_id]`) and carried-forward bindings are re-stamped with the new version's ID.
+
+### E-1.1a Validation evidence (read-only probe)
+
+On 2026-10-25 the frozen B0-M fixture (`a996e2aa...`, 24 decisions, 20 rules) was loaded through the genuine `DecisionIndexService` and serialized with the genuine `decision_mcp` transport functions. No MCP process ran, no model was called, and nothing was written. Results:
+
+| Check | Result |
+|---|---|
+| `search("")` canonical results equal the index record count | 24/24 |
+| `get` record identical to the search record | 24/24 |
+| Trace `canonical_record` identical to the search record | 24/24 |
+| Trace `declared_test_evidence` equal to the record's `test_evidence` | 24/24 |
+| Trace `missing_links` reproducible from record fields alone | 24/24 |
+| Rule `rule_type` present in `rule_id`; `sequence` equal to position | 20/20; 20/20 |
+| Rule `lifecycle_status` and `decision_version_id` / `decision_version` equal to the record's | 20/20 each |
+| Rule `rule_payload.value` found in any search-returned text field | 0/20 |
+| Rule `applicability` non-empty | 0/20 (B0-M rules are all globally applicable) |
+
+The B0-M fixture is used only to confirm transport behavior. It is not B0-A data (D1 Section 6.1). The last row is why the B0-A corpus must populate `applicability` (E-1.2 item 1).
 
 The B0-M-derived expected-answer schemas (T5 get projection, T6 trace projection with `derived_rule_ids` and `declared_test_evidence`, T7 `get`/`trace`, T8 identity `items`) contain only record fields. So every primary scenario is answerable from a single `decision.search` result. That defeats D1 Section 6.4 check 4, and the primary endpoint would not measure multi-step orchestration.
 
-**Correction to the earlier review:** the #662 review comment suggested `applicable_to -> get` and `search -> trace` (via `declared_test_evidence` / `missing_links`) as remedies. Both still allow a one-call solution through `search("")`, because `declared_test_evidence` and canonical `missing_links` can be derived from the search record. Only the `derived_rules` content is trace-only. This erratum replaces that suggestion.
+**Correction to the earlier review:** the #662 review comment suggested `applicable_to -> get` and `search -> trace` (via `declared_test_evidence` / `missing_links`) as remedies. Both still allow a one-call solution through `search("")`, because `declared_test_evidence` and canonical `missing_links` can be derived from the search record. The first draft of this erratum also overstated the trace-only fields: rule `lifecycle_status` and `decision_version_id` can be derived as well. Only `rule_payload` and `applicability` are trace-only (E-1.1a). This erratum replaces both earlier suggestions.
 
 ### E-1.2 Proposed rule: information dependency, not call sequence
 
 For every primary scenario (T5-T8):
 
-1. **Trace-only field requirement.** The expected answer must include at least one trace-only rule field (`rule_payload`, `applicability`, rule `lifecycle_status`, or a binding `decision_version_id` that differs from the record's `version_id`) for each decision the task selects. `rule_type` and `sequence` do not satisfy this requirement. The corpus generator must not repeat rule payload values or applicability values in any record text field that `decision.search` returns (`statement`, `rationale`, `constraints`, `anti_patterns`, `targets`, `context_scope`, source-evidence locators).
+1. **Trace-only field requirement.** For each decision the task selects or tests, the expected answer, or the selection that produces it, must depend on `rule_payload` or `applicability`. No other rule field satisfies this requirement (E-1.1). Corpus generator constraints:
+   - (a) every primary-family decision has at least one derived rule;
+   - (b) rule `applicability` is populated with non-empty `include_paths` (and `exclude_paths` where the family needs them) at the quotas approved at corpus review; global (empty) applicability stays in the corpus as a declared bin;
+   - (c) rule payload values and applicability path strings never appear in any record field that `decision.search` returns (`statement`, `rationale`, `constraints`, `anti_patterns`, `targets`, `context_scope`, source-evidence locators) or in any model-visible prompt;
+   - (d) applicability path strings are synthetic and unique to the corpus.
 2. **Selection dependency.** The identity of every selected decision must be determined by an earlier tool result under the frozen task rule, and must not be present in, or derivable from, the model-visible prompt (#662 Section 7.3, after the normalization in E-1.4).
 3. **Mechanical non-solvability check.** A deterministic validator computes the union of all results obtainable *without* `decision.trace` (including `decision.search` with an empty query under every lifecycle filter, and `decision.applicable_to` over every declared scope) and proves the expected answer cannot be produced from that union. A scenario that fails this check is rejected at corpus review.
 4. **Sequences are reference, not enforced.** The "reference sequence" is descriptive. Both arms may use any sequence of the four allowed read methods, including a full `search("")` dump. Strategy, call count and result bytes are recorded as secondary measurements. A dump strategy is not a protocol violation, and is part of what the interface comparison measures.
 
 ### E-1.3 Proposed family table (replaces D1 Section 6.3 rows T5-T8)
 
-| Family | Selection mechanism | Reference sequence | Required answer content |
-|---|---|---|---|
-| T5 | Single decision selected by text marker + lifecycle filter | `search -> trace` | Record identity (`decision_id`, `version_id`, `content_digest`) plus at least one trace-only rule field for each derived rule |
-| T6 | Single decision selected by text marker + lifecycle filter | `search -> trace` | Full lineage projection: identity, `derived_rule_ids`, `declared_test_evidence`, `missing_links`, plus at least one trace-only rule field per rule |
-| T7 | Single decision selected by scope applicability + lifecycle filter (explicit tie rule) | `applicable_to -> trace` (`get` optional) | Selected ID, identity projection, plus at least one trace-only rule field per rule |
-| T8 | `k >= 2` decisions selected by query + lifecycle filter + task rule (fan-out; `k` fixed per scenario) | `search -> trace` x `k` | Ordered items, each with identity plus at least one trace-only rule field |
+Under the information-dependency rule, every primary task reduces to "obtain candidates (or a full dump), trace some decisions, project". Families that differ only in selection tool or projection breadth are therefore the same workload. In particular, the selection-based T5/T6/T7 of the first draft of this erratum were all one select plus one trace. The families are instead defined along the three properties that drive orchestration cost:
 
-T5 and T6 now differ by projection breadth (compact vs full lineage), not by tool. The statistics reviewer must confirm whether that distinction justifies two equally weighted families, or whether D1-C should merge them and re-specify the family weights. That decision must be made before the pilot. T1-T4 negative controls are unchanged.
+- **fan-out `k`:** the number of `decision.trace` calls the information requires;
+- **filtering ratio:** traced decisions per decision in the final answer;
+- **dependency depth:** the number of sequential steps where a later argument or selection depends on an earlier result.
+
+| Family | Workload | Reference sequence | `k` | Filtering ratio | Depth | Required answer content |
+|---|---|---|---|---|---|---|
+| T5 single-target lookup | One decision selected by record fields (marker or scope + lifecycle, explicit tie rule) | `search` or `applicable_to` -> `trace` | 1 | 1 | 2 | Identity (`decision_id`, `version_id`, `content_digest`), `derived_rule_ids`, each rule's `rule_payload` and `applicability`, `missing_links` |
+| T6 trace-predicate filter | Candidate set of `m >= 3` decisions selected by record fields; answer is the subset whose rule `applicability.include_paths` contains a given exact path string (may be empty) | select -> `trace` x `m` | `m` | `m` / answer size (high) | 2 | Sorted `decision_id` list of the matching subset plus `count` |
+| T7 chained dependency | Trace decision A; a path from A's rule `applicability.include_paths` (selected by an explicit task rule) is the `paths` argument to `applicable_to`, which selects decision B; trace B | `trace(A)` -> `applicable_to(paths=[p])` -> `trace(B)` | 2 | 1 | 3 | `selected_id` (B), B's identity, each B rule's `rule_payload` and `applicability`, `missing_links` |
+| T8 fan-out compose | `k >= 2` decisions selected by record fields and a task rule; every selected decision is reported | select -> `trace` x `k` | `k` | 1 (low) | 2 | Items ordered by `decision_id`, each with identity and every rule's `rule_payload` and `applicability` |
+
+Constraints for these families:
+
+- `m` (T6) and `k` (T8) are fixed per scenario, drawn from bins approved at corpus review, and recorded in the manifest. They are covariates, not free parameters.
+- T6 matching is exact string membership in `include_paths`. It never uses glob, prefix or ADR-020 selector semantics, so the evaluator does not re-implement ADR-020 applicability, which would be a second resolver under ADR-023.
+- In T7, `applicable_to(paths=[p])` must yield exactly one B after the lifecycle filter and the explicit tie rule; the corpus validator proves this. The decision A is identified in the prompt (T7 starts from a known ID, like T4). The dependency check proves that `p` comes only from A's trace and that B is not derivable from the prompt. The `applicable_to` step uses the genuine MCP matching (case-insensitive substring of a scope hint in a supplied path). Expected answers for T7 therefore require double-entry ground truth: replay against the genuine pinned MCP agreeing with the independent evaluator. Any disagreement blocks freeze.
+- A dump strategy cannot bypass T6, T7 or T8, because the predicate, chain argument or reported values depend on trace-only fields.
+- T5 is kept as the minimal multi-step baseline. The statistics reviewer must confirm, before the pilot, that equal weighting across these four workload types is the intended estimand (D1 Section 2.2), or re-specify the weights.
+
+T1-T4 negative controls are unchanged. They include no trace-only requirement, except that the T4 lineage projection adds `missing_links` (below).
 
 Every lineage projection (T4, T6, T7 trace) must include `missing_links` in fixture order. Omitting or fabricating a missing link is an identity failure. This closes the gap where D1 Section 6.2 requires missing-link cases but the B0-M-derived schemas do not score them.
 
@@ -128,8 +169,12 @@ In both cases the normalized input total counts every prompt token exactly once,
 
 | Parameter | Proposed value | Approval state | Blocker |
 |---|---|---|---|
-| Primary family definitions | E-1 information-dependency rule and family table | Proposed | Corpus and statistics review |
-| T5/T6 family distinction | Projection breadth; merge decision before pilot | Proposed | Statistics reviewer |
+| Primary family definitions | E-1 information-dependency rule; families by fan-out, filtering ratio and dependency depth | Proposed | Corpus and statistics review |
+| Trace-only fields | `rule_payload` and `applicability` only (E-1.1, E-1.1a) | Proposed | Corpus/evaluator review |
+| Rule applicability population | Non-empty `include_paths` at approved quotas; global bin retained; no leakage into searchable text | Proposed | Corpus review |
+| `m` / `k` bins (T6/T8) | TBD | Blocked | Corpus review and pilot |
+| Equal weighting across workload types | 1/4 each, unless re-specified before pilot | Proposed | Statistics reviewer |
+| T7 double-entry ground truth | Genuine-MCP replay must agree with the independent evaluator | Proposed | Corpus/evaluator review |
 | Lineage `missing_links` scoring | Required in every trace projection | Proposed | Corpus/evaluator review |
 | Gate classes | E-2.2 three-class model | Proposed | Human owner + statistics review |
 | `margin_correct` | TBD | Blocked | Human approval before pilot |
