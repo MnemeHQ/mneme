@@ -1463,6 +1463,142 @@ the G2-1 §5.1 erratum record remain unchanged.
 
 ---
 
+## Amendment — authorize ADR-033 C4 bounded CI adapter implementation (2026-10-26)
+
+**Status:** authorized on the squash merge of PR
+[#678](https://github.com/MnemeHQ/mneme/pull/678), with the owner's approval
+recorded in that PR. It authorizes **one standard-library CI availability
+adapter and its Core regressions**, and nothing else. It is not authorization
+to unarchive CI1, change GitHub policy, run a live merge-gate experiment,
+modify Core production CI, or claim C4 closure.
+
+**Sections referenced:** the Freeze Anchor **Status** clause ("No behavioral
+change to retrieval or enforcement without an explicit charter amendment"),
+the separate [Amendment Procedure](#amendment-procedure), and the earlier
+ADR-033 C2a/C2b availability amendments, whose Claude Code PreToolUse surface
+remains unchanged.
+
+**Rationale (Amendment Procedure §3(b)).** The relevant behavioral charter is
+**already accepted and merged**, before this freeze amendment:
+
+- [Accepted ADR-033](../adr/ADR-033-opt-in-fail-closed-enforcement.md),
+  §§1-2 and 5-7: independent violation `strict|warn` and availability
+  `open|closed` policies, a coherent `mneme.check/v1` observation, CI
+  required-check authority and operational UNEVALUATED reporting.
+- [C4 Gate 0 scope charter](../plans/2026-10-26-adr033-c4-ci-availability-charter.md),
+  PR [#676](https://github.com/MnemeHQ/mneme/pull/676),
+  squash `9a0c1ae18bc37797249ab776ad6ea2c87005417f`; the five
+  owner-approved amendments A1-A5 are pinned.
+- [C4 Gate 1 implementation charter](../plans/2026-10-26-adr033-c4-gate1-implementation-charter-proposal.md),
+  PR [#677](https://github.com/MnemeHQ/mneme/pull/677),
+  squash `89a54d1a093a1d8eb43524dbee7f273170ac7087`;
+  owner approval [record](https://github.com/MnemeHQ/mneme/pull/677#issuecomment-6423873813)
+  and R1-R3 are included. Gate 1 requires this separate freeze amendment
+  before implementation.
+
+No implemented behavior is justified retrospectively by this amendment.
+It authorizes only the prospective, reviewed Core implementation change.
+
+### Authorized change — C4 Gate 1 only
+
+**Location.** One reviewed, Python standard-library-only CI adapter
+`scripts/ci/adr033_c4_gate.py` based on the CI1 lab
+`gate/ci1_gate.py` at lab revision `3cd402fe`, outside the `mneme-hq` wheel;
+`tests/test_adr033_c4_ci_gate.py`; and optional
+`tests/fixtures/adr033_c4_ci/v1/` fixture additions. Necessary documentation
+under `docs/validation/` and `docs/integrations/` is permitted only as
+described in the accepted charter. Historical CI1 fixtures and the canonical
+benchmark are not changed.
+
+**Evaluator unchanged (Gate 0 A5).** Use the already approved CI1 P2 evaluator
+from Core commit `0b74d410b45e7b3efcf08d00ce58e7bd7017b757` and
+wheel SHA-256
+`e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51`.
+A new evaluator build, package change or public CLI schema requires a
+separate owner ruling and new parity evidence, not this amendment.
+
+**Deterministic CI adapter behavior, and nothing broader:**
+
+1. Reuse CI1's trust boundary: trusted-base decision memory, PR head
+   fetched as data only, no PR code execution, fixed query, and the
+   existing coherent `mneme.check/v1`/`assess_verdict` contract
+   (ADR-033 §2, Gate 1 §2-3).
+2. A1: normalize and classify paths before file type; refuse unnormalizable
+   paths and any change to `.mneme/` or the trusted gate surface regardless
+   of file type. Only other non-regular/unmaterializable paths can become
+   operational UNEVALUATED.
+3. A2 plus R1: aggregate REFUSED > strict VIOLATION > UNEVALUATED > WARN >
+   PASS. Under `strict`, a trusted complete WARN or FAIL is a blocking
+   strict violation even when another file is UNEVALUATED. Report every
+   subordinate partial result. SKIP-only means unprotected deletion and is
+   never a verified PASS. `EXCLUDED` on a complete evaluation may be trusted
+   PASS but is not ADR-029 relevant enforcement.
+4. A3 plus R2: `open|closed` availability comes from the administrator-
+   controlled repository Actions variable `MNEME_CI_AVAILABILITY` read
+   in the trusted base-workflow context; missing/invalid values mean
+   `closed` with a visible warning. `strict|warn` violation mode is a
+   separate literal trusted-workflow invocation constant, **not** a second
+   Actions variable. Validate both reported inputs against their trusted
+   sources. A PR never controls either.
+5. A4: complete `warn` results require checker exit 0 for PASS/WARN/FAIL;
+   complete `strict` results follow exits 0/1/2. Incomplete or incoherent
+   observations are untrusted/UNEVALUATED and never become a trusted PASS.
+   Preserve strict/warn rule semantics and `assess_verdict` parity.
+6. Under `closed`, operational UNEVALUATED is non-success. Under explicit
+   `open`, it may produce the required-check success **only while visibly
+   labelled UNEVALUATED**, with a reason, `::warning::` annotation and job
+   summary, never PASS. Trusted strict violations and policy refusals
+   are non-success under either availability posture. Missing/untrusted
+   bootstrap, adapter hash, or gate report always makes the required
+   check non-success: no adapter may silently turn host failure into success.
+7. Adapter identity is review-pinned to an exact Core commit, Git blob and
+   content SHA-256. Future lab execution must verify these before loading
+   the script and must validate report/head/base/mode/posture/evaluator
+   coherence in a trusted decision step. This amendment authorizes
+   the **Core implementation and offline unit fixtures only**, not any
+   lab workflow modification or live execution.
+
+**Pinned regression contract:** Gate 0's O1-O12, including O2w, O8s, O9s,
+O9p, O9n and O10x, strict and warn O11 mixtures, O12 invalid/missing posture,
+and Gate 1 §5's hash/preflight/report failure controls; CI1.2, CI1 C1,
+CI1 V11 Option A, and frozen canonical benchmark parity. The implementation
+PR runs the unit tests and the frozen canonical benchmark at its final head
+and reports the results in the PR (as #591 did for C2b); Gate 2 is the
+separately authorized, recorded offline parity campaign against the pinned
+implementation. Fixtures remain
+versioned and append-only; any failure remains a failure. Evidence must bind
+the exact adapter and evaluator pins. Writing unit tests under the
+implementation PR is allowed; the separately approved Gate 2 offline
+validation campaign is **not** authorized here.
+
+### Explicitly preserved and not authorized
+
+- **No edits** to `mneme/`, `.mneme/`, `.github/workflows/`, Core rulesets
+  or Actions settings, trusted memory, ADR-030 persistence, public CLI schema
+  or `mneme.check/v1` producer.
+- **No semantic change** to `DecisionRetriever`, `ConflictDetector`,
+  typed-rule matching/applicability, existing hook policy, retrieval ranking,
+  rule identities, canonical benchmark or sealed CI1 fixtures.
+- **No lab changes:** the archived `MnemeHQ/mneme-ci1-lab` remains archived;
+  its GitHub workflow, check identity, ruleset, repo variables, Actions
+  policy, test PRs and merge attempts require separately authorized Gate 3.
+- **No production promotion.** Core's existing `mneme-check.yml` remains
+  advisory; CI1 production readiness is still deferred. No release or
+  installation rollout is authorized.
+- **No retrospective reinterpretation.** All C3 R-1 Edit-2 FAIL, F-R2/F-R3-1,
+  verifier-unavailable proceed, enrollment-removal, host-timeout H-2 proceed,
+  MultiEdit N/A, earlier-runtime P-6, operator-attestation limits and all
+  CI1 P7/P8, governed-update, evidence and host race limits remain recorded.
+  The six dimensions of ADR-029 must bind to the same evaluation before any
+  "relevant enforcement observed" claim.
+- **No Gate 2, 3 or 4 approval** is conferred by this amendment.
+  Implementation itself remains a separate reviewed PR under ADR-022.
+
+The earlier freeze amendments (including C2a, C2b and C2b Amendment 1,
+ADR-034 G1/G2-1/D1/D2 and their errata) remain unchanged.
+
+---
+
 ## Amendment Procedure
 
 This document is frozen at `e73ff7d`. To amend it:
