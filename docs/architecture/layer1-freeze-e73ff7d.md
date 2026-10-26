@@ -1597,6 +1597,96 @@ validation campaign is **not** authorized here.
 The earlier freeze amendments (including C2a, C2b and C2b Amendment 1,
 ADR-034 G1/G2-1/D1/D2 and their errata) remain unchanged.
 
+## Amendment — authorize the CI production rollout R0 scope, stage-gated (2026-10-26)
+
+**Status:** authorized on the squash merge of the `[layer1-freeze]` PR that
+adds this section, with the owner's approval recorded in that PR. It defines
+the **only Core CI, ruleset and repository-setting changes** that the R0
+rollout may make, and makes them eligible under this freeze. **It authorizes
+the execution of none of them.** Each of R0 stages S2-S7 still needs its own
+explicit owner authorization, and every change below still goes through its
+stage's review. This amendment does not activate enforcement, install a
+workflow, configure a bypass actor, change a required check or set a variable.
+
+**Sections referenced:** the Freeze Anchor **Status** clause ("No behavioral
+change to retrieval or enforcement without an explicit charter amendment"),
+the separate [Amendment Procedure](#amendment-procedure), and the earlier
+ADR-033 C4 amendment, which excluded Core production CI, rulesets and Actions
+settings. That exclusion stays in force for anything not listed here. CI1.4 §7
+condition 9 ("a separate rollout charter and `[layer1-freeze]` amendment
+before any change to `MnemeHQ/mneme` workflows or rulesets") is satisfied in
+scope only; the other eight conditions keep the classification in the R0
+charter §4.
+
+**Rationale (Amendment Procedure §3(b)).** The governing charter is **already
+accepted and merged**, before this amendment:
+
+- [R0 readiness charter](../plans/2026-10-26-ci-r0-production-rollout-readiness-charter.md),
+  PR [#684](https://github.com/MnemeHQ/mneme/pull/684), squash
+  `e6c80c07f0972a36786fec8d3988809f053ffbce`, with owner rulings R1-R5 in
+  §6 and the squash body: R1 single-repository boundary; R2 Option A as
+  design direction only, not its implementation, activation or any bypass
+  operation; R3 starting posture `closed`; R4 conditions 1, 4 and 5 accepted
+  as residuals for bounded rollout validation, with no ADR-029 upgrade; R5
+  the warn check stops being required when the gate becomes required.
+- [Accepted ADR-033](../adr/ADR-033-opt-in-fail-closed-enforcement.md) and the
+  [C4 closure record](../validation/adr033-c4-closure-2026-10-26.md)
+  (PR [#682](https://github.com/MnemeHQ/mneme/pull/682), `085244dc`).
+
+No change is justified retrospectively. The R0 charter and all C4 evidence
+are unchanged by this amendment.
+
+### Eligible changes — R0 charter §§5 and 7 only
+
+Each row is eligible **only** when its stage has separate owner
+authorization, and only in the order the charter's §7 fixes (S5 additionally
+requires every S4 case as expected and a clean S4→S5 configuration
+equivalence check).
+
+| Stage | Eligible change on `MnemeHQ/mneme` | Bound |
+|---|---|---|
+| S2 | create **one** dedicated gate ruleset targeting `main` | its bypass list has exactly one actor: the designated human account, `bypass_mode: pull_request`; no required check yet, or created disabled; `main-pr-only` keeps no bypass actors. Preceded by the recorded credential inventory (charter §5.1) |
+| S3 | add **one** new workflow under `.github/workflows/` derived from the reviewed lab workflow [`bootstrap-ci1-trusted-gate.yml`](../validation/adr033-c4-gate3-live-2026-10-26/bootstrap-ci1-trusted-gate.yml), by a normal reviewed PR | `pull_request_target`; adapter pinned to `c51729f7`, blob `5feedf60`, SHA-256 `afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9`; evaluator commit `0b74d410b45e7b3efcf08d00ce58e7bd7017b757`, wheel SHA-256 `e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51`; violation mode a workflow constant; actions SHA-pinned; repository-specific edits limited to names, protected-surface paths and check identity. **Not** a required check |
+| S3 | create repository variable `MNEME_CI_AVAILABILITY=closed` | only `open` / `closed` |
+| S3 | an Actions event policy permitting `pull_request_target` for that workflow | **only if** S3 shows GitHub's post-2026-11-02 behavior requires it; recorded with before/after state |
+| S4 | create staging branch `r0/recovery-staging` from `main` after S3, a copy of the gate ruleset targeting it (same bypass actor, gate required, strict up-to-date), and test PRs into it, including test-only `.mneme/` changes | never merged to `main`; `.mneme/project_memory.json` on `main` untouched; posture flips and required-check removal/restore only as the charter §7 S4 cases (a)-(e) |
+| S4 | create a **temporary staging-only equivalent** of the applicable `main-pr-only` protections (its required checks with the same contexts and app ids, PR rule, squash-only, deletion and non-fast-forward rules, no bypass actors) as a separate ruleset targeting `r0/recovery-staging` | solely to validate ruleset layering and bypass isolation (charter §7 S4 case (b)): a bypass of the staging gate ruleset must leave these checks enforced. The production `main-pr-only` ruleset is **not changed**. The staging ruleset is snapshotted and compared field by field with production `main-pr-only` before the S4 cases run (equivalence shown, not assumed), and any difference is recorded |
+| S4 | remove the staging gate ruleset, the staging `main-pr-only` equivalent and the staging branch | after the S4 record, with snapshots showing removal |
+| S4→S5 | read-only configuration snapshots and diff | no change |
+| S5 | in the `main` gate ruleset: add the gate check as required and turn on strict up-to-date; in `main-pr-only`: remove `mneme check --mode warn` from the required checks (R5); posture `closed` | one recorded change set with before/after snapshots |
+| S6 | ordinary compliant PRs; bypass merges of refused PRs | each bypass carries the charter §5.2 record |
+| any stage after S3 | the two emergency controls of charter §5.4: posture to `open`; removal of the gate from the gate ruleset's required checks | designated authority only; recorded on #540 the same day; restore only through a reviewed PR |
+
+`mneme-check.yml` itself is not modified; it keeps running as an advisory
+comment.
+
+### Explicitly preserved and not authorized
+
+- **No stage execution.** S2-S7 each need a separate owner authorization.
+  This amendment approves no bypass operation, including the first one.
+- **No pin change.** No adapter or evaluator other than the pins above; a
+  newer evaluator needs new parity evidence, an owner ruling and, first, the
+  fix for ADR-034 numeric/`subject` payloads being classed UNEVALUATED
+  (C4 closure §7).
+- **No edits** to `mneme/`, `scripts/ci/adr033_c4_gate.py`, the public CLI
+  schema, the `mneme.check/v1` producer, rule semantics, retrieval, the
+  canonical benchmark, or `.mneme/project_memory.json` on `main` (decision
+  updates stay `[memory]` tasks, merged through the §5.2 bypass once the gate
+  is required).
+- **No other repository, branch or setting:** no other workflow, ruleset,
+  variable, secret, Actions permission or organization setting; no change to
+  the production `main-pr-only` ruleset beyond the S5 removal (the S4
+  staging equivalent is a separate, temporary ruleset); no `bypass_mode: always`; no second
+  bypass actor.
+- **No lab work.** `MnemeHQ/mneme-ci1-lab` stays archived.
+- **No reinterpretation.** C4 verdicts, CI1 P7/P8, governed-update, evidence
+  and host-race limits, and every C3 limitation stay as recorded. No ADR-029
+  "relevant enforcement observed" claim.
+- **No production promotion decision.** Promotion stays DEFERRED until S7.
+
+The earlier freeze amendments, including ADR-033 C2a, C2b, C2b Amendment 1 and
+C4 and ADR-034 G1/G2-1/D1/D2 with their errata, remain unchanged.
+
 ---
 
 ## Amendment Procedure
