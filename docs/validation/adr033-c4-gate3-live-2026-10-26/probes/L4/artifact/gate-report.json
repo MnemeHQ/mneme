@@ -1,0 +1,59 @@
+{
+  "schema": "mneme.c4.gate-report/v1",
+  "adapter": {
+    "path": "scripts/ci/adr033_c4_gate.py",
+    "sha256": "afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9"
+  },
+  "evaluator": {
+    "commit": "0b74d410b45e7b3efcf08d00ce58e7bd7017b757",
+    "wheel_sha256": "e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51",
+    "python": "/home/runner/work/_temp/evaluator/bin/python"
+  },
+  "base_sha": "9137c93b66c2b8534f2222f125378b6761f6aae3",
+  "head_sha": "fbcf70e35d664482e1e8a8743cc3cfc1b91c1aa1",
+  "merge_base": "9137c93b66c2b8534f2222f125378b6761f6aae3",
+  "requested_mode": "strict",
+  "query": "adr033 c4 trusted gate",
+  "posture": {
+    "effective": "open",
+    "source": "vars.MNEME_CI_AVAILABILITY",
+    "fallback": null
+  },
+  "trusted_surface": {
+    "files": [
+      ".gitattributes",
+      ".gitmodules"
+    ],
+    "dirs": [
+      ".github/",
+      "gate/",
+      "p2/",
+      "policy/"
+    ]
+  },
+  "memory": null,
+  "files": [
+    {
+      "path": "gate/c4-l4-note.txt",
+      "status": "A",
+      "mode": "100644",
+      "classification": "REFUSED",
+      "kind": "trusted_surface",
+      "reason": "trusted surface: PR changes never reach the gate's own inputs"
+    }
+  ],
+  "gate_conditions": [],
+  "aggregate": {
+    "classification": "REFUSED",
+    "reason": "gate/c4-l4-note.txt: trusted surface: PR changes never reach the gate's own inputs",
+    "partly_unevaluated": false,
+    "counts": {
+      "REFUSED": 1
+    }
+  },
+  "disposition": "failure",
+  "annotations": [
+    "::error title=ADR-033 C4 REFUSED::gate/c4-l4-note.txt: trusted surface: PR changes never reach the gate's own inputs"
+  ],
+  "summary_written": true
+}

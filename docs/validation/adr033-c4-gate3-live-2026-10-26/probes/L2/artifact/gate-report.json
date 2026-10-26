@@ -1,0 +1,59 @@
+{
+  "schema": "mneme.c4.gate-report/v1",
+  "adapter": {
+    "path": "scripts/ci/adr033_c4_gate.py",
+    "sha256": "afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9"
+  },
+  "evaluator": {
+    "commit": "0b74d410b45e7b3efcf08d00ce58e7bd7017b757",
+    "wheel_sha256": "e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51",
+    "python": "/home/runner/work/_temp/evaluator/bin/python"
+  },
+  "base_sha": "06fb92c9962d6cbae4b388992791d524f3c33d5c",
+  "head_sha": "f7f6ed19c222168b792d6c0a67868e6fc51bad0d",
+  "merge_base": "06fb92c9962d6cbae4b388992791d524f3c33d5c",
+  "requested_mode": "strict",
+  "query": "adr033 c4 trusted gate",
+  "posture": {
+    "effective": "closed",
+    "source": "vars.MNEME_CI_AVAILABILITY",
+    "fallback": null
+  },
+  "trusted_surface": {
+    "files": [
+      ".gitattributes",
+      ".gitmodules"
+    ],
+    "dirs": [
+      ".github/",
+      "gate/",
+      "p2/",
+      "policy/"
+    ]
+  },
+  "memory": null,
+  "files": [
+    {
+      "path": "docs/c4-l2-link.md",
+      "status": "A",
+      "mode": "120000",
+      "classification": "UNEVALUATED",
+      "kind": "mode",
+      "reason": "not a regular file (symlink)"
+    }
+  ],
+  "gate_conditions": [],
+  "aggregate": {
+    "classification": "UNEVALUATED",
+    "reason": "docs/c4-l2-link.md: not a regular file (symlink)",
+    "partly_unevaluated": true,
+    "counts": {
+      "UNEVALUATED": 1
+    }
+  },
+  "disposition": "failure",
+  "annotations": [
+    "::error title=ADR-033 C4 UNEVALUATED::docs/c4-l2-link.md: not a regular file (symlink)"
+  ],
+  "summary_written": true
+}

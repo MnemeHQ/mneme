@@ -1,0 +1,170 @@
+[
+  {
+    "case": "L1",
+    "posture": "closed",
+    "head": "bb85d8a54d84bb539642a1b1ba7c9f925c584c76",
+    "Verify the adapter pins before running it": {
+      "exit": 0,
+      "stdout": "adapter c51729f78199203fe12fcbc5c678b89a2c4f7d3e:scripts/ci/adr033_c4_gate.py blob 5feedf60ce1a67b2bb85673354c8b8b367a87d06 sha256 afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9 (pinned)\n",
+      "stderr": ""
+    },
+    "Evaluate the PR in the trusted workspace": {
+      "exit": 0,
+      "stdout": "[adr033-c4-gate] PASS -> success (availability closed, mode strict)\nadapter exit code: 0\n",
+      "stderr": ""
+    },
+    "Gate decision": {
+      "exit": 0,
+      "stdout": "[adr033-c4-gate] decision: PASS accepted (availability closed)\n",
+      "stderr": ""
+    },
+    "aggregate": "PASS",
+    "disposition": "success",
+    "decision_exit": 0,
+    "ok": true
+  },
+  {
+    "case": "L2",
+    "posture": "closed",
+    "head": "3c1c87f5d83ae410ef5a4371f6c73854f9f67636",
+    "Verify the adapter pins before running it": {
+      "exit": 0,
+      "stdout": "adapter c51729f78199203fe12fcbc5c678b89a2c4f7d3e:scripts/ci/adr033_c4_gate.py blob 5feedf60ce1a67b2bb85673354c8b8b367a87d06 sha256 afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9 (pinned)\n",
+      "stderr": ""
+    },
+    "Evaluate the PR in the trusted workspace": {
+      "exit": 0,
+      "stdout": "::error title=ADR-033 C4 UNEVALUATED::docs/c4-l2-link.md: not a regular file (symlink)\n[adr033-c4-gate] UNEVALUATED -> failure (availability closed, mode strict)\nadapter exit code: 1\n",
+      "stderr": ""
+    },
+    "Gate decision": {
+      "exit": 1,
+      "stdout": "::error title=ADR-033 C4 decision::required check fails: UNEVALUATED under availability closed\n",
+      "stderr": ""
+    },
+    "aggregate": "UNEVALUATED",
+    "disposition": "failure",
+    "decision_exit": 1,
+    "ok": true
+  },
+  {
+    "case": "L3",
+    "posture": "open",
+    "head": "8c1841715f5abb075de6add8fd6257b8729c1cd2",
+    "Verify the adapter pins before running it": {
+      "exit": 0,
+      "stdout": "adapter c51729f78199203fe12fcbc5c678b89a2c4f7d3e:scripts/ci/adr033_c4_gate.py blob 5feedf60ce1a67b2bb85673354c8b8b367a87d06 sha256 afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9 (pinned)\n",
+      "stderr": ""
+    },
+    "Evaluate the PR in the trusted workspace": {
+      "exit": 0,
+      "stdout": "::warning title=ADR-033 C4 UNEVALUATED::UNEVALUATED, not PASS (availability open): docs/c4-l3-link.md: not a regular file (symlink)\n[adr033-c4-gate] UNEVALUATED -> success (availability open, mode strict)\nadapter exit code: 0\n",
+      "stderr": ""
+    },
+    "Gate decision": {
+      "exit": 0,
+      "stdout": "[adr033-c4-gate] decision: UNEVALUATED accepted (availability open)\n",
+      "stderr": ""
+    },
+    "aggregate": "UNEVALUATED",
+    "disposition": "success",
+    "decision_exit": 0,
+    "ok": true
+  },
+  {
+    "case": "L4",
+    "posture": "open",
+    "head": "8e2f0588d6eefb9765a1016004a4575e172b0c1f",
+    "Verify the adapter pins before running it": {
+      "exit": 0,
+      "stdout": "adapter c51729f78199203fe12fcbc5c678b89a2c4f7d3e:scripts/ci/adr033_c4_gate.py blob 5feedf60ce1a67b2bb85673354c8b8b367a87d06 sha256 afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9 (pinned)\n",
+      "stderr": ""
+    },
+    "Evaluate the PR in the trusted workspace": {
+      "exit": 0,
+      "stdout": "::error title=ADR-033 C4 REFUSED::gate/c4-l4-note.txt: trusted surface: PR changes never reach the gate's own inputs\n[adr033-c4-gate] REFUSED -> failure (availability open, mode strict)\nadapter exit code: 1\n",
+      "stderr": ""
+    },
+    "Gate decision": {
+      "exit": 1,
+      "stdout": "::error title=ADR-033 C4 decision::required check fails: REFUSED under availability open\n",
+      "stderr": ""
+    },
+    "aggregate": "REFUSED",
+    "disposition": "failure",
+    "decision_exit": 1,
+    "ok": true
+  },
+  {
+    "case": "L5",
+    "posture": "open",
+    "head": "30e3d01dd1a08d0df5ceb02576e14046275fb5b2",
+    "Verify the adapter pins before running it": {
+      "exit": 0,
+      "stdout": "adapter c51729f78199203fe12fcbc5c678b89a2c4f7d3e:scripts/ci/adr033_c4_gate.py blob 5feedf60ce1a67b2bb85673354c8b8b367a87d06 sha256 afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9 (pinned)\n",
+      "stderr": ""
+    },
+    "Evaluate the PR in the trusted workspace": {
+      "exit": 0,
+      "stdout": "::error title=ADR-033 C4 VIOLATION::docs/c4-l5.md: FAIL\n[adr033-c4-gate] VIOLATION -> failure (availability open, mode strict)\nadapter exit code: 1\n",
+      "stderr": ""
+    },
+    "Gate decision": {
+      "exit": 1,
+      "stdout": "::error title=ADR-033 C4 decision::required check fails: VIOLATION under availability open\n",
+      "stderr": ""
+    },
+    "aggregate": "VIOLATION",
+    "disposition": "failure",
+    "decision_exit": 1,
+    "ok": true
+  },
+  {
+    "case": "unset",
+    "posture": "",
+    "head": "08795a7111b632de1e159108629a71c8eb6bc8e8",
+    "Verify the adapter pins before running it": {
+      "exit": 0,
+      "stdout": "adapter c51729f78199203fe12fcbc5c678b89a2c4f7d3e:scripts/ci/adr033_c4_gate.py blob 5feedf60ce1a67b2bb85673354c8b8b367a87d06 sha256 afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9 (pinned)\n",
+      "stderr": ""
+    },
+    "Evaluate the PR in the trusted workspace": {
+      "exit": 0,
+      "stdout": "::warning title=ADR-033 C4 posture::MNEME_CI_AVAILABILITY is not set; using closed\n::error title=ADR-033 C4 UNEVALUATED::docs/c4-unset-link.md: not a regular file (symlink)\n[adr033-c4-gate] UNEVALUATED -> failure (availability closed, mode strict)\nadapter exit code: 1\n",
+      "stderr": ""
+    },
+    "Gate decision": {
+      "exit": 1,
+      "stdout": "::error title=ADR-033 C4 decision::required check fails: UNEVALUATED under availability closed\n",
+      "stderr": ""
+    },
+    "aggregate": "UNEVALUATED",
+    "disposition": "failure",
+    "decision_exit": 1,
+    "ok": true
+  },
+  {
+    "case": "invalid",
+    "posture": "Open",
+    "head": "82ebc67478fb7c7c8943d1c458bc40315de35841",
+    "Verify the adapter pins before running it": {
+      "exit": 0,
+      "stdout": "adapter c51729f78199203fe12fcbc5c678b89a2c4f7d3e:scripts/ci/adr033_c4_gate.py blob 5feedf60ce1a67b2bb85673354c8b8b367a87d06 sha256 afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9 (pinned)\n",
+      "stderr": ""
+    },
+    "Evaluate the PR in the trusted workspace": {
+      "exit": 0,
+      "stdout": "::warning title=ADR-033 C4 posture::MNEME_CI_AVAILABILITY is not exactly 'open' or 'closed' ('Open'); using closed\n::error title=ADR-033 C4 UNEVALUATED::docs/c4-invalid-link.md: not a regular file (symlink)\n[adr033-c4-gate] UNEVALUATED -> failure (availability closed, mode strict)\nadapter exit code: 1\n",
+      "stderr": ""
+    },
+    "Gate decision": {
+      "exit": 1,
+      "stdout": "::error title=ADR-033 C4 decision::required check fails: UNEVALUATED under availability closed\n",
+      "stderr": ""
+    },
+    "aggregate": "UNEVALUATED",
+    "disposition": "failure",
+    "decision_exit": 1,
+    "ok": true
+  }
+]
