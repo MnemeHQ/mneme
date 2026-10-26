@@ -21,6 +21,7 @@ changes only the status wording.
 (§6a, §7a), owner rulings G2-O1 to G2-O6. The amendment is a design
 contract only: it authorizes no implementation and claims no pre-write
 protection (see "G2 amendment (2026-10-24)" below).
+**Amended:** 2026-10-26: relevant-enforcement attribution with several applied numeric rules (§7b, owner ruling D1, from the G2-1 blind validation FAIL in #666). Per-rule attribution is authoritative, and the event-level value is existential. It authorizes no implementation.
 
 **What acceptance means.** Acceptance establishes what a future implementation
 must satisfy. It does **not** establish that Mneme enforces numeric bounds:
@@ -700,6 +701,80 @@ F2 activation restriction stays in force for closed-availability paths.
 
 **Other consumers.** The Agent SDK and LangChain consumers are out of scope.
 They keep §7's delta semantics.
+
+### 7b. Relevant-enforcement attribution with several applied numeric rules (amendment 2026-10-26, owner ruling D1)
+
+**Why.** The G2-1 blind validation (results record
+[`adr-034-g2-1-blind-scoring-results-2026-10-25.md`](../validation/adr-034-g2-1-blind-scoring-results-2026-10-25.md),
+#666 `cec27ea9`, verdict **FAIL**) exposed a gap, diagnosed as D1. §7a
+and G2-1 Amendment 1 A1.3 define relevance for **one** attributable numeric
+outcome. They do not say how the outcomes of several applied numeric rules
+in one event combine. The owner ruled on 2026-10-26 to make the following
+normative.
+
+**1. Per-rule attribution is authoritative.** Under ADR-029 §2, evidence
+binds to one specific decision, rule, subject and attributable outcome. So
+"relevant enforcement observed" is a claim about **one applied numeric
+rule**. For a rule R it holds only when:
+
+- R's matcher record is complete and decided (`RECOGNIZED`, or `PARTIAL`
+  with an established violation);
+- the hook disposition is attributable to R's outcome under the A1.3 table;
+- the common bindings hold: host identity, event, subject, digest, target
+  and provenance.
+
+**No inheritance between rules.** A rule never inherits another rule's
+relevance:
+
+- an unevaluated rule, an `EXCLUDED` rule, or a rule unrelated to the
+  disposition always has per-rule relevance `false`;
+- this holds even when another rule in the same event was relevantly
+  enforced.
+
+**2. Event-level relevance is existential.** The event-level value is
+`true` if and only if **at least one** applied numeric rule has per-rule
+relevance `true`. It means exactly that. It **never** claims that every
+applied rule was evaluated, that the action is compliant, or anything about
+another rule.
+
+**3. Completeness is a separate fact.** `evaluation_complete` (§4) and the
+event-level relevance value are independent and are both reported. An event
+can be relevantly enforced for one rule and incomplete overall.
+
+| Rule A | Rule B | Event-level relevance | Per-rule (A / B) | Evaluation complete |
+|---|---|---|---|---|
+| Violated, strict refusal attributable to A | Unevaluated | `true` (A only) | `true` / `false` | no |
+| Violated, strict refusal attributable to A | Recognized clean | `true` (A only) | `true` / `false` | yes |
+| Recognized clean, event proceeds | Recognized clean, event proceeds | `true` (both) | `true` / `true` | yes |
+| Violated, but the refusal came only from an unrelated (non-numeric) rule | Unevaluated | `false` | `false` / `false` | no |
+
+**4. What changes, and what does not.**
+- **Blocking decisions do not change.** The hook's blocking decisions, the
+  matcher and the strict/warn and availability behavior are unchanged.
+- **The evidence validator changes.** It is
+  `relevant_enforcement_observed()` in
+  `mneme/integrations/claude_code/hook.py`, which currently returns `true`
+  only when every applied numeric rule is decided. It must:
+  - separate the record-wide completeness check from per-rule attribution;
+  - keep the common checks for host, event, subject, digest, target and
+    provenance;
+  - return the existential event value;
+  - expose per-rule relevance.
+- **That change needs its own review.** It needs regression tests,
+  including every row of the table above, and a review of the evidence
+  validator.
+- **Not authorized here.** This amendment does not authorize that change,
+  and it does not authorize any change arising from D2. D2 (whether a
+  same-named method `def` in a class body shadows the module function) is
+  adjudicated separately.
+
+**5. No retroactive effect.** The G2-1 blind validation stays **FAIL**,
+exactly as recorded. This ruling does not re-score, reinterpret or upgrade
+it. Any later G2-1 PASS claim needs:
+
+- a new pre-registration that adopts this definition;
+- a newly authored, independently held-out corpus;
+- the failure policy of the original pre-registration (§6).
 
 ### 8. Mixed results (M-a, target contract)
 
