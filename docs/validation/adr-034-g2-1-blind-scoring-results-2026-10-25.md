@@ -62,7 +62,7 @@ not edited after decryption.
 | G4 Reasons | **FAIL** | 1 / 35 |
 | G5 Parity (hook and checker level, Amendment 2) | PASS | 0 / 37 |
 | G6 Evidence | **FAIL** | 3 / 122 |
-| G7 Determinism | PASS | 0 / 129 (the two runs are byte-identical) |
+| G7 Determinism | PASS | raw harness report `0 / 129`; the comparison covers the 122 concealed cases (see the G7 disclosure in §4); the two runs are byte-identical |
 | G8 Completeness | PASS | 0 / 122 (no scoring-process failure) |
 
 **G7 identity.** Each per-run file has the same SHA-256 in run 1 and run 2:
@@ -75,7 +75,14 @@ not edited after decryption.
 ## 3. Failures and diagnosis
 
 The diagnosis was authorized by the owner after scoring. Diagnostic replays
-are diagnostic only and change nothing. The classes:
+are diagnostic only and change nothing.
+
+**Every classification below is PROVISIONAL.** It is the scorer's
+diagnostic reading, not conclusive proof that an implementation defect or a
+label error is ruled out. The four case failures and the overall FAIL stand
+exactly as observed, whatever any later ruling decides.
+
+The classes:
 
 - **IMPLEMENTATION DEFECT:** the build departs from the contract;
 - **LABEL ERROR:** the label departs from the contract;
@@ -84,10 +91,10 @@ are diagnostic only and change nothing. The classes:
 
 | Case | Class | Gate (reasons) | Diagnosis |
 |---|---|---|---|
-| `g2h-3c14e161e8` | V | G6 (`relevant_enforcement_observed`) | **AMBIGUOUS** (D1) |
-| `g2h-c30ea85ef5` | V | G6 (`relevant_enforcement_observed`) | **AMBIGUOUS** (D1) |
-| `g2h-aa1649b8a0` | US | G4 (`primary_reason`) | **AMBIGUOUS** (D2) |
-| `g2h-6eacd08e5d` | C | G6 (`cause`, `relevant_enforcement_observed`, `…_per_rule`) | **AMBIGUOUS** (D2) |
+| `g2h-3c14e161e8` | V | G6 (`relevant_enforcement_observed`) | **AMBIGUOUS** (D1), provisional |
+| `g2h-c30ea85ef5` | V | G6 (`relevant_enforcement_observed`) | **AMBIGUOUS** (D1), provisional |
+| `g2h-aa1649b8a0` | US | G4 (`primary_reason`) | **AMBIGUOUS** (D2), provisional |
+| `g2h-6eacd08e5d` | C | G6 (`cause`, `relevant_enforcement_observed`, `…_per_rule`) | **AMBIGUOUS** (D2), provisional |
 
 **D1: case-level relevance with more than one applied numeric rule.**
 
@@ -112,6 +119,17 @@ differs:
 
 None of them defines how per-rule relevance combines into a case value when
 more than one numeric rule applies.
+
+**Two separate points:**
+
+1. **The contract gap.** ADR-034's attribution definition has a genuine gap
+   at the case level: it doesn't say how several numeric rules' attribution
+   combines into one case value.
+2. **The scoring interpretation.** The conservative conjunction (#651 Q2)
+   was explicitly accepted for this harness before decryption, and it
+   decided these two G6 failures. That the labels disagree with it is a fact
+   about this pre-registered interpretation. It is kept distinct from the
+   contract gap, and it does not change the observed failures.
 
 **D2: a same-named method `def` in a class body.**
 
@@ -149,8 +167,12 @@ shadows or rebinds the module function. In both cases the build's reading
 is the conservative one (unevaluated, never clean). G1 passes, and neither
 case is an unsafe pass or a false block.
 
-**No failure is classified as an implementation defect, a label error or a
-harness defect.** All four rest on two contract gaps, D1 and D2. Each needs
+D2 has **competing interpretations** (Python scoping against "rebound
+anywhere in the module"). Settling it needs a future architectural ruling.
+
+**Provisionally, no failure is classified as an implementation defect, a
+label error or a harness defect.** All four are read as resting on D1 and
+D2. These readings do not prove that such defects are absent. Each gap needs
 an owner ruling or an ADR-034 amendment before any new corpus is written.
 
 ## 4. Disclosures
@@ -169,8 +191,21 @@ an owner ruling or an ADR-034 amendment before any new corpus is written.
   cases disagree with at least one ungated label; 120 agree in full. Both are
   the D2 cases (`g2h-6eacd08e5d`: `matcher_status`, `matcher_outcome`,
   `unknown_source_reasons`; `g2h-aa1649b8a0`: `primary_reason`,
-  `unknown_source_reasons`), classified **AMBIGUOUS** (D2). This count is
-  never folded into the gates.
+  `unknown_source_reasons`), provisionally classified **AMBIGUOUS** (D2).
+  This count is never folded into the gates.
+- **G7 denominator (harness reporting defect).** The raw harness report
+  reads G7 PASS `0/129`. That count wrongly includes the 7 public smoke
+  cases, which the pre-registration excludes from every gate denominator
+  (G2V-F4).
+  - **What G7 actually compares:** the concealed-only files,
+    `run-<n>/cases.jsonl` and `run-<n>/summary.json`. That is the **122
+    concealed cases** across two byte-identical runs.
+  - **The smoke cases** are written to separate files that G7 does not
+    compare, so they did not affect the G7 verdict.
+  - **Effect:** the denominator is a reporting defect in the frozen harness.
+    It does not change the observed PASS. The harness is not edited after
+    decryption (pre-registration §6), so the raw output is kept here as reported, for
+    auditability.
 - **Public smoke cases (non-gating, outside every denominator).** All 7 pass
   every gate, with 0 label mismatches, and are identical across both passes.
 - **Synthetic scoring is not live-host evidence.** The harness computed
@@ -190,7 +225,8 @@ an owner ruling or an ADR-034 amendment before any new corpus is written.
 
 ## 6. Output artifacts
 
-All are outside the repository, under `C:/dev/g2-1-scoring/out/`:
+They were written outside the repository, under `C:/dev/g2-1-scoring/out/`.
+They are now held only in the encrypted evidence archive (§7).
 
 | File | SHA-256 |
 |---|---|
@@ -200,12 +236,66 @@ All are outside the repository, under `C:/dev/g2-1-scoring/out/`:
 | `run-1/smoke_cases.jsonl` = `run-2/…` | `b69af19ba7b8c7d1b5feea60459c3879f3b497a3b2200b552dd8855b7a0a293a` |
 | `run-1/smoke_summary.json` = `run-2/…` | `0b9c876de4b2cef8e9ce147052e4e438c6f2a0f22ea95d2e14eea55404d80b30` |
 
-**Custody.** The outputs and the scorer's diagnosis notes are archived,
-encrypted to the owner key. Plaintext (the tar, the extracted corpus and the
-outputs) is shredded only after the owner verifies that archive. A
-follow-up note records both steps.
+## 7. Custody (metadata only)
 
-## 7. Isolation statement (scorer)
+**Evidence archive.** A deterministic tar holds every scoring output and the
+scorer's diagnosis evidence:
+
+- the 10 output files listed in §6 (the final `summary.json`, plus the four
+  per-run files for each of the two runs);
+- `diagnosis/diagnosis.md`;
+- an inner manifest, `EVIDENCE_FILES.sha256`
+  (`51b899f8a06ef541b90ac2953299c353266ca577e40dc66d0dffd0e7002b4cda`).
+
+The tar has sorted entries, a fixed mtime of 2026-10-25T00:00:00Z, and
+uid/gid 0. It is encrypted to the owner key (primary
+`88CE4C9F66A5F3CA7F1C0A484839E24F94E4F796`, encryption subkey
+`C4370AB8829450C5`).
+
+| Item | SHA-256 |
+|---|---|
+| Evidence tar (plaintext) | `c57eec8f4dddfa55252024a18a7163ad4b193b7e8faa7d07d750a12c6112641c` |
+| Evidence ciphertext `C:/dev/mneme-heldout-034-g2-sealed/g2-1-scoring-evidence.tar.gpg` | `a332fcbdd50ed7cf89c053cda3e2234ca5785054a4988ffc920885fc3a0fd916` |
+
+**Owner verification (2026-10-26).**
+
+- The owner decrypted the evidence ciphertext through subkey
+  `C4370AB8829450C5` into `%TEMP%`.
+- The decrypted tar hashed to `c57eec8f…641c`, matching the tar above.
+- The temporary copy was deleted, and its absence was confirmed.
+
+**Plaintext removal.** This is verified file absence. Deletion does not prove
+physical erasure on an SSD, and no unrecoverability claim is made. After the
+owner's verification, these locations were deleted, and each was then
+confirmed absent:
+
+| Path | Held | State |
+|---|---|---|
+| `C:/dev/g2-1-scoring/plaintext/` | the decrypted corpus tar | absent |
+| `C:/dev/g2-1-scoring/corpus/` | the extracted corpus | absent |
+| `C:/dev/g2-1-scoring/out/` | the scoring outputs | absent |
+| `C:/dev/g2-1-scoring/diagnosis/` | the diagnosis notes | absent |
+| `C:/dev/g2-1-scoring/evidence/` | the plaintext evidence tar | absent |
+
+No harness run root remains: `C:/dev/g2-1-scoring/run` and the default
+`%TEMP%` run roots are absent.
+
+**Kept, and re-hashed after removal.** Both match their recorded values:
+
+| File | SHA-256 |
+|---|---|
+| Evidence ciphertext | `a332fcbdd50ed7cf89c053cda3e2234ca5785054a4988ffc920885fc3a0fd916` |
+| Sealed corpus ciphertext `g2-1-heldout-corpus.tar.gpg` | `016a6134bc71f5c531981c101373dad8c562b83da24dcd9b154644ad85205ae4`, as in the freeze record |
+
+**What remains under `C:/dev/g2-1-scoring/`.** None of it holds case
+content:
+
+- the pinned harness clone;
+- the two build environments;
+- `build.log`;
+- `score.log`, which holds only the gate headline and the result line.
+
+## 8. Isolation statement (scorer)
 
 **Read for scoring and this record:**
 
