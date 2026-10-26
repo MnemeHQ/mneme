@@ -738,6 +738,9 @@ _NAMESPACE_ATTRS = frozenset({
 })
 # Builtins that read or write an attribute named by an argument.
 _ATTRIBUTE_BUILTINS = frozenset({"setattr", "delattr", "getattr"})
+# Library callables that look attributes up by name from string arguments
+# (``operator.attrgetter("__globals__")``, ``inspect.getattr_static``, ...).
+_NAME_LOOKUPS = frozenset({"attrgetter", "methodcaller", "getattr_static"})
 # Ways to obtain a module object by a computed name.
 _MODULE_LOADERS = frozenset({"__import__", "import_module"})
 _COMPREHENSIONS = (ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)
@@ -890,7 +893,19 @@ class _CallScopeResolver:
             else:
                 if isinstance(func, ast.Attribute) and func.attr in _MODULE_LOADERS:
                     self._module_loader(node)
+                callee = getattr(func, "id", None) or getattr(func, "attr", None)
+                if callee in _NAME_LOOKUPS:
+                    self._name_lookup(node)
                 self._visit(func, scope)
+            # A namespace attribute name handed to any callee may be looked
+            # up by it (an unknown helper, ``object.__getattribute__``):
+            # undecidable here, so fail closed. The same string as plain
+            # data (docstring, value, comparison, f-string) is harmless.
+            if any(
+                self._names_namespace(arg)
+                for arg in (*node.args, *(kw.value for kw in node.keywords))
+            ):
+                self.fail_lines.append(node.lineno)
             for arg in node.args:
                 self._visit(arg, scope)
             for kw in node.keywords:
@@ -955,10 +970,6 @@ class _CallScopeResolver:
             ):
                 self.fail_lines.append(node.lineno)
             self._visit(node.value, scope)
-        elif isinstance(node, ast.Constant):
-            # ``getattr(m, "__dict__")``, ``attrgetter("__globals__")``, ...
-            if isinstance(node.value, str) and node.value in _NAMESPACE_ATTRS:
-                self.fail_lines.append(node.lineno)
         else:
             self._generic(node, scope)
 
@@ -967,7 +978,7 @@ class _CallScopeResolver:
 
         The target object may be this module, so a write is harmless only
         when it provably names another attribute; a read is harmless unless
-        it can fetch a namespace (checked on the constant itself).
+        it can fetch a namespace.
         """
         args = node.args
         attr = args[1] if len(args) >= 2 else None
@@ -976,10 +987,42 @@ class _CallScopeResolver:
             and not any(kw.arg is None for kw in node.keywords)
             and isinstance(attr, ast.Constant)
             and isinstance(attr.value, str)
+            and not self._names_namespace(attr)
             and (builtin == "getattr" or attr.value != self.name)
         )
         if not safe:
             self.fail_lines.append(node.lineno)
+
+    def _name_lookup(self, node: ast.Call) -> None:
+        # ``attrgetter``/``methodcaller``/``getattr_static``: the names must
+        # be visible constants, or a namespace may be fetched through a
+        # string held in a variable.
+        callee = getattr(node.func, "id", None) or node.func.attr
+        if callee == "attrgetter":
+            names = node.args
+        elif callee == "methodcaller":
+            names = node.args[:1]
+        else:  # getattr_static(obj, attr[, default])
+            names = node.args[1:2]
+        if (
+            not names
+            or any(kw.arg is None for kw in node.keywords)
+            or any(
+                not (isinstance(arg, ast.Constant) and isinstance(arg.value, str))
+                for arg in names
+            )
+        ):
+            self.fail_lines.append(node.lineno)
+
+    @staticmethod
+    def _names_namespace(node: ast.AST) -> bool:
+        # A string constant naming a namespace attribute, dotted paths
+        # (``attrgetter("f.__globals__")``) included.
+        return (
+            isinstance(node, ast.Constant)
+            and isinstance(node.value, str)
+            and any(part in _NAMESPACE_ATTRS for part in node.value.split("."))
+        )
 
     def _module_loader(self, node: ast.Call) -> None:
         # A computed module name (``import_module(__name__)``) may be this

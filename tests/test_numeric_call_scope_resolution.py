@@ -469,6 +469,58 @@ def test_unrelated_attribute_use_creates_no_false_ambiguity(unrelated):
     assert _run(source) == ("RECOGNIZED", "NO_VIOLATION", [], [])
 
 
+# ── Namespace attribute names as plain data (review D2R-F2) ─────────────────
+
+
+@pytest.mark.parametrize("data", [
+    'HELP_TEXT = "__dict__"',
+    'HELP_TEXT = "__globals__"',
+    'def h():\n    """Reads __dict__ and "__globals__"."""\n    return 1',
+    'MAPPING = {"key": "__dict__", "other": ["__globals__", "f_globals"]}',
+    'label = f"{name}: __dict__"',
+    'same = attr == "__dict__"',
+    'found = "__globals__" in names',
+    'if key != "__setattr__":\n    pass',
+    'pair = ("__dict__", "__globals__")',
+    'from operator import attrgetter\nget = attrgetter("retries", "owner.name")',
+])
+def test_namespace_attribute_name_as_data_stays_recognized(data):
+    source = DECL + data + "\nclassify(x, 2)\n"
+    assert _run(source) == ("RECOGNIZED", "NO_VIOLATION", [], [])
+
+
+def test_namespace_attribute_name_as_data_still_reports_a_violation():
+    source = DECL + 'HELP_TEXT = "__dict__"\nclassify(x, 9)\n'
+    status, outcome, unknown, exceeding = _run(source)
+    assert (status, outcome, unknown) == ("RECOGNIZED", "VIOLATION", [])
+    assert exceeding == [(4, "9")]
+
+
+@pytest.mark.parametrize("use", [
+    # The same strings, used for a real namespace lookup, still fail closed.
+    "ns = getattr(me, '__dict__')",
+    "ns = getattr(g, '__globals__')",
+    "setattr(me, '__dict__', other)",
+    "from operator import attrgetter\nns = attrgetter('__globals__')(g)",
+    "from operator import attrgetter\nns = attrgetter('h.__globals__')(m)",
+    "from operator import methodcaller\nmethodcaller('__setattr__', 'classify', other)(me)",
+    "import inspect\nns = inspect.getattr_static(me, '__dict__')",
+    "ns = object.__getattribute__(me, '__dict__')",
+    "ns = lookup(me, '__dict__')",
+    "ns = lookup(me, attr='__globals__')",
+    # A namespace name moved through a variable into a name-based lookup.
+    'from operator import attrgetter\nNAME = "__globals__"\nns = attrgetter(NAME)(g)',
+    'import inspect\nNAME = "__dict__"\nns = inspect.getattr_static(me, NAME)',
+    'from operator import methodcaller\nNAME = "__setattr__"\nmethodcaller(NAME, "classify", other)(me)',
+    'NAME = "__dict__"\nns = getattr(me, NAME)',
+])
+def test_namespace_attribute_name_in_a_lookup_is_ambiguous(use):
+    source = DECL + use + "\nclassify(x, 2)\n"
+    status, outcome, unknown, exceeding = _run(source)
+    assert (status, outcome, exceeding) == ("MATCHER_UNEVALUATED", "UNEVALUATED", [])
+    assert [(kind, reason) for kind, _, reason in unknown] == [("call", AMB)]
+
+
 # ── Unchanged surfaces ───────────────────────────────────────────────────────
 
 
