@@ -1,7 +1,8 @@
 # CI production rollout R0: readiness charter (Mneme Core)
 
-**Status: PROPOSED.** Read-only charter. Merging it records the owner's rulings
-in §6 and nothing else. R2 (Option A) is accepted as design direction only. **It authorizes no workflow, ruleset, required-check,
+**Status: ACCEPTED (owner, 2026-10-26).** Read-only charter. Merging it records
+the owner's rulings R1-R5 in §6 and nothing else. R2 (Option A) is accepted as
+design direction only. **It authorizes no workflow, ruleset, required-check,
 Actions-policy, repository-variable or `.mneme/` change on `MnemeHQ/mneme`,
 and no `[layer1-freeze]` amendment.** Production merge blocking stays
 **DEFERRED** ([CI1.4 §7](../validation/ci1-4-trusted-merge-gate-validation-2026-10-19.md)).
@@ -205,16 +206,22 @@ is first exercised in an incident.
 
 | ID | Ruling | Status |
 |---|---|---|
-| R1 | Adopt the §2 boundary | requested; recommend yes |
+| R1 | Adopt the §2 boundary | **Accepted (owner, 2026-10-26):** single-repository boundary |
 | R2 | Bootstrap, decision updates and recovery use §5 Option A | **Accepted as R0 design direction (owner, 2026-10-26)**, subject to clarifications 1-4 (§§5.1-5.4) and recovery validation before activation (§7 S4). Not an approval of implementation, activation or any bypass operation |
-| R3 | Starting posture | requested; recommend `closed` (unavailable evaluation blocks; availability rollback to `open` per §5.4) |
-| R4 | Accept conditions 1, 4 and 5 as bounded residuals (§4) | requested; recommend yes |
-| R5 | Keep `mneme-check.yml` as an advisory comment but drop `mneme check --mode warn` from the required checks when the gate becomes required | requested; recommend yes: two checks with different trust models must not both look like the governance gate |
+| R3 | Starting posture | **Accepted (owner, 2026-10-26):** `closed` (unavailable evaluation blocks; availability rollback to `open` per §5.4) |
+| R4 | Accept conditions 1, 4 and 5 as bounded residuals (§4) | **Accepted (owner, 2026-10-26):** for bounded rollout validation only; no ADR-029 evidence-claim upgrade |
+| R5 | Keep `mneme-check.yml` as an advisory comment but drop `mneme check --mode warn` from the required checks when the gate becomes required | **Accepted (owner, 2026-10-26):** the warn check stops being required when the gate becomes required (S5), not before |
 
 Owner wording (2026-10-26, Mneme Core conversation, recorded on the owner's
-behalf): "This approves Option A as the R0 design direction, not its
-implementation, activation or any future bypass operation." Production
-promotion stays DEFERRED.
+behalf):
+
+- R2: "This approves Option A as the R0 design direction, not its
+  implementation, activation or any future bypass operation."
+- R1, R3-R5: "accept R1 (single repo boundary), R3 (closed), R4 (residuals for
+  bounded rollout validation, no ADR-029 upgrade), R5 (drop warn check from
+  required when the gate becomes required)."
+
+These rulings authorize no stage in §7. Production promotion stays DEFERRED.
 
 ## 7. Stages after this charter
 
