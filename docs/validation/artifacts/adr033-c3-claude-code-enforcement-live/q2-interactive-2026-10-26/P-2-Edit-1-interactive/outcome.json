@@ -1,0 +1,49 @@
+{
+  "probe": "P-2",
+  "tool": "Edit",
+  "rep": "1",
+  "arm": "interactive",
+  "selftest": false,
+  "expect": "block",
+  "verifier_expect": "AUTHORIZED",
+  "label": "PASS",
+  "delivery": {
+    "emitted": "observed",
+    "model_delivered": "observed",
+    "user_visible": "observed"
+  },
+  "diagnostic": "not_applicable",
+  "checks": {
+    "E1": "ok",
+    "E2": "ok",
+    "E3": "ok",
+    "verifier": "ok",
+    "Q2_user_delivery": "ok"
+  },
+  "failures": [],
+  "missing": [],
+  "deviations": [],
+  "facts": {
+    "target_changed": false,
+    "e2_source": "transcript",
+    "tool_result_is_error": true,
+    "tool_result_excerpt": "PreToolUse:Edit hook error: [\"<HOME>\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\python.exe\" \"C:\\dev\\mneme\\docs\\validation\\artifacts\\adr033-c3-claude-code-enforcement-live\\harness\\hookwrap_c3.py\"]: mneme-hook: availability AUTHORIZED; baseline=main@5125231; evaluation=TRUSTED_COMPLETE; availability did not refuse.\r\nmneme: FAIL - architectural decisio",
+    "tool_use_id": "toolu_01U8kzCnyYwNjoVw6xWmbeyA",
+    "hook_records": 1,
+    "hook_exit": 2,
+    "hook_seconds": 3.293,
+    "verifications": [
+      {
+        "authorization": "AUTHORIZED",
+        "reason": "",
+        "detail": "",
+        "url": "https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture",
+        "branch": "main",
+        "tip": "5125231076fb5a8e537a483c84850de99c25ba57",
+        "seconds": 2.942
+      }
+    ],
+    "recording_sha256": "ad078af5eda41f5ff7c0e3dc766dafb03d7e15f0b06223e0914ba275f6638abd",
+    "host_offers_tool": null
+  }
+}
