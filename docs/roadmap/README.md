@@ -270,6 +270,24 @@ Extend the existing Audit workflow for long-running migrations and modernization
 
 Do not create a separate migration product unless pilot evidence justifies it.
 
+### P1.5 — Dynamic multi-agent workflow governance (Claude Managed Agents beta)
+
+Run a **bounded compatibility and control-surface experiment** against Anthropic Claude Managed Agents Dynamic Workflows (public beta, October 2026). This is an orchestration **consumer** experiment, not a Mneme orchestrator, managed-agent adapter, or production-support commitment. Keep the existing Managed Agents M0 **PARTIAL** evidence and limitations intact.
+
+**Hypothesis:** a lead agent may delegate work across multiple agent threads/phases, yet the same pinned Mneme decision authority and deterministic rule semantics should govern each supported mutation, and CI should independently evaluate the *combined* resulting changes. Agent-level instructions or review do not count as enforcement.
+
+**Smallest validation (conditional on availability of real control points):**
+
+1. Pin the beta API/SDK, runtime configuration (including `multiagent_20261001` where applicable), repository fixture, canonical decision/rule revisions, supported mutation surfaces, and an explicit test protocol. Use **one lead agent, two workers, two reviewed decisions**, one compliant implementation, and one intentionally forbidden change.
+2. Probe whether the actual delegate/worker execution exposes authoritative decision retrieval and **pre-mutation** interception. Verify direct new-file writes, existing-file edits/overwrite, shell or indirect writes, retry/resume, and at least one attempt to bypass worker-level wiring. Do not infer current-byte availability or a blocking completion/Stop-equivalent from M0.
+3. Include parallel changes that are individually plausible but collectively violate an architectural constraint. Run the independent **CI1** check on the combined output; explicitly distinguish prevented, detected after mutation, blocked at CI, and **UNEVALUATED** paths.
+4. Correlate workflow/run, phase and worker/thread identities with pinned decision/rule revision, scope/applicability, target/evaluated input, allow/deny/unevaluated result, CI outcome and observable limitations. Treat telemetry as untrusted evidence input, not decision authority.
+5. Report architectural compliance, functional completion, false blocks, bypasses, human intervention, wall-clock time and token/cost overhead. Preserve negative/partial evidence, and isolate this experiment from M4 independent validation.
+
+**Exit gate:** reproduce compliant completion and forbidden-change blocking *at each claimed supported pre-mutation seam*, plus independent detection of combined violations in CI, with full attribution. If existing-file mutation or worker bypass cannot be guarded, publish **PARTIAL/unsupported** coverage and do **not** promote to native/validated support. Do not broaden scope or reopen G1/M4 to accommodate this experiment.
+
+**Dependencies/placement:** reuse the canonical Decision Index (DG1 authority/applicability; DG2 federation only if the test needs declared multi-source policy), current hook/CLI/CI1 and evidence contracts. Do not create another policy engine or orchestration runtime. This is behind P0 external validation and M4; a capability probe may proceed separately if it does not distract from those gates.
+
 ### P1.5 — Deep Agents capability POC
 
 Run the pinned Deep Agents validation already described in the integration roadmap. Determine whether filesystem mutation tools expose a reliable pre-mutation seam and whether nested/subagent behavior preserves the governance boundary.
@@ -304,9 +322,9 @@ Measure architecture compliance, functional completion, and scope expansion.
 
 **This is an interoperability experiment, not a Claudeforce integration claim.** Do not add Salesforce or Claudeforce to the support matrix until Mneme has actual validation evidence or maintained adapter code.
 
-### P2 — Claude Managed Agents revisit
+### P2 — Claude Managed Agents production-support revisit
 
-The completed M0 is **PARTIAL** and remains evidence-only.
+The completed M0 is **PARTIAL** and remains evidence-only. The P1.5 Dynamic Workflows probe above is an evaluation of orchestration interoperability, **not** evidence of production-safe Managed Agents enforcement or a substitute for the missing control surfaces.
 
 Revisit only if Anthropic exposes one or more of the missing control surfaces identified by the validation:
 
