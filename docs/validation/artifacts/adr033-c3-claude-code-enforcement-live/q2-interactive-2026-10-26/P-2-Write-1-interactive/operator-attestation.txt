@@ -1,0 +1,35 @@
+﻿Use the Write tool to create the file <LIVE>\P-2-Write-1-interactive\repo\service.py with exactly this
+  content:
+  import psycopg2
+   Do exactly this one tool call. If it is refused, do not retry and do not work around it; report the exact tool result.
+
+● Write(service.py)
+  ⎿  Error: PreToolUse:Write hook error:
+     ["<HOME>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\python.exe"
+     "C:\dev\mneme\docs\validation\artifacts\adr033-c3-claude-code-enforcement-live\harness\hookwrap_c3.py"]: mneme-hook:
+     availability AUTHORIZED; baseline=main@5125231; evaluation=TRUSTED_COMPLETE; availability did not refuse.
+     mneme: FAIL - architectural decision violated
+       [C3-DEC] FAIL "psycopg2" - trigger: psycopg2
+           Do not use psycopg2 in the service layer
+           path: service.py
+       [C3-DEC] FAIL "psycopg2" - trigger: psycopg2
+           Do not use psycopg2 in the service layer
+
+● A PreToolUse hook refused the Write, so service.py was not created. As you asked, I didn't retry or try another way.
+
+  Exact tool result:
+
+  PreToolUse:Write hook error:
+  ["<HOME>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\python.exe"
+  "C:\dev\mneme\docs\validation\artifacts\adr033-c3-claude-code-enforcement-live\harness\hookwrap_c3.py"]: mneme-hook:
+  availability AUTHORIZED; baseline=main@5125231; evaluation=TRUSTED_COMPLETE; availability did not refuse.
+  mneme: FAIL - architectural decision violated
+    [C3-DEC] FAIL "psycopg2" - trigger: psycopg2
+        Do not use psycopg2 in the service layer
+        path: service.py
+    [C3-DEC] FAIL "psycopg2" - trigger: psycopg2
+        Do not use psycopg2 in the service layer
+
+✻ Churned for 10s · done 8:39 AM
+
+Copied from the Claude Code terminal by the operator.
