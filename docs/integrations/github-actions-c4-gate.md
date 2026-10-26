@@ -1,10 +1,15 @@
 # GitHub Actions trusted availability gate (ADR-033 C4)
 
-**Status: Experimental.** The adapter and its offline regressions exist in this
-repository. It is **not** enabled on Mneme Core's CI, has no recorded Gate 2
-offline validation or Gate 3 live GitHub validation yet, and is not a
-production-ready or general fail-closed enforcement claim. Core's
-`mneme-check.yml` stays advisory (an implicit, undeclared `open`; ADR-033 §5).
+**Status: Experimental.** The adapter is validated offline
+([Gate 2 record](../validation/adr033-c4-gate2-offline-2026-10-26.md), #680)
+and live in an isolated GitHub lab
+([Gate 3 record](../validation/adr033-c4-gate3-live-2026-10-26.md), #681),
+and C4 is closed as a bounded milestone
+([closure record](../validation/adr033-c4-closure-2026-10-26.md)). It is
+**not** enabled on Mneme Core's CI and is not a production-ready or general
+fail-closed enforcement claim. Core's `mneme-check.yml` stays advisory (an
+implicit, undeclared `open`; ADR-033 §5). Any adoption needs a separate rollout
+decision.
 
 Governing documents: [ADR-033](../adr/ADR-033-opt-in-fail-closed-enforcement.md)
 §§1-2 and 5-7; the [C4 Gate 0 charter](../plans/2026-10-26-adr033-c4-ci-availability-charter.md)
@@ -98,8 +103,32 @@ Checks API run and no second check identity.
 Before running the adapter, the trusted workflow must fetch it from an exact,
 reviewed Core commit and path (never from the PR or a mutable branch) and verify
 its git blob id and content SHA-256. If that preflight fails, the check fails
-under every posture. That bootstrap and the lab workflow are Gate 3 work and
-are not part of this repository.
+under every posture.
+
+## Reference workflow and required check
+
+The workflow validated in the isolated lab is kept as evidence:
+[`bootstrap-ci1-trusted-gate.yml`](../validation/adr033-c4-gate3-live-2026-10-26/bootstrap-ci1-trusted-gate.yml).
+It is a reference, not an installable product. Using it in a repository needs:
+
+1. **The workflow on the default branch.** `pull_request_target` always runs the
+   base branch's copy, so the workflow governs PRs only after it is merged. A
+   gate that protects `.github/` refuses its own installation PR; the lab merged
+   it through a recorded administrator operation (Gate 3 record §3).
+2. **The adapter pins** (`ADAPTER_COMMIT`, `ADAPTER_PATH`, `ADAPTER_BLOB`,
+   `ADAPTER_SHA256`) and the evaluator pins (`EVALUATOR_COMMIT`,
+   `APPROVED_WHEEL_SHA256`, a hash-locked runtime lock file and build
+   constraints) set to reviewed values.
+3. **Trusted-surface entries** covering every file the workflow reads
+   (`--trusted-surface`; `.github/`, `.gitattributes` and `.gitmodules` are
+   always included).
+4. **A ruleset or branch protection** that requires the job's check name
+   (`CI1 trusted gate` in the lab) from the GitHub Actions app, with no bypass
+   actors.
+5. **An Actions policy** that allows `pull_request_target` for this workflow,
+   where the organization restricts it.
+6. **The repository variable** `MNEME_CI_AVAILABILITY` set by an administrator
+   to `closed` or `open`. Leaving it unset means `closed`.
 
 ## Outputs
 
@@ -125,14 +154,20 @@ exit by itself.
   `subject` records in a payload are treated as UNEVALUATED.
 - Unicode normalization variants of protected paths (for example NFD on macOS)
   are not matched; only case variants are.
-- The CI1 limits stay: administrative P7/P8 exposure, no governed decision
-  update route, rule coverage only as wide as the include selectors, partial
-  ADR-029 binding, untested merge races. GitHub `pull_request_target` behavior
-  after 2026-11-02 is unverified.
+- The decision step runs the same script as the evaluation step, so it catches
+  an inconsistent or tampered report but not a defect shared by both.
+- The per-file report records path, content SHA-256 and head SHA, not the
+  file's git blob id.
+- The CI1 limits stay: administrative P7/P8 exposure (an administrator can
+  disable the ruleset, as the lab bootstrap did), no governed decision update
+  route, rule coverage only as wide as the include selectors, partial ADR-029
+  binding, untested merge races. GitHub `pull_request_target` behavior after
+  2026-11-02 is unverified.
 
 ## Release implications
 
-None yet. The adapter is a standalone, standard-library-only script outside the
-`mneme-hq` wheel, so installing or upgrading `mneme-hq` does not install it.
-Adoption by any repository, including Mneme Core, needs the Gate 2 and Gate 3
-evidence and a separate rollout decision with its own Layer 1 authorization.
+None. The adapter is a standalone, standard-library-only script outside the
+`mneme-hq` wheel, so installing or upgrading `mneme-hq` does not install it, and
+no `mneme-hq` release is needed for it. The Gate 2 and Gate 3 evidence exists;
+adoption by any repository, including Mneme Core, still needs a separate
+rollout decision with its own Layer 1 authorization.
