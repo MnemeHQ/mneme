@@ -10,6 +10,19 @@ change is allowed after unblinding.
 build and running a new independent blind validation. This follows the G2-1
 FAIL, the D1 and D2 rulings, and the merged fixes.
 
+**Revision 2** (2026-10-26) answers the pre-merge review, which requested
+changes. It makes three protocol corrections. None of them is based on any
+case content.
+
+- **R2V-F1:** G2 false blocks now cover the SC and MR cases that are expected
+  to proceed (§5).
+- **R2V-F2:** the owner ruled on 2026-10-26 that §7b table row 4 is stated
+  noncoverage for R2. MR covers rows 1–3 as native events, plus a native
+  analogue of row 4 (§4.2, §4.3).
+- **R2V-F3:** G6 first checks that the record carries **exactly** the
+  expected set of applied numeric rule IDs, and only then checks their
+  values (§4.1, §5).
+
 **What this record is.** It is the new pre-registration that the following
 records require for any later G2-1 PASS:
 
@@ -120,9 +133,14 @@ below.
   - No case's expected label may depend on how a future symbol ruling would
     resolve a class-body or function-local rebinding of the symbol. Any such
     case goes to the owner's ambiguity brief, not into the corpus.
-- **Evidence (§7b).** Each routed case is labelled with three things:
+- **Evidence (§7b).** Each routed case is labelled with four things:
+  - **the expected applied-rule set (R2V-F3):** the set of `rule_id` values
+    of numeric rules that are `APPLIED` to the target. The author derives
+    it independently, from the fixture's memory and ADR-020 applicability,
+    never from an observed record. A case with no applied numeric rule
+    labels the set as explicitly empty (`{}`);
   - the expected **per-rule** `relevant_enforcement_observed` for every
-    numeric rule in the record, keyed by `rule_id`;
+    `rule_id` in that expected set;
   - the expected **event-level** value: true exactly when at least one
     per-rule value is true;
   - the expected record-wide `evaluation_complete`.
@@ -138,7 +156,7 @@ the total floor rises from 104 to **120**.
 | Class | Scenario | Expected | Min |
 |---|---|---|---|
 | **SC** | Routed, strict. Each case has one **function source** whose call sites need §3a scoping to resolve: a same-named method `def` in a class body (inside and outside that class); a parameter, local, comprehension or nested-function binding of the name; enclosing-scope resolution; `global` / `nonlocal`; indirect namespace mutation; a namespace-related string used as plain data | The §3a label, and the matching exit and disposition. Covers recognized-violation, recognized-clean and `AMBIGUOUS_BINDING` outcomes, at least 2 cases of each | 10 |
-| **MR** | Routed. Two or more applied numeric rules in one event. Covers every row of the ADR-034 §7b table, at least once each; the rest is the author's choice | The hook disposition; each rule's per-rule relevance; the event-level value; `evaluation_complete` | 6 |
+| **MR** | Routed. Two or more applied numeric rules in one event, under `open`. Must include ADR-034 §7b table rows 1–3, at least once each, plus at least 2 cases of the **native row-4 analogue** (§4.3). The rest is the author's choice | The hook disposition; the applied-rule set; each rule's per-rule relevance; the event-level value; `evaluation_complete` | 6 |
 | | **Floor total** (104 + 16) | | **120** |
 
 **The distribution rules stay as in R1-PR §4.** Floors count concealed,
@@ -146,26 +164,77 @@ scored cases only. At most 10% of cases may be public smoke cases, each
 from a different class. Smoke cases never count toward a floor or a gate
 denominator.
 
+### 4.3 §7b row 4: stated noncoverage (owner ruling R2V-F2, 2026-10-26)
+
+**What row 4 describes.** The ADR-034 §7b table's row 4 is: rule A violated,
+rule B unevaluated, and a refusal that comes **only** from an unrelated,
+non-numeric control.
+
+**Why it can't be a native event here.** At the pinned build, the hook
+attributes the refusal to the numeric rule whenever the trusted payload
+reports a numeric violation. Every scored class runs under `open`
+availability, so there is no competing availability refusal.
+
+The public D1 regressions can only reach row 4 in one of two ways, and
+neither counts as an ordinary event:
+
+- a closed-availability run, which R1 lists as noncoverage;
+- a record mutated by hand.
+
+**The owner's ruling:**
+
+- **Row 4 is stated noncoverage for R2.** It is not scored as a routed
+  event. No tampered or constructed record is presented as a native
+  event.
+- **Its behavior stays pinned by the public D1 regression tests only.** R2
+  makes no blind-validation claim for it.
+- **MR must include a native analogue instead,** at least 2 cases. In each:
+  - two or more numeric rules are applied;
+  - every applied numeric rule is `NO_VIOLATION` or unevaluated;
+  - a `FORBID_LITERAL` violation causes a strict refusal.
+
+  **Expected:** exit 2, with every rule's per-rule relevance labelled under
+  A1.3 per rule. A rule whose outcome is unevaluated, or whose
+  `NO_VIOLATION` does not explain the literal refusal, is `false`.
+
+  The analogue tests the same "no credit for an unrelated refusal, no
+  inheritance" property, using real hook output.
+- **No availability or gate change.** Availability stays `open` in every
+  scored class. R1's noncoverage of AUTHORIZED closed availability stands.
+  No new gate or denominator is added.
+
 ## 5. Gates
 
 The gates are R1-PR §5 G1–G8 with Amendments 1 and 2, including
 symlink capability as a PASS requirement. The changes:
 
+- **G2 False block (R2V-F1)** also covers every SC and MR case labelled as
+  expected to proceed. That includes a recognized-clean SC case, an
+  `AMBIGUOUS_BINDING` SC case and MR row 3. Any such case observed with
+  exit 2 counts as a **G2 false block**, not just a G6 or generic failure.
+  The only exception is a case labelled as expected to block because of a
+  `FORBID_LITERAL` violation, such as the native row-4 analogue (the LIT
+  exception). Zero false blocks are still required.
 - **G4 Reasons** also covers SC and MR. Every unevaluated rule or call site
   must have its expected primary reason.
 - **G6 Evidence** is restated under §7b. Every routed case must have exactly
   one complete G2 record that joins by digest and path, with the expected
-  cause and mode. Three values are scored separately, and each must match
-  its label:
-  1. **per-rule relevance,** for every numeric rule, as computed by the
-     pinned build's `relevant_enforcement_per_rule()` with the pinned host
-     identity;
-  2. **event-level relevance,** from `relevant_enforcement_observed()`;
-  3. **record-wide `evaluation_complete`,** from
+  cause and mode. The scorer then checks the following, in order:
+  1. **Rule-ID set (R2V-F3).** The record's numeric `rule_id` values must
+     **equal** the expected applied-rule set exactly: no missing ID, no
+     extra ID, and no duplicate. For a case labelled `{}`, the record
+     carries no numeric rule. If the set doesn't match, the case fails G6
+     before any value is checked.
+  2. **Per-rule relevance,** for every `rule_id` in the expected set, as
+     computed by the pinned build's `relevant_enforcement_per_rule()` with
+     the pinned host identity. The result's keys must equal the expected
+     set.
+  3. **Event-level relevance,** from `relevant_enforcement_observed()`.
+  4. **Record-wide `evaluation_complete`,** from
      `recorded_evaluation_complete()`.
 
-  The case fails G6 if any of the three differs from its label. No
-  unrouted case may have a G2 record.
+  The case fails G6 if any of the four differs from its label. No unrouted
+  case may have a G2 record.
 
 **The G1 unsafe-pass rule now covers the new classes.** A strict SC or MR
 case expected to block counts as an unsafe pass if it is observed
