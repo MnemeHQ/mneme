@@ -44,7 +44,7 @@
     {
       "path": "P-2-Edit-1-interactive/operator-attestation.txt",
       "source_sha256": "8256569bced56725536a6a8d665cfa207f2d02ce52e1c106a98a349a11c57e69",
-      "published_sha256": "133164ebd29a7916e100c59d408664b440b936bf7f63edeb1adb6f03819bdefe"
+      "published_sha256": "fc453a4443b6b179c948f038c486dc21afa2e9cc5813b5826361b7b9358e2445"
     },
     {
       "path": "P-2-Edit-1-interactive/netcap-sni.txt",
@@ -116,7 +116,7 @@
     {
       "path": "P-2-Write-1-interactive/operator-attestation.txt",
       "source_sha256": "78d552340a0f0c3e063397933b7c344894127ca6fcd909c7936f7df9301b279f",
-      "published_sha256": "3024770df13252916aab1af96532b1db10f76921e33a2152fc6b17db36b054ef"
+      "published_sha256": "f87408e77452986907d59bd242c7e4ab77aa7d51dc5714262ee935319a04b49f"
     },
     {
       "path": "P-2-Write-1-interactive/netcap-sni.txt",
@@ -197,7 +197,7 @@
     {
       "path": "R-1-Edit-1-interactive/operator-attestation.txt",
       "source_sha256": "69e099c9f46f7b32facfa27e3586833ce35f32422a9f41ec7af4ac2cec9d3ed9",
-      "published_sha256": "b0786f03aeb0b2c32fb5748ab60b107d74df44499218449ce5e7b5bc5eb07888"
+      "published_sha256": "d237a4630672a6f0e2e7efb825ea3fedbdbbe790e16b90478693ea10e7604c85"
     },
     {
       "path": "R-1-Edit-1-interactive/netcap-sni.txt",
@@ -269,7 +269,7 @@
     {
       "path": "R-1-Write-1-interactive/operator-attestation.txt",
       "source_sha256": "b1ecec5d5bb3c3527029f37c38835f511db72173a077b4c9fdafa27b762b40e0",
-      "published_sha256": "e0871ea99d1f8a8b83273c3766e543fee07d3f7cb8893555f6fc89586379f250"
+      "published_sha256": "095d243d45960f5776de18db804e4a86451315361479c79458c5e8e01af6872e"
     },
     {
       "path": "R-1-Write-1-interactive/netcap-sni.txt",
@@ -431,5 +431,14 @@
       "batch-q2-e4-20261026T133400Z.txt",
       "batch-q2-e4-20261026T133713Z.txt"
     ]
+  },
+  "post_collection": {
+    "bom_stripped": [
+      "P-2-Edit-1-interactive/operator-attestation.txt",
+      "P-2-Write-1-interactive/operator-attestation.txt",
+      "R-1-Edit-1-interactive/operator-attestation.txt",
+      "R-1-Write-1-interactive/operator-attestation.txt"
+    ],
+    "why": "PowerShell 5.1 Set-Content -Encoding utf8 (operator helper q2.ps1) writes a UTF-8 BOM; the repository encoding check forbids it. Only the 3-byte BOM was removed from the published copy; text unchanged; source_sha256 is the operator's file as written."
   }
 }

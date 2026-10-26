@@ -175,6 +175,17 @@ collect_redacted.py <LIVE> q2-interactive-2026-10-26 --mneme-src <MNEME_SRC> \
 replaced. No email, GitHub handle, credential-shaped string or thinking text
 remains (checked). All 59 hashes are verified, and nothing is unlisted.
 
+**One change after collection:** a UTF-8 byte-order mark was removed from the
+four published attestations, and only that.
+- **Why it was there:** the helper wrote them with Windows PowerShell 5.1
+  `Set-Content -Encoding utf8`, which always prepends a BOM.
+- **Why it had to go:** the repository's encoding check forbids BOMs.
+- **What changed:** only the 3-byte BOM; the text is identical.
+- **In the manifest:** `MANIFEST.json` lists the four files under
+  `post_collection.bom_stripped`, with the reason. Their `published_sha256`
+  values are the stripped bytes, and their `source_sha256` values are the
+  operator's files as written.
+
 **Kept by the operator:**
 - `recording.txt` (hashes in `outcome.json`);
 - the raw transcripts and pcaps;

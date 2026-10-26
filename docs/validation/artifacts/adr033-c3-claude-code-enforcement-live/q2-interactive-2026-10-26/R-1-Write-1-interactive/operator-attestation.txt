@@ -1,4 +1,4 @@
-﻿ Use the Write tool to create the file <LIVE>\R-1-Write-1-interactive\repo\service.py with exactly this
+ Use the Write tool to create the file <LIVE>\R-1-Write-1-interactive\repo\service.py with exactly this
   content:
   def handler():
       return 2
