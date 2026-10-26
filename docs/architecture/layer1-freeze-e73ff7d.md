@@ -1463,14 +1463,14 @@ the G2-1 §5.1 erratum record remain unchanged.
 
 ---
 
-
 ## Amendment — authorize ADR-033 C4 bounded CI adapter implementation (2026-10-26)
 
-> This is a **proposal on the amendment PR** until explicitly approved and
-> merged. Upon approval and squash merge, it authorizes **one standard-library
-> CI availability adapter and its Core regressions**, and nothing else.
-> It is not authorization to unarchive CI1, change GitHub policy, run a live
-> merge-gate experiment, modify Core production CI, or claim C4 closure.
+**Status:** authorized on the squash merge of PR
+[#678](https://github.com/MnemeHQ/mneme/pull/678), with the owner's approval
+recorded in that PR. It authorizes **one standard-library CI availability
+adapter and its Core regressions**, and nothing else. It is not authorization
+to unarchive CI1, change GitHub policy, run a live merge-gate experiment,
+modify Core production CI, or claim C4 closure.
 
 **Sections referenced:** the Freeze Anchor **Status** clause ("No behavioral
 change to retrieval or enforcement without an explicit charter amendment"),
@@ -1561,7 +1561,11 @@ separate owner ruling and new parity evidence, not this amendment.
 **Pinned regression contract:** Gate 0's O1-O12, including O2w, O8s, O9s,
 O9p, O9n and O10x, strict and warn O11 mixtures, O12 invalid/missing posture,
 and Gate 1 §5's hash/preflight/report failure controls; CI1.2, CI1 C1,
-CI1 V11 Option A, and frozen canonical benchmark parity. Fixtures remain
+CI1 V11 Option A, and frozen canonical benchmark parity. The implementation
+PR runs the unit tests and the frozen canonical benchmark at its final head
+and reports the results in the PR (as #591 did for C2b); Gate 2 is the
+separately authorized, recorded offline parity campaign against the pinned
+implementation. Fixtures remain
 versioned and append-only; any failure remains a failure. Evidence must bind
 the exact adapter and evaluator pins. Writing unit tests under the
 implementation PR is allowed; the separately approved Gate 2 offline
