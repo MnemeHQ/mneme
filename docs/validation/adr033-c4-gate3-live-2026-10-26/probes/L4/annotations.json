@@ -1,0 +1,38 @@
+[
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/MnemeHQ/mneme-ci1-lab/blob/fbcf70e35d664482e1e8a8743cc3cfc1b91c1aa1/.github",
+    "start_line": 30,
+    "start_column": null,
+    "end_line": 30,
+    "end_column": null,
+    "annotation_level": "failure",
+    "title": "",
+    "message": "Process completed with exit code 1.",
+    "raw_details": ""
+  },
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/MnemeHQ/mneme-ci1-lab/blob/fbcf70e35d664482e1e8a8743cc3cfc1b91c1aa1/.github",
+    "start_line": 29,
+    "start_column": null,
+    "end_line": 29,
+    "end_column": null,
+    "annotation_level": "failure",
+    "title": "ADR-033 C4 decision",
+    "message": "required check fails: REFUSED under availability open",
+    "raw_details": ""
+  },
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/MnemeHQ/mneme-ci1-lab/blob/fbcf70e35d664482e1e8a8743cc3cfc1b91c1aa1/.github",
+    "start_line": 46,
+    "start_column": null,
+    "end_line": 46,
+    "end_column": null,
+    "annotation_level": "failure",
+    "title": "ADR-033 C4 REFUSED",
+    "message": "gate/c4-l4-note.txt: trusted surface: PR changes never reach the gate's own inputs",
+    "raw_details": ""
+  }
+]

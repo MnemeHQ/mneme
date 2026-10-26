@@ -1,0 +1,74 @@
+{
+  "schema": "mneme.c4.gate-report/v1",
+  "adapter": {
+    "path": "scripts/ci/adr033_c4_gate.py",
+    "sha256": "afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9"
+  },
+  "evaluator": {
+    "commit": "0b74d410b45e7b3efcf08d00ce58e7bd7017b757",
+    "wheel_sha256": "e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51",
+    "python": "/home/runner/work/_temp/evaluator/bin/python"
+  },
+  "base_sha": "9137c93b66c2b8534f2222f125378b6761f6aae3",
+  "head_sha": "70310804ff4a5e7c0c047426e2888569eedcf2db",
+  "merge_base": "9137c93b66c2b8534f2222f125378b6761f6aae3",
+  "requested_mode": "strict",
+  "query": "adr033 c4 trusted gate",
+  "posture": {
+    "effective": "open",
+    "source": "vars.MNEME_CI_AVAILABILITY",
+    "fallback": null
+  },
+  "trusted_surface": {
+    "files": [
+      ".gitattributes",
+      ".gitmodules"
+    ],
+    "dirs": [
+      ".github/",
+      "gate/",
+      "p2/",
+      "policy/"
+    ]
+  },
+  "memory": {
+    "path": ".mneme/project_memory.json",
+    "blob": "dd760bf0969aa9009c63d2496050b910e87191f1",
+    "source_commit": "9137c93b66c2b8534f2222f125378b6761f6aae3",
+    "sha256": "552768a81e9b1ed132d46b10e3a8de9ad3b0e538a2233fac9e767f0aea057342"
+  },
+  "files": [
+    {
+      "path": "docs/c4-l5.md",
+      "status": "A",
+      "mode": "100644",
+      "classification": "VIOLATION",
+      "sha256": "68f6563af96f872a5f17f9e5cf79f5aad2f8b571ead8725be7d87de1ea10cc38",
+      "reason": "FAIL",
+      "exit": 2,
+      "stdout": "{\"schema\": \"mneme.check/v1\", \"verdict\": \"FAIL\", \"mode\": \"strict\", \"evaluation_complete\": true, \"applicability\": [{\"decision_id\": \"ADR-901\", \"rule_type\": \"FORBID_LITERAL\", \"rule_value\": \"install legacy-client\", \"rule_index\": 0, \"path_scoped\": true, \"input_path\": \"docs/c4-l5.md\", \"outcome\": \"APPLIED\", \"selector\": \"docs/**\", \"reason\": \"an include selector matched\", \"rule_id\": \"ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b\", \"decision_version_id\": \"dver-d3d431ff6d5edba8b555a040a7b85f9b\"}], \"violations\": [{\"decision_id\": \"ADR-901\", \"decision_text\": \"CI1 fixture - forbid the legacy client installer in documentation\", \"severity\": \"FAIL\", \"rule\": \"install legacy-client\", \"trigger\": \"install legacy-client\", \"kind\": \"typed_rule\", \"rule_type\": \"FORBID_LITERAL\", \"input_path\": \"docs/c4-l5.md\", \"selector\": \"docs/**\", \"rule_id\": \"ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b\", \"decision_version_id\": \"dver-d3d431ff6d5edba8b555a040a7b85f9b\"}], \"freshness\": [{\"code\": \"ADR_MISSING\", \"adr_id\": \"ADR-901\", \"message\": \"Decision ADR-901 references ADR source adr/ADR-901-ci1-fixture-scoped-installer.md but that file does not exist. Either restore the file or remove the decision.\", \"path\": \"adr/ADR-901-ci1-fixture-scoped-installer.md\"}, {\"code\": \"ADR_MISSING\", \"adr_id\": \"ADR-902\", \"message\": \"Decision ADR-902 references ADR source adr/ADR-902-ci1-fixture-retrieval-decoy.md but that file does not exist. Either restore the file or remove the decision.\", \"path\": \"adr/ADR-902-ci1-fixture-retrieval-decoy.md\"}]}\n",
+      "stderr_tail": "",
+      "applicability": [
+        {
+          "decision_id": "ADR-901",
+          "rule_id": "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b",
+          "outcome": "APPLIED"
+        }
+      ]
+    }
+  ],
+  "gate_conditions": [],
+  "aggregate": {
+    "classification": "VIOLATION",
+    "reason": "docs/c4-l5.md: FAIL",
+    "partly_unevaluated": false,
+    "counts": {
+      "VIOLATION": 1
+    }
+  },
+  "disposition": "failure",
+  "annotations": [
+    "::error title=ADR-033 C4 VIOLATION::docs/c4-l5.md: FAIL"
+  ],
+  "summary_written": true
+}

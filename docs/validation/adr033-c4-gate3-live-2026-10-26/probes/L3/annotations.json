@@ -1,0 +1,14 @@
+[
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/MnemeHQ/mneme-ci1-lab/blob/51585842a7cdd448a495f44f54cf7fe99100c693/.github",
+    "start_line": 46,
+    "start_column": null,
+    "end_line": 46,
+    "end_column": null,
+    "annotation_level": "warning",
+    "title": "ADR-033 C4 UNEVALUATED",
+    "message": "UNEVALUATED, not PASS (availability open): docs/c4-l3-link.md: not a regular file (symlink)",
+    "raw_details": ""
+  }
+]

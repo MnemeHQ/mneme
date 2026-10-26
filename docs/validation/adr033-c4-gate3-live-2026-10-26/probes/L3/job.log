@@ -1,0 +1,775 @@
+CI1 trusted gate	Set up job	﻿2026-10-26T22:10:14.6113830Z Current runner version: '2.338.0'
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.6129724Z ##[group]Runner Image Provisioner
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.6130406Z Hosted Compute Agent
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.6130762Z Version: 20261021.618
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.6131186Z Commit: 21505ad2541d5be6135ed84fc33697146cf75b8e
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.6131619Z Build Date: 2026-10-21T00:45:21Z
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.6132073Z Worker ID: {dc2c8afe-b98f-408a-9ae8-eef662717f24}
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.6132547Z Region: centralus
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.6132965Z Cloud: Azure
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.6133337Z ##[endgroup]
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.6134093Z ##[group]Operating System
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.6134464Z Ubuntu
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.6134881Z 24.04.5
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.6135194Z LTS
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.6135537Z ##[endgroup]
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.6136008Z ##[group]Runner Image
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.6136372Z Image: ubuntu-24.04
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.6136764Z Version: 20261012.334.1
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.6137417Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261012.334/images/ubuntu/Ubuntu2404-Readme.md
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.6138464Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261012.334
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.6139023Z ##[endgroup]
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.6139750Z ##[group]GITHUB_TOKEN Permissions
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.6141052Z Contents: read
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.6141458Z Metadata: read
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.6141798Z ##[endgroup]
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.6143031Z Secret source: Actions
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.6143685Z Cache mode: read
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.6144269Z Prepare workflow directory
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.6458667Z Prepare all required actions
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.6491148Z Getting action download info
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.8803554Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+CI1 trusted gate	Set up job	2026-10-26T22:10:14.9661981Z Download action repository 'actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9' (SHA:cf430e030ddbb5b0abf93d22962f4752f3646cd9)
+CI1 trusted gate	Set up job	2026-10-26T22:10:15.4431416Z Complete job name: CI1 trusted gate
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	﻿2026-10-26T22:10:15.4888272Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4888769Z with:
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4888989Z   path: base
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4889211Z   fetch-depth: 0
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4889448Z   persist-credentials: false
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4889720Z   repository: MnemeHQ/mneme-ci1-lab
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4891760Z   token: ***
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4891983Z   ssh-strict: true
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4892212Z   ssh-user: git
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4892433Z   clean: true
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4892663Z   sparse-checkout-cone-mode: true
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4892934Z   fetch-tags: false
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4893162Z   show-progress: true
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4893392Z   lfs: false
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4893601Z   submodules: false
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4893832Z   set-safe-directory: true
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4894091Z   allow-unsafe-pr-checkout: false
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4894413Z env:
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4894678Z   EVALUATOR_COMMIT: 0b74d410b45e7b3efcf08d00ce58e7bd7017b757
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4895174Z   APPROVED_WHEEL_SHA256: e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4895792Z   ADAPTER_REPOSITORY: MnemeHQ/mneme
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4896112Z   ADAPTER_COMMIT: c51729f78199203fe12fcbc5c678b89a2c4f7d3e
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4896459Z   ADAPTER_PATH: scripts/ci/adr033_c4_gate.py
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4896795Z   ADAPTER_BLOB: 5feedf60ce1a67b2bb85673354c8b8b367a87d06
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4897234Z   ADAPTER_SHA256: afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4897637Z   VIOLATION_MODE: strict
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4897887Z   MNEME_CI_AVAILABILITY: open
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4898139Z   PR_NUMBER: 37
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4898392Z   HEAD_SHA: 51585842a7cdd448a495f44f54cf7fe99100c693
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4898710Z   GATE_PYTHON: /usr/bin/python3.12
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.4898972Z ##[endgroup]
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5544243Z Syncing repository: MnemeHQ/mneme-ci1-lab
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5546144Z ##[group]Getting Git version info
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5546897Z Working directory is '/home/runner/work/mneme-ci1-lab/mneme-ci1-lab/base'
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5547474Z [command]/usr/bin/git version
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5622957Z git version 2.55.0
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5635522Z ##[endgroup]
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5643339Z Temporarily overriding HOME='/home/runner/work/_temp/c7bd855e-0304-4697-9ddd-7348f87bffb0' before making global git config changes
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5644614Z Adding repository directory to the temporary git global config as a safe directory
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5648211Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mneme-ci1-lab/mneme-ci1-lab/base
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5688410Z ##[group]Determining repository object format
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5689968Z ##[endgroup]
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5690567Z ##[group]Initializing the repository
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5694430Z [command]/usr/bin/git init /home/runner/work/mneme-ci1-lab/mneme-ci1-lab/base
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5805129Z hint: Using 'master' as the name for the initial branch. This default branch name
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5806213Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5806975Z hint: to use in all of your new repositories, which will suppress this warning,
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5807569Z hint: call:
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5807932Z hint:
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5808372Z hint: 	git config --global init.defaultBranch <name>
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5808768Z hint:
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5809068Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5809545Z hint: 'development'. The just-created branch can be renamed via this command:
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5809981Z hint:
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5810310Z hint: 	git branch -m <name>
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5810693Z hint:
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5811184Z hint: Disable this message with "git config set advice.defaultBranchName false"
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5812090Z Initialized empty Git repository in /home/runner/work/mneme-ci1-lab/mneme-ci1-lab/base/.git/
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5818721Z [command]/usr/bin/git remote add origin https://github.com/MnemeHQ/mneme-ci1-lab
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5863992Z ##[endgroup]
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5864614Z ##[group]Disabling automatic garbage collection
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5867176Z [command]/usr/bin/git config --local gc.auto 0
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5903257Z ##[endgroup]
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5904097Z ##[group]Setting up auth
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5904552Z Removing SSH command configuration
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.5936570Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.6020176Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.6234368Z Removing HTTP extra header
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.6239063Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.6267038Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.6428079Z Removing includeIf entries pointing to credentials config files
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.6432025Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.6460981Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.6636505Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-d158c17f-09d1-4f9e-9c6d-21307224a346.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.7840100Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/mneme-ci1-lab/mneme-ci1-lab/base/.git.path /home/runner/work/_temp/git-credentials-d158c17f-09d1-4f9e-9c6d-21307224a346.config
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.7942648Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/mneme-ci1-lab/mneme-ci1-lab/base/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-d158c17f-09d1-4f9e-9c6d-21307224a346.config
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.8532091Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/base/.git.path /github/runner_temp/git-credentials-d158c17f-09d1-4f9e-9c6d-21307224a346.config
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.8729646Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/base/.git/worktrees/*.path /github/runner_temp/git-credentials-d158c17f-09d1-4f9e-9c6d-21307224a346.config
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.8820482Z ##[endgroup]
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.8821111Z ##[group]Fetching the repository
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:15.8825208Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5851475Z From https://github.com/MnemeHQ/mneme-ci1-lab
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5852678Z  * [new branch]      c4/gate3-bootstrap      -> origin/c4/gate3-bootstrap
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5853492Z  * [new branch]      c4/gate3-l1             -> origin/c4/gate3-l1
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5854224Z  * [new branch]      c4/gate3-l2             -> origin/c4/gate3-l2
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5854963Z  * [new branch]      c4/gate3-l3             -> origin/c4/gate3-l3
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5855897Z  * [new branch]      ci1-c1-l1               -> origin/ci1-c1-l1
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5856634Z  * [new branch]      ci1-c1-l2               -> origin/ci1-c1-l2
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5857364Z  * [new branch]      ci1-c1-l3               -> origin/ci1-c1-l3
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5858094Z  * [new branch]      ci1-c1-l4               -> origin/ci1-c1-l4
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5858846Z  * [new branch]      ci1-c1-l5               -> origin/ci1-c1-l5
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5859563Z  * [new branch]      ci1-c1-l6               -> origin/ci1-c1-l6
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5860361Z  * [new branch]      ci1-v13a-docs-symlink   -> origin/ci1-v13a-docs-symlink
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5861258Z  * [new branch]      ci1-v13b-memory-symlink -> origin/ci1-v13b-memory-symlink
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5863410Z  * [new branch]      ci1-v8-out-of-scope     -> origin/ci1-v8-out-of-scope
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5864227Z  * [new branch]      feat/c1-trusted-surface -> origin/feat/c1-trusted-surface
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5865000Z  * [new branch]      main                    -> origin/main
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5865876Z  * [new branch]      test/reporting-regression -> origin/test/reporting-regression
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5866651Z  * [new branch]      v0/compliant-docs       -> origin/v0/compliant-docs
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5867386Z  * [new branch]      v1/prohibited-docs      -> origin/v1/prohibited-docs
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5868301Z  * [new branch]      v10/stale-head          -> origin/v10/stale-head
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5868983Z  * [new branch]      v11/p1-seed             -> origin/v11/p1-seed
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5869655Z  * [new branch]      v11/p3-rename           -> origin/v11/p3-rename
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5870359Z  * [new branch]      v11/stale-base          -> origin/v11/stale-base
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5871033Z  * [new branch]      v11a/px                 -> origin/v11a/px
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5871662Z  * [new branch]      v11a/py                 -> origin/v11a/py
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5872406Z  * [new branch]      v1r/post-policy-prohibited -> origin/v1r/post-policy-prohibited
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5873248Z  * [new branch]      v2/policy-substitution  -> origin/v2/policy-substitution
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5874018Z  * [new branch]      v3/memory-deletion      -> origin/v3/memory-deletion
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5874789Z  * [new branch]      v3a/memory-deletion-only -> origin/v3a/memory-deletion-only
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5875934Z  * [new branch]      v4/evaluator-substitution -> origin/v4/evaluator-substitution
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5876884Z  * [new branch]      v5/gate-workflow-edit   -> origin/v5/gate-workflow-edit
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5877674Z  * [new branch]      v6/permissive-workflow  -> origin/v6/permissive-workflow
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5878700Z  * [new branch]      v7/lookalike-check      -> origin/v7/lookalike-check
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5879597Z  * [new branch]      v7b/delayed-lookalike   -> origin/v7b/delayed-lookalike
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5881302Z [command]/usr/bin/git branch --list --remote origin/main
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5889257Z   origin/main
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5896014Z [command]/usr/bin/git rev-parse refs/remotes/origin/main
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5917710Z 06fb92c9962d6cbae4b388992791d524f3c33d5c
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5926750Z ##[endgroup]
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5927531Z ##[group]Determining the checkout info
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5928320Z ##[endgroup]
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.5928788Z [command]/usr/bin/git sparse-checkout disable
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.6052645Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.6149715Z ##[group]Checking out the ref
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.6151232Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.6249735Z Switched to a new branch 'main'
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.6254408Z branch 'main' set up to track 'origin/main'.
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.6261742Z ##[endgroup]
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.6295587Z [command]/usr/bin/git log -1 --format=%H
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.6317988Z 06fb92c9962d6cbae4b388992791d524f3c33d5c
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.6327146Z ##[group]Removing auth
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.6327616Z Removing SSH command configuration
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.6328365Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.6359493Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.6526047Z Removing HTTP extra header
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.6528250Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.6557019Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.6718478Z Removing includeIf entries pointing to credentials config files
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.6720175Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.6745486Z includeif.gitdir:/home/runner/work/mneme-ci1-lab/mneme-ci1-lab/base/.git.path
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.6746988Z includeif.gitdir:/home/runner/work/mneme-ci1-lab/mneme-ci1-lab/base/.git/worktrees/*.path
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.6748268Z includeif.gitdir:/github/workspace/base/.git.path
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.6749159Z includeif.gitdir:/github/workspace/base/.git/worktrees/*.path
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.6751750Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/mneme-ci1-lab/mneme-ci1-lab/base/.git.path
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.6779449Z /home/runner/work/_temp/git-credentials-d158c17f-09d1-4f9e-9c6d-21307224a346.config
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.6786565Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/mneme-ci1-lab/mneme-ci1-lab/base/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-d158c17f\-09d1\-4f9e\-9c6d\-21307224a346\.config
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.6852456Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/mneme-ci1-lab/mneme-ci1-lab/base/.git/worktrees/*.path
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.6874555Z /home/runner/work/_temp/git-credentials-d158c17f-09d1-4f9e-9c6d-21307224a346.config
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.6880374Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/mneme-ci1-lab/mneme-ci1-lab/base/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-d158c17f\-09d1\-4f9e\-9c6d\-21307224a346\.config
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.7064620Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/base/.git.path
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.7085472Z /github/runner_temp/git-credentials-d158c17f-09d1-4f9e-9c6d-21307224a346.config
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.7090856Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/base/.git.path \/github\/runner_temp\/git\-credentials\-d158c17f\-09d1\-4f9e\-9c6d\-21307224a346\.config
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.7360466Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/base/.git/worktrees/*.path
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.7369710Z /github/runner_temp/git-credentials-d158c17f-09d1-4f9e-9c6d-21307224a346.config
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.7376417Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/base/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-d158c17f\-09d1\-4f9e\-9c6d\-21307224a346\.config
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.7453311Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.7614926Z Removing credentials config '/home/runner/work/_temp/git-credentials-d158c17f-09d1-4f9e-9c6d-21307224a346.config'
+CI1 trusted gate	Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:16.7620688Z ##[endgroup]
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	﻿2026-10-26T22:10:16.7868563Z ##[group]Run set -euo pipefail
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	2026-10-26T22:10:16.7869097Z [36;1mset -euo pipefail[0m
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	2026-10-26T22:10:16.7869484Z [36;1mcd base[0m
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	2026-10-26T22:10:16.7869834Z [36;1mbase_sha="$(git rev-parse HEAD)"[0m
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	2026-10-26T22:10:16.7870796Z [36;1m[ "$base_sha" = "$GITHUB_SHA" ] || { echo "::error::base checkout $base_sha != GITHUB_SHA $GITHUB_SHA"; exit 1; }[0m
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	2026-10-26T22:10:16.7872090Z [36;1mgit fetch --no-tags --quiet origin "+refs/pull/${PR_NUMBER}/head:refs/ci1/pr-head"[0m
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	2026-10-26T22:10:16.7872981Z [36;1mfetched="$(git rev-parse refs/ci1/pr-head)"[0m
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	2026-10-26T22:10:16.7873558Z [36;1mif [ "$fetched" != "$HEAD_SHA" ]; then[0m
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	2026-10-26T22:10:16.7874236Z [36;1m  # A newer push raced this run; that push triggers its own run.[0m
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	2026-10-26T22:10:16.7875234Z [36;1m  echo "::error::PR head moved ($fetched != event $HEAD_SHA); this run is not evaluated"[0m
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	2026-10-26T22:10:16.7876158Z [36;1m  exit 1[0m
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	2026-10-26T22:10:16.7876454Z [36;1mfi[0m
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	2026-10-26T22:10:16.7876823Z [36;1mecho "BASE_SHA=$base_sha" >> "$GITHUB_ENV"[0m
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	2026-10-26T22:10:16.7877415Z [36;1mecho "base $base_sha, head $HEAD_SHA"[0m
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	2026-10-26T22:10:16.8241234Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	2026-10-26T22:10:16.8241836Z env:
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	2026-10-26T22:10:16.8242253Z   EVALUATOR_COMMIT: 0b74d410b45e7b3efcf08d00ce58e7bd7017b757
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	2026-10-26T22:10:16.8243219Z   APPROVED_WHEEL_SHA256: e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	2026-10-26T22:10:16.8244077Z   ADAPTER_REPOSITORY: MnemeHQ/mneme
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	2026-10-26T22:10:16.8244615Z   ADAPTER_COMMIT: c51729f78199203fe12fcbc5c678b89a2c4f7d3e
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	2026-10-26T22:10:16.8245216Z   ADAPTER_PATH: scripts/ci/adr033_c4_gate.py
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	2026-10-26T22:10:16.8245930Z   ADAPTER_BLOB: 5feedf60ce1a67b2bb85673354c8b8b367a87d06
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	2026-10-26T22:10:16.8246760Z   ADAPTER_SHA256: afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	2026-10-26T22:10:16.8247538Z   VIOLATION_MODE: strict
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	2026-10-26T22:10:16.8247908Z   MNEME_CI_AVAILABILITY: open
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	2026-10-26T22:10:16.8248298Z   PR_NUMBER: 37
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	2026-10-26T22:10:16.8248682Z   HEAD_SHA: 51585842a7cdd448a495f44f54cf7fe99100c693
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	2026-10-26T22:10:16.8249227Z   GATE_PYTHON: /usr/bin/python3.12
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	2026-10-26T22:10:16.8249636Z ##[endgroup]
+CI1 trusted gate	Fetch the PR head as objects only (never checked out)	2026-10-26T22:10:17.0502433Z base 06fb92c9962d6cbae4b388992791d524f3c33d5c, head 51585842a7cdd448a495f44f54cf7fe99100c693
+CI1 trusted gate	Check out the evaluator source at the pinned commit	﻿2026-10-26T22:10:17.0800911Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0801809Z with:
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0802381Z   repository: MnemeHQ/mneme
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0803091Z   ref: 0b74d410b45e7b3efcf08d00ce58e7bd7017b757
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0803850Z   path: evaluator-src
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0804449Z   fetch-depth: 1
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0805051Z   persist-credentials: false
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0810314Z   token: ***
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0810864Z   ssh-strict: true
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0811405Z   ssh-user: git
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0811924Z   clean: true
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0812473Z   sparse-checkout-cone-mode: true
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0813234Z   fetch-tags: false
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0813783Z   show-progress: true
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0814347Z   lfs: false
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0814859Z   submodules: false
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0815409Z   set-safe-directory: true
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0816152Z   allow-unsafe-pr-checkout: false
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0816774Z env:
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0817395Z   EVALUATOR_COMMIT: 0b74d410b45e7b3efcf08d00ce58e7bd7017b757
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0818506Z   APPROVED_WHEEL_SHA256: e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0819502Z   ADAPTER_REPOSITORY: MnemeHQ/mneme
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0820244Z   ADAPTER_COMMIT: c51729f78199203fe12fcbc5c678b89a2c4f7d3e
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0821028Z   ADAPTER_PATH: scripts/ci/adr033_c4_gate.py
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0821801Z   ADAPTER_BLOB: 5feedf60ce1a67b2bb85673354c8b8b367a87d06
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0822794Z   ADAPTER_SHA256: afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0823713Z   VIOLATION_MODE: strict
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0824299Z   MNEME_CI_AVAILABILITY: open
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0824899Z   PR_NUMBER: 37
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0825492Z   HEAD_SHA: 51585842a7cdd448a495f44f54cf7fe99100c693
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0826336Z   GATE_PYTHON: /usr/bin/python3.12
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0827017Z   BASE_SHA: 06fb92c9962d6cbae4b388992791d524f3c33d5c
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.0827698Z ##[endgroup]
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.1392277Z Syncing repository: MnemeHQ/mneme
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.1394429Z ##[group]Getting Git version info
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.1396146Z Working directory is '/home/runner/work/mneme-ci1-lab/mneme-ci1-lab/evaluator-src'
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.1445991Z [command]/usr/bin/git version
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.1481692Z git version 2.55.0
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.1493546Z ##[endgroup]
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.1500535Z Temporarily overriding HOME='/home/runner/work/_temp/c80964e4-30dd-497c-9466-1b47b1f78441' before making global git config changes
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.1502929Z Adding repository directory to the temporary git global config as a safe directory
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.1505396Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mneme-ci1-lab/mneme-ci1-lab/evaluator-src
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.2685134Z ##[group]Determining repository object format
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.2687344Z ##[endgroup]
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.2691888Z ##[group]Initializing the repository
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.2694103Z [command]/usr/bin/git init /home/runner/work/mneme-ci1-lab/mneme-ci1-lab/evaluator-src
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.4470845Z hint: Using 'master' as the name for the initial branch. This default branch name
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.4471264Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.4472490Z hint: to use in all of your new repositories, which will suppress this warning,
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.4472881Z hint: call:
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.4473083Z hint:
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.4473343Z hint: 	git config --global init.defaultBranch <name>
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.4473636Z hint:
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.4473959Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.4474420Z hint: 'development'. The just-created branch can be renamed via this command:
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.4474773Z hint:
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.4474982Z hint: 	git branch -m <name>
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.4475212Z hint:
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.4475529Z hint: Disable this message with "git config set advice.defaultBranchName false"
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.4476612Z Initialized empty Git repository in /home/runner/work/mneme-ci1-lab/mneme-ci1-lab/evaluator-src/.git/
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.4479559Z [command]/usr/bin/git remote add origin https://github.com/MnemeHQ/mneme
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.4995016Z ##[endgroup]
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.4995390Z ##[group]Disabling automatic garbage collection
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.4998385Z [command]/usr/bin/git config --local gc.auto 0
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.6186654Z ##[endgroup]
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.6187029Z ##[group]Setting up auth
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.6187412Z Removing SSH command configuration
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.6191344Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.6220290Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.6384922Z Removing HTTP extra header
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.6388121Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.6413510Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.6580027Z Removing includeIf entries pointing to credentials config files
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.6583621Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.6611524Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.6791851Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-0ef970d5-c469-4856-8d71-9a05c3b3f0c6.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.7403218Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/mneme-ci1-lab/mneme-ci1-lab/evaluator-src/.git.path /home/runner/work/_temp/git-credentials-0ef970d5-c469-4856-8d71-9a05c3b3f0c6.config
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.8201672Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/mneme-ci1-lab/mneme-ci1-lab/evaluator-src/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-0ef970d5-c469-4856-8d71-9a05c3b3f0c6.config
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:17.9502806Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/evaluator-src/.git.path /github/runner_temp/git-credentials-0ef970d5-c469-4856-8d71-9a05c3b3f0c6.config
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:18.0516293Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/evaluator-src/.git/worktrees/*.path /github/runner_temp/git-credentials-0ef970d5-c469-4856-8d71-9a05c3b3f0c6.config
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:18.1518812Z ##[endgroup]
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:18.1519186Z ##[group]Fetching the repository
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:18.1524013Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin 0b74d410b45e7b3efcf08d00ce58e7bd7017b757
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.1579338Z From https://github.com/MnemeHQ/mneme
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.1579692Z  * branch            0b74d410b45e7b3efcf08d00ce58e7bd7017b757 -> FETCH_HEAD
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.1588974Z [command]/usr/bin/git rev-parse --verify --quiet 0b74d410b45e7b3efcf08d00ce58e7bd7017b757^{object}
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.1613477Z 0b74d410b45e7b3efcf08d00ce58e7bd7017b757
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.1616750Z ##[endgroup]
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.1616992Z ##[group]Determining the checkout info
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.1617239Z ##[endgroup]
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.1620450Z [command]/usr/bin/git sparse-checkout disable
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.1828604Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.2029177Z ##[group]Checking out the ref
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.2032527Z [command]/usr/bin/git checkout --progress --force 0b74d410b45e7b3efcf08d00ce58e7bd7017b757
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.4656503Z Note: switching to '0b74d410b45e7b3efcf08d00ce58e7bd7017b757'.
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.4657063Z 
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.4657386Z You are in 'detached HEAD' state. You can look around, make experimental
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.4657954Z changes and commit them, and you can discard any commits you make in this
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.4658379Z state without impacting any branches by switching back to a branch.
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.4658614Z 
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.4658781Z If you want to create a new branch to retain commits you create, you may
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.4659135Z do so (now or later) by using -c with the switch command. Example:
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.4659338Z 
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.4659653Z   git switch -c <new-branch-name>
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.4659793Z 
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.4659875Z Or undo this operation with:
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.4660005Z 
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.4660073Z   git switch -
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.4660172Z 
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.4660338Z Turn off this advice by setting config variable advice.detachedHead to false
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.4660580Z 
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.4660809Z HEAD is now at 0b74d41 docs: CI1.3 isolated merge-blocking experiment charter (PROPOSED) (#541)
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.4661671Z ##[endgroup]
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.4700216Z [command]/usr/bin/git log -1 --format=%H
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.4724130Z 0b74d410b45e7b3efcf08d00ce58e7bd7017b757
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.4730348Z ##[group]Removing auth
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.4730562Z Removing SSH command configuration
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.4732571Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.4760520Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.4937663Z Removing HTTP extra header
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.4940321Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.4968581Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.5143799Z Removing includeIf entries pointing to credentials config files
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.5146360Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.5168259Z includeif.gitdir:/home/runner/work/mneme-ci1-lab/mneme-ci1-lab/evaluator-src/.git.path
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.5168698Z includeif.gitdir:/home/runner/work/mneme-ci1-lab/mneme-ci1-lab/evaluator-src/.git/worktrees/*.path
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.5169114Z includeif.gitdir:/github/workspace/evaluator-src/.git.path
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.5169570Z includeif.gitdir:/github/workspace/evaluator-src/.git/worktrees/*.path
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.5175936Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/mneme-ci1-lab/mneme-ci1-lab/evaluator-src/.git.path
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.5200189Z /home/runner/work/_temp/git-credentials-0ef970d5-c469-4856-8d71-9a05c3b3f0c6.config
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.5207780Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/mneme-ci1-lab/mneme-ci1-lab/evaluator-src/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-0ef970d5\-c469\-4856\-8d71\-9a05c3b3f0c6\.config
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.5239897Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/mneme-ci1-lab/mneme-ci1-lab/evaluator-src/.git/worktrees/*.path
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.5262143Z /home/runner/work/_temp/git-credentials-0ef970d5-c469-4856-8d71-9a05c3b3f0c6.config
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.5268512Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/mneme-ci1-lab/mneme-ci1-lab/evaluator-src/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-0ef970d5\-c469\-4856\-8d71\-9a05c3b3f0c6\.config
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.5297107Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/evaluator-src/.git.path
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.5318814Z /github/runner_temp/git-credentials-0ef970d5-c469-4856-8d71-9a05c3b3f0c6.config
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.5324674Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/evaluator-src/.git.path \/github\/runner_temp\/git\-credentials\-0ef970d5\-c469\-4856\-8d71\-9a05c3b3f0c6\.config
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.5354449Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/evaluator-src/.git/worktrees/*.path
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.5375759Z /github/runner_temp/git-credentials-0ef970d5-c469-4856-8d71-9a05c3b3f0c6.config
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.5381031Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/evaluator-src/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-0ef970d5\-c469\-4856\-8d71\-9a05c3b3f0c6\.config
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.5411650Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.5587856Z Removing credentials config '/home/runner/work/_temp/git-credentials-0ef970d5-c469-4856-8d71-9a05c3b3f0c6.config'
+CI1 trusted gate	Check out the evaluator source at the pinned commit	2026-10-26T22:10:19.5594803Z ##[endgroup]
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	﻿2026-10-26T22:10:19.5708113Z ##[group]Run set -euo pipefail
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5708314Z [36;1mset -euo pipefail[0m
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5708453Z [36;1munset PYTHONPATH[0m
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5708582Z [36;1mumask 0002[0m
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5708882Z [36;1m[ "$(git -C evaluator-src rev-parse HEAD)" = "$EVALUATOR_COMMIT" ] || { echo "::error::evaluator source is not the pinned commit"; exit 1; }[0m
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5709207Z [36;1mb="$RUNNER_TEMP/build"[0m
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5709350Z [36;1mmkdir -p "$b"[0m
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5709535Z [36;1mgit -C evaluator-src archive --format=tar HEAD > "$b/src.tar"[0m
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5709908Z [36;1m/usr/bin/python3.12 -I -c "import sys, tarfile; tarfile.open(sys.argv[1]).extractall(sys.argv[2], filter='data')" "$b/src.tar" "$b/src"[0m
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5710243Z [36;1m/usr/bin/python3.12 -I -m venv "$b/venv"[0m
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5710480Z [36;1mexport SOURCE_DATE_EPOCH="$(git -C evaluator-src log -1 --format=%ct)"[0m
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5710761Z [36;1mPIP_CONSTRAINT="$GITHUB_WORKSPACE/base/p2/build-constraints.txt" \[0m
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5711101Z [36;1m  "$b/venv/bin/python" -I -m pip wheel -q --no-deps --disable-pip-version-check \[0m
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5711344Z [36;1m  --wheel-dir "$b/built" "$b/src"[0m
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5711499Z [36;1mshopt -s nullglob[0m
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5711634Z [36;1mwheels=("$b"/built/*.whl)[0m
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5711889Z [36;1m[ "${#wheels[@]}" -eq 1 ] || { echo "::error::expected exactly one built wheel, found ${#wheels[@]}"; exit 1; }[0m
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5712184Z [36;1msha="$(sha256sum "${wheels[0]}" | cut -d' ' -f1)"[0m
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5712495Z [36;1m[ "$sha" = "$APPROVED_WHEEL_SHA256" ] || { echo "::error::evaluator wheel $sha != approved $APPROVED_WHEEL_SHA256"; exit 1; }[0m
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5712812Z [36;1mecho "EVALUATOR_WHEEL=${wheels[0]}" >> "$GITHUB_ENV"[0m
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5713013Z [36;1mecho "evaluator wheel $sha (approved)"[0m
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5766874Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5767061Z env:
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5767211Z   EVALUATOR_COMMIT: 0b74d410b45e7b3efcf08d00ce58e7bd7017b757
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5767486Z   APPROVED_WHEEL_SHA256: e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5767733Z   ADAPTER_REPOSITORY: MnemeHQ/mneme
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5767916Z   ADAPTER_COMMIT: c51729f78199203fe12fcbc5c678b89a2c4f7d3e
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5768110Z   ADAPTER_PATH: scripts/ci/adr033_c4_gate.py
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5768294Z   ADAPTER_BLOB: 5feedf60ce1a67b2bb85673354c8b8b367a87d06
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5768546Z   ADAPTER_SHA256: afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5768775Z   VIOLATION_MODE: strict
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5768919Z   MNEME_CI_AVAILABILITY: open
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5769051Z   PR_NUMBER: 37
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5769188Z   HEAD_SHA: 51585842a7cdd448a495f44f54cf7fe99100c693
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5769357Z   GATE_PYTHON: /usr/bin/python3.12
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5769519Z   BASE_SHA: 06fb92c9962d6cbae4b388992791d524f3c33d5c
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:19.5769686Z ##[endgroup]
+CI1 trusted gate	Rebuild the evaluator wheel and require the approved sha256	2026-10-26T22:10:23.8249080Z evaluator wheel e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51 (approved)
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	﻿2026-10-26T22:10:23.8276488Z ##[group]Run set -euo pipefail
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	2026-10-26T22:10:23.8276691Z [36;1mset -euo pipefail[0m
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	2026-10-26T22:10:23.8276822Z [36;1munset PYTHONPATH[0m
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	2026-10-26T22:10:23.8276955Z [36;1me="$RUNNER_TEMP/evaluator"[0m
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	2026-10-26T22:10:23.8277113Z [36;1m/usr/bin/python3.12 -I -m venv "$e"[0m
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	2026-10-26T22:10:23.8277418Z [36;1mreq="$RUNNER_TEMP/evaluator-requirements.txt"[0m
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	2026-10-26T22:10:23.8277613Z [36;1mcp base/gate/evaluator-requirements.txt "$req"[0m
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	2026-10-26T22:10:23.8277842Z [36;1mecho "$EVALUATOR_WHEEL --hash=sha256:$APPROVED_WHEEL_SHA256" >> "$req"[0m
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	2026-10-26T22:10:23.8278107Z [36;1m"$e/bin/python" -I -m pip install -q --disable-pip-version-check \[0m
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	2026-10-26T22:10:23.8278350Z [36;1m  --require-hashes --only-binary=:all: --no-deps -r "$req"[0m
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	2026-10-26T22:10:23.8278732Z [36;1m"$e/bin/python" -I -c "import importlib.metadata as m, mneme, sys; p = mneme.__file__; assert p.startswith(sys.prefix), p; print(m.version('mneme-hq'), p)"[0m
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	2026-10-26T22:10:23.8279103Z [36;1mecho "EVALUATOR_PYTHON=$e/bin/python" >> "$GITHUB_ENV"[0m
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	2026-10-26T22:10:23.8329396Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	2026-10-26T22:10:23.8329578Z env:
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	2026-10-26T22:10:23.8329724Z   EVALUATOR_COMMIT: 0b74d410b45e7b3efcf08d00ce58e7bd7017b757
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	2026-10-26T22:10:23.8329997Z   APPROVED_WHEEL_SHA256: e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	2026-10-26T22:10:23.8330235Z   ADAPTER_REPOSITORY: MnemeHQ/mneme
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	2026-10-26T22:10:23.8330405Z   ADAPTER_COMMIT: c51729f78199203fe12fcbc5c678b89a2c4f7d3e
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	2026-10-26T22:10:23.8330586Z   ADAPTER_PATH: scripts/ci/adr033_c4_gate.py
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	2026-10-26T22:10:23.8330761Z   ADAPTER_BLOB: 5feedf60ce1a67b2bb85673354c8b8b367a87d06
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	2026-10-26T22:10:23.8330998Z   ADAPTER_SHA256: afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	2026-10-26T22:10:23.8331216Z   VIOLATION_MODE: strict
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	2026-10-26T22:10:23.8331342Z   MNEME_CI_AVAILABILITY: open
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	2026-10-26T22:10:23.8331472Z   PR_NUMBER: 37
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	2026-10-26T22:10:23.8331602Z   HEAD_SHA: 51585842a7cdd448a495f44f54cf7fe99100c693
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	2026-10-26T22:10:23.8331768Z   GATE_PYTHON: /usr/bin/python3.12
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	2026-10-26T22:10:23.8331926Z   BASE_SHA: 06fb92c9962d6cbae4b388992791d524f3c33d5c
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	2026-10-26T22:10:23.8332162Z   EVALUATOR_WHEEL: /home/runner/work/_temp/build/built/mneme_hq-0.10.0-py3-none-any.whl
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	2026-10-26T22:10:23.8332384Z ##[endgroup]
+CI1 trusted gate	Install the pinned evaluator (hash-locked, no resolution)	2026-10-26T22:10:29.1358234Z 0.10.0 /home/runner/work/_temp/evaluator/lib/python3.12/site-packages/mneme/__init__.py
+CI1 trusted gate	Check out the adapter at the reviewed commit	﻿2026-10-26T22:10:29.1477389Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1477598Z with:
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1477709Z   repository: MnemeHQ/mneme
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1477854Z   ref: c51729f78199203fe12fcbc5c678b89a2c4f7d3e
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1478004Z   path: adapter-src
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1478116Z   fetch-depth: 1
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1478231Z   persist-credentials: false
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1479747Z   token: ***
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1479855Z   ssh-strict: true
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1479963Z   ssh-user: git
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1480065Z   clean: true
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1480179Z   sparse-checkout-cone-mode: true
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1480315Z   fetch-tags: false
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1480423Z   show-progress: true
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1480532Z   lfs: false
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1480631Z   submodules: false
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1480754Z   set-safe-directory: true
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1480885Z   allow-unsafe-pr-checkout: false
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1481014Z env:
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1481153Z   EVALUATOR_COMMIT: 0b74d410b45e7b3efcf08d00ce58e7bd7017b757
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1481440Z   APPROVED_WHEEL_SHA256: e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1481677Z   ADAPTER_REPOSITORY: MnemeHQ/mneme
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1481844Z   ADAPTER_COMMIT: c51729f78199203fe12fcbc5c678b89a2c4f7d3e
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1482025Z   ADAPTER_PATH: scripts/ci/adr033_c4_gate.py
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1482200Z   ADAPTER_BLOB: 5feedf60ce1a67b2bb85673354c8b8b367a87d06
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1482439Z   ADAPTER_SHA256: afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1482657Z   VIOLATION_MODE: strict
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1482782Z   MNEME_CI_AVAILABILITY: open
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1482908Z   PR_NUMBER: 37
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1483035Z   HEAD_SHA: 51585842a7cdd448a495f44f54cf7fe99100c693
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1483320Z   GATE_PYTHON: /usr/bin/python3.12
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1483476Z   BASE_SHA: 06fb92c9962d6cbae4b388992791d524f3c33d5c
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1483708Z   EVALUATOR_WHEEL: /home/runner/work/_temp/build/built/mneme_hq-0.10.0-py3-none-any.whl
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1483973Z   EVALUATOR_PYTHON: /home/runner/work/_temp/evaluator/bin/python
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1484147Z ##[endgroup]
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1990583Z Syncing repository: MnemeHQ/mneme
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1992930Z ##[group]Getting Git version info
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.1993388Z Working directory is '/home/runner/work/mneme-ci1-lab/mneme-ci1-lab/adapter-src'
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2019850Z [command]/usr/bin/git version
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2062290Z git version 2.55.0
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2075068Z ##[endgroup]
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2081343Z Temporarily overriding HOME='/home/runner/work/_temp/286f9571-6c2a-4b27-884c-9af3f83895ff' before making global git config changes
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2081823Z Adding repository directory to the temporary git global config as a safe directory
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2084996Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mneme-ci1-lab/mneme-ci1-lab/adapter-src
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2108878Z ##[group]Determining repository object format
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2110137Z ##[endgroup]
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2110443Z ##[group]Initializing the repository
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2113485Z [command]/usr/bin/git init /home/runner/work/mneme-ci1-lab/mneme-ci1-lab/adapter-src
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2155023Z hint: Using 'master' as the name for the initial branch. This default branch name
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2156259Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2156975Z hint: to use in all of your new repositories, which will suppress this warning,
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2157377Z hint: call:
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2157531Z hint:
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2157729Z hint: 	git config --global init.defaultBranch <name>
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2157958Z hint:
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2158188Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2158594Z hint: 'development'. The just-created branch can be renamed via this command:
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2159116Z hint:
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2159270Z hint: 	git branch -m <name>
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2159461Z hint:
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2159706Z hint: Disable this message with "git config set advice.defaultBranchName false"
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2160188Z Initialized empty Git repository in /home/runner/work/mneme-ci1-lab/mneme-ci1-lab/adapter-src/.git/
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2164525Z [command]/usr/bin/git remote add origin https://github.com/MnemeHQ/mneme
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2200076Z ##[endgroup]
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2200571Z ##[group]Disabling automatic garbage collection
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2201010Z [command]/usr/bin/git config --local gc.auto 0
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2229064Z ##[endgroup]
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2229364Z ##[group]Setting up auth
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2229583Z Removing SSH command configuration
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2230005Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2248812Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2431549Z Removing HTTP extra header
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2436381Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2460167Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2644442Z Removing includeIf entries pointing to credentials config files
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2650184Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2678221Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2844338Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-d105e98a-aa62-4e44-a491-259dd19b4e78.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2873574Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/mneme-ci1-lab/mneme-ci1-lab/adapter-src/.git.path /home/runner/work/_temp/git-credentials-d105e98a-aa62-4e44-a491-259dd19b4e78.config
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2900510Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/mneme-ci1-lab/mneme-ci1-lab/adapter-src/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-d105e98a-aa62-4e44-a491-259dd19b4e78.config
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2929170Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/adapter-src/.git.path /github/runner_temp/git-credentials-d105e98a-aa62-4e44-a491-259dd19b4e78.config
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2956601Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/adapter-src/.git/worktrees/*.path /github/runner_temp/git-credentials-d105e98a-aa62-4e44-a491-259dd19b4e78.config
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2981980Z ##[endgroup]
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2982319Z ##[group]Fetching the repository
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:29.2986548Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin c51729f78199203fe12fcbc5c678b89a2c4f7d3e
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.5010635Z From https://github.com/MnemeHQ/mneme
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.5011037Z  * branch            c51729f78199203fe12fcbc5c678b89a2c4f7d3e -> FETCH_HEAD
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.5020115Z [command]/usr/bin/git rev-parse --verify --quiet c51729f78199203fe12fcbc5c678b89a2c4f7d3e^{object}
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.5044256Z c51729f78199203fe12fcbc5c678b89a2c4f7d3e
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.5048382Z ##[endgroup]
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.5048704Z ##[group]Determining the checkout info
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.5049200Z ##[endgroup]
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.5052389Z [command]/usr/bin/git sparse-checkout disable
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.5086963Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.5113015Z ##[group]Checking out the ref
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.5116472Z [command]/usr/bin/git checkout --progress --force c51729f78199203fe12fcbc5c678b89a2c4f7d3e
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.7569119Z Note: switching to 'c51729f78199203fe12fcbc5c678b89a2c4f7d3e'.
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.7569418Z 
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.7569590Z You are in 'detached HEAD' state. You can look around, make experimental
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.7569879Z changes and commit them, and you can discard any commits you make in this
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.7570126Z state without impacting any branches by switching back to a branch.
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.7570276Z 
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.7570371Z If you want to create a new branch to retain commits you create, you may
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.7570606Z do so (now or later) by using -c with the switch command. Example:
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.7570741Z 
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.7570802Z   git switch -c <new-branch-name>
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.7570917Z 
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.7570973Z Or undo this operation with:
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.7571057Z 
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.7571103Z   git switch -
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.7571186Z 
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.7571293Z Turn off this advice by setting config variable advice.detachedHead to false
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.7571451Z 
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.7571562Z HEAD is now at c51729f feat(ci): ADR-033 C4 trusted CI availability adapter (#679)
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.7582895Z ##[endgroup]
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.7620971Z [command]/usr/bin/git log -1 --format=%H
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.7643069Z c51729f78199203fe12fcbc5c678b89a2c4f7d3e
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.7650074Z ##[group]Removing auth
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.7650306Z Removing SSH command configuration
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.7652939Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.7678534Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.7851362Z Removing HTTP extra header
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.7854235Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.7880944Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.8048969Z Removing includeIf entries pointing to credentials config files
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.8051246Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.8071504Z includeif.gitdir:/home/runner/work/mneme-ci1-lab/mneme-ci1-lab/adapter-src/.git.path
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.8072041Z includeif.gitdir:/home/runner/work/mneme-ci1-lab/mneme-ci1-lab/adapter-src/.git/worktrees/*.path
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.8072379Z includeif.gitdir:/github/workspace/adapter-src/.git.path
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.8072611Z includeif.gitdir:/github/workspace/adapter-src/.git/worktrees/*.path
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.8078878Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/mneme-ci1-lab/mneme-ci1-lab/adapter-src/.git.path
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.8129508Z /home/runner/work/_temp/git-credentials-d105e98a-aa62-4e44-a491-259dd19b4e78.config
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.8135568Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/mneme-ci1-lab/mneme-ci1-lab/adapter-src/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-d105e98a\-aa62\-4e44\-a491\-259dd19b4e78\.config
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.8164346Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/mneme-ci1-lab/mneme-ci1-lab/adapter-src/.git/worktrees/*.path
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.8184530Z /home/runner/work/_temp/git-credentials-d105e98a-aa62-4e44-a491-259dd19b4e78.config
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.8190569Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/mneme-ci1-lab/mneme-ci1-lab/adapter-src/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-d105e98a\-aa62\-4e44\-a491\-259dd19b4e78\.config
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.8217465Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/adapter-src/.git.path
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.8237291Z /github/runner_temp/git-credentials-d105e98a-aa62-4e44-a491-259dd19b4e78.config
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.8242680Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/adapter-src/.git.path \/github\/runner_temp\/git\-credentials\-d105e98a\-aa62\-4e44\-a491\-259dd19b4e78\.config
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.8270234Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/adapter-src/.git/worktrees/*.path
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.8290118Z /github/runner_temp/git-credentials-d105e98a-aa62-4e44-a491-259dd19b4e78.config
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.8295927Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/adapter-src/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-d105e98a\-aa62\-4e44\-a491\-259dd19b4e78\.config
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.8326070Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.8493111Z Removing credentials config '/home/runner/work/_temp/git-credentials-d105e98a-aa62-4e44-a491-259dd19b4e78.config'
+CI1 trusted gate	Check out the adapter at the reviewed commit	2026-10-26T22:10:30.8499770Z ##[endgroup]
+CI1 trusted gate	Verify the adapter pins before running it	﻿2026-10-26T22:10:30.8591739Z ##[group]Run # Any mismatch fails the required check under every posture.
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8592057Z [36;1m# Any mismatch fails the required check under every posture.[0m
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8592254Z [36;1mset -euo pipefail[0m
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8592540Z [36;1m[ "$(git -C adapter-src rev-parse HEAD)" = "$ADAPTER_COMMIT" ] || { echo "::error::adapter source is not the pinned commit"; exit 1; }[0m
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8592885Z [36;1mentry="$(git -C adapter-src ls-tree HEAD -- "$ADAPTER_PATH")"[0m
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8593129Z [36;1mmode="${entry%% *}"; blob="$(echo "$entry" | cut -d' ' -f3 | cut -f1)"[0m
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8593524Z [36;1m[ "$mode" = "100644" ] || { echo "::error::adapter is not a regular file (mode $mode)"; exit 1; }[0m
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8593847Z [36;1m[ "$blob" = "$ADAPTER_BLOB" ] || { echo "::error::adapter blob $blob != pinned $ADAPTER_BLOB"; exit 1; }[0m
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8594169Z [36;1ma="$RUNNER_TEMP/adapter"[0m
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8594406Z [36;1mmkdir -p "$a"[0m
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8594809Z [36;1mgit -C adapter-src cat-file blob "$ADAPTER_BLOB" > "$a/adr033_c4_gate.py"[0m
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8595123Z [36;1msha="$(sha256sum "$a/adr033_c4_gate.py" | cut -d' ' -f1)"[0m
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8595493Z [36;1m[ "$sha" = "$ADAPTER_SHA256" ] || { echo "::error::adapter sha256 $sha != pinned $ADAPTER_SHA256"; exit 1; }[0m
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8596046Z [36;1mecho "ADAPTER_FILE=$a/adr033_c4_gate.py" >> "$GITHUB_ENV"[0m
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8596388Z [36;1mecho "adapter $ADAPTER_COMMIT:$ADAPTER_PATH blob $blob sha256 $sha (pinned)"[0m
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8648771Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8649059Z env:
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8649293Z   EVALUATOR_COMMIT: 0b74d410b45e7b3efcf08d00ce58e7bd7017b757
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8649635Z   APPROVED_WHEEL_SHA256: e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8660324Z   ADAPTER_REPOSITORY: MnemeHQ/mneme
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8660534Z   ADAPTER_COMMIT: c51729f78199203fe12fcbc5c678b89a2c4f7d3e
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8660730Z   ADAPTER_PATH: scripts/ci/adr033_c4_gate.py
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8660910Z   ADAPTER_BLOB: 5feedf60ce1a67b2bb85673354c8b8b367a87d06
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8661172Z   ADAPTER_SHA256: afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8661409Z   VIOLATION_MODE: strict
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8661542Z   MNEME_CI_AVAILABILITY: open
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8661672Z   PR_NUMBER: 37
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8661805Z   HEAD_SHA: 51585842a7cdd448a495f44f54cf7fe99100c693
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8661979Z   GATE_PYTHON: /usr/bin/python3.12
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8662140Z   BASE_SHA: 06fb92c9962d6cbae4b388992791d524f3c33d5c
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8662377Z   EVALUATOR_WHEEL: /home/runner/work/_temp/build/built/mneme_hq-0.10.0-py3-none-any.whl
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8662642Z   EVALUATOR_PYTHON: /home/runner/work/_temp/evaluator/bin/python
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8662825Z ##[endgroup]
+CI1 trusted gate	Verify the adapter pins before running it	2026-10-26T22:10:30.8807492Z adapter c51729f78199203fe12fcbc5c678b89a2c4f7d3e:scripts/ci/adr033_c4_gate.py blob 5feedf60ce1a67b2bb85673354c8b8b367a87d06 sha256 afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9 (pinned)
+CI1 trusted gate	Evaluate the PR in the trusted workspace	﻿2026-10-26T22:10:30.8827886Z ##[group]Run # GitHub runs `shell: bash` as `bash -eo pipefail`, so a non-zero
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8828196Z [36;1m# GitHub runs `shell: bash` as `bash -eo pipefail`, so a non-zero[0m
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8828457Z [36;1m# adapter exit is captured in a condition. This step only records;[0m
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8828669Z [36;1m# "Gate decision" enforces.[0m
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8828827Z [36;1mset -uo pipefail[0m
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8828968Z [36;1mout="$RUNNER_TEMP/gate-out"[0m
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8829114Z [36;1mmkdir -p "$out"[0m
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8829277Z [36;1mif "$GATE_PYTHON" -I "$ADAPTER_FILE" evaluate \[0m
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8829545Z [36;1m  --repo base --base-sha "$BASE_SHA" --head-sha "$HEAD_SHA" --mode "$VIOLATION_MODE" \[0m
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8829840Z [36;1m  --workspace "$RUNNER_TEMP/ws" --empty-dir "$RUNNER_TEMP/empty" \[0m
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8830117Z [36;1m  --venv-python "$EVALUATOR_PYTHON" --evaluator-commit "$EVALUATOR_COMMIT" \[0m
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8830387Z [36;1m  --evaluator-wheel-sha256 "$APPROVED_WHEEL_SHA256" \[0m
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8830663Z [36;1m  --trusted-surface gate/ --trusted-surface p2/ --trusted-surface policy/ \[0m
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8830944Z [36;1m  --report "$out/gate-report.json" --summary "$out/summary.md"; then[0m
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8831144Z [36;1m  code=0[0m
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8831254Z [36;1melse[0m
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8831470Z [36;1m  code=$?[0m
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8831581Z [36;1mfi[0m
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8831703Z [36;1mecho "exit=$code" >> "$GITHUB_OUTPUT"[0m
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8831874Z [36;1mecho "adapter exit code: $code"[0m
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8832035Z [36;1mif [ -f "$out/summary.md" ]; then[0m
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8832211Z [36;1m  cat "$out/summary.md" >> "$GITHUB_STEP_SUMMARY"[0m
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8832378Z [36;1melse[0m
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8832681Z [36;1m  printf '## ADR-033 C4 trusted gate\n\n- **No summary was produced** (adapter exit %s). The decision step blocks.\n' "$code" >> "$GITHUB_STEP_SUMMARY"[0m
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8833005Z [36;1mfi[0m
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8833110Z [36;1mexit 0[0m
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8879901Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8880084Z env:
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8880235Z   EVALUATOR_COMMIT: 0b74d410b45e7b3efcf08d00ce58e7bd7017b757
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8880516Z   APPROVED_WHEEL_SHA256: e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8880774Z   ADAPTER_REPOSITORY: MnemeHQ/mneme
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8880950Z   ADAPTER_COMMIT: c51729f78199203fe12fcbc5c678b89a2c4f7d3e
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8881141Z   ADAPTER_PATH: scripts/ci/adr033_c4_gate.py
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8881328Z   ADAPTER_BLOB: 5feedf60ce1a67b2bb85673354c8b8b367a87d06
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8881581Z   ADAPTER_SHA256: afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8881809Z   VIOLATION_MODE: strict
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8881941Z   MNEME_CI_AVAILABILITY: open
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8882074Z   PR_NUMBER: 37
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8882211Z   HEAD_SHA: 51585842a7cdd448a495f44f54cf7fe99100c693
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8882386Z   GATE_PYTHON: /usr/bin/python3.12
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8882546Z   BASE_SHA: 06fb92c9962d6cbae4b388992791d524f3c33d5c
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8882786Z   EVALUATOR_WHEEL: /home/runner/work/_temp/build/built/mneme_hq-0.10.0-py3-none-any.whl
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8883058Z   EVALUATOR_PYTHON: /home/runner/work/_temp/evaluator/bin/python
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8883289Z   ADAPTER_FILE: /home/runner/work/_temp/adapter/adr033_c4_gate.py
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.8883474Z ##[endgroup]
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.9278996Z ##[warning]UNEVALUATED, not PASS (availability open): docs/c4-l3-link.md: not a regular file (symlink)
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.9283835Z [adr033-c4-gate] UNEVALUATED -> success (availability open, mode strict)
+CI1 trusted gate	Evaluate the PR in the trusted workspace	2026-10-26T22:10:30.9305728Z adapter exit code: 0
+CI1 trusted gate	Preserve the gate evidence	﻿2026-10-26T22:10:30.9389096Z ##[group]Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:30.9389315Z with:
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:30.9389432Z   name: ci1-gate-pr37-40410321115
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:30.9389580Z   path: /home/runner/work/_temp/gate-out/
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:30.9389730Z   if-no-files-found: error
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:30.9389857Z   retention-days: 90
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:30.9389980Z   compression-level: 6
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:30.9390093Z   overwrite: false
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:30.9390209Z   include-hidden-files: false
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:30.9390336Z   archive: true
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:30.9390448Z env:
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:30.9390585Z   EVALUATOR_COMMIT: 0b74d410b45e7b3efcf08d00ce58e7bd7017b757
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:30.9390853Z   APPROVED_WHEEL_SHA256: e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:30.9391090Z   ADAPTER_REPOSITORY: MnemeHQ/mneme
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:30.9391261Z   ADAPTER_COMMIT: c51729f78199203fe12fcbc5c678b89a2c4f7d3e
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:30.9391450Z   ADAPTER_PATH: scripts/ci/adr033_c4_gate.py
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:30.9391651Z   ADAPTER_BLOB: 5feedf60ce1a67b2bb85673354c8b8b367a87d06
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:30.9391890Z   ADAPTER_SHA256: afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:30.9392109Z   VIOLATION_MODE: strict
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:30.9392234Z   MNEME_CI_AVAILABILITY: open
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:30.9392359Z   PR_NUMBER: 37
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:30.9392491Z   HEAD_SHA: 51585842a7cdd448a495f44f54cf7fe99100c693
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:30.9392654Z   GATE_PYTHON: /usr/bin/python3.12
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:30.9392808Z   BASE_SHA: 06fb92c9962d6cbae4b388992791d524f3c33d5c
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:30.9393160Z   EVALUATOR_WHEEL: /home/runner/work/_temp/build/built/mneme_hq-0.10.0-py3-none-any.whl
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:30.9393424Z   EVALUATOR_PYTHON: /home/runner/work/_temp/evaluator/bin/python
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:30.9393643Z   ADAPTER_FILE: /home/runner/work/_temp/adapter/adr033_c4_gate.py
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:30.9393820Z ##[endgroup]
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:31.0246258Z With the provided path, there will be 2 files uploaded
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:31.0249285Z Artifact name is valid!
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:31.0249654Z Root directory input is valid!
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:31.2988209Z Uploading artifact: ci1-gate-pr37-40410321115.zip
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:31.3010201Z Beginning upload of artifact content to blob storage
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:31.4589348Z Uploaded bytes 1369
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:31.4946815Z Finished uploading artifact content to blob storage!
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:31.4947313Z SHA256 digest of uploaded artifact is 76c82660b7607dbae4987a5177d29cb535cc8acfd2806b0e40ee2711aa10539b
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:31.4947751Z Finalizing artifact upload
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:32.0010981Z Artifact ci1-gate-pr37-40410321115 successfully finalized. Artifact ID 12693730187
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:32.0011595Z Artifact ci1-gate-pr37-40410321115 has been successfully uploaded! Final size is 1369 bytes. Artifact ID is 12693730187
+CI1 trusted gate	Preserve the gate evidence	2026-10-26T22:10:32.0013985Z Artifact download URL: https://github.com/MnemeHQ/mneme-ci1-lab/actions/runs/40410321115/artifacts/12693730187
+CI1 trusted gate	Gate decision	﻿2026-10-26T22:10:32.0111065Z ##[group]Run set -uo pipefail
+CI1 trusted gate	Gate decision	2026-10-26T22:10:32.0111243Z [36;1mset -uo pipefail[0m
+CI1 trusted gate	Gate decision	2026-10-26T22:10:32.0111381Z [36;1mout="$RUNNER_TEMP/gate-out"[0m
+CI1 trusted gate	Gate decision	2026-10-26T22:10:32.0111557Z [36;1m"$GATE_PYTHON" -I "$ADAPTER_FILE" verify-report \[0m
+CI1 trusted gate	Gate decision	2026-10-26T22:10:32.0111805Z [36;1m  --report "$out/gate-report.json" --adapter-exit "${GATE_EXIT:-none}" \[0m
+CI1 trusted gate	Gate decision	2026-10-26T22:10:32.0112085Z [36;1m  --base-sha "$BASE_SHA" --head-sha "$HEAD_SHA" --mode "$VIOLATION_MODE" \[0m
+CI1 trusted gate	Gate decision	2026-10-26T22:10:32.0112362Z [36;1m  --adapter-sha256 "$ADAPTER_SHA256" --evaluator-commit "$EVALUATOR_COMMIT" \[0m
+CI1 trusted gate	Gate decision	2026-10-26T22:10:32.0112671Z [36;1m  --evaluator-wheel-sha256 "$APPROVED_WHEEL_SHA256" --summary "$out/summary.md"[0m
+CI1 trusted gate	Gate decision	2026-10-26T22:10:32.0162077Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+CI1 trusted gate	Gate decision	2026-10-26T22:10:32.0162255Z env:
+CI1 trusted gate	Gate decision	2026-10-26T22:10:32.0162402Z   EVALUATOR_COMMIT: 0b74d410b45e7b3efcf08d00ce58e7bd7017b757
+CI1 trusted gate	Gate decision	2026-10-26T22:10:32.0162670Z   APPROVED_WHEEL_SHA256: e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51
+CI1 trusted gate	Gate decision	2026-10-26T22:10:32.0162931Z   ADAPTER_REPOSITORY: MnemeHQ/mneme
+CI1 trusted gate	Gate decision	2026-10-26T22:10:32.0163104Z   ADAPTER_COMMIT: c51729f78199203fe12fcbc5c678b89a2c4f7d3e
+CI1 trusted gate	Gate decision	2026-10-26T22:10:32.0163290Z   ADAPTER_PATH: scripts/ci/adr033_c4_gate.py
+CI1 trusted gate	Gate decision	2026-10-26T22:10:32.0163468Z   ADAPTER_BLOB: 5feedf60ce1a67b2bb85673354c8b8b367a87d06
+CI1 trusted gate	Gate decision	2026-10-26T22:10:32.0163709Z   ADAPTER_SHA256: afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9
+CI1 trusted gate	Gate decision	2026-10-26T22:10:32.0163923Z   VIOLATION_MODE: strict
+CI1 trusted gate	Gate decision	2026-10-26T22:10:32.0164053Z   MNEME_CI_AVAILABILITY: open
+CI1 trusted gate	Gate decision	2026-10-26T22:10:32.0164186Z   PR_NUMBER: 37
+CI1 trusted gate	Gate decision	2026-10-26T22:10:32.0164317Z   HEAD_SHA: 51585842a7cdd448a495f44f54cf7fe99100c693
+CI1 trusted gate	Gate decision	2026-10-26T22:10:32.0164482Z   GATE_PYTHON: /usr/bin/python3.12
+CI1 trusted gate	Gate decision	2026-10-26T22:10:32.0164640Z   BASE_SHA: 06fb92c9962d6cbae4b388992791d524f3c33d5c
+CI1 trusted gate	Gate decision	2026-10-26T22:10:32.0164873Z   EVALUATOR_WHEEL: /home/runner/work/_temp/build/built/mneme_hq-0.10.0-py3-none-any.whl
+CI1 trusted gate	Gate decision	2026-10-26T22:10:32.0165133Z   EVALUATOR_PYTHON: /home/runner/work/_temp/evaluator/bin/python
+CI1 trusted gate	Gate decision	2026-10-26T22:10:32.0165358Z   ADAPTER_FILE: /home/runner/work/_temp/adapter/adr033_c4_gate.py
+CI1 trusted gate	Gate decision	2026-10-26T22:10:32.0165535Z   GATE_EXIT: 0
+CI1 trusted gate	Gate decision	2026-10-26T22:10:32.0165793Z ##[endgroup]
+CI1 trusted gate	Gate decision	2026-10-26T22:10:32.0488432Z [adr033-c4-gate] decision: UNEVALUATED accepted (availability open)
+CI1 trusted gate	Post Check out the adapter at the reviewed commit	﻿2026-10-26T22:10:32.0604023Z Post job cleanup.
+CI1 trusted gate	Post Check out the adapter at the reviewed commit	2026-10-26T22:10:32.1117133Z [command]/usr/bin/git version
+CI1 trusted gate	Post Check out the adapter at the reviewed commit	2026-10-26T22:10:32.1147680Z git version 2.55.0
+CI1 trusted gate	Post Check out the adapter at the reviewed commit	2026-10-26T22:10:32.1170366Z Temporarily overriding HOME='/home/runner/work/_temp/313388f7-288e-4e9e-8b2b-cef18ae15a2e' before making global git config changes
+CI1 trusted gate	Post Check out the adapter at the reviewed commit	2026-10-26T22:10:32.1171086Z Adding repository directory to the temporary git global config as a safe directory
+CI1 trusted gate	Post Check out the adapter at the reviewed commit	2026-10-26T22:10:32.1176350Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mneme-ci1-lab/mneme-ci1-lab/adapter-src
+CI1 trusted gate	Post Check out the adapter at the reviewed commit	2026-10-26T22:10:32.1197827Z Removing SSH command configuration
+CI1 trusted gate	Post Check out the adapter at the reviewed commit	2026-10-26T22:10:32.1202265Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+CI1 trusted gate	Post Check out the adapter at the reviewed commit	2026-10-26T22:10:32.1259533Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+CI1 trusted gate	Post Check out the adapter at the reviewed commit	2026-10-26T22:10:32.1439081Z Removing HTTP extra header
+CI1 trusted gate	Post Check out the adapter at the reviewed commit	2026-10-26T22:10:32.1443480Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+CI1 trusted gate	Post Check out the adapter at the reviewed commit	2026-10-26T22:10:32.1469119Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+CI1 trusted gate	Post Check out the adapter at the reviewed commit	2026-10-26T22:10:32.1659009Z Removing includeIf entries pointing to credentials config files
+CI1 trusted gate	Post Check out the adapter at the reviewed commit	2026-10-26T22:10:32.1666789Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+CI1 trusted gate	Post Check out the adapter at the reviewed commit	2026-10-26T22:10:32.1698516Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+CI1 trusted gate	Post Check out the evaluator source at the pinned commit	﻿2026-10-26T22:10:32.2009002Z Post job cleanup.
+CI1 trusted gate	Post Check out the evaluator source at the pinned commit	2026-10-26T22:10:32.2566395Z [command]/usr/bin/git version
+CI1 trusted gate	Post Check out the evaluator source at the pinned commit	2026-10-26T22:10:32.2586121Z git version 2.55.0
+CI1 trusted gate	Post Check out the evaluator source at the pinned commit	2026-10-26T22:10:32.2614105Z Temporarily overriding HOME='/home/runner/work/_temp/a895c154-e7eb-4293-8c16-28cacafb042a' before making global git config changes
+CI1 trusted gate	Post Check out the evaluator source at the pinned commit	2026-10-26T22:10:32.2614861Z Adding repository directory to the temporary git global config as a safe directory
+CI1 trusted gate	Post Check out the evaluator source at the pinned commit	2026-10-26T22:10:32.2618788Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mneme-ci1-lab/mneme-ci1-lab/evaluator-src
+CI1 trusted gate	Post Check out the evaluator source at the pinned commit	2026-10-26T22:10:32.2649905Z Removing SSH command configuration
+CI1 trusted gate	Post Check out the evaluator source at the pinned commit	2026-10-26T22:10:32.2656142Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+CI1 trusted gate	Post Check out the evaluator source at the pinned commit	2026-10-26T22:10:32.2693319Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+CI1 trusted gate	Post Check out the evaluator source at the pinned commit	2026-10-26T22:10:32.2956729Z Removing HTTP extra header
+CI1 trusted gate	Post Check out the evaluator source at the pinned commit	2026-10-26T22:10:32.2957359Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+CI1 trusted gate	Post Check out the evaluator source at the pinned commit	2026-10-26T22:10:32.2976744Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+CI1 trusted gate	Post Check out the evaluator source at the pinned commit	2026-10-26T22:10:32.3214827Z Removing includeIf entries pointing to credentials config files
+CI1 trusted gate	Post Check out the evaluator source at the pinned commit	2026-10-26T22:10:32.3222217Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+CI1 trusted gate	Post Check out the evaluator source at the pinned commit	2026-10-26T22:10:32.3251671Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+CI1 trusted gate	Post Check out the BASE commit (trusted workflow and memory)	﻿2026-10-26T22:10:32.3550867Z Post job cleanup.
+CI1 trusted gate	Post Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:32.4119415Z [command]/usr/bin/git version
+CI1 trusted gate	Post Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:32.4165778Z git version 2.55.0
+CI1 trusted gate	Post Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:32.4196461Z Temporarily overriding HOME='/home/runner/work/_temp/8cf03300-1002-4139-bfcb-345401479344' before making global git config changes
+CI1 trusted gate	Post Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:32.4214047Z Adding repository directory to the temporary git global config as a safe directory
+CI1 trusted gate	Post Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:32.4226333Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mneme-ci1-lab/mneme-ci1-lab/base
+CI1 trusted gate	Post Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:32.4231351Z Removing SSH command configuration
+CI1 trusted gate	Post Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:32.4237227Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+CI1 trusted gate	Post Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:32.4282085Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+CI1 trusted gate	Post Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:32.4556913Z Removing HTTP extra header
+CI1 trusted gate	Post Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:32.4557576Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+CI1 trusted gate	Post Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:32.4584194Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+CI1 trusted gate	Post Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:32.4756082Z Removing includeIf entries pointing to credentials config files
+CI1 trusted gate	Post Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:32.4761123Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+CI1 trusted gate	Post Check out the BASE commit (trusted workflow and memory)	2026-10-26T22:10:32.4787938Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+CI1 trusted gate	Complete job	﻿2026-10-26T22:10:32.5051475Z Cleaning up orphan processes
