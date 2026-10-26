@@ -241,7 +241,7 @@ They are now held only in the encrypted evidence archive (§7).
 **Evidence archive.** A deterministic tar holds every scoring output and the
 scorer's diagnosis evidence:
 
-- the 10 output files listed in §6 (the final `summary.json`, plus the four
+- the 9 scoring output files listed in §6 (the final `summary.json`, plus the four
   per-run files for each of the two runs);
 - `diagnosis/diagnosis.md`;
 - an inner manifest, `EVIDENCE_FILES.sha256`
