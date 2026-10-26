@@ -8,7 +8,7 @@
 **D1 resolution:** PR #655, squash-merged at `4b8471149d49f6f4a2a4ddfd0d3601d59355c337`.  
 **Governing architecture:** ADR-017, ADR-022, ADR-023 and ADR-027.
 
-This document reviews the smallest enforceable, validation-only execution boundary for model-generated Code Mode programs. It does not build a host, run hostile code, make a model/API call, change production, alter the MCP inventory, authorize a pilot or take S1-A2 work.
+This document reviews the smallest enforceable, validation-only execution boundary for model-generated Code Mode programs. It incorporates the proposed E-3 broker symmetry from [merged D1 Erratum 1](./cm-01-b0-a-d1-erratum-1-proposal-2026-10-25.md) (#664), without claiming any host/broker exists. It does not build a host, run hostile code, make a model/API call, change production, alter the MCP inventory, authorize a pilot or take S1-A2 work.
 
 F1's in-process QuickJS is **not** a hardened hostile-code sandbox. F1 proves client cancellation and promise settlement, not OS-level termination, network isolation, secret isolation or container security. No hardening claim is made until independent red-team evidence exists.
 
@@ -105,6 +105,12 @@ The broker runs outside the guest and inside the trusted boundary.
 - Never gives the guest a generic MCP client, token or socket to the upstream server.
 
 The upstream MCP inventory remains exactly six tools. The guest sees only four.
+
+### 3.3a Direct-arm broker symmetry (merged D1 Erratum 1 E-3)
+
+The **direct MCP arm** calls the same trusted broker implementation as Code Mode, with the identical pinned four-method allowlist, real upstream argument/schema validation, call quotas, timeout rules, argument/result-size caps and audit fields. Only the Code Mode arm runs generated code inside a disposable restricted guest; the direct model's tool requests originate from the trusted orchestrator and use the broker without a guest. Both arms use the genuine pinned six-tool Decision MCP upstream through this narrow read-only bridge.
+
+At corpus freeze, probe the maximum legitimate response size for `decision.search` with `query=""` (full canonical dump) and `decision.applicable_to` over all declared scope cases. The broker limit must not truncate any result required by an allowed task in either arm; record the maximum and limit in the frozen manifest. Any limit breach during the benchmark is a harness-integrity FAIL, not silent truncation or a reason to drop a trial. Both arms' latency spans include broker time; report broker overhead separately. No implementation or symmetry test is claimed by this design.
 
 ### 3.4 F1 executor/adapter reuse
 
@@ -267,7 +273,7 @@ No model-generated code has been executed under this design.
 | Seccomp/AppArmor profile | TBD | Independent review and red-team |
 | Cgroup limits | TBD | Resource test evidence |
 | Broker transport | Unix socket or VM channel (TBD) | Isolation review |
-| Broker quota/timeouts | TBD | Abuse-test evidence |
+| Broker quota/timeouts | Same approved configuration across both arms; numerical limits TBD | Abuse-test evidence and full-dump sizing at corpus freeze |
 | Argument/result size limits | TBD | Broker tests |
 | Guest filesystem contents | TBD | Image review |
 | Credential custody | Proposed orchestrator-only | Security review |
