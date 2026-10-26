@@ -1,0 +1,1018 @@
+{
+  "version": 1,
+  "rows": [
+    {
+      "id": "O1",
+      "description": "trusted complete PASS",
+      "modes": [
+        "strict"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "write",
+          "path": "docs/a.md",
+          "content": "c4-case:strict_pass\n"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "PASS",
+          "success"
+        ],
+        "open": [
+          "PASS",
+          "success"
+        ]
+      }
+    },
+    {
+      "id": "O1w",
+      "description": "trusted complete PASS, warn mode",
+      "modes": [
+        "warn"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "write",
+          "path": "docs/a.md",
+          "content": "c4-case:warn_pass\n"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "PASS",
+          "success"
+        ],
+        "open": [
+          "PASS",
+          "success"
+        ]
+      }
+    },
+    {
+      "id": "O2",
+      "description": "trusted complete strict FAIL",
+      "modes": [
+        "strict"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "write",
+          "path": "docs/a.md",
+          "content": "c4-case:strict_fail\n"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "VIOLATION",
+          "failure"
+        ],
+        "open": [
+          "VIOLATION",
+          "failure"
+        ]
+      }
+    },
+    {
+      "id": "O2-R1",
+      "description": "trusted complete strict WARN is a strict violation (R1)",
+      "modes": [
+        "strict"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "write",
+          "path": "docs/a.md",
+          "content": "c4-case:strict_warn\n"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "VIOLATION",
+          "failure"
+        ],
+        "open": [
+          "VIOLATION",
+          "failure"
+        ]
+      }
+    },
+    {
+      "id": "O2w",
+      "description": "trusted complete FAIL in warn mode is reported, not blocking (A4)",
+      "modes": [
+        "warn"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "write",
+          "path": "docs/a.md",
+          "content": "c4-case:warn_fail\n"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "WARN",
+          "success"
+        ],
+        "open": [
+          "WARN",
+          "success"
+        ]
+      }
+    },
+    {
+      "id": "O3",
+      "description": "incomplete evaluation",
+      "modes": [
+        "strict"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "write",
+          "path": "docs/a.md",
+          "content": "c4-case:strict_incomplete\n"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "UNEVALUATED",
+          "failure"
+        ],
+        "open": [
+          "UNEVALUATED",
+          "success"
+        ]
+      }
+    },
+    {
+      "id": "O4",
+      "description": "missing trusted-base memory",
+      "modes": [
+        "strict"
+      ],
+      "base_memory": false,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "write",
+          "path": "docs/a.md",
+          "content": "c4-case:strict_pass\n"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "UNEVALUATED",
+          "failure"
+        ],
+        "open": [
+          "UNEVALUATED",
+          "success"
+        ]
+      }
+    },
+    {
+      "id": "O4s",
+      "description": "trusted-base memory is a symlink",
+      "modes": [
+        "strict"
+      ],
+      "base_memory": "symlink",
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "write",
+          "path": "docs/a.md",
+          "content": "c4-case:strict_pass\n"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "UNEVALUATED",
+          "failure"
+        ],
+        "open": [
+          "UNEVALUATED",
+          "success"
+        ]
+      }
+    },
+    {
+      "id": "O5",
+      "description": "malformed memory / checker crash (no payload, exit 1)",
+      "modes": [
+        "strict"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "write",
+          "path": "docs/a.md",
+          "content": "c4-case:crash_empty_stdout_exit_1\n"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "UNEVALUATED",
+          "failure"
+        ],
+        "open": [
+          "UNEVALUATED",
+          "success"
+        ]
+      }
+    },
+    {
+      "id": "O6t",
+      "description": "checker timeout",
+      "modes": [
+        "strict"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "write",
+          "path": "docs/a.md",
+          "content": "c4-sleep\n"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "UNEVALUATED",
+          "failure"
+        ],
+        "open": [
+          "UNEVALUATED",
+          "success"
+        ]
+      }
+    },
+    {
+      "id": "O6l",
+      "description": "checker launch failure",
+      "modes": [
+        "strict"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": true,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "write",
+          "path": "docs/a.md",
+          "content": "c4-case:strict_pass\n"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "UNEVALUATED",
+          "failure"
+        ],
+        "open": [
+          "UNEVALUATED",
+          "success"
+        ]
+      }
+    },
+    {
+      "id": "O7",
+      "description": "contradictory exit code",
+      "modes": [
+        "strict"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "write",
+          "path": "docs/a.md",
+          "content": "c4-case:strict_pass_exit_1\n"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "UNEVALUATED",
+          "failure"
+        ],
+        "open": [
+          "UNEVALUATED",
+          "success"
+        ]
+      }
+    },
+    {
+      "id": "O7w",
+      "description": "warn-mode FAIL with exit 2 (A4)",
+      "modes": [
+        "warn"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "write",
+          "path": "docs/a.md",
+          "content": "c4-case:warn_fail_exit_2\n"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "UNEVALUATED",
+          "failure"
+        ],
+        "open": [
+          "UNEVALUATED",
+          "success"
+        ]
+      }
+    },
+    {
+      "id": "O7m",
+      "description": "reported mode differs from requested",
+      "modes": [
+        "strict"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "write",
+          "path": "docs/a.md",
+          "content": "c4-case:mode_mismatch_warn_for_strict\n"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "UNEVALUATED",
+          "failure"
+        ],
+        "open": [
+          "UNEVALUATED",
+          "success"
+        ]
+      }
+    },
+    {
+      "id": "O7l",
+      "description": "legacy payload without evaluation_complete (A2)",
+      "modes": [
+        "strict"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "write",
+          "path": "docs/a.md",
+          "content": "c4-case:legacy_no_completeness\n"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "UNEVALUATED",
+          "failure"
+        ],
+        "open": [
+          "UNEVALUATED",
+          "success"
+        ]
+      }
+    },
+    {
+      "id": "O8",
+      "description": "edit of trusted decision memory",
+      "modes": [
+        "strict",
+        "warn"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "write",
+          "path": ".mneme/project_memory.json",
+          "content": "c4-case:strict_pass\n"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "REFUSED",
+          "failure"
+        ],
+        "open": [
+          "REFUSED",
+          "failure"
+        ]
+      }
+    },
+    {
+      "id": "O8d",
+      "description": "deletion of trusted decision memory",
+      "modes": [
+        "strict"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "delete",
+          "path": ".mneme/project_memory.json"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "REFUSED",
+          "failure"
+        ],
+        "open": [
+          "REFUSED",
+          "failure"
+        ]
+      }
+    },
+    {
+      "id": "O8s",
+      "description": "trusted memory replaced by a symlink (A1)",
+      "modes": [
+        "strict"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "symlink",
+          "path": ".mneme/project_memory.json",
+          "target": "../outside"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "REFUSED",
+          "failure"
+        ],
+        "open": [
+          "REFUSED",
+          "failure"
+        ]
+      }
+    },
+    {
+      "id": "O8c",
+      "description": "case-variant policy path (A1)",
+      "modes": [
+        "strict"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "write",
+          "path": ".Mneme/project_memory.json",
+          "content": "c4-case:strict_pass\n"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "REFUSED",
+          "failure"
+        ],
+        "open": [
+          "REFUSED",
+          "failure"
+        ]
+      }
+    },
+    {
+      "id": "O9",
+      "description": "workflow added on the trusted surface",
+      "modes": [
+        "strict",
+        "warn"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "write",
+          "path": ".github/workflows/x.yml",
+          "content": "c4-case:strict_pass\n"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "REFUSED",
+          "failure"
+        ],
+        "open": [
+          "REFUSED",
+          "failure"
+        ]
+      }
+    },
+    {
+      "id": "O9d",
+      "description": "trusted-surface file deleted",
+      "modes": [
+        "strict"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "delete",
+          "path": ".github/workflows/gate.yml"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "REFUSED",
+          "failure"
+        ],
+        "open": [
+          "REFUSED",
+          "failure"
+        ]
+      }
+    },
+    {
+      "id": "O9s",
+      "description": "symlink on the trusted surface (A1)",
+      "modes": [
+        "strict"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "symlink",
+          "path": ".github/workflows/evil.yml",
+          "target": "../outside"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "REFUSED",
+          "failure"
+        ],
+        "open": [
+          "REFUSED",
+          "failure"
+        ]
+      }
+    },
+    {
+      "id": "O9u",
+      "description": "submodule on an extra trusted-surface directory (A1)",
+      "modes": [
+        "strict"
+      ],
+      "base_memory": true,
+      "trusted_surface": [
+        "gate/"
+      ],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "submodule",
+          "path": "gate/vendor"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "REFUSED",
+          "failure"
+        ],
+        "open": [
+          "REFUSED",
+          "failure"
+        ]
+      }
+    },
+    {
+      "id": "O9x",
+      "description": "file on an extra trusted-surface directory",
+      "modes": [
+        "strict"
+      ],
+      "base_memory": true,
+      "trusted_surface": [
+        "gate/"
+      ],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "write",
+          "path": "gate/adr033_c4_gate.py",
+          "content": "c4-case:strict_pass\n"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "REFUSED",
+          "failure"
+        ],
+        "open": [
+          "REFUSED",
+          "failure"
+        ]
+      }
+    },
+    {
+      "id": "O9n",
+      "description": "non-regular entries outside the trusted surface",
+      "modes": [
+        "strict"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "symlink",
+          "path": "docs/link.md",
+          "target": "../outside"
+        },
+        {
+          "op": "submodule",
+          "path": "docs/vendor"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "UNEVALUATED",
+          "failure"
+        ],
+        "open": [
+          "UNEVALUATED",
+          "success"
+        ]
+      }
+    },
+    {
+      "id": "O9c",
+      "description": "unestablished change list (head not in the object store)",
+      "modes": [
+        "strict"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "missing",
+      "changes": [],
+      "expect": {
+        "closed": [
+          "REFUSED",
+          "failure"
+        ],
+        "open": [
+          "REFUSED",
+          "failure"
+        ]
+      }
+    },
+    {
+      "id": "O10",
+      "description": "deletion outside the trusted surface",
+      "modes": [
+        "strict"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "delete",
+          "path": "docs/old.md"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "SKIP",
+          "success"
+        ],
+        "open": [
+          "SKIP",
+          "success"
+        ]
+      }
+    },
+    {
+      "id": "O10x",
+      "description": "out-of-scope file evaluated as EXCLUDED",
+      "modes": [
+        "strict"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "write",
+          "path": "src/notes.md",
+          "content": "c4-case:strict_pass_excluded\n"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "PASS",
+          "success"
+        ],
+        "open": [
+          "PASS",
+          "success"
+        ]
+      }
+    },
+    {
+      "id": "O11a",
+      "description": "PASS + UNEVALUATED",
+      "modes": [
+        "strict"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "write",
+          "path": "docs/a.md",
+          "content": "c4-case:strict_pass\n"
+        },
+        {
+          "op": "write",
+          "path": "docs/b.md",
+          "content": "c4-case:strict_incomplete\n"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "UNEVALUATED",
+          "failure"
+        ],
+        "open": [
+          "UNEVALUATED",
+          "success"
+        ]
+      }
+    },
+    {
+      "id": "O11b",
+      "description": "strict FAIL + UNEVALUATED",
+      "modes": [
+        "strict"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "write",
+          "path": "docs/a.md",
+          "content": "c4-case:strict_fail\n"
+        },
+        {
+          "op": "write",
+          "path": "docs/b.md",
+          "content": "c4-case:strict_incomplete\n"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "VIOLATION",
+          "failure"
+        ],
+        "open": [
+          "VIOLATION",
+          "failure"
+        ]
+      }
+    },
+    {
+      "id": "O11c",
+      "description": "REFUSED + PASS",
+      "modes": [
+        "strict"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "write",
+          "path": "docs/a.md",
+          "content": "c4-case:strict_pass\n"
+        },
+        {
+          "op": "write",
+          "path": ".github/workflows/x.yml",
+          "content": "c4-case:strict_pass\n"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "REFUSED",
+          "failure"
+        ],
+        "open": [
+          "REFUSED",
+          "failure"
+        ]
+      }
+    },
+    {
+      "id": "O11d",
+      "description": "strict WARN + UNEVALUATED (R1)",
+      "modes": [
+        "strict"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "write",
+          "path": "docs/a.md",
+          "content": "c4-case:strict_warn\n"
+        },
+        {
+          "op": "write",
+          "path": "docs/b.md",
+          "content": "c4-case:strict_incomplete\n"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "VIOLATION",
+          "failure"
+        ],
+        "open": [
+          "VIOLATION",
+          "failure"
+        ]
+      }
+    },
+    {
+      "id": "O11dw",
+      "description": "warn-mode WARN + UNEVALUATED",
+      "modes": [
+        "warn"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "write",
+          "path": "docs/a.md",
+          "content": "c4-case:warn_warn\n"
+        },
+        {
+          "op": "write",
+          "path": "docs/b.md",
+          "content": "c4-case:warn_incomplete\n"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "UNEVALUATED",
+          "failure"
+        ],
+        "open": [
+          "UNEVALUATED",
+          "success"
+        ]
+      }
+    },
+    {
+      "id": "O11e",
+      "description": "SKIP-only",
+      "modes": [
+        "strict"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "delete",
+          "path": "docs/old.md"
+        },
+        {
+          "op": "delete",
+          "path": "docs/other.md"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "SKIP",
+          "success"
+        ],
+        "open": [
+          "SKIP",
+          "success"
+        ]
+      }
+    },
+    {
+      "id": "O11f",
+      "description": "REFUSED + UNEVALUATED",
+      "modes": [
+        "strict"
+      ],
+      "base_memory": true,
+      "trusted_surface": [],
+      "launch_fail": false,
+      "head": "normal",
+      "changes": [
+        {
+          "op": "write",
+          "path": ".mneme/extra.json",
+          "content": "c4-case:strict_pass\n"
+        },
+        {
+          "op": "write",
+          "path": "docs/b.md",
+          "content": "c4-case:strict_incomplete\n"
+        }
+      ],
+      "expect": {
+        "closed": [
+          "REFUSED",
+          "failure"
+        ],
+        "open": [
+          "REFUSED",
+          "failure"
+        ]
+      }
+    }
+  ]
+}
