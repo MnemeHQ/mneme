@@ -219,7 +219,8 @@ promotion stays DEFERRED.
 ## 7. Stages after this charter
 
 Each stage needs its own owner authorization; none is authorized here. The
-production switch (S5) is conditional on S4 passing.
+production switch (S5) is conditional on S4 passing and on a clean S4→S5
+configuration equivalence check.
 
 | Stage | Content | Exit evidence |
 |---|---|---|
@@ -227,6 +228,7 @@ production switch (S5) is conditional on S4 passing.
 | S2 authority | §5.3 steps 1-2: designate the authority, credential inventory, create the gate ruleset with its bypass actor | inventory record; ruleset snapshot |
 | S3 shadow | §5.3 step 3: install the workflow by a reviewed PR, **not required**, posture `closed`; run on representative Core PRs on or after 2026-11-02 | per run: check identity, verdict, report; ADR-005 hits split into real violations and quotations; any `pull_request_target` platform difference; zero unexplained UNEVALUATED |
 | S4 recovery validation (pre-promotion) | on a Core staging branch (for example `r0/recovery-staging`, cut from `main` after S3) targeted by a copy of the gate ruleset with the same bypass actor and strict up-to-date, the gate **required**: (a) a `.mneme/` change is REFUSED and blocked, then merged through a §5.2 bypass by the designated authority; (b) the bypass leaves `main-pr-only`-equivalent checks enforced; (c) posture flip to `open` with an UNEVALUATED case passing with a warning while a REFUSED case still blocks, then back to `closed` with re-run; (d) required-check removal and restore; (e) a non-authority account cannot bypass | per case: check run, merge response (200/405), rule-insights entry, §5.2 record; ruleset before/after snapshots. **S5 is not authorized unless every S4 case is as expected** |
+| S4→S5 configuration equivalence | read-only, **immediately before S5**: compare the S4 staging configuration with production as it will be after S5. That means every active ruleset targeting `main` and the staging branch (rules, required-check contexts and app ids, strict up-to-date, bypass actors and modes, enforcement status, merge methods), the gate workflow blob on each branch, the `MNEME_CI_AVAILABILITY` value, and the Actions permissions. S4 proves the recovery mechanism on staging; it does not by itself prove the production rulesets interact the same way | a diff record of both snapshots. **Any difference that affects merge authorization blocks S5 until reviewed and accepted by the owner** |
 | S5 switch | one change to the `main` gate ruleset: gate required, strict up-to-date on; drop the warn check from `main-pr-only` (R5); posture `closed` | ruleset before/after snapshots |
 | S6 post-switch check | a compliant PR merges; the first real `.mneme/` change goes through a §5.2 bypass. A literal-rule VIOLATION is shown offline or in shadow, never by merging a violating change to `main` | per-case check run and merge response |
 | S7 record | R0 results record; production promotion decision | merged record |
