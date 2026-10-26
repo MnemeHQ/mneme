@@ -1,6 +1,6 @@
 # ADR-033 C4 Gate 1: bounded CI adapter implementation charter (proposal)
 
-**Status:** PROPOSED FOR OWNER REVIEW ONLY. This document does **not** approve Gate 1, amend the Layer 1 freeze, authorize implementation, reopen the CI1 lab, change a workflow/ruleset/Actions variable, or authorize a live PR or merge attempt. Merging this documentation-only proposal records a candidate design, not permission to execute it. An explicit subsequent owner ruling is required.
+**Status:** PROPOSED FOR OWNER REVIEW. The owner's Gate 1 ruling is recorded in this PR before merge; on merge with that ruling recorded, this document becomes the **accepted** C4 Gate 1 charter (section 7). Acceptance does **not** amend the Layer 1 freeze, authorize implementation, reopen the CI1 lab, change a workflow/ruleset/Actions variable, or authorize a live PR or merge attempt. Merging without a recorded owner ruling records a candidate design only.
 
 **Date:** 2026-10-26.
 **Repository:** `MnemeHQ/mneme`.
@@ -40,13 +40,13 @@ The exact adapter hash and the trusted-workflow bootstrap patch are **not** auth
 
 **Policy source (A3):** propose the exact repository Actions variable `MNEME_CI_AVAILABILITY`, read by the trusted `pull_request_target` workflow through GitHub's `vars` context. Only the literal `open` or `closed` is valid. Missing, empty, malformed, or differently cased values resolve to **closed with an explicit configuration warning**. The effective posture and its administrative provenance are captured for each run. This is an **administrative trust** source (ADR-033 §5, P7/P8), not a `.mneme/` declaration. PR code may not supply or override it.
 
-**Violation mode:** `strict` or `warn` is a separate trusted workflow/adapter input. The test matrix covers both; neither setting is inferred from checker output. A complete strict PASS/WARN/FAIL requires exits 0/1/2; complete warn-mode PASS/WARN/FAIL requires exit 0. Incomplete observations follow ADR-033 §2's separate treatment, not that exit matrix.
+**Violation mode:** `strict` or `warn` is a separate trusted input with a fixed source: a literal constant in the trusted adapter invocation within the base-revision workflow, which the C1 trusted-surface refusal protects (as CI1's `REQUESTED_MODE = "strict"` was a gate-file constant). It is never read from the PR tree, title, branch, labels, environment or any PR-writable location, and it is not a second Actions variable. Each run records the requested mode in the report, and the decision step (section 4) checks it against the workflow constant. Live probes L1-L4 use `strict`; `warn` is covered offline. The test matrix covers both; neither setting is inferred from checker output. A complete strict PASS/WARN/FAIL requires exits 0/1/2; complete warn-mode PASS/WARN/FAIL requires exit 0. Incomplete observations follow ADR-033 §2's separate treatment, not that exit matrix.
 
 **Classifier:** use the `mneme.check/v1` coherence semantics of ADR-033 §2 and the already shipped `assess_verdict` contract (#484), without introducing divergent trust semantics. Because A5 places the adapter outside the wheel and restricts it to standard-library-only code, any deterministic JSON validation inside this adapter is an **adapter translation**, not a new enforcement engine. The implementation must prove parity with the approved validator through a cross-checking test matrix. A mismatch is Gate 2 FAIL, not an invitation to relax A5 or the contract.
 
 **A1 order:** normalize/check the path first (including absolute path, NUL, backslash, empty, `.`, `..` components); then classify any `.mneme/` or trusted-surface change as **REFUSED regardless of file type**; only then treat any other non-regular or unmaterializable path as operational UNEVALUATED. Refusals never turn into UNEVALUATED merely because the entry is a symlink, submodule or other unsupported mode.
 
-**A2 aggregate precedence:** REFUSED > strict VIOLATION > UNEVALUATED > WARN > PASS. Do not lose per-file detail: a strict violation plus an incomplete evaluation is still reported as **partly unevaluated**, even if the blocking reason is the violation. Untrusted/incomplete payloads (including missing `evaluation_complete: true`) never produce an authoritative PASS. SKIP-only remains SKIP, may satisfy the check, and never becomes PASS. A trusted complete EXCLUDED applicability result remains a PASS for the check but is **not** relevant enforcement observed under ADR-029.
+**A2 aggregate precedence:** REFUSED > strict VIOLATION > UNEVALUATED > WARN > PASS. **Interpretation of A2 (not an amendment):** under `strict`, any trusted complete WARN or FAIL result is a "strict VIOLATION", because strict WARN exits 1 and is non-success today; the lower WARN rank applies only under `warn`. Otherwise a strict WARN combined with one unevaluable file would aggregate to UNEVALUATED and could pass under `open`, letting a PR unblock a WARN by adding an unevaluable file. Do not lose per-file detail: a strict violation plus an incomplete evaluation is still reported as **partly unevaluated**, even if the blocking reason is the violation. Untrusted/incomplete payloads (including missing `evaluation_complete: true`) never produce an authoritative PASS. SKIP-only remains SKIP, may satisfy the check, and never becomes PASS. A trusted complete EXCLUDED applicability result remains a PASS for the check but is **not** relevant enforcement observed under ADR-029.
 
 **Disposition:**
 
@@ -67,7 +67,7 @@ Under `open`, operational errors **inside a running trusted adapter** must still
 CI1's existing `Gate decision` step accepts only a report stating `passed: true` with `verdict: PASS`. That condition cannot support `open` with an explicitly UNEVALUATED result. At **Gate 3 only**, a reviewed replacement of that **lab** decision step must instead:
 
 - Validate the adapter's execution result *and* parse a schema-checked report whose effective posture equals the independently read trusted posture.
-- Check its base SHA, head SHA, adapter identity, evaluator identity, classification, reason and required-check disposition; fail if any required field is missing/inconsistent.
+- Check its base SHA, head SHA, adapter identity, evaluator identity, requested mode (equal to the trusted workflow constant), classification, reason and required-check disposition; fail if any required field is missing/inconsistent.
 - Permit a success conclusion for an `open` UNEVALUATED result **only** when the report still says UNEVALUATED, names the reason, and the same job emits `::warning::` and the job summary.
 - Never permit `REFUSED`, a strict trusted violation, invalid report, missing report or adapter preflight failure to succeed.
 - Emit only the existing genuine required check `CI1 trusted gate`; do not introduce a Checks API or same-name look-alike check.
@@ -83,7 +83,7 @@ Additional mandatory checks within those rows:
 1. O7: cross-product of mode, JSON schema, verdict/violation coherence, missing fields, non-boolean completeness, return-code coherence, and legacy payloads. Require parity against the approved `assess_verdict` semantics; do not relabel a missing verdict as a real FAIL.
 2. O8s/O9s/O9p: protected paths with symlink, submodule, deletion, rename into/out of the surface, mixed mode/path invalidity and unnormalizable paths remain REFUSED under `open`.
 3. O9n: non-protected non-regular entries, materialization failures, and gate-level recoverable errors are operational UNEVALUATED with reasons; ensure no policy refusal is silently downgraded.
-4. O11: PASS+UNEVALUATED; strict FAIL+UNEVALUATED; REFUSED+PASS; WARN+UNEVALUATED; SKIP-only; check both aggregate decision and preserved subordinate evidence.
+4. O11: PASS+UNEVALUATED; strict FAIL+UNEVALUATED; REFUSED+PASS; WARN+UNEVALUATED in **both** modes (under `strict` it is non-success in `open` and `closed`; under `warn` it follows the UNEVALUATED posture); SKIP-only; check both aggregate decision and preserved subordinate evidence.
 5. O12: missing/invalid `MNEME_CI_AVAILABILITY` resolves to closed with a visible configuration warning.
 6. Explicit negative tests: checker timeout, Python launch error, adapter/bootstrap failure, wrong blob/sha256, mismatched base/head, bad report, missing summary/annotation, and report posture different from trusted posture. None can create a silent required-check success.
 7. Existing CI1.2 fixture replay, ADR-005 global-rule checks, contradictory-output controls, CI1 C1 trusted-surface regression, and CI1 V11 Option A invariants. Re-run the applicable canonical frozen benchmark and capture its exact results; do not alter its fixtures or interpret a historical passing score as new parity evidence.
@@ -103,9 +103,9 @@ Installation and release notes must state supported GitHub context, administrati
 
 ## 7. Approval sequence, stop conditions and separate freeze procedure
 
-1. **This proposal:** review/merge as a documentation-only Gate 1 candidate. Merging **does not** itself authorize implementation.
-2. **Owner Gate 1 ruling:** explicitly accept or amend this exact charter, including A1-A5, the adapter path, variable name and bootstrap/report protocol. Without that ruling, no code.
-3. **Freeze amendment:** after accepting the charter, open a **separate** PR titled `[layer1-freeze] authorize ADR-033 C4 CI adapter`, citing this accepted charter and freeze Amendment Procedure §3(b). Merge it before any implementing PR. Its change must be only the narrow authorization described below.
+1. **This charter and the owner's Gate 1 ruling, in one PR:** the owner explicitly accepts or amends this exact charter, including A1-A5, the adapter path, variable name, mode source and bootstrap/report protocol, and the ruling is recorded in this PR (status set to ACCEPTED, as for the C2b and C3 charters). Merging with the ruling recorded is the acceptance; there is no separate post-merge ruling step. Without that ruling, no code.
+2. *(Folded into step 1.)*
+3. **Freeze amendment:** after this charter merges as accepted, open a **separate** PR titled `[layer1-freeze] authorize ADR-033 C4 CI adapter`, citing this accepted charter and freeze Amendment Procedure §3(b). Merge it before any implementing PR. Its change must be only the narrow authorization described below.
 4. **Implementation PR:** only after both preceding approvals, implement Core adapter/tests/versioned fixtures in a reviewed PR. No deployment or lab administration.
 5. **Gate 2:** separate authorization to execute and record offline parity/regressions against the pinned implementation.
 6. **Gate 3:** separate authorization for lab unarchive, trusted workflow integration, repo variable changes, controlled PRs and actual GitHub merge attempts. Nothing touches Core production CI.
@@ -137,7 +137,7 @@ No new rule, retriever, conflict-detection or canonical persistence semantics; n
 
 ## 10. Proposed approval decision
 
-**Candidate:** approve the bounded adapter design above as the C4 Gate 1 implementation charter, with implementation still conditioned on a separate explicit owner Gate 1 ruling and the subsequent freeze-amendment PR. Reject or request revision if the trusted report, variable or adapter identity boundaries are insufficiently specified.
+**Candidate:** approve the bounded adapter design above as the C4 Gate 1 implementation charter by recording the owner's Gate 1 ruling in this PR before merge; implementation remains conditioned on the subsequent freeze-amendment PR. Reject or request revision if the trusted report, variable or adapter identity boundaries are insufficiently specified.
 
 **Execution provenance**
 - Change author: agent
