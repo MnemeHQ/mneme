@@ -22,6 +22,7 @@ changes only the status wording.
 contract only: it authorizes no implementation and claims no pre-write
 protection (see "G2 amendment (2026-10-24)" below).
 **Amended:** 2026-10-26: relevant-enforcement attribution with several applied numeric rules (§7b, owner ruling D1, from the G2-1 blind validation FAIL in #666). Per-rule attribution is authoritative, and the event-level value is existential. It authorizes no implementation.
+**Amended:** 2026-10-26: function-source name resolution follows Python lexical scoping (§3a, owner ruling D2, from the G2-1 blind validation FAIL in #666). It authorizes no matcher change.
 
 **What acceptance means.** Acceptance establishes what a future implementation
 must satisfy. It does **not** establish that Mneme enforces numeric bounds:
@@ -215,6 +216,107 @@ following makes the source `UNKNOWN`:
 
 There are no optional sources (O2 ruling): a declared source that is absent
 is always `UNKNOWN`.
+
+### 3a. Function-source name resolution follows Python lexical scoping (amendment 2026-10-26, owner ruling D2)
+
+**Why.** The G2-1 blind validation (results record
+[`adr-034-g2-1-blind-scoring-results-2026-10-25.md`](../validation/adr-034-g2-1-blind-scoring-results-2026-10-25.md),
+#666 `cec27ea9`, verdict **FAIL**) exposed a gap, diagnosed as D2. §3 says
+the function source becomes `UNKNOWN` when "the function is shadowed,
+rebound or escapes as a value". It doesn't say **where** a shadowing binding
+takes effect.
+
+The shipped matcher reads it as "any other binding of the name, anywhere in
+the module" (`mneme/numeric_rule.py:742-760`). Under that reading:
+
+- a same-named method `def` in an unrelated class makes the whole call
+  source `AMBIGUOUS_BINDING`;
+- that holds even for a proven module-level direct call;
+- under availability `open`, a genuinely violating write can then proceed
+  unevaluated.
+
+Python does not resolve names that way. On 2026-10-26 the owner ruled that
+the following is normative. It replaces that reading **for the function
+(`call`) source**.
+
+**1. Call sites are resolved one at a time, by Python's lexical rules.** For
+each direct bare-name call `function(...)`, the name is resolved at that
+call site, in this order:
+
+1. the enclosing function's local scope, which covers parameters,
+   assignments, `def`, `class`, `import`, `for`/`with`/`except` targets and
+   walrus targets;
+2. the scopes of any enclosing functions;
+3. the module scope.
+
+A **class body's scope is not visible from the functions nested inside it**,
+methods included. For a statement written directly in a class body, the
+class scope comes first.
+
+**2. A binding only matters where it resolves.**
+- **Resolves to the declaration:** a call site that resolves to the single
+  module-level declaration (AMB-01) is a source, classified under §3 and
+  §5a.
+- **Resolves to another binding:** a call site that resolves to any other
+  binding is that call site's own `UNKNOWN` / `AMBIGUOUS_BINDING` source.
+  Examples are a parameter, a local name, an enclosing function's name, or a
+  class-body binding seen from that same class body. The call site is never
+  ignored, so the rule can never come out clean through it.
+- **No call site resolves to it:** a binding that no direct call site
+  resolves to has **no effect** on the call source. For example, a
+  same-named method `def` in a class body does not shadow the module
+  function for calls outside that class body.
+
+**3. Rebinding and escape at module scope still make the whole source
+`AMBIGUOUS_BINDING`.** That covers:
+- a second module-level binding of the name, or any module-level
+  reassignment, `del`, or conditional or `try`-guarded definition;
+- a `global function` declaration in any scope;
+- any load of the name that resolves to the module declaration other than
+  as the callee of a direct call. That is the escape case, as before.
+
+**4. If resolution can't be decided, the result is unevaluated, never
+clean.** Two situations count:
+- the module uses a construct that defeats static resolution: `exec`/`eval`,
+  `globals()`/`locals()`/`vars()` writes, star imports, `nonlocal` or
+  `global` touching the name, `__builtins__` manipulation, and similar;
+- the matcher otherwise cannot decide a call site's binding
+  deterministically.
+
+In either case the affected call sites, or the whole source if the scope is
+unbounded, are `UNKNOWN` / `AMBIGUOUS_BINDING`. A clean result is never
+assumed.
+
+**5. Unchanged.** Method and attribute calls (`self.function(...)`,
+`obj.function(...)`) are not direct bare-name calls, so they are not
+sources. Absence of every source is still `SOURCE_NOT_FOUND` (O2). The
+`symbol` source keeps its §3 wording. Reason priorities (§4) are
+unchanged.
+
+**6. Consequences.**
+- **Not authorized here.** This amendment authorizes **no** matcher change.
+  Implementing it is a separate, reviewed change to the shared matcher
+  (`mneme/numeric_rule.py`). It needs scope-resolution regressions: class
+  body versus method, parameter, nested function, enclosing scope,
+  comprehension, `global`/`nonlocal`, dynamic constructs, and the D2 shapes.
+- **M4 and G1.** The recognition boundary of the M4-validated matcher
+  changes, and so does the effect of v1/M4 interpretation AMB-07.
+  - **Before:** a same-named parameter shadowed the whole source.
+  - **After:** it makes only the call sites inside that function `UNKNOWN`.
+
+  M4's PASS (#628) remains evidence for its pinned build only. Its results
+  are preserved and not re-scored. A post-change G1 audit claim is **not**
+  covered by M4. The change must regression-test the shared matcher against
+  the public M4 R vectors and the G1 regression suite. Any new G1 blind
+  claim needs its own validation.
+- **G2-1.** The FAIL stays exactly as recorded. Any later PASS needs a new
+  pre-registration that adopts this section and §7b, plus a newly authored,
+  independently held-out corpus.
+
+**Not decided here: the `symbol` source.** The same question applies to a
+class-body assignment, or a function-local assignment, of the governed
+**symbol**. It is outside D2. The §3 reading ("rebound anywhere in the
+module") stays in force for symbols until a separate ruling.
 
 ### 4. Outcome semantics
 
