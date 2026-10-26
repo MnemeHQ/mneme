@@ -1,0 +1,6 @@
+[c4-gate2] Manifest replay (cases.json x query variants / modes): 46/46 parity
+[c4-gate2] ADR-005 global-rule cross-check: 13/13 parity
+[c4-gate2] Corpus memory regeneration: 2/2 parity
+[c4-gate2] Classifier stub checks: 35/35 parity
+[c4-gate2] identity rechecked: True
+[c4-gate2] verdict: PASS
