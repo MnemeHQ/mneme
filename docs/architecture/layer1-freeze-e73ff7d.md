@@ -1355,6 +1355,106 @@ remain unchanged.
 
 ---
 
+## Amendment — authorize the ADR-034 D1 evidence-validator and D2 matcher changes (2026-10-26)
+
+> This authorizes **two bounded implementation changes**, each specified by
+> an ADR-034 amendment that is already merged: D1, per-rule attribution of
+> relevant enforcement (§7b), and D2, function-source resolution by Python
+> lexical scoping (§3a). Each change is delivered as its own reviewed PR. It
+> authorizes no validation claim, no symbol-source change and no other
+> behavior.
+
+**Change 1, D1 (ADR-034 §7b).**
+- **Where:** `relevant_enforcement_observed()` and the evidence record in
+  `mneme/integrations/claude_code/hook.py`.
+- **What:**
+  - per-rule relevance is authoritative, and the event-level value is
+    existential: at least one applied numeric rule is relevantly enforced;
+  - record-wide `evaluation_complete` is kept as a separate fact;
+  - the common host, event, subject, digest, target and provenance bindings
+    stay in place;
+  - a rule never inherits another rule's relevance.
+- **Unchanged:** the hook's blocking decisions, exit codes,
+  availability handling, the strict/warn dispositions and the
+  `mneme.check/v1` payloads.
+- **Pinned regressions:** every row of the §7b table, plus the existing G2-1
+  evidence and tamper tests.
+
+**Change 2, D2 (ADR-034 §3a).**
+- **Where:** function (`call`) source resolution in
+  `mneme/numeric_rule.py`.
+- **What:**
+  - each direct bare-name call site is resolved by Python lexical scoping;
+  - a binding no call site resolves to has no effect;
+  - a call site that resolves to another binding is `UNKNOWN` /
+    `AMBIGUOUS_BINDING`;
+  - module-level rebinding, `global`, escape and undecidable or dynamic
+    resolution stay `AMBIGUOUS_BINDING` and are never clean;
+  - class-body execution order, and any binding static analysis cannot
+    establish, **fail closed**.
+- **Pinned regressions:**
+  - scope-resolution cases: class body versus method, parameter, nested
+    function, enclosing scope, comprehension, `global`/`nonlocal`, dynamic
+    constructs, and the D2 shapes;
+  - the public M4 R1–R18 vectors and the G1 regression suite;
+  - golden rule IDs, and payloads for checks with no numeric rule, which
+    stay byte-identical.
+
+**Sections referenced:** the Freeze Anchor **Status** clause, the ADR-034 G1
+and G2-1 amendments above, and the Amendment Procedure below.
+- The G1 amendment and the G2-1 amendment both state that M4 matcher
+  semantics are not authorized for change.
+- Change 2 is an explicit, narrow exception to that, for the function source
+  only.
+
+**Rationale (Amendment Procedure §3(b)).** Every charter-level decision was
+**already made**:
+- **Validation result:** the G2-1 blind validation results record (#666,
+  squash `cec27ea9`, verdict FAIL) diagnosed D1 and D2.
+- **The rulings:** the owner ruled on both, and they were merged as ADR-034
+  amendments:
+  - §7b, PR [#668](https://github.com/MnemeHQ/mneme/pull/668), squash
+    `78d1d684`;
+  - §3a, PR [#669](https://github.com/MnemeHQ/mneme/pull/669), squash
+    `4175722e`.
+
+Neither change is justified after the fact. Both are still to be
+implemented.
+
+**Recorded consequences.**
+- **M4 and G1.** After Change 2, the matcher's recognition boundary differs
+  from the build M4 validated. That includes the effect of interpretation
+  AMB-07: a same-named parameter makes only the call sites in its own
+  function `UNKNOWN`. M4's PASS (#628) remains evidence for its pinned build
+  only. A post-change G1 audit claim is **not** covered by M4, and any new
+  blind G1 claim needs its own validation.
+- **G2-1.** The G2-1 FAIL stays final. A later PASS needs a new
+  pre-registration that adopts §3a and §7b, plus a newly authored,
+  independently held-out corpus.
+- **Pinned harnesses.** The pinned `benchmarks/adr034_m4/` and
+  `benchmarks/adr034_g2_1/` harnesses are not modified.
+
+### Not authorized by this amendment
+
+- Any change to the `symbol` source's resolution. Under §3a that stays
+  undecided.
+- Any change to blocking decisions, availability policy (ADR-033),
+  `FORBID_LITERAL`, `DecisionRetriever`, `ConflictDetector`, persistence or
+  rule identity.
+- Any change to the pinned M4 or G2-1 harnesses or evidence, or re-scoring
+  of any sealed or revealed corpus.
+- Implementation by any session or person with access to the G2-1 held-out
+  corpus content, its answer key, or the scorer's diagnosis evidence beyond
+  the merged results record.
+- Any enforcement, "relevant enforcement observed" or production claim, or
+  any G1 or G2-1 validation claim, for the changed builds.
+
+The existing DG1B1, DG1F-C1a, #260, T-08 slice-1, C2a, C2b, ADR-034 G1,
+C2b Amendment 1 and ADR-034 G2-1 freeze amendments, the G1 F-1 record and
+the G2-1 §5.1 erratum record remain unchanged.
+
+---
+
 ## Amendment Procedure
 
 This document is frozen at `e73ff7d`. To amend it:
