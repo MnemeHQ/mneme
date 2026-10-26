@@ -505,10 +505,6 @@ class _Binding:
 @dataclass
 class _ModuleFacts:
     bindings: dict[str, list[_Binding]] = field(default_factory=dict)
-    # Load references of a name that are not the callee of a direct call.
-    escapes: dict[str, list[int]] = field(default_factory=dict)
-    # Direct bare-name calls, by callee name.
-    calls: dict[str, list[ast.Call]] = field(default_factory=dict)
 
 
 def _arg_names(args: ast.arguments) -> list[ast.arg]:
@@ -521,7 +517,7 @@ def _arg_names(args: ast.arguments) -> list[ast.arg]:
 
 
 class _FactCollector(ast.NodeVisitor):
-    """Collect bindings, escapes and direct calls across the whole module."""
+    """Collect bindings across the whole module (the ``symbol`` source)."""
 
     def __init__(self, module: ast.Module) -> None:
         self.facts = _ModuleFacts()
@@ -656,19 +652,6 @@ class _FactCollector(ast.NodeVisitor):
             self._bind(node.rest, node, "match", node)
         self.generic_visit(node)
 
-    # Calls and escapes.
-    def visit_Call(self, node: ast.Call) -> None:
-        if isinstance(node.func, ast.Name):
-            self.facts.calls.setdefault(node.func.id, []).append(node)
-            for child in (*node.args, *node.keywords):
-                self.visit(child)
-            return
-        self.generic_visit(node)
-
-    def visit_Name(self, node: ast.Name) -> None:
-        if isinstance(node.ctx, ast.Load):
-            self.facts.escapes.setdefault(node.id, []).append(node.lineno)
-
 
 def _collect(module: ast.Module) -> _ModuleFacts:
     collector = _FactCollector(module)
@@ -739,25 +722,274 @@ def _classify_symbol(
     return _Classified("UNKNOWN", binding.line, REASON_UNRECOGNIZED_FORM)
 
 
-def _function_ambiguity(function: str, facts: _ModuleFacts) -> int | None:
-    """Line of the first rebinding, shadowing or escape of ``function``.
+# ── Function-source resolution by Python lexical scoping (ADR-034 §3a) ───────
 
-    A single module-level ``def`` or unaliased import is the function's
-    declaration (AMB-01). Any other binding anywhere -- including a parameter
-    of the same name (AMB-07) -- shadows or rebinds it, and any load of the
-    name other than as the callee of a direct call lets it escape as a value.
+# Names whose use defeats static resolution of any module name (§3a rule 4):
+# they can execute source or read and write a namespace as a mapping.
+_DYNAMIC_NAMES = frozenset({
+    "exec", "eval", "globals", "locals", "vars", "__builtins__",
+})
+_DYNAMIC_MODULES = frozenset({"builtins", "__builtin__"})
+_COMPREHENSIONS = (ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)
+
+
+@dataclass
+class _Scope:
+    kind: str                     # "module" | "function" | "class" | "comprehension"
+    parent: "_Scope | None"
+    # A class whose namespace may be pre-populated by a metaclass ``__prepare__``
+    # (any base or keyword): its body lookups cannot be decided statically.
+    opaque: bool = False
+    binding_lines: list[int] = field(default_factory=list)
+
+
+@dataclass
+class _CallResolution:
+    # Set when the whole call source is ambiguous (§3a rules 3 and 4).
+    ambiguous_line: int | None = None
+    # Direct calls that resolve to the module-level declaration (AMB-01).
+    resolved: list[ast.Call] = field(default_factory=list)
+    # Direct calls that resolve to another binding, or cannot be decided.
+    unresolved: list[ast.Call] = field(default_factory=list)
+
+
+class _CallScopeResolver:
+    """Resolve each direct ``function(...)`` call site by lexical scoping.
+
+    Lookup order at a call site is the local scope, then enclosing function
+    scopes, then the module scope. A class body's scope is visible only to
+    statements written directly in it. Anything static analysis cannot
+    decide fails closed as ``AMBIGUOUS_BINDING``; a clean result is never
+    assumed.
     """
-    bindings = facts.bindings.get(function, [])
-    declaration = next(
-        (
-            b for b in bindings
-            if b.module_level and b.kind in ("def", "import")
-        ),
-        None,
-    )
-    offending = [b.line for b in bindings if b is not declaration]
-    offending.extend(facts.escapes.get(function, []))
-    return min(offending) if offending else None
+
+    def __init__(self, function: str, module: ast.Module) -> None:
+        self.name = function
+        self.module_scope = _Scope("module", None)
+        self._top = {id(stmt) for stmt in module.body}
+        # Module-scope bindings as (line, is a top-level def/unaliased import).
+        self.module_bindings: list[tuple[int, bool]] = []
+        self.fail_lines: list[int] = []
+        self.calls: list[tuple[ast.Call, _Scope]] = []
+        self.loads: list[tuple[int, _Scope]] = []
+        self._stmts(module.body, self.module_scope)
+
+    # ── Collection ──────────────────────────────────────────────────────────
+
+    def _bind(self, scope: _Scope, line: int, declaration: bool = False) -> None:
+        if scope.kind == "module":
+            self.module_bindings.append((line, declaration))
+        else:
+            scope.binding_lines.append(line)
+
+    def _stmts(self, body: list[ast.stmt], scope: _Scope) -> None:
+        for stmt in body:
+            self._visit(stmt, scope)
+
+    def _visit(self, node: ast.AST | None, scope: _Scope) -> None:
+        if node is None:
+            return
+        name = self.name
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            self._type_params(node)
+            for deco in node.decorator_list:
+                self._visit(deco, scope)
+            self._arguments_outer(node.args, scope)
+            self._visit(node.returns, scope)
+            if node.name == name:
+                self._bind(scope, node.lineno, id(node) in self._top)
+            inner = _Scope("function", scope)
+            self._arguments_inner(node.args, inner)
+            self._stmts(node.body, inner)
+        elif isinstance(node, ast.Lambda):
+            self._arguments_outer(node.args, scope)
+            inner = _Scope("function", scope)
+            self._arguments_inner(node.args, inner)
+            self._visit(node.body, inner)
+        elif isinstance(node, ast.ClassDef):
+            self._type_params(node)
+            for deco in node.decorator_list:
+                self._visit(deco, scope)
+            for base in node.bases:
+                self._visit(base, scope)
+            for kw in node.keywords:
+                self._visit(kw.value, scope)
+            if node.name == name:
+                self._bind(scope, node.lineno)
+            inner = _Scope(
+                "class", scope, opaque=bool(node.bases or node.keywords),
+            )
+            self._stmts(node.body, inner)
+        elif isinstance(node, _COMPREHENSIONS):
+            first, *rest = node.generators
+            # The first iterable is evaluated in the enclosing scope.
+            self._visit(first.iter, scope)
+            inner = _Scope("comprehension", scope)
+            for i, gen in enumerate(node.generators):
+                self._visit(gen.target, inner)
+                if i:
+                    self._visit(gen.iter, inner)
+                for cond in gen.ifs:
+                    self._visit(cond, inner)
+            if isinstance(node, ast.DictComp):
+                self._visit(node.key, inner)
+                self._visit(node.value, inner)
+            else:
+                self._visit(node.elt, inner)
+        elif isinstance(node, ast.NamedExpr):
+            if node.target.id == name:
+                # A walrus binds in the nearest non-comprehension scope.
+                target = scope
+                while target.kind == "comprehension":
+                    target = target.parent
+                if target.kind == "class" and target is not scope:
+                    # Not valid Python; never resolved by assumption.
+                    self.fail_lines.append(node.lineno)
+                self._bind(target, node.lineno)
+            self._visit(node.value, scope)
+        elif isinstance(node, ast.Name):
+            if node.id in _DYNAMIC_NAMES:
+                self.fail_lines.append(node.lineno)
+            if node.id != name:
+                return
+            if isinstance(node.ctx, ast.Load):
+                self.loads.append((node.lineno, scope))
+            else:
+                if isinstance(node.ctx, ast.Del) and scope.kind == "module":
+                    self.fail_lines.append(node.lineno)
+                self._bind(scope, node.lineno)
+        elif isinstance(node, ast.Call):
+            if isinstance(node.func, ast.Name) and node.func.id == name:
+                self.calls.append((node, scope))
+            else:
+                self._visit(node.func, scope)
+            for arg in node.args:
+                self._visit(arg, scope)
+            for kw in node.keywords:
+                self._visit(kw.value, scope)
+        elif isinstance(node, (ast.Global, ast.Nonlocal)):
+            if name in node.names:
+                self.fail_lines.append(node.lineno)
+        elif isinstance(node, (ast.Import, ast.ImportFrom)):
+            if isinstance(node, ast.ImportFrom) and node.module in _DYNAMIC_MODULES:
+                self.fail_lines.append(node.lineno)
+            for alias in node.names:
+                if alias.name == "*" or alias.name in _DYNAMIC_MODULES:
+                    self.fail_lines.append(node.lineno)
+                    continue
+                if alias.asname is not None:
+                    bound, unaliased = alias.asname, alias.asname == alias.name
+                else:
+                    bound, unaliased = alias.name.split(".")[0], True
+                if bound == name:
+                    self._bind(
+                        scope, node.lineno, unaliased and id(node) in self._top,
+                    )
+        elif isinstance(node, ast.ExceptHandler):
+            if node.name == name:
+                self._bind(scope, node.lineno)
+            self._generic(node, scope)
+        elif isinstance(node, (ast.MatchAs, ast.MatchStar)):
+            if node.name == name:
+                self._bind(scope, node.lineno)
+            self._generic(node, scope)
+        elif isinstance(node, ast.MatchMapping):
+            if node.rest == name:
+                self._bind(scope, node.lineno)
+            self._generic(node, scope)
+        elif type(node).__name__ == "TypeAlias":
+            # The value lives in its own lazily evaluated annotation scope.
+            if self._mentions(node):
+                self.fail_lines.append(node.lineno)
+            if node.name.id == name:
+                self._bind(scope, node.lineno)
+        elif isinstance(node, ast.Attribute):
+            if (
+                node.attr == "modules"
+                and isinstance(node.value, ast.Name)
+                and node.value.id == "sys"
+            ):
+                # sys.modules reaches the module namespace as an object.
+                self.fail_lines.append(node.lineno)
+            self._visit(node.value, scope)
+        else:
+            self._generic(node, scope)
+
+    def _generic(self, node: ast.AST, scope: _Scope) -> None:
+        for child in ast.iter_child_nodes(node):
+            self._visit(child, scope)
+
+    def _arguments_outer(self, args: ast.arguments, scope: _Scope) -> None:
+        # Defaults and annotations are evaluated in the enclosing scope.
+        for default in (*args.defaults, *args.kw_defaults):
+            self._visit(default, scope)
+        for arg in _arg_names(args):
+            self._visit(arg.annotation, scope)
+
+    def _arguments_inner(self, args: ast.arguments, scope: _Scope) -> None:
+        for arg in _arg_names(args):
+            if arg.arg == self.name:
+                self._bind(scope, arg.lineno)
+
+    def _type_params(self, node: ast.AST) -> None:
+        # PEP 695 annotation scopes: fail closed if they touch the name.
+        for param in getattr(node, "type_params", []):
+            if self._mentions(param):
+                self.fail_lines.append(node.lineno)
+
+    def _mentions(self, node: ast.AST) -> bool:
+        return any(
+            (isinstance(n, ast.Name) and n.id == self.name)
+            or getattr(n, "name", None) == self.name
+            for n in ast.walk(node)
+        )
+
+    # ── Resolution ──────────────────────────────────────────────────────────
+
+    def _lookup(self, scope: _Scope) -> str:
+        """Where the name at ``scope`` resolves.
+
+        ``"module"`` for the module scope, ``"other"`` for another binding,
+        ``"undecided"`` when static analysis cannot tell.
+        """
+        current, first = scope, True
+        while current.kind != "module":
+            if current.kind == "class":
+                if first:
+                    # A statement written directly in a class body: a class
+                    # binding depends on execution order, and an opaque
+                    # namespace cannot be read statically. Both fail closed.
+                    if current.binding_lines or current.opaque:
+                        return "undecided"
+                # Otherwise a class scope is invisible from nested scopes.
+            elif current.binding_lines:
+                return "other"
+            first = False
+            current = current.parent
+        return "module"
+
+    def resolve(self) -> _CallResolution:
+        offending = list(self.fail_lines)
+        declarations = [b for b in self.module_bindings if b[1]]
+        if len(self.module_bindings) > 1 or (
+            self.module_bindings and not declarations
+        ):
+            # A second module-level binding, or a reassignment, ``del``, or
+            # conditional or ``try``-guarded definition (§3a rule 3).
+            offending.extend(line for line, _ in self.module_bindings)
+        for line, scope in self.loads:
+            if self._lookup(scope) != "other":
+                # The declaration escapes as a value, or may.
+                offending.append(line)
+        if offending:
+            return _CallResolution(ambiguous_line=min(offending))
+        result = _CallResolution()
+        for call, scope in self.calls:
+            if self._lookup(scope) == "module":
+                result.resolved.append(call)
+            else:
+                result.unresolved.append(call)
+        return result
 
 
 def _classify_call_site(
@@ -826,24 +1058,34 @@ def evaluate_source(contract: NumericContract, source: bytes) -> MatcherResult:
         classified.append((SOURCE_KIND_SYMBOL, symbol_result))
 
     if contract.call_function is not None:
-        ambiguous_line = _function_ambiguity(contract.call_function, facts)
-        calls = sorted(
-            facts.calls.get(contract.call_function, []),
-            key=lambda c: (c.lineno, c.col_offset),
-        )
-        if ambiguous_line is not None:
-            # The whole call source is ambiguous (AMB-07).
+        resolution = _CallScopeResolver(contract.call_function, module).resolve()
+        if resolution.ambiguous_line is not None:
+            # The whole call source is ambiguous (§3a rules 3 and 4).
             classified.append((
                 SOURCE_KIND_CALL,
-                _Classified("UNKNOWN", ambiguous_line, REASON_AMBIGUOUS_BINDING),
+                _Classified(
+                    "UNKNOWN", resolution.ambiguous_line, REASON_AMBIGUOUS_BINDING,
+                ),
             ))
-        elif not calls:
+        elif not resolution.resolved and not resolution.unresolved:
             classified.append((
                 SOURCE_KIND_CALL,
                 _Classified("UNKNOWN", None, REASON_SOURCE_NOT_FOUND),
             ))
         else:
+            unresolved = {id(call) for call in resolution.unresolved}
+            calls = sorted(
+                [*resolution.resolved, *resolution.unresolved],
+                key=lambda c: (c.lineno, c.col_offset),
+            )
             for call in calls:
+                if id(call) in unresolved:
+                    # Resolves to another binding: its own unknown source
+                    # (§3a rule 2), never ignored.
+                    classified.append((SOURCE_KIND_CALL, _Classified(
+                        "UNKNOWN", call.lineno, REASON_AMBIGUOUS_BINDING,
+                    )))
+                    continue
                 classified.append((SOURCE_KIND_CALL, _classify_call_site(
                     call,
                     contract.call_position,
