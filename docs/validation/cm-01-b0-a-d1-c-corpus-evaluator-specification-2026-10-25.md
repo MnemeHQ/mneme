@@ -65,7 +65,7 @@ relationship_density           (TBD)
 ambiguity_bin_distribution     (TBD)
 ```
 
-No numeric value in this list is approved. Counts follow the approved D1 power plan and corpus review, not a convenience target. The generator must emit a manifest of its inputs, seed, version and output hashes.
+No numeric value in this list is approved. Populate rule `applicability.include_paths` at approved quotas, retain a global/empty-applicability bin, keep path strings/payloads out of the searchable record, and include zero/partial/all-match T6 bins plus T8 k-size bins. Counts follow the approved D1 power plan and corpus review, not a convenience target. The generator must emit a manifest of its inputs, seed, version and output hashes.
 
 ### 2.3 Canonical identity fields
 
@@ -82,62 +82,69 @@ Every scenario's expected answer uses only identity fields defined by the accept
 
 The evaluator must not invent identity values, infer a missing digest or accept a plausible-looking substitute.
 
-## 3. T1-T8 scenario contracts
+## 3. T1-T8 scenario contracts — aligned with D1 Erratum 1 E-1
 
-| Family | Model-visible input | Required operations | Required output | Data-dependency contract |
-|---|---|---|---|---|
-| T1 | Stable decision ID | `decision.get` | Identity projection | None; single step |
-| T2 | Unique text marker and lifecycle filter | `decision.search` | Canonical IDs and count | Search only |
-| T3 | Scope context | `decision.applicable_to` | Canonical IDs and count | Scope retrieval only |
-| T4 | Stable decision ID | `decision.trace` | Lineage and declared evidence | Trace only |
-| T5 | Marker and lifecycle filter | `search`, then `get` | Identity projection | Later `record_id` must be selected from search output |
-| T6 | Marker and lifecycle filter | `search`, then `trace` | Lineage projection | Later `record_id` must be selected from search output |
-| T7 | Scope context | `applicable_to`, lifecycle filter, `get`, `trace` | Selected ID plus get/trace projections | Selection requires scope/lifecycle output; get and trace use that selection |
-| T8 | Query and lifecycle filter | `search`, filter, then repeated `get` | Ordered identity items | Selected IDs must come from search output and rule presence |
+The [merged, still-proposed D1 Erratum 1](./cm-01-b0-a-d1-erratum-1-proposal-2026-10-25.md) (#664) supersedes the old B0-M-derived T5–T8 contracts **for this proposal**. Task sequences below are *descriptive*, never enforced: both arms may issue any of the four permitted read calls, including `decision.search(query="")`. Every primary scenario requires information that genuinely appears only inside canonical `decision.trace` `derived_rules[].rule_payload` or `derived_rules[].applicability`, proven by the mechanical non-solvability check in `3.2.
 
-T1-T4 are negative controls and do not enter the primary token estimand. They remain mandatory correctness/authority/security gates.
+| Family | Model-visible initial input | Reference operation strategy (not mandated) | Required answer and test dimension |
+|---|---|---|---|
+| T1 | Stable decision ID | `get` | Original identity projection (negative control) |
+| T2 | Unique marker and lifecycle filter | `search` | Canonical IDs and count (negative control) |
+| T3 | Scope context | `applicable_to` | Canonical IDs and count (negative control) |
+| T4 | Stable decision ID | `trace` | Lineage projection **including `missing_links`** (negative control) |
+| T5 single target | Marker/scope and lifecycle, no derived target ID | candidate retrieval → `trace` once | Selected identity plus full rule payload/applicability and `missing_links`; one required trace |
+| T6 trace-predicate filter | Record-defined candidate set of `m >= 3` and explicitly disclosed predicate path `p_T6` | retrieve candidates → `trace` each; exact membership test | IDs of all candidates with a rule whose `applicability.include_paths` contains `p_T6` (exact string membership), sorted, plus count. Zero/partial/all-match bins |
+| T7 chained dependency | Declared starting decision A ID; target B hidden | `trace(A)` → `applicable_to(paths=[p from A])` → `trace(B)` | Selected B plus its identity, rule payloads/applicability and `missing_links`; genuine context-scope matching, depth three |
+| T8 fan-out compose | Candidate retrieval criteria without selected answer IDs | retrieve candidates → `trace` `k >= 2` selected decisions | Sorted items with identity, all rules' payloads and applicability; fan-out |
 
-### 3.1 Exact output schemas
+T5 has one required trace, T6 has `m >= 3` required traces with filtered fraction `phi=(m-c)/m`, T7 has two traces with the second target depending on A's previously retrieved applicability and the genuine `applicable_to` result, and T8 has `k >= 2` required traces with no output filtering. The T6 `c` bins (zero, partial, all matches), `m` and T8 `k` sizes and family quotas are **unapproved**, fixed before pilot. `p_T6` is the sole permitted *prompt-disclosed applicability path*: the prompt must not disclose candidate membership or any expected answer ID. The T7 seed A is the sole permitted prompt-disclosed starting decision ID among primary tasks; its derived path and answer target B are not disclosed.
 
-The evaluator accepts only these frozen shapes. Extra fields are rejected where the schema says closed; ordering is exact where specified.
+T6 tests exact membership in the raw `include_paths` list; **no ADR-020 glob or selector resolution is performed by the evaluator**. T7 uses genuine MCP `applicable_to` behavior for its path-dependent context-scope selection, and its expected answer requires double-entry ground truth (`6.2). T1–T4 are negative controls outside the primary benefit estimand; they still contribute to the approved correctness and integrity gates. Equal family weights of 1/4 are **proposed pending statistics/human approval** under Erratum E-1 and E-2.
+
+### 3.1 Proposed exact output schemas
+
+The private answer evaluator must accept only the family-specific closed schema frozen before execution. The following proposal **replaces** the old B0-M-derived identity-only outputs and must be ratified before any corpus or D1-C freeze:
 
 ```text
-T1 / T5 get projection:
+T1 get:
   { decision_id, version, version_id, content_digest,
     lifecycle_status, context_scope, derived_rule_ids }
-
 T2 / T3:
   { canonical_ids: [string, ... sorted ascending], count: integer }
-
-T4 / T6 trace projection:
+T4 full lineage:
   { canonical_decision_id, version, version_id, content_digest,
-    derived_rule_ids,
-    declared_test_evidence: [ { selector, sha }, ... ] }
-
+    derived_rule_ids, declared_test_evidence: [ { selector, sha }, ... ],
+    missing_links: [string, ... fixture order] }
+T5:
+  { decision_id, version_id, content_digest, derived_rule_ids,
+    derived_rules: [ { rule_id, rule_payload, applicability }, ... ordered ],
+    missing_links: [string, ... fixture order] }
+T6:
+  { canonical_ids: [string, ... sorted ascending], count: integer }
 T7:
-  { selected_id,
-    get: <T1 get projection>,
-    trace: <T4 trace projection> }
-
+  { selected_id, decision_id, version_id, content_digest,
+    derived_rules: [ { rule_id, rule_payload, applicability }, ... ordered ],
+    missing_links: [string, ... fixture order] }
 T8:
-  { items: [ { decision_id, version, content_digest,
-               derived_rule_ids }, ... ] }   // sorted by decision_id
+  { items: [ { decision_id, version_id, content_digest,
+    derived_rules: [ { rule_id, rule_payload, applicability }, ... ordered ] },
+    ... sorted by decision_id] }
 ```
 
-Within each projection, `context_scope`, `derived_rule_ids` and `declared_test_evidence` preserve frozen fixture order; `canonical_ids` and T8 `items` are sorted ascending by `decision_id`. No field may be normalized into an approximate match. Missing required fields, extra fields in a closed object, wrong types, wrong order where required, or wrong identity values are failures.
+All rule payload/applicability objects are compared recursively and exactly to the genuine frozen trace output. Arrays retain frozen order unless explicitly declared sorted; `canonical_ids` and T8 `items` sort ascending by raw Unicode code point of `decision_id` (no locale collation). Each schema is closed: wrong type, omitted/fabricated field, extra field, wrong value, or wrong required order fails evaluation. Missing, extra or fabricated `missing_links` are scored. Fixture-derived example identities and answers must not appear in any model-visible schema illustration.
 
-### 3.2 T5-T8 data-dependency proof
+### 3.2 T5–T8 information-dependency and leakage proof
 
-For every T5-T8 scenario, a deterministic structural validator must prove:
+For each proposed primary scenario the deterministic verifier must:
 
-1. the later request argument (typically `record_id`) is absent from the prompt, tool descriptions and model-visible context;
-2. the argument is not derivable from a stable rule stated in the prompt;
-3. the argument is produced by the earlier tool result under the frozen task algorithm;
-4. removing or corrupting the earlier tool result makes the scenario unsolvable or changes the selected identity;
-5. no alternative valid sequence selects a different canonical answer;
-6. the scenario has exactly one expected final projection under the task rules.
+1. Retrieve the actual serialized non-trace observation set from the **pinned genuine MCP**: `decision.search(query="")` under every permitted lifecycle filter, `get` of visible IDs, `applicable_to` over all declared scopes and every explicitly disclosed prompt parameter (including `p_T6` and the seed A ID). The union must lack the trace-only data required to compute the expected answer or selected subset.
+2. Prove that the model-visible prompt, schemas and rendered request (after NFKC, Unicode casefolding and deletion of `- _ . : /` and whitespace for identity-leak checks) do not disclose derived target IDs, candidate-to-path membership, any relevant rule payload or applicability, or T7's chained path. Only `p_T6` and T7 seed A may be supplied where explicitly declared.
+3. Prove T5's answer requires one trace, T6's exact predicate requires traces for all `m` candidates (including zero-match), T7's path must be produced by `trace(A)` and yield exactly one B through genuine applicability, and T8 requires each of its `k` selected traces. Show that counterfactually removing the requisite trace output prevents full scoring or changes the correct answer.
+4. Reject scenarios where payloads, applicability paths or the disclosed `p_T6` are repeated in searchable canonical record text, source locators, initial prompts, task examples or tool metadata such that a non-trace result suffices. For T6 specifically, verify `search(p_T6)` and `applicable_to(paths=[p_T6])` cannot identify membership.
+5. Confirm unique deterministic ground truth with a genuine pinned-MCP replay and independently checked answer projection (`6.2). Do **not** independently implement a runtime decision resolver or invent authority.
+6. Retain failure logs, per-tool field-availability evidence and a verifiable dependency graph. No reference call sequence may be required of either arm; a `search("")` dump is allowed and measured.
 
-The validator records a dependency graph and a counterfactual result. A scenario without a proven dependency fails corpus review.
+Failure of any requirement rejects the scenario before corpus freeze. This is a specification only; no validator or red-team/model call is claimed to exist.
 
 ## 4. Scenario schema and manifest
 
@@ -178,9 +185,9 @@ The scenario manifest above is a **private orchestration/evaluator artifact**, n
 - the same frozen required-final-answer JSON schema and task-operation constraints for both arms;
 - arm-specific tool interface descriptions (four direct read tools or one Code Mode interface) whose differences are included in the measured intervention.
 
-The `model_task_payload` MUST be generated from a dedicated projection schema, **not** by serializing the full scenario and deleting known secret fields. The prompt, system/developer instructions, tool definitions, model-facing wrapper and submitted request body must be inspected as a whole, after all interpolation, before dispatch. The expected-answer record and evaluator/oracle only enter the trusted scorer **after** the model response. Genuine MCP tool results may legitimately disclose identities retrieved at runtime; the prohibition is on advance disclosure through scenario metadata or prompts. Explicit IDs for T1/T4 remain allowed, while T5-T8 subsequent target IDs remain withheld until the preceding MCP result.
+The `model_task_payload` MUST be generated from a dedicated projection schema, **not** by serializing the full scenario and deleting known secret fields. The prompt, system/developer instructions, tool definitions, model-facing wrapper and submitted request body must be inspected as a whole, after all interpolation, before dispatch. The expected-answer record and evaluator/oracle only enter the trusted scorer **after** the model response. Genuine MCP tool results may legitimately disclose identities retrieved at runtime; the prohibition is on advance disclosure through scenario metadata or prompts. Explicit IDs for T1/T4 and T7 seed A remain allowed; T6's exact predicate path p_T6 may also be disclosed. All derived/answer target IDs and T7's chained path remain withheld until genuine MCP results.
 
-**Mandatory preflight (synthetic, no model/API call):** place a unique secret canary only in the private `expected`/oracle metadata of a test scenario; render both Direct and Code Mode model-facing requests; assert that the canary and all forbidden metadata keys are absent from every request component and tool description. Assert that any attempt to pass the full scenario object, any unknown projection key, or a leaked subsequent `record_id` for T5-T8 fails closed. Preserve projection-schema hash, rendered-request hashes, allowlist tests and leakage-verifier results. These are specifications for future tests, **not** completed evidence. The model-facing projection is distinct from the actual Decision MCP fixture, which remains available only through the genuine MCP read methods.
+**Mandatory preflight (synthetic, no model/API call):** place a unique secret canary only in the private `expected`/oracle metadata of a test scenario; render both Direct and Code Mode model-facing requests; assert that the canary and all forbidden metadata keys are absent from every request component and tool description. Assert that any attempt to pass the full scenario object, any unknown projection key, or a leaked derived target `record_id` for T5-T8 fails closed (except the explicitly declared T7 seed A). Preserve projection-schema hash, rendered-request hashes, allowlist tests and leakage-verifier results. These are specifications for future tests, **not** completed evidence. The model-facing projection is distinct from the actual Decision MCP fixture, which remains available only through the genuine MCP read methods. Prohibit real fixture-derived answer examples in shared schema text; perform normalization-aware (NFKC, casefold, separator-insensitive) leakage validation.
 
 ## 5. Corpus adequacy and coverage
 
@@ -238,7 +245,7 @@ The corpus review must show that T5-T8 are materially data-dependent and not rew
 ### 6.2 Ground-truth consistency acceptance
 
 - 100% of frozen expected answers must be independently re-derived from the frozen corpus by the evaluator or a reviewer-owned oracle and match field-for-field.
-- Every expected field must trace to a canonical fixture field; no expected value may come from model output or generator-private convenience logic.
+- Every expected field must trace to the genuine pinned MCP fixture and serialized outputs; no expected value may come from model output or generator-private convenience logic. For search and applicability membership (especially T7), a deterministic genuine-MCP replay and the independently written evaluator projection must agree exactly; disagreement blocks freeze. The evaluator is a cross-check/scorer, **never** a replacement runtime resolver under ADR-023.
 - A reviewer must re-derive a predeclared sample of scenarios without using generator-private helpers.
 - Mutation coverage must show that changing any required identity field causes evaluator failure.
 - Any mismatch between generator expected output and independent derivation blocks corpus freeze.
@@ -255,6 +262,9 @@ The evaluator test suite must include at least:
 - wrong context scope;
 - wrong derived rule ID;
 - wrong declared evidence selector/hash;
+- omitted or fabricated `missing_links` entry;
+- T6 predicate case where `c=0`, partial or all candidates match, with exact `include_paths` membership;
+- T7 correct seed A but wrong trace-derived path or wrongly selected B;
 - fabricated missing field;
 - missing required field;
 - extra field where the schema forbids extras;
@@ -303,9 +313,9 @@ Shared boilerplate alone is not a reason to pass a near-duplicate. Report both t
 For every scenario:
 
 - expected decision IDs, version IDs, digests, rule IDs and evidence selectors must not appear in prompt or tool descriptions unless the task explicitly requires the ID;
-- no later-call argument may be pre-filled in the prompt for T5-T8;
+- no derived/answer-target argument may be pre-filled in the prompt for T5-T8 (T7 seed A and T6 predicate p_T6 are the only declared input exceptions);
 - no expected answer may be recoverable from a prompt-only string match;
-- the dependency proof in Section 3.2 and the model-visible projection in Section 4.1 must pass;
+- the information-dependency proof in Section 3.2 and the model-visible projection in Section 4.1 must pass;
 - the model must not receive a hidden answer file, prior transcript or evaluator output.
 
 ### 7.4 B0-M overlap
@@ -359,6 +369,9 @@ Required sign-off before any freeze proposal:
 | Evidence density | TBD | Coverage review |
 | Missing-link density | TBD | Trace coverage review |
 | Ambiguity bins | TBD | Task-rule review |
+| T6 m / c bins, disclosed p_T6 | TBD; one disclosed predicate allowed | Prepilot corpus quota/leakage approval |
+| T8 k bins | TBD | Fan-out quota review |
+| E-1 1/4 family weights | Proposed, not accepted | Independent statistics/human decision |
 | Search/applicable cardinality bins | TBD | Coverage review |
 | Near-duplicate thresholds | 5-token Jaccard, 0.60/0.80 proposed | Corpus review and approval |
 | Evaluator implementation | TBD | Separate implementation and test review |
