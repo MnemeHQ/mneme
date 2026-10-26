@@ -1211,6 +1211,10 @@ def build_evidence_record(
             "trusted": payload is not None,
             "problem": assessment.problem if assessment is not None else "check not run",
             "subject": subject,
+            # ADR-034 §7b.3: completeness is reported apart from relevance.
+            "evaluation_complete": (
+                payload.get("evaluation_complete", True) if payload is not None else None
+            ),
         },
         "rules": rules,
         "violations": violations,
@@ -1251,31 +1255,22 @@ def _decided_numeric_rule(rule: Any, subject: Dict[str, Any], digest: str) -> bo
     return False
 
 
-def relevant_enforcement_observed(
-    record: Any,
-    pinned_host: tuple,
-) -> bool:
-    """Can this record support "relevant enforcement observed" (ADR-029)?
+def _common_bindings_hold(record: Any, pinned_host: tuple) -> bool:
+    """The record-wide ADR-029 bindings every per-rule claim shares.
 
-    Fail closed (ADR-029 §2, ADR-034 §7a, G2-1 charter §5.2/§6.2). Every
-    binding must be present and coherent:
+    Fail closed (ADR-029 §2, ADR-034 §7a, G2-1 charter §5.2/§6.2):
 
     - this surface and schema, and the pinned host identity
       ``(version, executable_sha256)``;
     - a ``Write`` event whose target (``file_path``, resolved against the
       recorded ``cwd`` when relative) is the subject's verified-absent target;
     - a trusted ``proposed_new_source`` subject whose digest, and every
-      numeric rule's digest, equal the carrier digest;
-    - every APPLIED numeric rule complete, coherent and decided: an
-      unevaluated rule never counts just because it applied;
-    - the reported numeric violations are exactly the rules whose matcher
-      outcome is VIOLATION, and the hook disposition is attributable to them:
-      ``refused``/``deferred`` only with a numeric violation, ``proceeded``
-      only with none. A refusal caused only by another rule is never
-      attributed to the numeric rule.
+      numeric rule's digest and governed path, equal the carrier's;
+    - uniquely identified rule records, and reported numeric violations that
+      are exactly the rules whose matcher outcome is VIOLATION;
+    - a recognized hook outcome, mode and disposition cause.
 
-    Anything else stays at "execution observed" or below. Recording the
-    identity does not authenticate it.
+    Matcher completeness is not checked here: it is per rule (ADR-034 §7b).
     """
     try:
         pinned_version, pinned_sha256 = pinned_host
@@ -1295,8 +1290,7 @@ def relevant_enforcement_observed(
             return False
         if not isinstance(event.get("identifiers"), dict):
             return False
-        outcome = record.get("hook_outcome")
-        if outcome not in _HOOK_OUTCOMES:
+        if record.get("hook_outcome") not in _HOOK_OUTCOMES:
             return False
         checker = record["checker"]
         subject = checker.get("subject")
@@ -1323,9 +1317,16 @@ def relevant_enforcement_observed(
         rules = record["rules"]
         if not isinstance(rules, list) or not rules:
             return False
-        if not all(_decided_numeric_rule(rule, subject, digest) for rule in rules):
+        if not all(isinstance(r, dict) and _nonempty_str(r.get("rule_id")) for r in rules):
             return False
-        violated = {r["rule_id"] for r in rules if r["matcher_outcome"] == "VIOLATION"}
+        if len({r["rule_id"] for r in rules}) != len(rules):
+            return False
+        for rule in rules:
+            if rule.get("subject_sha256") != digest:
+                return False
+            if rule.get("governed_path") != subject.get("governed_path"):
+                return False
+        violated = {r["rule_id"] for r in rules if r.get("matcher_outcome") == "VIOLATION"}
         reported = record["violations"]
         if not isinstance(reported, list) or not all(isinstance(v, dict) for v in reported):
             return False
@@ -1334,20 +1335,107 @@ def relevant_enforcement_observed(
         }
         if reported_numeric != violated:
             return False
-        # The disposition must be the numeric result's own (G2I-F3): an
-        # availability refusal or another rule's block is never attributed
-        # to the numeric rule, whatever the matcher found.
         disposition = record["disposition"]
-        mode, cause = disposition.get("mode"), disposition.get("cause")
-        if mode not in _VALID_MODES or cause not in _DISPOSITION_CAUSES:
-            return False
-        if outcome == "refused":
-            return mode == "strict" and cause == "numeric_violation" and bool(violated)
-        if outcome == "deferred":
-            return mode == "warn" and cause == "numeric_violation" and bool(violated)
-        return cause == "no_violation" and not violated and not reported
+        return (
+            disposition.get("mode") in _VALID_MODES
+            and disposition.get("cause") in _DISPOSITION_CAUSES
+        )
     except (AttributeError, KeyError, TypeError, ValueError, OSError):
         return False
+
+
+def _disposition_attributable(rule: Dict[str, Any], record: Dict[str, Any]) -> bool:
+    """The hook disposition is this rule's own outcome (G2-1 A1.3, G2I-F3).
+
+    A violation is attributable only to a strict refusal or a warn deferral
+    the hook made for a numeric violation reported against this rule. A
+    recognized non-violation is attributable only to a complete trusted PASS
+    that proceeded. An availability refusal or another rule's block is never
+    attributed to this rule, whatever its matcher found.
+    """
+    outcome = record["hook_outcome"]
+    disposition = record["disposition"]
+    mode, cause = disposition.get("mode"), disposition.get("cause")
+    if rule["matcher_outcome"] == "VIOLATION":
+        named = any(
+            v.get("rule_id") == rule["rule_id"] and v.get("rule_type") == _NUMERIC_RULE_TYPE
+            for v in record["violations"]
+        )
+        if not named or cause != "numeric_violation":
+            return False
+        if outcome == "refused":
+            return mode == "strict"
+        if outcome == "deferred":
+            return mode == "warn"
+        return False
+    return outcome == "proceeded" and cause == "no_violation" and not record["violations"]
+
+
+def relevant_enforcement_per_rule(
+    record: Any,
+    pinned_host: tuple,
+) -> Dict[str, bool]:
+    """Per-rule "relevant enforcement observed" (ADR-029, ADR-034 §7b).
+
+    Authoritative. Keyed by ``rule_id`` for each numeric rule the record
+    carries. Rule R is ``True`` only when the common bindings hold, R is
+    APPLIED and its matcher record is complete and decided (``RECOGNIZED``,
+    or ``PARTIAL`` with an established violation), and the hook disposition
+    is attributable to R.
+
+    An unevaluated, ``EXCLUDED`` or unrelated rule is ``False``, even when
+    another rule in the same event is ``True``: no rule inherits another
+    rule's relevance. A malformed record yields ``{}`` or all ``False``.
+    Recording the identity does not authenticate it.
+    """
+    try:
+        keyed = {
+            r["rule_id"]: r for r in record["rules"]
+            if isinstance(r, dict) and _nonempty_str(r.get("rule_id"))
+        }
+    except (KeyError, TypeError):
+        return {}
+    if not _common_bindings_hold(record, pinned_host):
+        return {rule_id: False for rule_id in keyed}
+    subject = record["checker"]["subject"]
+    digest = record["carrier_sha256"]
+    return {
+        rule_id: _decided_numeric_rule(rule, subject, digest)
+        and _disposition_attributable(rule, record)
+        for rule_id, rule in keyed.items()
+    }
+
+
+def relevant_enforcement_observed(
+    record: Any,
+    pinned_host: tuple,
+) -> bool:
+    """Event-level "relevant enforcement observed" (ADR-034 §7b, existential).
+
+    ``True`` if and only if at least one applied numeric rule has per-rule
+    relevance ``True`` (:func:`relevant_enforcement_per_rule`). It never
+    claims that every applied rule was evaluated, that the action is
+    compliant, or anything about another rule; completeness is a separate
+    fact (:func:`recorded_evaluation_complete`). Anything else stays at
+    "execution observed" or below.
+    """
+    return any(relevant_enforcement_per_rule(record, pinned_host).values())
+
+
+def recorded_evaluation_complete(record: Any) -> Optional[bool]:
+    """The checker's record-wide ``evaluation_complete`` (ADR-034 §4, §7b.3).
+
+    Reported apart from relevance and never implied by it. ``None`` when the
+    record carries no trusted boolean value.
+    """
+    try:
+        checker = record["checker"]
+        if checker.get("trusted") is not True:
+            return None
+        value = checker.get("evaluation_complete")
+    except (AttributeError, KeyError, TypeError):
+        return None
+    return value if isinstance(value, bool) else None
 
 
 def _write_evidence(
