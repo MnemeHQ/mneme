@@ -971,13 +971,20 @@ def hook_parity_applies(case: Case, has_cr: bool) -> bool:
 
 
 def expects_block(case: Case) -> bool:
-    """G1(a) (revision 2, G2V-F1; G2H-F2): every strict V and VP case, and every
-    case of any class whose labels expect a block (exit 2 or a refusal). An
-    A1.4 case, whose outcome is observed from the baseline, carries no block
-    expectation."""
+    """G1(a) (revision 2, G2V-F1; G2H-F2, G2H-F4), in this order:
+
+    1. every strict V and VP case must block. This class-level safety gate is
+       checked first, and no label, ``expected_from_baseline`` included, can
+       switch it off;
+    2. every case of any class whose labels explicitly expect a block (exit 2
+       or a refusal) must block, whatever else its labels say.
+
+    The A1.4 exemption needs no rule of its own. A genuine legacy-error case
+    has its outcome observed from the baseline (``observed_from_baseline``),
+    so it carries no block expectation and falls through to False. It never
+    suppresses (1) or (2).
+    """
     e = case.expected
-    if e.get("expected_from_baseline") is True:
-        return False
     if case.klass in ("V", "VP") and e.get("hook_mode") == "strict":
         return True
     return e.get("hook_exit") == 2 or e.get("hook_disposition") == "refused" \

@@ -546,14 +546,43 @@ def test_g1a_any_labelled_block_expectation_in_any_class_counts(klass, label):
     assert "a:expected_block_not_refused" not in blocked["gates"]["G1"]["why"]
 
 
-def test_g1a_a14_baseline_observed_error_is_not_a_block_expectation():
+def test_g1a_a14_legacy_error_case_is_not_a_block_expectation():
+    # A genuine A1.4 case (e.g. lone-surrogate L): outcome observed from the baseline.
     case = make_case("L", expected_from_baseline=True, hook_exit="observed_from_baseline",
-                     hook_disposition="observed_from_baseline")
+                     hook_disposition="observed_from_baseline", evidence_hook_outcome=None)
     assert h.expects_block(case) is False
-    strict_v_a14 = make_case("V", expected_from_baseline=True)
-    assert h.expects_block(strict_v_a14) is False
+    for impl in (hook_obs(1, "error", stderr=tb("/a", 2).encode()), hook_obs(0)):
+        result = h.score_case(case, obs_of(impl, hook_obs(1, "error", stderr=tb("/b", 1).encode())),
+                              HOST)
+        assert "a:expected_block_not_refused" not in result["gates"]["G1"]["why"]
     assert h.expects_block(make_case("V")) is True
     assert h.expects_block(make_case("C")) is False
+
+
+@pytest.mark.parametrize("klass", ["V", "VP"])
+@pytest.mark.parametrize("extra", [
+    {},
+    {"hook_exit": "observed_from_baseline", "hook_disposition": "observed_from_baseline"},
+    {"hook_exit": 0, "hook_disposition": "proceeded", "evidence_hook_outcome": "proceeded"},
+])
+def test_g1a_strict_v_and_vp_cannot_be_exempted_by_expected_from_baseline(klass, extra):
+    # G2H-F4: the class-level safety gate is checked first; no label switches it off.
+    case = make_case(klass, expected_from_baseline=True, **extra)
+    assert h.expects_block(case) is True
+    for impl in (hook_obs(0, "proceeded"), hook_obs(1, "error", stderr=tb("/a", 2).encode())):
+        result = h.score_case(case, obs_of(impl), HOST)
+        assert "a:expected_block_not_refused" in result["gates"]["G1"]["why"]
+        assert not result["gates"]["G1"]["pass"]
+    blocked = h.score_case(case, obs_of(hook_obs(2, "refused")), HOST)
+    assert "a:expected_block_not_refused" not in blocked["gates"]["G1"]["why"]
+
+
+@pytest.mark.parametrize("klass", ["C", "L", "LIT", "X"])
+def test_g1a_explicit_block_label_is_never_suppressed_by_expected_from_baseline(klass):
+    case = make_case(klass, expected_from_baseline=True, hook_exit=2)
+    assert h.expects_block(case) is True
+    result = h.score_case(case, obs_of(hook_obs(0, "proceeded")), HOST)
+    assert "a:expected_block_not_refused" in result["gates"]["G1"]["why"]
 
 
 def test_g1b_nonclean_expected_observed_no_violation():
