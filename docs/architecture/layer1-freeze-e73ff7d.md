@@ -1392,6 +1392,12 @@ remain unchanged.
     resolution stay `AMBIGUOUS_BINDING` and are never clean;
   - class-body execution order, and any binding static analysis cannot
     establish, **fail closed**.
+- **Outcome boundary:** D2 may change a strict-mode refusal or warn-mode
+  defer solely because corrected function-source resolution changes a
+  previously unevaluated result into a recognized numeric violation. This is
+  an authorized consequence of the matcher change, **not** permission to
+  change the hook's blocking logic, exit-code mapping, availability handling
+  or strict/warn policy. D1 remains evidence-only.
 - **Pinned regressions:**
   - scope-resolution cases: class body versus method, parameter, nested
     function, enclosing scope, comprehension, `global`/`nonlocal`, dynamic
@@ -1438,9 +1444,11 @@ implemented.
 
 - Any change to the `symbol` source's resolution. Under §3a that stays
   undecided.
-- Any change to blocking decisions, availability policy (ADR-033),
-  `FORBID_LITERAL`, `DecisionRetriever`, `ConflictDetector`, persistence or
-  rule identity.
+- Any independent change to hook blocking logic, exit-code mapping,
+  strict/warn policy or availability policy (ADR-033), beyond the hook
+  outcomes necessarily resulting from D2's scoped matcher recognition.
+  No change to `FORBID_LITERAL`, `DecisionRetriever`, `ConflictDetector`,
+  persistence or rule identity.
 - Any change to the pinned M4 or G2-1 harnesses or evidence, or re-scoring
   of any sealed or revealed corpus.
 - Implementation by any session or person with access to the G2-1 held-out
