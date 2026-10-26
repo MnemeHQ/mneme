@@ -1,6 +1,7 @@
 # ADR-034 G2-1 revalidation pre-registration (R2: corrected build, new held-out corpus)
 
 **Date:** 2026-10-26
+**Amended:** 2026-10-26, Amendment 1 (the owner's rulings on the R2 ambiguity brief); see the end of this file
 **Status:** PROPOSED. Once merged, this pre-registration is frozen, and with
 it the corrected implementation it pins. Changing it afterwards needs a
 dated, owner-approved amendment that is merged **before** decryption. No
@@ -332,3 +333,85 @@ G2-1 closes only on a PASS results record from R2, or from a later round.
 - A new G1 (whole-file audit) claim. M4's PASS stays evidence for its own
   pinned build only (freeze amendment #670).
 - Activating `FORBID_NUMERIC_ABOVE` in this repository's memory.
+
+## Amendment 1: owner rulings on the R2 ambiguity brief (2026-10-26)
+
+**Status:** this amendment must merge **before sealing**, and therefore
+before any decryption. It records the owner's rulings on the R2 corpus
+author's sanitized ambiguity brief (AMB-R2-01 to AMB-R2-12). No gate is
+loosened, no floor is lowered, and no class is added or removed.
+
+The owner made these rulings without opening any corpus material. Every
+ruling confirms the corpus's reading as reported, so the expected changes to
+labels are none. The author still reconciles before sealing (R1-PR A1.6).
+
+### R2A1.1 Labelling rulings
+
+| Item | Ruling |
+|---|---|
+| **AMB-R2-01** Routed fallback | The expected applied-rule set (§4.1) is defined by ADR-020 applicability at the target, not by whether the matcher succeeds. For a routed event whose checker falls back to the legacy path, the set holds every numeric rule `APPLIED` at the target, and is **not** `{}`. Each such rule is `MATCHER_UNEVALUATED`, with per-rule relevance `false`. The event-level value is `false`, and so is `evaluation_complete` |
+| **AMB-R2-02** Missing target or parent | ADR-020 §6's "input path is missing" means that **no input path was supplied**. It does not mean that the target file or its parent doesn't exist. Applicability for such a target follows its selectors |
+| **AMB-R2-03** Outside the policy root | Memory discovery starts at the target's parent (charter §2; A1.1). If no memory is found, the event is unrouted: no checker call, exit 0, no record |
+| **AMB-R2-04** Attribute store with the governed name | `obj.<NAME> = ...` is an attribute store. It is **not** a binding of the governed name. This holds both for the symbol source (it is not a §3 "rebinding") and for the function source (no call site resolves to it under §3a). String literals that spell the name, and words such as `globals`, `exec` or `global` used as data, are plain data |
+
+### R2A1.2 Scoring and harness rulings
+
+| Item | Ruling |
+|---|---|
+| **AMB-R2-05** Unknown-source reasons | Each rule's distinct unknown-source reasons are compared for **set** equality. G4 gates only the **primary** reason |
+| **AMB-R2-06** Memory delivery | Fixtures ship ADR source files. Each fixture's `.mneme/project_memory.json` is compiled with the pinned implementation build's own ADR import, and the **same** compiled file is used for the baseline build. A compile failure is a G8 case failure, never an exclusion |
+| **AMB-R2-07** `rule_id` derivation | Expected `rule_id` values come from the ADR-034 §5 identity formula. The `rule_id` of a rule that appears only as `EXCLUDED` is informational and not gated. Rule IDs inside an expected applied-rule set stay gated by G6 (R2V-F3) |
+| **AMB-R2-08** Cause vocabulary | Mapping the record's cause field onto the corpus's `expected_cause` values is a harness matter. The mapping is fixed in the R2 harness PR and reviewed there, before decryption. Changing it after decryption voids blind status (§6) |
+
+### R2A1.3 Stated noncoverage (AMB-R2-09, AMB-R2-10)
+
+The R2 corpus contains none of the following function-source shapes, and
+R2 makes no claim for them:
+
+- **(a)** a direct call with too few positional arguments for the declared
+  position, or one using `*args` / `**kwargs`;
+- **(b)** a direct call to the governed name in a module that has no `def`
+  of it, or that binds the name only through an import;
+- **(c)** a class-body statement that calls the name before the class body
+  binds it;
+- **(d)** the name used as a decorator;
+- **(e)** a call site that resolves to the declaration and exceeds the
+  bound, in a module where a module-level rebinding, escape or `global`
+  makes the whole source `AMBIGUOUS_BINDING`. Here ADR-034 §3a rules 2 and
+  3 point different ways, so (e) is **deferred to a later ADR-034
+  ruling**. No R2 label depends on it.
+
+**Symbol source.** Every symbol-source binding in the corpus is a
+module-level assignment statement (AMB-R2-10). That is consistent with §4.1:
+no label depends on the undecided symbol question.
+
+### R2A1.4 Information and isolation
+
+- **Noted:** AMB-R2-11 (line endings and parsing at CPython 3.12.10) and
+  AMB-R2-12 (13 public smoke cases, one per class, 8.33%) are information
+  only.
+- **Isolation disclosure accepted.** The R2 corpus author disclosed that it
+  read ADR-019. ADR-019 was on neither the allowed nor the barred list, and
+  the author read it for `FORBID_LITERAL` directive syntax. It is a public
+  ADR with no G2-1 case content, labels or diagnosis evidence. The owner
+  accepts the disclosure. The author's isolation statement records it.
+
+### R2A1.5 Reconciliation before sealing
+
+**What the author reconciles.** The author re-checks every case each item
+touches, then re-checks every concealed class floor and the 120 total. It
+reports counts only.
+
+**The authored counts.** The corpus as authored has 143 concealed and 13
+public cases, and every floor is met. The freeze record states the final
+counts.
+
+**When sealing may start.** Only after all three of these:
+
+1. this amendment merges;
+2. the author reports reconciliation;
+3. the orchestrator gives an explicit seal go-ahead.
+
+**What sealing removes.** At sealing, the author's `_authoring/` material is
+deleted together with the plaintext. That material holds the generator, the
+salt and the name map.
