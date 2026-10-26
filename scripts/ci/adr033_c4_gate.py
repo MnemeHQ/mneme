@@ -157,9 +157,13 @@ def normalize_surface(entries: list[str]) -> tuple[tuple[str, ...], tuple[str, .
     """Split trusted-surface entries into files and ``dir/`` prefixes."""
     files, dirs = list(BASE_SURFACE_FILES), list(BASE_SURFACE_DIRS)
     for e in entries:
-        if path_problem(e.rstrip("/")):
+        # Exactly one trailing slash marks a directory; the rest must itself be
+        # a normalized path, so ``gate//`` or ``/`` is invalid, not ``gate/``.
+        is_dir = isinstance(e, str) and e.endswith("/")
+        core = e[:-1] if is_dir else e
+        if not isinstance(e, str) or path_problem(core):
             raise GateError(f"invalid trusted-surface entry {e!r}")
-        (dirs if e.endswith("/") else files).append(e)
+        (dirs if is_dir else files).append(e)
     return tuple(files), tuple(dirs)
 
 
@@ -580,10 +584,13 @@ def verify_report(report: Any, *, adapter_exit: Any, expected: dict[str, Any], p
         "base_sha": report["base_sha"], "head_sha": report["head_sha"],
         "requested_mode": report["requested_mode"],
         "adapter_sha256": (report["adapter"] or {}).get("sha256"),
+        "evaluator_commit": (report["evaluator"] or {}).get("commit"),
         "evaluator_wheel_sha256": (report["evaluator"] or {}).get("wheel_sha256"),
     }
     for key, value in pins.items():
-        if key in expected and value != expected[key]:
+        if not expected.get(key):
+            problems.append(f"no trusted {key} to check the report against")
+        elif value != expected[key]:
             problems.append(f"report {key} {value!r} != trusted {expected[key]!r}")
     trusted_posture = resolve_posture(posture_raw)["effective"]
     reported_posture = (report["posture"] or {}).get("effective")
@@ -654,7 +661,8 @@ def _cmd_verify(args: argparse.Namespace) -> int:
     except OSError:
         summary = None
     expected = {"base_sha": args.base_sha, "head_sha": args.head_sha, "requested_mode": args.mode,
-                "adapter_sha256": args.adapter_sha256, "evaluator_wheel_sha256": args.evaluator_wheel_sha256}
+                "adapter_sha256": args.adapter_sha256, "evaluator_commit": args.evaluator_commit,
+                "evaluator_wheel_sha256": args.evaluator_wheel_sha256}
     try:
         adapter_exit: Any = int(args.adapter_exit)
     except ValueError:
@@ -702,6 +710,7 @@ def main(argv: list[str] | None = None) -> int:
     vr.add_argument("--head-sha", required=True)
     vr.add_argument("--mode", required=True, choices=VALID_MODES)
     vr.add_argument("--adapter-sha256", required=True)
+    vr.add_argument("--evaluator-commit", required=True)
     vr.add_argument("--evaluator-wheel-sha256", required=True)
     vr.add_argument("--summary", type=Path, help="the job summary the evaluate step wrote")
     vr.set_defaults(func=_cmd_verify)

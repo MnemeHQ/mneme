@@ -147,7 +147,7 @@ def run(tmp: Path, repo: Path, base: str, head: str, *, mode="strict", posture="
 def expected_pins(report: dict) -> dict:
     return {"base_sha": report["base_sha"], "head_sha": report["head_sha"],
             "requested_mode": report["requested_mode"], "adapter_sha256": gate.adapter_identity()["sha256"],
-            "evaluator_wheel_sha256": EVALUATOR["wheel_sha256"]}
+            "evaluator_commit": EVALUATOR["commit"], "evaluator_wheel_sha256": EVALUATOR["wheel_sha256"]}
 
 
 def decision(report: dict, posture: str | None, *, adapter_exit=None, summary: str | None = "auto", **override):
@@ -270,11 +270,21 @@ def test_existing_workspace_is_unevaluated_not_reused(tmp_path, stub):
     assert (f["classification"], f["kind"], report["disposition"]) == ("UNEVALUATED", "workspace", "failure")
 
 
-def test_invalid_trusted_surface_entry_refuses(tmp_path, stub):
-    repo, base, head = build_repo(tmp_path, changes=[{"op": "write", "path": "docs/a.md", "content": "c4-case:strict_pass\n"}])
-    report = run(tmp_path, repo, base, head, posture="open", surface=["../gate/"])
-    assert report["aggregate"]["classification"] == gate.REFUSED
+@pytest.mark.parametrize("entry", ["../gate/", "gate//", "gate///", "/", "//", "", "gate/../x/", "./gate/",
+                                   "gate\\", "/gate/", "gate//x.py", "docs/\udcff/"])
+def test_invalid_trusted_surface_entry_refuses(tmp_path, stub, entry):
+    """Review finding 2 on #679: ``gate//`` used to pass validation and protect nothing."""
+    repo, base, head = build_repo(tmp_path, changes=[{"op": "write", "path": "gate/config.py", "content": "c4-case:strict_pass\n"}])
+    report = run(tmp_path, repo, base, head, posture="open", surface=[entry])
+    assert (report["aggregate"]["classification"], report["disposition"]) == ("REFUSED", "failure")
     assert report["gate_conditions"][0]["kind"] == "change_list"
+
+
+@pytest.mark.parametrize("entry,protected", [("gate/", "gate/config.py"), ("tools/pin.txt", "tools/pin.txt"),
+                                              ("a/b/", "A/B/c.py")])
+def test_valid_trusted_surface_entries_protect_their_paths(entry, protected):
+    surface = gate.normalize_surface([entry])
+    assert gate.path_refusal(protected, surface)[0] == "trusted_surface"
 
 
 # ── O9p: unnormalizable paths (git cannot store most of these) ───────────────
@@ -468,10 +478,26 @@ def test_decision_accepts_a_consistent_open_unevaluated_report(open_unevaluated)
 
 @pytest.mark.parametrize("override", [
     {"base_sha": "f" * 40}, {"head_sha": "f" * 40}, {"requested_mode": "warn"},
-    {"adapter_sha256": "0" * 64}, {"evaluator_wheel_sha256": "0" * 64},
+    {"adapter_sha256": "0" * 64}, {"evaluator_commit": "1" * 40}, {"evaluator_wheel_sha256": "0" * 64},
 ])
 def test_decision_rejects_pin_mismatch(open_unevaluated, override):
     assert decision(open_unevaluated, "open", **override)
+
+
+def test_decision_rejects_a_report_with_the_wrong_evaluator_commit(open_unevaluated):
+    """Review finding 1 on #679: the wheel hash alone is not the evaluator identity."""
+    forged = json.loads(json.dumps(open_unevaluated))
+    forged["evaluator"]["commit"] = "1" * 40
+    assert any("evaluator_commit" in p for p in decision(forged, "open"))
+
+
+@pytest.mark.parametrize("key", ["base_sha", "head_sha", "requested_mode", "adapter_sha256",
+                                 "evaluator_commit", "evaluator_wheel_sha256"])
+def test_decision_requires_every_trusted_pin(open_unevaluated, key):
+    expected = {**expected_pins(open_unevaluated), key: ""}
+    problems = gate.verify_report(open_unevaluated, adapter_exit=0, expected=expected, posture_raw="open",
+                                  summary_text=gate.summary_markdown(open_unevaluated))
+    assert any(f"no trusted {key}" in p for p in problems)
 
 
 def test_decision_rejects_a_report_whose_posture_differs_from_the_trusted_posture(open_unevaluated):
@@ -552,7 +578,7 @@ def test_cli_launch_failure_then_decision(tmp_path, posture, evaluate_exit, deci
     vr = _cli("verify-report", "--report", str(report), "--adapter-exit", str(ev.returncode),
               "--base-sha", base, "--head-sha", head, "--mode", "strict",
               "--adapter-sha256", hashlib.sha256(ADAPTER_PATH.read_bytes()).hexdigest(),
-              "--evaluator-wheel-sha256", EVALUATOR["wheel_sha256"], "--summary", str(summary),
+              "--evaluator-commit", EVALUATOR["commit"], "--evaluator-wheel-sha256", EVALUATOR["wheel_sha256"], "--summary", str(summary),
               env_posture=posture)
     assert vr.returncode == decision_exit, vr.stdout + vr.stderr
 
@@ -560,7 +586,7 @@ def test_cli_launch_failure_then_decision(tmp_path, posture, evaluate_exit, deci
 def test_cli_decision_fails_on_a_missing_report(tmp_path):
     vr = _cli("verify-report", "--report", str(tmp_path / "none.json"), "--adapter-exit", "0",
               "--base-sha", "a", "--head-sha", "b", "--mode", "strict", "--adapter-sha256", "c",
-              "--evaluator-wheel-sha256", "d", env_posture="open")
+              "--evaluator-commit", "e", "--evaluator-wheel-sha256", "d", env_posture="open")
     assert vr.returncode == 1 and "::error" in vr.stdout
 
 

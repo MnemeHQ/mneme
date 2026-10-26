@@ -55,7 +55,9 @@ Paths are classified before file types (A1):
 4. A symlink, submodule or other non-regular entry elsewhere is UNEVALUATED.
 5. Every other file is evaluated.
 
-If the change list itself cannot be established, the result is REFUSED.
+If the change list itself cannot be established, or a `--trusted-surface`
+entry is not a normalized path (a directory takes exactly one trailing `/`, so
+`gate//` is invalid), the result is REFUSED.
 
 Per-file results combine as REFUSED > strict VIOLATION > UNEVALUATED > WARN >
 PASS (A2). Under `strict`, a trusted WARN or FAIL is a strict violation (R1).
@@ -82,12 +84,12 @@ python -I scripts/ci/adr033_c4_gate.py evaluate --repo base --base-sha "$BASE_SH
 `verify-report` is the decision step. It never takes the adapter's exit code
 alone: it re-reads the posture variable, recomputes the aggregate and
 disposition from the per-file results, and checks the base and head SHAs, mode,
-adapter SHA-256 and evaluator wheel SHA-256 against the trusted workflow's
-values. An `open` UNEVALUATED success also needs its `::warning::` annotation
+adapter SHA-256, evaluator commit and evaluator wheel SHA-256 against the
+trusted workflow's values; a missing trusted value fails too. An `open` UNEVALUATED success also needs its `::warning::` annotation
 and job-summary entry. Anything missing or inconsistent fails the check.
 
 ```bash
-python -I scripts/ci/adr033_c4_gate.py verify-report --report "$RUNNER_TEMP/gate-out/gate-report.json" --adapter-exit "$GATE_EXIT" --base-sha "$BASE_SHA" --head-sha "$HEAD_SHA" --mode strict --adapter-sha256 "$ADAPTER_SHA256" --evaluator-wheel-sha256 "$APPROVED_WHEEL_SHA256" --summary "$GITHUB_STEP_SUMMARY"
+python -I scripts/ci/adr033_c4_gate.py verify-report --report "$RUNNER_TEMP/gate-out/gate-report.json" --adapter-exit "$GATE_EXIT" --base-sha "$BASE_SHA" --head-sha "$HEAD_SHA" --mode strict --adapter-sha256 "$ADAPTER_SHA256" --evaluator-commit "$EVALUATOR_COMMIT" --evaluator-wheel-sha256 "$APPROVED_WHEEL_SHA256" --summary "$GITHUB_STEP_SUMMARY"
 ```
 
 Both steps belong to the one genuine required check. The adapter creates no
