@@ -341,18 +341,21 @@ before any decryption. It records the owner's rulings on the R2 corpus
 author's sanitized ambiguity brief (AMB-R2-01 to AMB-R2-12). No gate is
 loosened, no floor is lowered, and no class is added or removed.
 
-The owner made these rulings without opening any corpus material. Every
-ruling confirms the corpus's reading as reported, so the expected changes to
-labels are none. The author still reconciles before sealing (R1-PR A1.6).
+The owner made these rulings without opening any corpus material. As
+first made, every ruling confirmed the corpus's reading. Review of this
+amendment then led the owner to revise AMB-R2-01 (R2A1.6) and the
+function-source part of AMB-R2-04 (R2A1.7). Those revisions change the
+labels of the affected cases. The author reconciles
+before sealing (R1-PR A1.6).
 
 ### R2A1.1 Labelling rulings
 
 | Item | Ruling |
 |---|---|
-| **AMB-R2-01** Routed fallback | The expected applied-rule set (§4.1) is defined by ADR-020 applicability at the target, not by whether the matcher succeeds. For a routed event whose checker falls back to the legacy path, the set holds every numeric rule `APPLIED` at the target, and is **not** `{}`. Each such rule is `MATCHER_UNEVALUATED`, with per-rule relevance `false`. The event-level value is `false`, and so is `evaluation_complete` |
+| **AMB-R2-01** Routed fallback (revised by R2A1-F1, see R2A1.6) | ADR-020 applicability is unchanged. A routed event whose checker falls back to the legacy path, however, never produces a trusted proposed-source evaluation. Its G2 record's expected numeric rule-ID set is therefore `{}`, its per-rule relevance is `{}`, its event-level value is `false`, and its `evaluation_complete` is `null`. The legacy checker behavior is scored under G5 parity, not G6 |
 | **AMB-R2-02** Missing target or parent | ADR-020 §6's "input path is missing" means that **no input path was supplied**. It does not mean that the target file or its parent doesn't exist. Applicability for such a target follows its selectors |
 | **AMB-R2-03** Outside the policy root | Memory discovery starts at the target's parent (charter §2; A1.1). If no memory is found, the event is unrouted: no checker call, exit 0, no record |
-| **AMB-R2-04** Attribute store with the governed name | `obj.<NAME> = ...` is an attribute store. It is **not** a binding of the governed name. This holds both for the symbol source (it is not a §3 "rebinding") and for the function source (no call site resolves to it under §3a). String literals that spell the name, and words such as `globals`, `exec` or `global` used as data, are plain data |
+| **AMB-R2-04** Attribute store with the governed name (function part revised by R2A1-F2, see R2A1.7) | `obj.<NAME> = ...` and `del obj.<NAME>` are attribute operations, not lexical bindings of `NAME`. **Symbol source:** this is not a §3 "rebinding" and has no effect, as originally ruled. **Function source:** when `NAME` is the governed function, `obj` could reference the current module, so the operation is a possible module-namespace mutation; the whole function source is `AMBIGUOUS_BINDING`, never clean (§3a rule 4). String literals that spell the name, and words such as `globals`, `exec` or `global` used as data, are plain data under both sources |
 
 ### R2A1.2 Scoring and harness rulings
 
@@ -415,3 +418,59 @@ counts.
 **What sealing removes.** At sealing, the author's `_authoring/` material is
 deleted together with the plaintext. That material holds the generator, the
 salt and the name map.
+
+### R2A1.6 Owner ruling on review finding R2A1-F1 (2026-10-26)
+
+**Why.** The original AMB-R2-01 ruling read the §4.1 "expected applied-rule
+set" as applicability alone. Under that reading, a routed fallback would
+carry a non-empty set of `MATCHER_UNEVALUATED` rules. The review of this
+amendment found that reading inconsistent with the G2 evidence contract: a
+routed fallback never produces a trusted proposed-source evaluation, so no
+numeric rule is evaluated or serialized in its G2 record.
+
+**The ruling.** The owner ruled that §4.1's expected rule-ID set means the
+numeric rules **actually evaluated against trusted proposed source** and
+carried in the G2 record. It does not mean every rule that applies to the
+file. For a routed event whose checker falls back to the legacy path:
+
+| Field | Expected |
+|---|---|
+| Numeric rules applicable under ADR-020 | Unchanged, and not gated by G6 |
+| Numeric rule-ID set in the G2 evidence record | `{}` |
+| Per-rule relevance | `{}` |
+| Event-level relevance | `false` |
+| `evaluation_complete` | `null` (no trusted value) |
+| Legacy checker behavior, including its numeric trace | Scored under G5 parity |
+
+**What G6 still requires.** A routed fallback must still have exactly one
+G2 record (A1.1). G6 checks that the record exists and matches the table
+above. G6 never expects a numeric evaluation that did not occur.
+
+**Scope.** This ruling corrects the validation expectation only. It changes
+no Mneme implementation, no applicability rule, no class count and no
+gate. The author reconciles the affected L cases (2 concealed, per the
+author's report) before sealing and reports counts only.
+
+### R2A1.7 Owner ruling on review finding R2A1-F2 (2026-10-26)
+
+**Why.** As first made, AMB-R2-04 said an attribute store whose attribute
+name equals the governed function has no effect on the function source. The
+review found that this contradicts ADR-034 §3a rule 4 and the accepted D2
+correction D2R-F1. `obj` may be an alias of the current module, so
+`obj.<NAME> = ...` or `del obj.<NAME>` can rebind the module declaration
+indirectly. Static analysis cannot rule that out.
+
+**The ruling.** The owner ruled as follows.
+
+- **Function source.** An attribute store or delete whose attribute name
+  equals the governed function is not a direct lexical binding. It is,
+  however, a possible module-namespace mutation, so the **whole** function
+  source is `AMBIGUOUS_BINDING` and never clean.
+- **Symbol source.** The §3 interpretation stays unchanged. An attribute
+  assignment is not, by itself, a rebinding of the governed symbol.
+
+**Scope.** This ruling corrects the validation expectation only. It changes
+no Mneme implementation, no class floor and no gate G1–G8. The author
+reconciles the affected SC case (1 concealed, per the author's report),
+confirms every SC floor and outcome minimum is still met, and reports
+counts only.
