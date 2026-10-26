@@ -1,6 +1,6 @@
-# ADR-033 C4 Gate 1: bounded CI adapter implementation charter (proposal)
+# ADR-033 C4 Gate 1: bounded CI adapter implementation charter
 
-**Status:** PROPOSED FOR OWNER REVIEW. The owner's Gate 1 ruling is recorded in this PR before merge; on merge with that ruling recorded, this document becomes the **accepted** C4 Gate 1 charter (section 7). Acceptance does **not** amend the Layer 1 freeze, authorize implementation, reopen the CI1 lab, change a workflow/ruleset/Actions variable, or authorize a live PR or merge attempt. Merging without a recorded owner ruling records a candidate design only.
+**Status:** **ACCEPTED — Gate 1 owner approval recorded 2026-10-26** in [PR #677](https://github.com/MnemeHQ/mneme/pull/677#issuecomment-6423873813), after R1–R3 at `3248ccd932e028e70c6203234b63f65722ff7a1a`. Acceptance fixes this bounded implementation charter, but **does not** amend the Layer 1 freeze or authorize implementation until a separately approved `[layer1-freeze]` amendment merges. It does not authorize lab unarchive, CI/ruleset/Actions-variable changes, or live PR or merge attempts. Gates 2–4 remain separate.
 
 **Date:** 2026-10-26.
 **Repository:** `MnemeHQ/mneme`.
@@ -9,11 +9,11 @@
 **Architecture:** [ADR-033](../adr/ADR-033-opt-in-fail-closed-enforcement.md) §§1-2, 5-7; ADR-017/020/021/029/030/031; [Layer 1 freeze](../architecture/layer1-freeze-e73ff7d.md), Amendment Procedure.
 **Prior evidence:** CI1.2 [fixtures](../../tests/fixtures/ci1_contract/README.md), [CI1.4](../validation/ci1-4-trusted-merge-gate-validation-2026-10-19.md), [CI1 readiness](../validation/ci1-production-readiness-reconciliation-2026-10-20.md), CI1 C1, V11 Option A, and [C3 closure](../validation/adr033-c3-closure-2026-10-26.md).
 
-## 1. Question and authorized boundary if Gate 1 is subsequently approved
+## 1. Accepted Gate 1 boundary (implementation contingent on freeze amendment)
 
 Implement exactly one **CI adapter**, derived from the archived CI1 trusted gate, that deterministically translates `mneme.check/v1` observations and the approved `open|closed` availability policy into an attributable required-check outcome. CI remains **post-change merge verification**, never PreToolUse interception.
 
-Gate 1 would authorize **only** a reviewed Core adapter, its isolated deterministic tests, its versioned C4 fixtures and adapter documentation. It would **not** activate a required merge-blocking check in Core, alter GitHub administration, run the live validation, or amend ADR-033.
+Once the separate freeze amendment is approved and merged, Gate 1 permits **only** a reviewed Core adapter, its isolated deterministic tests, its versioned C4 fixtures and adapter documentation. It would **not** activate a required merge-blocking check in Core, alter GitHub administration, run the live validation, or amend ADR-033.
 
 **Proposed Core file placement (requires Gate 1 approval):**
 
@@ -135,9 +135,9 @@ No freeze text is written now. It is not permissible to retroactively authorize 
 
 No new rule, retriever, conflict-detection or canonical persistence semantics; no malformed-memory CLI redesign; no CI productization for other providers; no live test without Gate 3; no Core production required-check conversion, settings edit, release or installation rollout. The lab stays archived until a separate owner action. C3 R-1 Edit-2 FAIL, F-R2/F-R3-1, Architecture A verifier-unavailable proceed, local enrollment removal, H-2 timeout proceed, MultiEdit N/A, P-6 earlier runtime pin and operator-attested evidence remain untouched.
 
-## 10. Proposed approval decision
+## 10. Gate 1 owner ruling
 
-**Candidate:** approve the bounded adapter design above as the C4 Gate 1 implementation charter by recording the owner's Gate 1 ruling in this PR before merge; implementation remains conditioned on the subsequent freeze-amendment PR. Reject or request revision if the trusted report, variable or adapter identity boundaries are insufficiently specified.
+**APPROVED:** the human owner explicitly accepted this bounded adapter design, including Gate 0 A1–A5 and review fixes R1–R3, on 2026-10-26. The ruling is recorded in [PR #677](https://github.com/MnemeHQ/mneme/pull/677#issuecomment-6423873813). This acceptance permits the next **freeze-amendment PR proposal**; implementation remains blocked until that separate amendment is approved and merged. Gates 2–4 and production rollout are not authorized.
 
 **Execution provenance**
 - Change author: agent
