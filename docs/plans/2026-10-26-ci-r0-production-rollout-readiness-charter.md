@@ -1,7 +1,7 @@
 # CI production rollout R0: readiness charter (Mneme Core)
 
 **Status: PROPOSED.** Read-only charter. Merging it records the owner's rulings
-in §6 and nothing else. **It authorizes no workflow, ruleset, required-check,
+in §6 and nothing else. R2 (Option A) is accepted as design direction only. **It authorizes no workflow, ruleset, required-check,
 Actions-policy, repository-variable or `.mneme/` change on `MnemeHQ/mneme`,
 and no `[layer1-freeze]` amendment.** Production merge blocking stays
 **DEFERRED** ([CI1.4 §7](../validation/ci1-4-trusted-merge-gate-validation-2026-10-19.md)).
@@ -72,7 +72,7 @@ the correct `mneme-hq` install line does **not** trigger the rule, but a first
 draft of this document that *quoted* the forbidden literal did (FAIL). Under a
 required gate, any doc, ADR or test fixture that quotes the literal would be a
 VIOLATION, and docs/ADRs routinely quote what they forbid. How often real Core
-PRs do this is unmeasured (§7 S2).
+PRs do this is unmeasured (§7 S3).
 
 ## 4. The nine CI1 conditions, classified
 
@@ -89,7 +89,7 @@ required-check switch.
 | 4 | Malformed-memory CLI | unchanged: exit 1, traceback, empty stdout; C4 classes it UNEVALUATED (O5) | **R** | accept the crash path for R0: under `closed` it blocks, under `open` it passes with a warning |
 | 5 | ADR-029 binding | partial; C4 did not claim "relevant enforcement observed" | **R** | R0 claims a merge gate, not ADR-029 relevant enforcement; record that the claim stays at "execution observed, near-complete binding" |
 | 6 | Governed `.mneme/` changes | no route; gate refuses `.mneme/` under every posture | **B** | §5 decision, implemented with the rollout |
-| 7 | GitHub after 2026-11-02 | never observed | **E** | shadow-phase runs on Core on or after 2026-11-02 (§7 S2) |
+| 7 | GitHub after 2026-11-02 | never observed | **E** | shadow-phase runs on Core on or after 2026-11-02 (§7 S3) |
 | 8 | Production-shaped coverage | one literal rule, lab ruleset | **E** | shadow-phase results on representative Core PRs, including how often ADR-005 fires on documents that quote the forbidden literal |
 | 9 | Separate authorization | not started | process | this charter, then a `[layer1-freeze]` amendment |
 
@@ -99,57 +99,141 @@ not fix the other.
 
 ## 5. First decision: governed decision update, bootstrap and recovery
 
-A gate that protects `.mneme/` and `.github/` refuses (a) its own installation
-PR, (b) every legitimate decision update, (c) its own later fixes. The lab
-solved (a) with a recorded ruleset disable; that leaves every check off for the
-window and is not a production route.
+A gate that protects `.mneme/` and `.github/` refuses (a) every legitimate
+decision update, (b) its own later fixes, and, once required, (c) any change
+to its own workflow. The lab handled its bootstrap with a recorded ruleset
+disable; that turns every check off for the window and is not a production
+route.
 
-All three are the same operation: **an authorized human merges one reviewed PR
-whose required gate check is REFUSED.** R0 should use one route for all three.
+All of these are the same operation: **an authorized human merges one reviewed
+PR whose required gate check is not green.** R0 uses one route for all of them.
 
 | Option | Mechanism | Assessment |
 |---|---|---|
-| **A (recommended)** | Add one ruleset bypass actor (the repository admin role, or a named owner account), `bypass_mode: pull_request`. The gate stays required for everyone else. Each bypass merge is a squash of a reviewed PR whose body records the REFUSED check run, the reason, and the owner's approval | Native GitHub, no new code, no window where checks are off, auditable from the PR and check run. Residual is exactly P7/P8 (an admin can bypass), which condition 1 already carries |
+| **A (accepted as design direction, §6 R2)** | A ruleset bypass actor that is one designated human authority, `bypass_mode: pull_request`. The gate stays required for everyone else | Native GitHub, no new code, no window where checks are off. Residual is exactly P7/P8 (condition 1) |
 | B | Disable and re-enable the ruleset per change (lab method) | All required checks off during the window; easy to forget to re-enable; no per-PR audit link |
 | C | Trusted decision-update workflow (label or signed approval read by the gate) | New trust surface and code; needs DG1 decision-update semantics (ADR-030/031). Out of R0 scope; a later replacement for A |
 
-**Recommendation: A**, with these bindings:
+### 5.1 Scope of GitHub bypass authority (clarification 1)
 
+GitHub bypass is **ruleset-wide, not check-specific.** A bypass actor on a
+ruleset can merge past *every* rule in that ruleset: every required check (for
+any verdict, including pending, failed, VIOLATION and UNEVALUATED, not only
+REFUSED), the up-to-date requirement, and the PR rules. GitHub does not know
+which Mneme verdict justified a bypass, and does not limit bypass to `.mneme/`
+or `.github/` changes.
+
+To keep that authority as narrow as GitHub allows:
+
+- **Dedicated gate ruleset.** The Mneme gate's required check and the strict
+  up-to-date requirement live in their own ruleset targeting `main`. Only that
+  ruleset has a bypass list. `main-pr-only` keeps no bypass actors, so its
+  required checks (PR battery, encoding, provenance, install command) and
+  squash-only rule still apply to a bypassed merge. Rules from both rulesets
+  aggregate; this layering must be confirmed on Core in S4 before it is
+  relied on.
+- **One designated human authority.** The bypass actor is a named human
+  account (the owner), not a team, app or role that grows over time.
+- **No agent-accessible credentials.** No token that agent sessions, CI or
+  automation can use may carry that account's bypass ability. S2 records the
+  credential inventory: which tokens exist for that account, where they are
+  stored, and confirmation that none is configured in agent environments
+  (`gh` auth, `GH_TOKEN`/`GITHUB_TOKEN` exports, MCP servers, repository or
+  organization secrets). If the owner's day-to-day `gh` login is also the
+  agent's login, that is a finding to resolve before S2 completes, by moving
+  agents to a separate non-bypass identity.
 - `bypass_mode: pull_request` only, never `always`; direct pushes to `main`
   stay blocked (ruleset and the ADR-022 pre-push guard).
-- The bypass actor is a human role. Agent sessions must not hold a token that
-  can use it; R0 records the current token inventory as part of condition 1.
-- Each bypass merge carries in its PR body: the REFUSED check run id, the
-  changed protected paths, and the owner's approval text.
-- **Rollback (pre-authorized):** set `MNEME_CI_AVAILABILITY=open` for runner or
-  evaluator unavailability; remove the gate from the ruleset's required checks
-  for a gate defect. Either is recorded on #540 within the same day, and the
-  gate is restored only through a reviewed PR.
 
-Option A does not create a DG1 decision-change semantics; it is an
-administrative route under P7/P8. That boundary is recorded, not hidden.
+### 5.2 Per-bypass record (clarification 2)
 
-## 6. Owner rulings requested on merge
+**GitHub enforces none of this; it is procedure.** GitHub logs that a bypass
+happened (rule insights / audit log) but does not require a reason, an
+approval, or a link to the check run. Every bypassed PR must carry, before
+merge, in its PR body (and the squash commit body):
 
-| ID | Ruling | Recommendation |
+| Field | Content |
+|---|---|
+| Human approval | the designated authority's approval text and date |
+| Protected paths | every changed path under `.mneme/`, `.github/` or the trusted adapter surface |
+| Bypass reason | one of: decision update, gate fix, gate install/config, availability incident, other (explained) |
+| Check-run identity | gate check-run id, head SHA, verdict and reason class (REFUSED / VIOLATION / UNEVALUATED / missing) |
+
+After merge, the bypass is cross-checked against GitHub's rule-insights entry
+for that merge and noted on #540. A bypass without the record is an incident,
+not a recovery. A later stage may add an automated post-merge audit; R0 does
+not assume one.
+
+### 5.3 Bootstrap order (clarification 3)
+
+The bypass actor exists before the protected workflow is installed:
+
+1. Designate the authority and complete the credential inventory (§5.1).
+2. Create the dedicated gate ruleset with that bypass actor and **no required
+   check yet**. Whether GitHub accepts the ruleset in that shape, or it must
+   be created disabled, is settled in S2.
+3. Install the gate workflow by a normal reviewed PR. Note: under
+   `pull_request_target` GitHub runs the workflow from the **base** branch, so
+   the installing PR itself gets no gate run, and nothing yet requires one.
+   The first gate runs are on PRs opened after the install merges.
+4. Shadow runs, then recovery validation (§7 S3-S4), then the switch.
+
+### 5.4 Rollback is two different controls (clarification 4)
+
+| | Availability rollback | Required-check removal |
 |---|---|---|
-| R1 | Adopt the §2 boundary | yes |
-| R2 | Bootstrap, decision updates and recovery use §5 Option A | yes |
-| R3 | Starting posture | `closed`: an unavailable evaluation blocks; rollback to `open` is pre-authorized |
-| R4 | Accept conditions 1, 4 and 5 as bounded residuals (§4) | yes |
-| R5 | Keep `mneme-check.yml` as an advisory comment but drop `mneme check --mode warn` from the required checks when the gate becomes required | yes; two checks with different trust models must not both look like the governance gate |
+| Action | set `MNEME_CI_AVAILABILITY=open` | remove the gate from the gate ruleset's required checks (or disable that ruleset) |
+| For | runner, evaluator install or memory-read **unavailability** | a **gate defect**: wrong VIOLATION/REFUSED, a check that never reports, a broken pin |
+| Gate still required | yes | no |
+| UNEVALUATED | passes with a warning | irrelevant (nothing required) |
+| VIOLATION / REFUSED | **still block** | no longer block; every PR mergeable on the other rulesets alone |
+| Missing check (job never reports) | still blocks: posture is read by the job | no longer blocks |
+| Existing check results | unchanged until re-run; a head red under `closed` stays red until re-run (C4 §7) | irrelevant |
+| Restore | set back to `closed`, re-run affected checks | re-add by a reviewed PR record and ruleset change |
+| Exposure | narrow: only operational failures pass | wide: Mneme enforcement fully off on `main` |
+
+Both are pre-authorized as emergency actions for the designated authority,
+each recorded on #540 the same day with the trigger, start and end time and
+PRs merged in the window. Neither is authorized by this charter. A single PR
+that must merge past a correct refusal uses the §5.2 bypass, not either
+rollback.
+
+Recovery must be shown to work **before** promotion (§7 S4); no rollback path
+is first exercised in an incident.
+
+## 6. Owner rulings
+
+| ID | Ruling | Status |
+|---|---|---|
+| R1 | Adopt the §2 boundary | requested; recommend yes |
+| R2 | Bootstrap, decision updates and recovery use §5 Option A | **Accepted as R0 design direction (owner, 2026-10-26)**, subject to clarifications 1-4 (§§5.1-5.4) and recovery validation before activation (§7 S4). Not an approval of implementation, activation or any bypass operation |
+| R3 | Starting posture | requested; recommend `closed` (unavailable evaluation blocks; availability rollback to `open` per §5.4) |
+| R4 | Accept conditions 1, 4 and 5 as bounded residuals (§4) | requested; recommend yes |
+| R5 | Keep `mneme-check.yml` as an advisory comment but drop `mneme check --mode warn` from the required checks when the gate becomes required | requested; recommend yes: two checks with different trust models must not both look like the governance gate |
+
+Owner wording (2026-10-26, Mneme Core conversation, recorded on the owner's
+behalf): "This approves Option A as the R0 design direction, not its
+implementation, activation or any future bypass operation." Production
+promotion stays DEFERRED.
 
 ## 7. Stages after this charter
 
-Each stage needs its own owner authorization; none is authorized here.
+Each stage needs its own owner authorization; none is authorized here. The
+production switch (S5) is conditional on S4 passing.
 
 | Stage | Content | Exit evidence |
 |---|---|---|
-| S1 | `[layer1-freeze]` amendment covering `.github/workflows/` gate install, ruleset bypass, required-check and strict up-to-date changes | merged amendment |
-| S2 shadow | install the gate workflow (via the §5 bypass, which is its first real use), **not required**; posture `closed`; run on representative Core PRs, on or after 2026-11-02 | for each run: check identity, verdict, report; ADR-005 hits split into real violations and quotations; any `pull_request_target` platform difference; zero unexplained UNEVALUATED |
-| S3 switch | one ruleset change: add the gate as required, strict up-to-date on, drop the warn check (R5) | ruleset before/after snapshot |
-| S4 controlled cases | on Core: compliant PR merges; a `.mneme/` change is REFUSED then merged via bypass; posture flip to `open` and back is recorded. A literal-rule VIOLATION is shown offline or in shadow, not by merging a violating change | per-case check run and merge response |
-| S5 record | R0 results record; production promotion decision | merged record |
+| S1 | `[layer1-freeze]` amendment covering the gate workflow install, the dedicated gate ruleset and bypass actor, required-check and strict up-to-date changes, and the staging branch in S4 | merged amendment |
+| S2 authority | §5.3 steps 1-2: designate the authority, credential inventory, create the gate ruleset with its bypass actor | inventory record; ruleset snapshot |
+| S3 shadow | §5.3 step 3: install the workflow by a reviewed PR, **not required**, posture `closed`; run on representative Core PRs on or after 2026-11-02 | per run: check identity, verdict, report; ADR-005 hits split into real violations and quotations; any `pull_request_target` platform difference; zero unexplained UNEVALUATED |
+| S4 recovery validation (pre-promotion) | on a Core staging branch (for example `r0/recovery-staging`, cut from `main` after S3) targeted by a copy of the gate ruleset with the same bypass actor and strict up-to-date, the gate **required**: (a) a `.mneme/` change is REFUSED and blocked, then merged through a §5.2 bypass by the designated authority; (b) the bypass leaves `main-pr-only`-equivalent checks enforced; (c) posture flip to `open` with an UNEVALUATED case passing with a warning while a REFUSED case still blocks, then back to `closed` with re-run; (d) required-check removal and restore; (e) a non-authority account cannot bypass | per case: check run, merge response (200/405), rule-insights entry, §5.2 record; ruleset before/after snapshots. **S5 is not authorized unless every S4 case is as expected** |
+| S5 switch | one change to the `main` gate ruleset: gate required, strict up-to-date on; drop the warn check from `main-pr-only` (R5); posture `closed` | ruleset before/after snapshots |
+| S6 post-switch check | a compliant PR merges; the first real `.mneme/` change goes through a §5.2 bypass. A literal-rule VIOLATION is shown offline or in shadow, never by merging a violating change to `main` | per-case check run and merge response |
+| S7 record | R0 results record; production promotion decision | merged record |
+
+If S4 cannot run on a staging branch (for example, ruleset layering differs
+from §5.1), the switch stays blocked until equivalent pre-promotion evidence
+exists. No recovery path is first validated on production `main`.
 
 ## 8. Non-goals
 
@@ -160,5 +244,6 @@ to the CLI malformed-memory contract, no ADR-029 upgrade.
 ## 9. Preliminary decision
 
 **Production promotion: DEFER.** Not a C4 failure: production authorization has
-not been justified yet. The blockers are conditions 2 and 6; the first decision
-is §5.
+not been justified yet. The blockers are conditions 2 and 6. Option A is the
+accepted design direction for condition 6 and recovery (§6 R2); the switch
+also depends on recovery validated before activation (§7 S4).
