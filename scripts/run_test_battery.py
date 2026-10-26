@@ -118,6 +118,7 @@ GATE_CORE_PATHS: tuple[str, ...] = (
     "tests/test_ci1_contract_fixtures.py",
     "tests/test_ci1_contract_matrix.py",
     "tests/test_ci1_evaluator_preflight.py",
+    "tests/test_adr033_c4_ci_gate.py",
     "tests/test_smoke.py",
 )
 
@@ -212,6 +213,7 @@ GATE_SHIPPED_PATHS: tuple[str, ...] = (
     "tests/integrations/antigravity",
     "tests/integrations/test_numeric_upper_bound_consumers.py",
     "tests/integrations/test_numeric_upper_bound_g2_hook.py",
+    "tests/integrations/test_numeric_g2_per_rule_attribution.py",
 )
 
 GATE_AUDIT_EVIDENCE_PATHS: tuple[str, ...] = (

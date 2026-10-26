@@ -1,0 +1,5 @@
+# Preserve byte-identical harness sources and evidence (hashed in manifest.sha256).
+/.gitattributes -text
+*.py -text
+*.md text eol=lf
+**/evidence/** -text
