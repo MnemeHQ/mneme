@@ -23,6 +23,7 @@ contract only: it authorizes no implementation and claims no pre-write
 protection (see "G2 amendment (2026-10-24)" below).
 **Amended:** 2026-10-26: relevant-enforcement attribution with several applied numeric rules (§7b, owner ruling D1, from the G2-1 blind validation FAIL in #666). Per-rule attribution is authoritative, and the event-level value is existential. It authorizes no implementation.
 **Amended:** 2026-10-26: function-source name resolution follows Python lexical scoping (§3a, owner ruling D2, from the G2-1 blind validation FAIL in #666). It authorizes no matcher change.
+**Amended:** 2026-10-27: evidence attribution of non-numeric refusals (§7c, owner rulings D3-1 to D3-4, from the G2-1 R2 FAIL in #692). The evidence record names every violation a trusted, coherent payload reports, with or without a subject. Those identities are attribution only, never relevance. It authorizes no implementation.
 
 **What acceptance means.** Acceptance establishes what a future implementation
 must satisfy. It does **not** establish that Mneme enforces numeric bounds:
@@ -877,6 +878,96 @@ it. Any later G2-1 PASS claim needs:
 - a new pre-registration that adopts this definition;
 - a newly authored, independently held-out corpus;
 - the failure policy of the original pre-registration (§6).
+
+### 7c. Evidence attribution of non-numeric refusals (amendment 2026-10-27, owner rulings D3-1 to D3-4)
+
+**Why.** The G2-1 revalidation R2 scored **FAIL**. Its results record is
+[`adr-034-g2-1-r2-blind-scoring-results-2026-10-27.md`](../validation/adr-034-g2-1-r2-blind-scoring-results-2026-10-27.md)
+(#692 `591ef687`, custody close #693 `fb11bd00`). The post-scoring
+diagnosis, D3, found the cause.
+
+- **Enforcement was correct.** A routed `Write` with no applied numeric
+  rule was refused by a literal rule.
+- **The evidence record was not.** Its `violations` list was empty, so the
+  refusal could not be attributed to the rule that caused it.
+
+The checker leaves out the subject record by design (G2-1 charter §5.2
+rule 3). The hook's evidence record copied violation identities only when
+that subject was present.
+
+The design is in the accepted proposal,
+[`2026-10-27-adr-034-d3-literal-attribution-proposal.md`](../plans/2026-10-27-adr-034-d3-literal-attribution-proposal.md)
+(#694 `38c28a0b`). The owner adopted Option A, and the following is
+normative.
+
+**1. Violation identities come from every trusted, coherent payload.**
+
+- **What the record carries.** The §7a host-event record's `violations`
+  list carries the identity (`rule_id`, `rule_type`) of every violation
+  that the checker payload reports. This holds whether or not the payload
+  carries a `proposed_new_source` subject.
+- **"Trusted" means consistency, not authentication.** It means only that
+  the payload passed the hook's consumer consistency checks (G2-1 charter
+  §5). It is not authenticated evidence.
+- **Untrusted payloads carry nothing.** If the payload is untrusted,
+  inconsistent or missing, `violations` stays empty.
+- **Unchanged:** the `subject` and `rules` fields, and when they are
+  filled.
+
+**2. These identities are attribution only, never relevance.**
+
+- **What they are.** A violation identity is the checker's own report of
+  which rule it found violated.
+- **What they do not support.** They never support "relevant enforcement
+  observed" (§7a, §7b) for any rule. Under ADR-029 §2, that claim still
+  needs the full binding: host, event, subject, digest, target and an
+  attributable numeric outcome.
+- **No inheritance (§7b.1).** A refusal by a non-numeric rule is never
+  attributed to a numeric rule.
+
+**3. A malformed identity attributes nothing.** A violation entry whose
+`rule_id` is missing, empty or not a string never counts as attribution to
+any rule. This holds even when its `rule_type` names a known rule type
+such as `FORBID_LITERAL`.
+
+- Implementations and evaluation contracts must treat such an entry as
+  unattributed.
+- They must cover this with synthetic regression tests.
+
+**4. What changes, and what does not.**
+
+- **Changes:** how the evidence record is built (`build_evidence_record` in
+  `mneme/integrations/claude_code/hook.py`). Only the population of
+  `violations` changes.
+- **Does not change:**
+  - blocking decisions, hook outcomes, exit codes and stderr;
+  - strict/warn and availability behavior;
+  - the matcher and numeric applicability;
+  - the `mneme check --json` payload, including the conditional subject
+    record;
+  - the disposition cause vocabulary;
+  - `relevant_enforcement_per_rule`, `relevant_enforcement_observed` and
+    `recorded_evaluation_complete`.
+- **Schema (D3-2).** The schema stays `mneme.hook_evidence/v1`: no field is
+  added, removed or retyped. A consumer that must tell pre-D3 records from
+  post-D3 records keys on the implementation pin.
+
+**5. Review, tests and authorization.** The change needs:
+
+- its own implementation PR, with the regression and parity tests in
+  proposal §5 and the §3 malformed-identity tests;
+- a review against ADR-029, §7a, §7b and this section.
+
+This amendment does not authorize that change.
+
+**6. No retroactive effect (D3-4).** R1 and R2 stay **FAIL**, exactly as
+recorded. G2-1 stays **FAIL**.
+
+Any later G2-1 PASS claim needs R3:
+
+- a new pre-registration that pins the D3 implementation and adopts §1–§3;
+- a newly authored, independently held-out corpus and a new scorer;
+- the pre-R3 key-custody control stated in #693 §9.5.
 
 ### 8. Mixed results (M-a, target contract)
 
