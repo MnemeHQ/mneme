@@ -2,6 +2,7 @@
 
 **Date:** 2026-10-26
 **Amended:** 2026-10-26, Amendment 1 (the owner's rulings on the R2 ambiguity brief); see the end of this file
+**Amended:** 2026-10-27, Amendment 2 (the owner's correction of the R2A1.6 `evaluation_complete` expectation, before decryption); see the end of this file
 **Status:** PROPOSED. Once merged, this pre-registration is frozen, and with
 it the corrected implementation it pins. Changing it afterwards needs a
 dated, owner-approved amendment that is merged **before** decryption. No
@@ -474,3 +475,108 @@ no Mneme implementation, no class floor and no gate G1–G8. The author
 reconciles the affected SC case (1 concealed, per the author's report),
 confirms every SC floor and outcome minimum is still met, and reports
 counts only.
+
+## Amendment 2: routed-fallback `evaluation_complete` (owner, 2026-10-27)
+
+**Status:** an owner-approved correction. It must merge **before
+decryption**. It changes one expected value for one narrowly defined kind
+of case. No other gate, floor, class, pin or corpus anchor changes, and the
+sealed corpus is not changed.
+
+**Why it is needed.** R2A1.6 expects `evaluation_complete == null` for a
+routed event whose checker falls back to the legacy path. That expectation
+rested on the assumption that such a record carries no trusted completeness
+value.
+
+Before decryption, the R2 scorer ran the pinned build on **its own
+synthetic content**, not on the corpus (harness PR #688, Q1). It observed:
+
+- the routed fallback's G2 record carries `checker.trusted: true`, no
+  subject and `rules: []`;
+- it also carries the legacy checker payload's `evaluation_complete: false`.
+
+So the pinned build's `recorded_evaluation_complete()` returns `false`. The
+owner checked this against the code at `dbab816f`.
+
+The assumption behind R2A1.6's `null` was therefore wrong. As written, every
+routed-fallback case would fail G6 by construction, whatever G2-1 does.
+
+### A2R2.1 What `false` and `null` mean
+
+| Value | Meaning |
+|---|---|
+| `false` | The checker supplied a **trusted** boolean saying the evaluation was incomplete |
+| `null` | No trusted boolean completeness value is available |
+
+**Why `false` is the contract value.** A routed legacy fallback is, by the
+G2 evidence contract (§7a; R2A1.6), an event where no trusted
+proposed-source evaluation took place. The legacy checker's trusted
+statement that evaluation was incomplete is the truthful completeness fact
+for that event.
+
+`false` is therefore fixed here from the contract. It is **not** copied from
+any observed result for a concealed case, and no concealed result has been
+observed.
+
+### A2R2.2 The corrected expectation
+
+For a routed event whose checker falls back to the legacy path, G6
+expects:
+
+| G6 field | Expected |
+|---|---|
+| Numeric rule-ID set in the G2 record | `{}` |
+| Per-rule relevance | `{}` |
+| Event-level relevance | `false` |
+| `evaluation_complete` | **`false`** (was `null` in R2A1.6) |
+| Legacy checker behavior, including its numeric trace | Scored under G5 parity |
+
+Everything else in R2A1.6 is unchanged. In particular, the routed fallback
+must still have exactly one G2 record (A1.1), and G6 never expects a numeric
+evaluation that did not happen.
+
+**Untrusted values fail.** A record whose completeness value is untrusted
+or absent, so that `recorded_evaluation_complete()` returns `null`, fails
+G6 step 4 for such a case. So does any value other than `false`.
+
+### A2R2.3 How the sealed labels are read
+
+The sealed corpus is frozen (#687) and is **not** changed or re-sealed.
+Its routed-fallback cases are marked by the boolean
+`g6_routed_fallback: true`. The freeze record reports 2 concealed L cases.
+Their stored `evaluation_complete` label is `null`, written under R2A1.6.
+
+**For every case where `g6_routed_fallback` is `true`,** the harness reads
+the expected `evaluation_complete` as **`false`**, by this amendment. The
+stored `null` is superseded.
+
+**Nothing else is reinterpreted.** No other label, in that case or any
+other, is reinterpreted. The rule applies to the flag, not to any case
+identity.
+
+### A2R2.4 Harness and disclosure
+
+**Before the completion record pins the harness.** The R2 harness (#688)
+is updated to implement A2R2.2 and A2R2.3 before the pre-scoring completion
+record pins it. Its unit tests must tell the two values apart:
+
+- a trusted legacy `false` passes step 4 for a flagged case;
+- an untrusted `null` fails it.
+
+A harness change after decryption would void blind status (§6).
+
+**In the results record.** The results record must:
+
+- state that Amendment 2 applied;
+- give the number of flagged cases, by class only;
+- give their G6 outcome.
+
+No case is excluded from any gate because of this amendment.
+
+### A2R2.5 What this does not change
+
+- G6's other steps, and every other gate G1–G8.
+- Every class floor and the 120 total.
+- The implementation pin `dbab816f`.
+- The sealed corpus and its hashes.
+- Mneme's implementation, and ADR-020 applicability.
