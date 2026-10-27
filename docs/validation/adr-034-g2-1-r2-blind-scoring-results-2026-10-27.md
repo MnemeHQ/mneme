@@ -278,8 +278,8 @@ root, outputs, cases.jsonl) and confirms absence."
   and the ciphertext hash. The ciphertext re-hashes to it.
 - The orchestrator independently re-hashed the ciphertext and re-listed its
   recipient. Both matched.
-- No owner decrypt-verify of the evidence ciphertext has been done. The
-  owner may do it later.
+- These checks do not show that the archive is recoverable. The owner's
+  decrypt-verify, done after the plaintext was deleted, is recorded in §9.6.
 
 ### 9.3 Deletions
 
@@ -314,8 +314,9 @@ was not accessed.
 ### 9.4 Deviation: in-memory decryption during verification
 
 **What happened.** The scorer's first verification call was
-`gpg --list-packets` without `--list-only`. That decrypted the evidence
-stream in memory to list its inner packet headers.
+`gpg --list-packets` without `--list-only`. That option decrypts in
+memory. It succeeded, and gpg listed the evidence stream's inner packet
+headers.
 
 - No plaintext was written or printed.
 - Only the evidence the scorer had just built was involved. No corpus
@@ -329,39 +330,47 @@ This was not an owner decrypt-verify.
 That remains true for scoring and diagnosis. The gpg operations in this
 addendum came afterwards, during custody close.
 
-### 9.5 Finding: the owner key is usable without a passphrase
+### 9.5 Security-control requirement before R3
 
-The deviation in §9.4 was possible because this machine's Git gpg keyring
-holds the owner's secret key (`88CE4C9F…`, subkey `C4370AB8829450C5`), and
-it decrypts with no passphrase prompt.
+The §9.4 decryption succeeded inside an agent session. The sealing method
+assumes that only the owner can decrypt. That condition is **not
+established** for the current key setup.
 
-**Consequence.** Any process on this machine that can run Git's gpg can
-decrypt a ciphertext sealed to this key. That includes:
+The detailed finding is kept in an owner-private record, outside this
+public repository. No key change is authorized or made by this record.
 
-- any agent session, corpus author or scorer;
-- the R1 and R2 corpus ciphertexts.
+**Requirement.** Before any R3 corpus is sealed, the owner must establish
+independently that agent sessions on the sealing and scoring machines
+cannot decrypt ciphertexts sealed to the owner key. The R3
+pre-registration must state how this is established.
 
-The sealing method assumes that only the owner can decrypt.
+### 9.6 Owner decrypt-verify of the evidence archive
 
-**Scope of this finding.** No misuse is known. The known decryptions of the
-R2 corpus ciphertext were both the owner's:
+**Sequence of events.** The owner ran this verification on the owner's
+local machine after custody close, when every plaintext copy in §9.3 had
+already been deleted.
 
-- the seal verification recorded in #687;
-- the decryption for scoring after #690 merged.
+- It started at 2026-10-27T21:57:09Z and finished at 21:57:14Z.
+- It decrypted with subkey `C4370AB8829450C5`, into a temporary folder
+  under `%TEMP%`.
+- It printed hashes and counts only. No case content was displayed.
 
-This record cannot rule out other access, because nothing logs gpg use on
-this machine.
+| Check | Expected | Result |
+|---|---|---|
+| Evidence ciphertext SHA-256 | `6867fdcc…e71495` | MATCH |
+| Evidence tar SHA-256 | `751ea42b…fff21a` | MATCH |
+| Tar file entries | 13 | 13 |
+| `EVIDENCE_FILES.sha256` SHA-256 | `817a8c70…3eead` | MATCH |
+| Manifest lines | 12 | 12 |
+| Manifest check (`sha256sum -c`) | all OK | 12 OK, 0 not OK, exit 0 |
 
-**Before R3** (owner action; not authorized or done by this record), the
-owner should either:
+**Clean-up.** The temporary folder was removed afterwards, and the script
+confirmed it was absent.
 
-- protect the secret key with a passphrase that agent sessions do not hold;
-  or
-- move the secret key off any machine where agent sessions run.
+**Result: the archived evidence is recoverable.** It decrypts with the
+owner key and is byte-identical to the archive committed in §9.1.
 
-The R3 pre-registration should state the key-custody condition.
-
-### 9.6 Not authorized by this addendum
+### 9.7 Not authorized by this addendum
 
 - Any fix to `mneme/`, the harness or the labels.
 - Any re-scoring of R2, and any start of R3.
