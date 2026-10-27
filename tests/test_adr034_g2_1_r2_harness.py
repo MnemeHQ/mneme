@@ -687,6 +687,50 @@ def test_g6_routed_fallback_expects_a_trusted_false_per_r2_amendment_2():
     assert "label_inconsistent_with_r2a1_6" not in result["diagnostics"]["conformance"]
 
 
+def _no_rule_case() -> "h.Case":
+    return _case("P", applied_numeric_rule_ids=[], relevant_enforcement_per_rule={},
+                 relevant_enforcement_observed=False, hook_exit=0, disposition="proceeded",
+                 expected_cause="no_violation", numeric_rules=[])
+
+
+def _no_rule_obs() -> dict:
+    record = _record([], outcome="proceeded", cause="no_violation", subject=False)
+    impl = _hook(exit_code=0, disposition="proceeded", records=[record], traces=[],
+                 evaluations=[{"per_rule": {}, "event": False, "evaluation_complete": True}])
+    pair = {"proposed": {"exit": 0, "stdout_sha256": "x"},
+            "input": {"exit": 0, "stdout_sha256": "x"}}
+    return _obs(impl, checker_pair=pair)
+
+
+@pytest.mark.parametrize("make", [
+    lambda: (_fallback_case(), _obs(_fallback_hook(True, False))),
+    lambda: (_no_rule_case(), _no_rule_obs()),
+    lambda: (_case("LIT", relevant_enforcement_observed=False, hook_exit=2,
+                   expected_cause="literal_violation", literal_violation=True,
+                   relevant_enforcement_per_rule={RID_A: False},
+                   numeric_rules=[_rule(outcome="NO_VIOLATION")]),
+             _obs(_hook(records=[_record(
+                 [{"rule_id": RID_A, "matcher_status": "RECOGNIZED",
+                   "matcher_outcome": "NO_VIOLATION", "primary_reason": None}],
+                 cause="other_rule", violations=[{"rule_id": "lit", "rule_type": h.LITERAL}])],
+                 evaluations=[{"per_rule": {RID_A: False}, "event": False,
+                               "evaluation_complete": True}],
+                 traces=[{"rule_type": h.NUMERIC, "rule_id": RID_A, "outcome": "APPLIED",
+                          "matcher_status": "RECOGNIZED", "matcher_outcome": "NO_VIOLATION",
+                          "primary_reason": None, "unknown_sources": []}]))),
+], ids=["routed_fallback", "no_applied_rule", "all_false_relevance"])
+@pytest.mark.parametrize("schema", [None, "mneme.hook_evidence/v2", "", "MNEME.HOOK_EVIDENCE/V1"])
+def test_g6r_f1_record_schema_must_be_exact_even_when_all_relevance_is_false(make, schema):
+    case, obs = make()
+    assert _gates(case, obs)["G6"]["pass"], _why(case, obs, "G6")
+    record = obs["implementation"]["evidence_records"][0]
+    if schema is None:
+        del record["schema"]
+    else:
+        record["schema"] = schema
+    assert _why(case, obs, "G6") == ["schema"]
+
+
 def test_r2_amendment_2_is_keyed_on_the_flag_only():
     """A non-flagged case's null label is never reinterpreted."""
     case = _fallback_case(g6_routed_fallback=False)

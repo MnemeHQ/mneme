@@ -68,6 +68,7 @@ NUMERIC = "FORBID_NUMERIC_ABOVE"
 LITERAL = "FORBID_LITERAL"
 HOOK_MODULE = "mneme.integrations.claude_code.hook"
 EVIDENCE_SURFACE = "claude_code.PreToolUse"  # charter §6.2
+EVIDENCE_SCHEMA = "mneme.hook_evidence/v1"  # G6R-F1
 INPUT_KIND_PROPOSED = "proposed_new_source"
 CHILD_TIMEOUT_S = 120
 OBSERVE_LOG_ENV = "MNEME_G2R2_OBSERVE_LOG"
@@ -1466,6 +1467,11 @@ def score_g6(case: Case, impl: dict, facts: dict, host: tuple[str, str], fail) -
         fail("G6", f"record_count_{min(len(records), 2)}")
         return
     record, evaluation = records[0], evaluations[0]
+    # G6R-F1: the record must be exactly this evidence schema, before step 1.
+    # The pinned validator answers false for a malformed record, which would
+    # otherwise match a case whose expected relevance values are all false.
+    if record.get("schema") != EVIDENCE_SCHEMA:
+        fail("G6", "schema")
     for problem in record_binding_problems(record, facts, host):
         fail("G6", f"binding:{problem}")
     if record.get("hook_outcome") != impl["disposition"]:

@@ -217,6 +217,11 @@ any G2 record is a failure.
 **Routed cases.** Otherwise, there must be exactly one record. The harness
 then checks the following.
 
+0. **Schema (G6R-F1).** The record's `schema` is exactly
+   `mneme.hook_evidence/v1`. A missing schema, or any other value, fails G6
+   (reason `schema`) before step 1. Without this check, a malformed record
+   could match a case whose expected relevance values are all `false`,
+   because the pinned validator also answers `false` for it.
 1. **Bindings.** The R1 digest and path join holds. That covers the surface,
    the host identity, the event fields and identifiers, the carrier digest,
    the subject, and every rule's identity, digest and governed path.
@@ -402,6 +407,16 @@ pinned wheels. On 2026-10-27, with the #646 host identity, the result was:
     (A2R2.2), read through the flag (A2R2.3). An untrusted `null` fails.
   - **How it is pinned.** The tests tell the two values apart, and an
     end-to-end synthetic fallback passes every gate.
-- **Q2 to Q8:** these are listed in the PR body and wait for the reviewer.
-  Decisions are recorded here before the harness is pinned in the
-  pre-scoring completion record.
+- **Q2 to Q8: accepted** on re-review of `d4ad4504`, as implemented:
+  - Q2: the cause mapping table;
+  - Q3: the memory compile method;
+  - Q4: checker-level parity for routed CR;
+  - Q5: G2 for SC and MR;
+  - Q6: the build-only relevance;
+  - Q7: envelope substitution;
+  - Q8: the corpus layout.
+- **G6R-F1 (review finding): fixed.** G6 now requires the record's `schema`
+  to be exactly `mneme.hook_evidence/v1`, before step 1. The tests show a
+  missing or wrong schema failing G6 even when every expected relevance
+  value is `false`, including a flagged routed fallback and a
+  no-applied-rule case.
