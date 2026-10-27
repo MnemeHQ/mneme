@@ -231,3 +231,139 @@ No gpg operation was run by the scorer.
   re-scoring of R2.
 - **Claims:** any PASS, enforcement or production claim. **R2 is FAIL. G2-1
   stays FAIL.**
+
+## 9. Addendum: custody close (2026-10-27)
+
+**Append-only.** This addendum records custody close after #692 merged
+(`591ef687`). It changes nothing above: §6 described the state at that
+time, and the verdict stays **R2 FAIL**. **G2-1 stays FAIL.**
+
+**Authorization.** The owner authorized custody close with these words:
+"the scorer encrypts the scoring evidence to the owner key, verifies the
+ciphertext, then deletes every plaintext copy (tar, extracted corpus, run
+root, outputs, cases.jsonl) and confirms absence."
+
+### 9.1 Evidence archive
+
+| Item | Value |
+|---|---|
+| Location | `C:/dev/mneme-g2r2-scoring-evidence-sealed/` (new folder; never committed; not the corpus sealed folder) |
+| Build | deterministic GNU tar 1.35, the corpus-seal method: `--format=gnu`, sorted names, regular files only, no pax headers, mtime `2026-10-27T00:00:00Z`, uid and gid 0, mode 0644, root `g2-1-r2-scoring-evidence/`. Built twice, byte-identical |
+| Evidence tar SHA-256 | `751ea42b51cd5db1b9f4f693a74518ffa8d23f689c2b9324658265a9e5fff21a` (13 entries) |
+| Inner `EVIDENCE_FILES.sha256` SHA-256 | `817a8c700ee03661fc19291e029e0d2b832e1cc7dc60addb401cccffeb43eead` (12 lines) |
+| Ciphertext | `g2-1-r2-scoring-evidence.tar.gpg`, SHA-256 `6867fdcc7ff7530a3808737741a7464ef7cf4dd1d54fcc25b8bae46748e71495` |
+| Encrypted to | owner subkey `C4370AB8829450C5` (primary `88CE4C9F66A5F3CA7F1C0A484839E24F94E4F796`), with Git's gpg 2.4.5 |
+
+**What the archive holds:**
+
+- `out/summary.json`;
+- from each of `run-1/` and `run-2/`: `cases.jsonl`, `smoke_cases.jsonl`,
+  `smoke_summary.json` and `summary.json`;
+- the `score` stdout and stderr logs;
+- the §8 step 4 verification log;
+- `EVIDENCE_FILES.sha256`.
+
+**What it does not hold:**
+
+- the corpus tar and the extracted corpus. They are copies of the corpus
+  already sealed under #687.
+- the run root. The harness removes each case's working directory after
+  scoring, so `run/` was already absent.
+
+### 9.2 Verification
+
+- `gpg --list-only --list-packets` shows exactly one recipient packet:
+  algo 18, keyid `C4370AB8829450C5`.
+- `CIPHERTEXT.sha256` in the evidence folder lists the plaintext tar hash
+  and the ciphertext hash. The ciphertext re-hashes to it.
+- The orchestrator independently re-hashed the ciphertext and re-listed its
+  recipient. Both matched.
+- No owner decrypt-verify of the evidence ciphertext has been done. The
+  owner may do it later.
+
+### 9.3 Deletions
+
+Each path was deleted, and an existence check now reports it absent:
+
+- the plaintext evidence tar;
+- `C:/dev/g2-1-r2-scoring/plaintext/` (the decrypted corpus tar);
+- `C:/dev/g2-1-r2-scoring/corpus/` (the extracted corpus);
+- `C:/dev/g2-1-r2-scoring/run/` (already absent);
+- `C:/dev/g2-1-r2-scoring/out/` (both runs' `cases.jsonl` and
+  `smoke_cases.jsonl`, and the summaries);
+- `C:/dev/g2-1-r2-scoring/verify-files.log`;
+- the staging logs and `EVIDENCE_FILES.sha256`;
+- two temporary tar builds in `%TEMP%`, and one scratchpad folder.
+
+The orchestrator independently confirmed that the first five paths are
+absent. The scorer searched its scratchpad and `%TEMP%` for `cases.jsonl`
+and for concealed-case content, and found none.
+
+**What "absent" means.** Absence is at the file-system level only. No
+physical erasure on an SSD is claimed.
+
+**Kept.** These hold no case content:
+
+- the clone `C:/dev/g2-1-r2-scoring/mneme`;
+- `build/`, `build.out.json` and `build.err.log`.
+
+The evidence folder now holds only `CIPHERTEXT.sha256` and the
+ciphertext. The corpus sealed folder, `C:/dev/mneme-heldout-034-g2r2-sealed/`,
+was not accessed.
+
+### 9.4 Deviation: in-memory decryption during verification
+
+**What happened.** The scorer's first verification call was
+`gpg --list-packets` without `--list-only`. That decrypted the evidence
+stream in memory to list its inner packet headers.
+
+- No plaintext was written or printed.
+- Only the evidence the scorer had just built was involved. No corpus
+  ciphertext was touched.
+- The scorer then re-verified with `--list-only`, which lists the recipient
+  without decrypting.
+
+This was not an owner decrypt-verify.
+
+**Correction to §7.** §7 says "No gpg operation was run by the scorer."
+That remains true for scoring and diagnosis. The gpg operations in this
+addendum came afterwards, during custody close.
+
+### 9.5 Finding: the owner key is usable without a passphrase
+
+The deviation in §9.4 was possible because this machine's Git gpg keyring
+holds the owner's secret key (`88CE4C9F…`, subkey `C4370AB8829450C5`), and
+it decrypts with no passphrase prompt.
+
+**Consequence.** Any process on this machine that can run Git's gpg can
+decrypt a ciphertext sealed to this key. That includes:
+
+- any agent session, corpus author or scorer;
+- the R1 and R2 corpus ciphertexts.
+
+The sealing method assumes that only the owner can decrypt.
+
+**Scope of this finding.** No misuse is known. The known decryptions of the
+R2 corpus ciphertext were both the owner's:
+
+- the seal verification recorded in #687;
+- the decryption for scoring after #690 merged.
+
+This record cannot rule out other access, because nothing logs gpg use on
+this machine.
+
+**Before R3** (owner action; not authorized or done by this record), the
+owner should either:
+
+- protect the secret key with a passphrase that agent sessions do not hold;
+  or
+- move the secret key off any machine where agent sessions run.
+
+The R3 pre-registration should state the key-custody condition.
+
+### 9.6 Not authorized by this addendum
+
+- Any fix to `mneme/`, the harness or the labels.
+- Any re-scoring of R2, and any start of R3.
+- Any change to the owner's key. That is the owner's action.
+- Any PASS, enforcement or production claim.
