@@ -1,6 +1,7 @@
 # ADR-034 G2-1 revalidation pre-registration (R2: corrected build, new held-out corpus)
 
 **Date:** 2026-10-26
+**Amended:** 2026-10-26, Amendment 1 (the owner's rulings on the R2 ambiguity brief); see the end of this file
 **Status:** PROPOSED. Once merged, this pre-registration is frozen, and with
 it the corrected implementation it pins. Changing it afterwards needs a
 dated, owner-approved amendment that is merged **before** decryption. No
@@ -332,3 +333,144 @@ G2-1 closes only on a PASS results record from R2, or from a later round.
 - A new G1 (whole-file audit) claim. M4's PASS stays evidence for its own
   pinned build only (freeze amendment #670).
 - Activating `FORBID_NUMERIC_ABOVE` in this repository's memory.
+
+## Amendment 1: owner rulings on the R2 ambiguity brief (2026-10-26)
+
+**Status:** this amendment must merge **before sealing**, and therefore
+before any decryption. It records the owner's rulings on the R2 corpus
+author's sanitized ambiguity brief (AMB-R2-01 to AMB-R2-12). No gate is
+loosened, no floor is lowered, and no class is added or removed.
+
+The owner made these rulings without opening any corpus material. As
+first made, every ruling confirmed the corpus's reading. Review of this
+amendment then led the owner to revise AMB-R2-01 (R2A1.6) and the
+function-source part of AMB-R2-04 (R2A1.7). Those revisions change the
+labels of the affected cases. The author reconciles
+before sealing (R1-PR A1.6).
+
+### R2A1.1 Labelling rulings
+
+| Item | Ruling |
+|---|---|
+| **AMB-R2-01** Routed fallback (revised by R2A1-F1, see R2A1.6) | ADR-020 applicability is unchanged. A routed event whose checker falls back to the legacy path, however, never produces a trusted proposed-source evaluation. Its G2 record's expected numeric rule-ID set is therefore `{}`, its per-rule relevance is `{}`, its event-level value is `false`, and its `evaluation_complete` is `null`. The legacy checker behavior is scored under G5 parity, not G6 |
+| **AMB-R2-02** Missing target or parent | ADR-020 §6's "input path is missing" means that **no input path was supplied**. It does not mean that the target file or its parent doesn't exist. Applicability for such a target follows its selectors |
+| **AMB-R2-03** Outside the policy root | Memory discovery starts at the target's parent (charter §2; A1.1). If no memory is found, the event is unrouted: no checker call, exit 0, no record |
+| **AMB-R2-04** Attribute store with the governed name (function part revised by R2A1-F2, see R2A1.7) | `obj.<NAME> = ...` and `del obj.<NAME>` are attribute operations, not lexical bindings of `NAME`. **Symbol source:** this is not a §3 "rebinding" and has no effect, as originally ruled. **Function source:** when `NAME` is the governed function, `obj` could reference the current module, so the operation is a possible module-namespace mutation; the whole function source is `AMBIGUOUS_BINDING`, never clean (§3a rule 4). String literals that spell the name, and words such as `globals`, `exec` or `global` used as data, are plain data under both sources |
+
+### R2A1.2 Scoring and harness rulings
+
+| Item | Ruling |
+|---|---|
+| **AMB-R2-05** Unknown-source reasons | Each rule's distinct unknown-source reasons are compared for **set** equality. G4 gates only the **primary** reason |
+| **AMB-R2-06** Memory delivery | Fixtures ship ADR source files. Each fixture's `.mneme/project_memory.json` is compiled with the pinned implementation build's own ADR import, and the **same** compiled file is used for the baseline build. A compile failure is a G8 case failure, never an exclusion |
+| **AMB-R2-07** `rule_id` derivation | Expected `rule_id` values come from the ADR-034 §5 identity formula. The `rule_id` of a rule that appears only as `EXCLUDED` is informational and not gated. Rule IDs inside an expected applied-rule set stay gated by G6 (R2V-F3) |
+| **AMB-R2-08** Cause vocabulary | Mapping the record's cause field onto the corpus's `expected_cause` values is a harness matter. The mapping is fixed in the R2 harness PR and reviewed there, before decryption. Changing it after decryption voids blind status (§6) |
+
+### R2A1.3 Stated noncoverage (AMB-R2-09, AMB-R2-10)
+
+The R2 corpus contains none of the following function-source shapes, and
+R2 makes no claim for them:
+
+- **(a)** a direct call with too few positional arguments for the declared
+  position, or one using `*args` / `**kwargs`;
+- **(b)** a direct call to the governed name in a module that has no `def`
+  of it, or that binds the name only through an import;
+- **(c)** a class-body statement that calls the name before the class body
+  binds it;
+- **(d)** the name used as a decorator;
+- **(e)** a call site that resolves to the declaration and exceeds the
+  bound, in a module where a module-level rebinding, escape or `global`
+  makes the whole source `AMBIGUOUS_BINDING`. Here ADR-034 §3a rules 2 and
+  3 point different ways, so (e) is **deferred to a later ADR-034
+  ruling**. No R2 label depends on it.
+
+**Symbol source.** Every symbol-source binding in the corpus is a
+module-level assignment statement (AMB-R2-10). That is consistent with §4.1:
+no label depends on the undecided symbol question.
+
+### R2A1.4 Information and isolation
+
+- **Noted:** AMB-R2-11 (line endings and parsing at CPython 3.12.10) and
+  AMB-R2-12 (13 public smoke cases, one per class, 8.33%) are information
+  only.
+- **Isolation disclosure accepted.** The R2 corpus author disclosed that it
+  read ADR-019. ADR-019 was on neither the allowed nor the barred list, and
+  the author read it for `FORBID_LITERAL` directive syntax. It is a public
+  ADR with no G2-1 case content, labels or diagnosis evidence. The owner
+  accepts the disclosure. The author's isolation statement records it.
+
+### R2A1.5 Reconciliation before sealing
+
+**What the author reconciles.** The author re-checks every case each item
+touches, then re-checks every concealed class floor and the 120 total. It
+reports counts only.
+
+**The authored counts.** The corpus as authored has 143 concealed and 13
+public cases, and every floor is met. The freeze record states the final
+counts.
+
+**When sealing may start.** Only after all three of these:
+
+1. this amendment merges;
+2. the author reports reconciliation;
+3. the orchestrator gives an explicit seal go-ahead.
+
+**What sealing removes.** At sealing, the author's `_authoring/` material is
+deleted together with the plaintext. That material holds the generator, the
+salt and the name map.
+
+### R2A1.6 Owner ruling on review finding R2A1-F1 (2026-10-26)
+
+**Why.** The original AMB-R2-01 ruling read the §4.1 "expected applied-rule
+set" as applicability alone. Under that reading, a routed fallback would
+carry a non-empty set of `MATCHER_UNEVALUATED` rules. The review of this
+amendment found that reading inconsistent with the G2 evidence contract: a
+routed fallback never produces a trusted proposed-source evaluation, so no
+numeric rule is evaluated or serialized in its G2 record.
+
+**The ruling.** The owner ruled that §4.1's expected rule-ID set means the
+numeric rules **actually evaluated against trusted proposed source** and
+carried in the G2 record. It does not mean every rule that applies to the
+file. For a routed event whose checker falls back to the legacy path:
+
+| Field | Expected |
+|---|---|
+| Numeric rules applicable under ADR-020 | Unchanged, and not gated by G6 |
+| Numeric rule-ID set in the G2 evidence record | `{}` |
+| Per-rule relevance | `{}` |
+| Event-level relevance | `false` |
+| `evaluation_complete` | `null` (no trusted value) |
+| Legacy checker behavior, including its numeric trace | Scored under G5 parity |
+
+**What G6 still requires.** A routed fallback must still have exactly one
+G2 record (A1.1). G6 checks that the record exists and matches the table
+above. G6 never expects a numeric evaluation that did not occur.
+
+**Scope.** This ruling corrects the validation expectation only. It changes
+no Mneme implementation, no applicability rule, no class count and no
+gate. The author reconciles the affected L cases (2 concealed, per the
+author's report) before sealing and reports counts only.
+
+### R2A1.7 Owner ruling on review finding R2A1-F2 (2026-10-26)
+
+**Why.** As first made, AMB-R2-04 said an attribute store whose attribute
+name equals the governed function has no effect on the function source. The
+review found that this contradicts ADR-034 §3a rule 4 and the accepted D2
+correction D2R-F1. `obj` may be an alias of the current module, so
+`obj.<NAME> = ...` or `del obj.<NAME>` can rebind the module declaration
+indirectly. Static analysis cannot rule that out.
+
+**The ruling.** The owner ruled as follows.
+
+- **Function source.** An attribute store or delete whose attribute name
+  equals the governed function is not a direct lexical binding. It is,
+  however, a possible module-namespace mutation, so the **whole** function
+  source is `AMBIGUOUS_BINDING` and never clean.
+- **Symbol source.** The §3 interpretation stays unchanged. An attribute
+  assignment is not, by itself, a rebinding of the governed symbol.
+
+**Scope.** This ruling corrects the validation expectation only. It changes
+no Mneme implementation, no class floor and no gate G1–G8. The author
+reconciles the affected SC case (1 concealed, per the author's report),
+confirms every SC floor and outcome minimum is still met, and reports
+counts only.
