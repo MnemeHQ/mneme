@@ -140,6 +140,35 @@ Reviewers should verify:
 
 This review is part of Definition of Done for the PR.
 
+## Solo-maintainer architectural acceptance
+
+While Mneme has a single human project maintainer, that maintainer may
+explicitly accept architectural decisions, ADR amendments, and reviewed
+implementation changes. A second human approval is not required solely
+because no other project maintainer exists. The owner's acceptance must be
+recorded on the relevant PR or decision record, stating the accepted scope
+and any remaining gates.
+
+AI-assisted technical review is allowed as supporting evidence when its
+provenance and limitations are stated. It is not represented as an independent
+human approval. An agent's review, the owner's acceptance, and the outcome of
+automated checks are distinct records.
+
+This authority does not waive:
+- ADR-022's PR-only, squash-only merge path or the repository's required CI
+  checks and other enforced rules;
+- an accepted ADR, charter, security control, or explicit task-specific
+  review/authorization requirement;
+- the pre-registered independence, custody, implementation pinning, scoring
+  and success criteria of a blind validation protocol;
+- historical validation outcomes. FAIL cannot be changed to PASS by owner
+  acceptance or by a subsequent implementation correction.
+
+For validation milestones, the owner may accept architecture and authorize
+future work, but a PASS must follow the frozen protocol and recorded evidence.
+When additional maintainers join, a stricter human-review requirement may be
+adopted explicitly, without silently changing existing validation contracts.
+
 ## Release-candidate architecture verification
 
 Before tagging a release candidate, perform a lightweight architecture
