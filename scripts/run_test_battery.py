@@ -268,6 +268,15 @@ GATE_EXCLUSIONS: tuple[tuple[str, str], ...] = (
         "main-only: opt-in, needs the G2-1 public smoke cases and both pinned "
         "environments (skipped unless the MNEME_G2H_* variables are set)",
     ),
+    (
+        "tests/test_adr034_g2_1_r2_harness.py",
+        "main-only: benchmark tooling (ADR-034 G2-1 R2 scoring harness)",
+    ),
+    (
+        "tests/test_adr034_g2_1_r2_harness_smoke.py",
+        "main-only: opt-in, needs the G2-1 R2 public smoke cases and both pinned "
+        "environments (skipped unless the MNEME_G2R2_* variables are set)",
+    ),
     ("tests/test_eventcatalog_import.py", "main-only: experimental integration"),
     ("tests/integrations/hermes", "main-only: experimental integration"),
     (
