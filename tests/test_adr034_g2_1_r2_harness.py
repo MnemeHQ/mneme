@@ -657,29 +657,64 @@ def test_g6_values_come_from_the_builds_evaluation_in_order():
         assert _why(case, _obs(_hook(evaluations=[evaluation])), "G6") == [reason]
 
 
-def test_g6_routed_fallback_uses_the_r2a1_6_expectation_whatever_the_labels():
-    case = _case("L", g6_routed_fallback=True, hook_exit=0, disposition="proceeded",
-                 expected_cause="fail_open", applied_numeric_rule_ids=[],
-                 relevant_enforcement_per_rule={}, relevant_enforcement_observed=False,
-                 evaluation_complete=None, numeric_rules=[])
-    record = _record([], outcome="proceeded", cause="fail_open", subject=False, ec=None)
-    record["checker"]["trusted"] = False
-    evaluation = [{"per_rule": {}, "event": False, "evaluation_complete": None}]
-    impl = _hook(exit_code=0, disposition="proceeded", records=[record],
+def _fallback_case(**overrides) -> "h.Case":
+    # The stored evaluation_complete label is null, as R2A1.6 had it written.
+    labels = dict(g6_routed_fallback=True, hook_exit=0, disposition="proceeded",
+                  expected_cause="fail_open", applied_numeric_rule_ids=[],
+                  relevant_enforcement_per_rule={}, relevant_enforcement_observed=False,
+                  evaluation_complete=None, numeric_rules=[])
+    labels.update(overrides)
+    return _case("L", **labels)
+
+
+def _fallback_hook(trusted: bool, ec) -> dict:
+    record = _record([], outcome="proceeded", cause="fail_open", subject=False, ec=ec)
+    record["checker"]["trusted"] = trusted
+    evaluation = [{"per_rule": {}, "event": False, "evaluation_complete": ec}]
+    return _hook(exit_code=0, disposition="proceeded", records=[record],
                  evaluations=evaluation, traces=[], flag="--proposed-new-file")
-    assert _gates(case, _obs(impl))["G6"]["pass"]
-    # A label that disagrees with R2A1.6 does not move G6; it is a label finding.
-    case.expected["applied_numeric_rule_ids"] = [RID_A]
-    case.expected["relevant_enforcement_per_rule"] = {RID_A: False}
+
+
+def test_g6_routed_fallback_expects_a_trusted_false_per_r2_amendment_2():
+    """A2R2.2/A2R2.3: a trusted legacy false passes step 4; an untrusted null fails."""
+    case = _fallback_case()
+    assert h.g6_expectation(case.expected)["evaluation_complete"] is False
+    assert _gates(case, _obs(_fallback_hook(True, False)))["G6"]["pass"]
+    assert _why(case, _obs(_fallback_hook(False, None)), "G6") == ["step4:evaluation_complete"]
+    assert _why(case, _obs(_fallback_hook(True, True)), "G6") == ["step4:evaluation_complete"]
+    # The stored null is consistent with the flag; it is not a label finding.
+    result = h.score_case(case, _obs(_fallback_hook(True, False)), HOST)
+    assert "label_inconsistent_with_r2a1_6" not in result["diagnostics"]["conformance"]
+
+
+def test_r2_amendment_2_is_keyed_on_the_flag_only():
+    """A non-flagged case's null label is never reinterpreted."""
+    case = _fallback_case(g6_routed_fallback=False)
+    assert h.g6_expectation(case.expected)["evaluation_complete"] is None
+    assert _gates(case, _obs(_fallback_hook(False, None)))["G6"]["pass"]
+    assert _why(case, _obs(_fallback_hook(True, False)), "G6") == ["step4:evaluation_complete"]
+
+
+def test_g6_routed_fallback_ignores_other_disagreeing_labels_and_needs_a_record():
+    case = _fallback_case(applied_numeric_rule_ids=[RID_A],
+                          relevant_enforcement_per_rule={RID_A: False})
+    impl = _fallback_hook(True, False)
     result = h.score_case(case, _obs(impl), HOST)
     assert result["gates"]["G6"]["pass"]
     assert "label_inconsistent_with_r2a1_6" in result["diagnostics"]["conformance"]
-    # A fallback record with a boolean evaluation_complete fails step 4 (see README Q1).
-    impl["evidence_evaluation"] = [{"per_rule": {}, "event": False, "evaluation_complete": False}]
-    assert _why(case, _obs(impl), "G6") == ["step4:evaluation_complete"]
-    # A record must still exist.
     impl["evidence_records"], impl["evidence_evaluation"] = [], []
     assert _why(case, _obs(impl), "G6") == ["record_count_0"]
+
+
+def test_r2_amendment_2_summary_counts_flagged_cases_by_class_with_g6_outcome():
+    flagged = _fallback_case()
+    plain = _case()
+    scored = [(flagged, h.score_case(flagged, _obs(_fallback_hook(True, False)), HOST)),
+              (flagged, h.score_case(flagged, _obs(_fallback_hook(False, None)), HOST)),
+              (plain, h.score_case(plain, _obs(), HOST))]
+    summary = h.r2_amendment_2_summary(scored)
+    assert summary["applied"] is True and summary["flagged_cases"] == 2
+    assert summary["by_class"] == {"L": {"cases": 2, "g6_fail": 1, "g6_pass": 1}}
 
 
 def test_g6_unrouted_case_must_have_no_record_and_mode_cause_bindings_are_checked():
@@ -765,6 +800,8 @@ def test_end_to_end_synthetic_corpus_passes_every_gate_with_identical_passes(cor
     assert result["public_smoke"]["cases"] == 1
     assert result["public_smoke"]["passes_identical"] is True
     assert result["gates"]["G7"]["applicable"] == len(cases) - 1
+    assert result["r2_amendment_2"]["applied"] is True
+    assert result["r2_amendment_2"]["flagged_cases"] == 0
     assert result["amendment_2"]["in_scope_by_class"] == {
         "L": {"a2_pass": 1, "cases": 1, "raw_bytes_identical": 1}}
     summary = (tmp_path / "out" / "run-1" / "summary.json").read_text()
@@ -773,10 +810,10 @@ def test_end_to_end_synthetic_corpus_passes_every_gate_with_identical_passes(cor
         (tmp_path / "out" / "run-1" / "cases.jsonl").read_text()
 
 
-def test_end_to_end_routed_fallback_records_a_boolean_evaluation_complete(tmp_path):
-    """Q1 (README): at the pinned source a routed link-component fallback writes a
-    trusted record whose evaluation_complete is the legacy payload's boolean, so
-    R2A1.6's null expectation fails G6 step 4 and nothing else."""
+def test_end_to_end_routed_fallback_passes_with_a_trusted_false(tmp_path):
+    """R2 Amendment 2: at the pinned source a routed link-component fallback writes
+    a trusted record whose evaluation_complete is the legacy payload's false. The
+    flagged case (stored label null) is scored against false and passes every gate."""
     if not _symlinks(tmp_path):
         pytest.skip("symlinks not available")
     root = tmp_path / "corpus"
@@ -791,5 +828,9 @@ def test_end_to_end_routed_fallback_records_a_boolean_evaluation_complete(tmp_pa
     assert record["checker"]["trusted"] is True
     assert obs["implementation"]["evidence_evaluation"] == [
         {"per_rule": {}, "event": False, "evaluation_complete": False}]
+    assert case.expected["evaluation_complete"] is None  # the stored label
     failing = {g: v["why"] for g, v in result["gates"].items() if not v["pass"]}
-    assert failing == {"G6": ["step4:evaluation_complete"]}
+    assert failing == {}
+    assert result["diagnostics"]["conformance"] == []
+    assert h.r2_amendment_2_summary([(case, result)])["by_class"] == {
+        "L": {"cases": 1, "g6_fail": 0, "g6_pass": 1}}

@@ -84,3 +84,5 @@ def test_public_smoke_cases_score_cleanly_on_the_pinned_builds(tmp_path):
     assert failing == {}
     assert all(smoke["gates"][g]["applicable"] == 13 for g in ("G1", "G3", "G6", "G8"))
     assert smoke["label_conformance_mismatches"] == {}
+    assert smoke["r2_amendment_2"]["applied"] is True
+    assert final["r2_amendment_2"]["flagged_cases"] == 0  # no concealed cases here

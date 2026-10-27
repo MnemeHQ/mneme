@@ -238,19 +238,39 @@ The four §5 steps then run in order.
 4. **`evaluation_complete`.** The build's `recorded_evaluation_complete()`
    equals `evaluation_complete`. `null` is a distinct value here.
 
-**Routed fallbacks (R2A1.6).** For a case marked `g6_routed_fallback`, the
-expectation is fixed whatever the other G6 labels say:
+**Routed fallbacks (R2A1.6, as corrected by R2 Amendment 2).** For a case
+marked `g6_routed_fallback`, the expectation is fixed whatever the other G6
+labels say:
 
 | Item | Expected |
 |---|---|
 | Rule-ID set | `{}` |
 | Per-rule relevance | `{}` |
 | Event-level relevance | `false` |
-| `evaluation_complete` | `null` |
+| `evaluation_complete` | **`false`** (A2R2.2; R2A1.6 had `null`) |
 | Records | exactly one must exist |
 
-A disagreeing label does not change this. It is reported as the non-gating
-finding `label_inconsistent_with_r2a1_6`. See Q1.
+**How the stored label is read (A2R2.3).** The sealed corpus stores `null`
+for these cases. The harness reads the expected value as `false`, keyed on
+the `g6_routed_fallback` flag alone, never on a case identity. No other
+label is reinterpreted, in that case or any other.
+
+**What fails step 4.** An untrusted or absent value fails it, meaning
+`recorded_evaluation_complete()` returns `None`. Any value other than
+`false` also fails it.
+
+**Other labels.** A label that otherwise disagrees with R2A1.6 does not
+change the expectation. It is reported as the non-gating finding
+`label_inconsistent_with_r2a1_6`. A stored `null` or `false`
+`evaluation_complete` is consistent.
+
+**Reporting (A2R2.4).** Every run summary has an `r2_amendment_2` block:
+
+- `applied: true`;
+- the number of flagged cases;
+- their G6 pass and fail counts, by class.
+
+The headline repeats it.
 
 **`EXCLUDED` rules (R2A1.2, AMB-R2-07).** A rule that appears only as
 `EXCLUDED` (label `rule_id_form_verified: false`) is never in an applied
@@ -321,7 +341,7 @@ smoke cases:
 
 ## Tests
 
-**`tests/test_adr034_g2_1_r2_harness.py`** (main-only; 75 tests). It covers:
+**`tests/test_adr034_g2_1_r2_harness.py`** (main-only). It covers:
 
 - **Pins:** the pins against the pre-registration and the freeze record.
 - **Preconditions:**
@@ -352,7 +372,7 @@ smoke cases:
 - **End to end:** two passes over 13 synthetic cases, with the repository
   source as both builds. Every gate passes, G7 holds, and the smoke case is
   kept out of `cases.jsonl` and `summary.json`.
-- **A pinned routed-fallback finding:** see Q1.
+- **Routed fallbacks (R2 Amendment 2):** a trusted `false` passes step 4 for a flagged case and an untrusted `null` fails it; the flag alone, never a case identity, triggers the reading; an end-to-end synthetic fallback passes every gate; the `r2_amendment_2` summary counts are checked.
 
 **`tests/test_adr034_g2_1_r2_harness_smoke.py`** is opt-in. It needs these
 variables:
@@ -370,8 +390,18 @@ pinned wheels. On 2026-10-27, with the #646 host identity, the result was:
 - the passes identical;
 - 0 label mismatches.
 
-## Open questions for the reviewer
+## Owner and reviewer decisions on the open questions
 
-Q1 to Q8 are listed in the PR body. Owner and reviewer decisions are
-recorded here once made, before the harness is pinned in the pre-scoring
-completion record.
+- **Q1 (routed-fallback `evaluation_complete`): resolved by R2 Amendment 2
+  (#689).**
+  - **The finding.** Before decryption, on scorer-written synthetic content
+    only, a routed link-component fallback was observed at the pinned source.
+    Its record carries `checker.trusted: true`, no subject, `rules: []` and
+    the legacy payload's `evaluation_complete: false`.
+  - **The owner's ruling.** The owner corrected the expectation to `false`
+    (A2R2.2), read through the flag (A2R2.3). An untrusted `null` fails.
+  - **How it is pinned.** The tests tell the two values apart, and an
+    end-to-end synthetic fallback passes every gate.
+- **Q2 to Q8:** these are listed in the PR body and wait for the reviewer.
+  Decisions are recorded here before the harness is pinned in the
+  pre-scoring completion record.

@@ -155,10 +155,14 @@ DISCLOSURES = (
     "recorded_evaluation_complete(), with the pinned host identity given as input, right "
     "after the hook run while the fixture is still in place. This is synthetic replay: "
     "it is never evidence that a live host enforced anything.",
-    "R2A1.6: a case marked g6_routed_fallback is scored by G6 against the fixed "
-    "expectation (rule-ID set {}, per-rule {}, event-level false, evaluation_complete "
-    "null, one record), whatever its other G6 labels say; a disagreeing label is "
-    "reported as a non-gating label finding.",
+    "R2A1.6 as corrected by R2 Amendment 2 (A2R2.2, A2R2.3): a case marked "
+    "g6_routed_fallback is scored by G6 against the fixed expectation (rule-ID set {}, "
+    "per-rule {}, event-level false, evaluation_complete false, exactly one record), "
+    "whatever its other G6 labels say. The stored null evaluation_complete label is "
+    "read as false by the flag alone; an untrusted or absent value (None) or any other "
+    "value fails G6 step 4. A label disagreeing with R2A1.6 otherwise is reported as a "
+    "non-gating finding. The summary's r2_amendment_2 block counts flagged cases and "
+    "their G6 outcome by class.",
     "Public smoke cases are run and reported separately; they are never in a gate "
     "denominator (G2V-F4).",
     "G5 implements R1 pre-registration Amendment 2: where the pinned baseline's own run "
@@ -1433,9 +1437,16 @@ def mapped_cause(record: dict) -> str | None:
 
 
 def g6_expectation(e: dict) -> dict:
-    """What G6 steps 1-4 expect. R2A1.6 fixes it for a routed fallback."""
+    """What G6 steps 1-4 expect.
+
+    For a case flagged ``g6_routed_fallback`` the expectation is fixed by
+    R2A1.6 as corrected by R2 Amendment 2 (A2R2.2/A2R2.3): rule-ID set {},
+    per-rule {}, event-level false and ``evaluation_complete`` false. The
+    stored ``null`` label is superseded by the flag alone, never by case
+    identity; ``None`` (untrusted or absent) and any other value fail step 4.
+    """
     if e.get("g6_routed_fallback") is True:
-        return {"rule_ids": set(), "per_rule": {}, "event": False, "evaluation_complete": None}
+        return {"rule_ids": set(), "per_rule": {}, "event": False, "evaluation_complete": False}
     return {"rule_ids": set(e.get("applied_numeric_rule_ids") or []),
             "per_rule": dict(e.get("relevant_enforcement_per_rule") or {}),
             "event": e.get("relevant_enforcement_observed"),
@@ -1803,10 +1814,13 @@ def label_conformance(case: Case, obs: dict, traces: dict) -> list[str]:
     if e.get("routed_cr_parity_exception") is not routed_cr_exception(
             case, bool(facts.get("content_has_cr"))):
         out.append("routed_cr_parity_exception")
+    # The stored evaluation_complete of a flagged case is null (R2A1.6) or, if
+    # authored after R2 Amendment 2, false; either is consistent (A2R2.3).
     if e.get("g6_routed_fallback") is True and (
             e.get("applied_numeric_rule_ids") != [] or e.get("relevant_enforcement_per_rule") != {}
             or e.get("relevant_enforcement_observed") is not False
-            or e.get("evaluation_complete") is not None):
+            or not (e.get("evaluation_complete") is None
+                    or e.get("evaluation_complete") is False)):
         out.append("label_inconsistent_with_r2a1_6")
     if e.get("evidence_record_expected") is True and e.get("g6_routed_fallback") is not True:
         per_rule = e.get("relevant_enforcement_per_rule") or {}
@@ -1868,6 +1882,28 @@ def amendment_2_summary(scored: list[tuple[Case, dict]]) -> dict:
             "comparison": A2_COMPARISON}
 
 
+R2_AMENDMENT_2 = (
+    "R2 Amendment 2 (A2R2.2, A2R2.3): for every case flagged g6_routed_fallback, G6 "
+    "expects evaluation_complete false (R2A1.6 had null); the stored null label is "
+    "read as false by the flag alone, and no other label is reinterpreted. An untrusted "
+    "or absent value (recorded_evaluation_complete() returns None), or any other value, "
+    "fails step 4. No case is excluded from any gate."
+)
+
+
+def r2_amendment_2_summary(scored: list[tuple[Case, dict]]) -> dict:
+    """A2R2.4: flagged routed-fallback cases by class, and their G6 outcome."""
+    by_class: dict[str, dict[str, int]] = {}
+    for case, result in scored:
+        if case.expected.get("g6_routed_fallback") is not True:
+            continue
+        row = by_class.setdefault(case.klass, {"cases": 0, "g6_pass": 0, "g6_fail": 0})
+        row["cases"] += 1
+        row["g6_pass" if result["gates"]["G6"]["pass"] else "g6_fail"] += 1
+    return {"applied": True, "flagged_cases": sum(r["cases"] for r in by_class.values()),
+            "by_class": dict(sorted(by_class.items())), "rule": R2_AMENDMENT_2}
+
+
 def run_pass(cases: list[Case], ctx: Context, host: tuple[str, str], out_dir: Path) -> dict:
     out_dir.mkdir(parents=True)
     scored: list[tuple[Case, dict]] = []
@@ -1892,7 +1928,8 @@ def run_pass(cases: list[Case], ctx: Context, host: tuple[str, str], out_dir: Pa
     smoke_summary = {"cases": len(smoke), "gating": False, "gates": aggregate(smoke),
                      "label_conformance_mismatches": dict(sorted(smoke_conformance.items())),
                      "label_conformance": conformance_count(smoke),
-                     "amendment_2": amendment_2_summary(smoke)}
+                     "amendment_2": amendment_2_summary(smoke),
+                     "r2_amendment_2": r2_amendment_2_summary(smoke)}
     (out_dir / "smoke_summary.json").write_text(dump_json(smoke_summary), encoding="ascii",
                                                 newline="\n")
     summary = {
@@ -1906,6 +1943,7 @@ def run_pass(cases: list[Case], ctx: Context, host: tuple[str, str], out_dir: Pa
              "normalized_equal": s["diagnostics"]["stderr"]["normalized_equal"]}
             for c, s in concealed if "stderr" in s["diagnostics"]],
         "amendment_2": amendment_2_summary(concealed),
+        "r2_amendment_2": r2_amendment_2_summary(concealed),
     }
     (out_dir / "summary.json").write_text(dump_json(summary), encoding="ascii", newline="\n")
     return dict(summary, public_smoke=smoke_summary)
@@ -2012,6 +2050,10 @@ def score(*, corpus: Path, out_dir: Path, impl_python: str, impl_wheel: Path,
     # A gate PASS is never label agreement: report the mismatch count beside it.
     final["headline"] += (f" Label conformance (non-gating): {lc['cases_with_mismatch']} of "
                           f"{lc['cases']} concealed cases have at least one label mismatch.")
+    a2r2 = final["r2_amendment_2"]
+    final["headline"] += (f" R2 Amendment 2 applied: {a2r2['flagged_cases']} routed-fallback "
+                          f"case(s) scored with evaluation_complete false, by class "
+                          f"{json.dumps(a2r2['by_class'], sort_keys=True)}.")
     return _finish(out_dir, final)
 
 
@@ -2041,6 +2083,7 @@ def score_passes(cases: list[Case], ctx: Context, root: Path, out_dir: Path) -> 
         "label_conformance": summaries[0]["label_conformance"],
         "g5_stderr_diagnostics": summaries[0]["g5_stderr_diagnostics"],
         "amendment_2": summaries[0]["amendment_2"],
+        "r2_amendment_2": summaries[0]["r2_amendment_2"],
     }
 
 
