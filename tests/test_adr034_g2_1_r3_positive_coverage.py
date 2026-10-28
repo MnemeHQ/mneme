@@ -164,21 +164,28 @@ def _case(tmp_path: Path, cls: str, i: int) -> tuple[dict, SimpleNamespace, dict
         if sub == "AT-S0" or (sub == "AT-W0" and i % 2 == 0):
             checker_subject = "absent"
     elif cls == "LIT":
-        literals = [("synthetic-literal", C.LITERAL)]
-        if i < 2:
-            numeric_outcomes = {"synthetic-numeric": {
-                "matcher_status": "RECOGNIZED", "matcher_outcome": "VIOLATION",
-                "primary_reason": None,
+        # The literal and numeric labels must be backed by real, distinct
+        # synthetic ADR fixtures; fabricated rule IDs cannot establish this.
+        lit = _literal_rule(f"ADR-{9600+i}", "eval(")
+        fixture_files.append(lit)
+        literals = [(r.rule_id, r.rule_type) for r in _fixture_rules([lit])]
+        content = "result = eval('1')\n"
+        if i < 4:
+            num = _num_rule(f"ADR-{9610+i}", include="src/**")
+            fixture_files.append(num)
+            rule = next(r for r in _fixture_rules([num]) if r.rule_type == C.NUMERIC)
+            applied = [rule.rule_id]
+            violated = i < 2
+            content = f"LIMIT_S = {8 if violated else 3}\n" + content
+            numeric_outcomes = {rule.rule_id: {
+                "matcher_status": "RECOGNIZED",
+                "matcher_outcome": "VIOLATION" if violated else "NO_VIOLATION",
+                "primary_reason": None, "unknown_reasons": [],
             }}
-            cause = "numeric_violation"
-        elif i < 4:
-            numeric_outcomes = {"synthetic-numeric": {
-                "matcher_status": "RECOGNIZED", "matcher_outcome": "NO_VIOLATION",
-                "primary_reason": None,
-            }}
+            cause = "numeric_violation" if violated else "other_rule"
+        else:
             cause = "other_rule"
         disposition = "refused"
-        applied = list(numeric_outcomes)
     elif cls == "SC":
         fixture_files.append(_num_rule(f"ADR-97{i:02}", include="src/**", call=True))
         rule = next(r for r in _fixture_rules(fixture_files) if r.rule_type == C.NUMERIC)
@@ -195,10 +202,24 @@ def _case(tmp_path: Path, cls: str, i: int) -> tuple[dict, SimpleNamespace, dict
         }}
         content = ("def check(x): return x\ncheck(7)\n" if i < 2
                    else "def check(x): return x\ncheck(3)\n" if i < 4
-                   else "def wrapper(check):\n    return check(3)\n")
+                   else "def check(x): return x\ndef wrapper(check):\n    return check(3)\n")
     elif cls == "MR":
-        applied = ["synthetic-rule-A", "synthetic-rule-B"]
+        # §7b genuinely has two APPLIED numeric rules with distinct
+        # declaration sources; their IDs are derived from typed ADRs.
+        a_adr = _num_rule(f"ADR-{9500+i*2}", include="src/**", symbol="LIMIT_S")
+        b_adr = _num_rule(f"ADR-{9501+i*2}", include="src/**", symbol="OTHER_S")
+        fixture_files.extend([a_adr, b_adr])
+        applied = [next(r.rule_id for r in _fixture_rules([adr])
+                        if r.rule_type == C.NUMERIC) for adr in (a_adr, b_adr)]
         numeric_outcomes = {}
+        content = "LIMIT_S = 8\n" if i in (0, 1) else "LIMIT_S = 3\n"
+        if i in (1, 2):
+            content += "OTHER_S = 3\n"
+        if i in (3, 4):
+            lit = _literal_rule(f"ADR-{9570+i}", "eval(")
+            fixture_files.append(lit)
+            literals = [(r.rule_id, r.rule_type) for r in _fixture_rules([lit])]
+            content += "result = eval('1')\n"
         if i == 0:
             statuses = [("RECOGNIZED", "VIOLATION"), ("MATCHER_UNEVALUATED", "UNEVALUATED")]
             event_relevance, complete = True, False
@@ -212,12 +233,13 @@ def _case(tmp_path: Path, cls: str, i: int) -> tuple[dict, SimpleNamespace, dict
             event_relevance, complete = True, True
         else:
             statuses = [("RECOGNIZED", "NO_VIOLATION"), ("MATCHER_UNEVALUATED", "UNEVALUATED")]
-            event_relevance, complete = False, False
+            event_relevance, complete = (i >= 5), False
             if i in (3, 4):
-                literals = [("synthetic-literal", C.LITERAL)]
                 disposition, cause = "refused", "other_rule"
         for rid, (status, outcome) in zip(applied, statuses):
-            numeric_outcomes[rid] = {"matcher_status": status, "matcher_outcome": outcome}
+            numeric_outcomes[rid] = {"matcher_status": status, "matcher_outcome": outcome,
+                                     "primary_reason": None if status == "RECOGNIZED" else "SOURCE_NOT_FOUND",
+                                     "unknown_reasons": [] if status == "RECOGNIZED" else ["SOURCE_NOT_FOUND"]}
     if cls == "MR":
         rule_relevance = {rid: event_relevance and (i == 2 or rid == applied[0])
                           for rid in applied}
