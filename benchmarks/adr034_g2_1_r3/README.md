@@ -109,9 +109,14 @@ manually. A missing-LIT negative must revert to FAIL.
 This is a **coverage/admission logic unit test**, not a full Mneme
 implementation or G1–G8 execution test: gate-pass observations and matching
 outcome labels are scorer-authored synthetic controls. No concealed fixtures
-are used. Owner interpretations of byte variety, AT pair identity and L
-feature provenance, plus the complete SC lexical-shape inventory, remain
-separate open review items. This positive control does not resolve them.
+are used. The owner accepted the MR, byte-variety, AT diversity, L fixture
+and frozen 0.10.0 provenance interpretations in
+[`adr-034-g2-1-r3-pre-unblind-interpretations-2026-10-28.md`](../../docs/validation/adr-034-g2-1-r3-pre-unblind-interpretations-2026-10-28.md).
+The full qualitative SC lexical-shape inventory and whether a public AT
+really differs materially from concealed AT are **not** certified by these
+numeric counters. Those limitations require separate structural evidence
+and independent owner review; a green synthetic positive test is not such
+evidence.
 
 ## Interpretations fixed before decryption (for review)
 
@@ -160,6 +165,23 @@ separate open review items. This positive control does not resolve them.
 - **I13** Checker-level parity compares stdout and exit (R1 G5).
 - **I14** The compiled memory must carry exactly the derived typed-rule ids
   and no legacy constraints or anti-patterns. Otherwise the case fails G8.
+- **I15 (accepted owner interpretation)** MR §7b rows 1–2 require strict
+  numeric refusal attributable to the violated rule; row 3 is a complete
+  clean proceed with relevant rules; the native row-4 analogue remains R2's
+  literal-only refusal.
+- **I16 (accepted)** Byte variety is pooled across V/C/L. An empty write
+  cannot count as routed V/C, and a lone surrogate is not valid non-ASCII
+  UTF-8. L subtypes are derived from declared fixtures plus pre-snapshots,
+  never from post-run mutable paths.
+- **I17 (accepted)** AT diversity compares typed rule semantics, ignoring
+  cosmetic ADR-ID and file-name changes. AT-SI additionally checks independently
+  derived literal identities and distinct include scopes. Structural
+  fingerprints cannot prove qualitative novelty or public/concealed
+  independence.
+- **I18 (accepted)** R3 §2 freezes Mneme `0.10.0`. The checker/evidence
+  and installed runtime are compared to the frozen constant, not to the
+  tested wheel's self-reported version. A version mismatch fails G6/G8.
+  Wheel and installed-file attestation remain external pre-scoring gates.
 
 ## Known limitations
 
