@@ -351,3 +351,59 @@ def test_synthetic_concealed_only_positive_control_is_sensitive_to_missing_lit(t
     assert not coverage_result["met"]
     assert "LIT:mixed_violation:below_minimum" in coverage_result["shortfalls"]
     assert "LIT:mixed_clean_refusal:below_minimum" in coverage_result["shortfalls"]
+    floor = gates.floors(cases, passes, public_evidence)
+    assert not floor["met"]
+    outcome = gates.decide(
+        _success_results(cases), floor, {"capable": True}, "concealed",
+        {"manifest": {"entries": 128, "mismatches": []}},
+    )
+    assert outcome["verdict"] == "FAIL"
+
+
+@pytest.mark.parametrize("missing", [
+    "public", "manifest", "symlink", "case_failure", "lone_surrogate",
+    "sc_ambiguous", "mr_row1",
+])
+def test_synthetic_positive_control_ablations_fail(tmp_path, missing):
+    """Each ablation operates on synthetic data, never a held-out case."""
+    try:
+        cases, passes, public_evidence = _synthetic_admission(tmp_path)
+    except OSError as exc:
+        pytest.skip(f"symlink capability unavailable: {type(exc).__name__}")
+
+    passed_results = _success_results(cases)
+    integrity = {"manifest": {"entries": 128, "mismatches": []}}
+    symlinks = {"capable": True}
+    if missing == "public":
+        public_evidence = {"verified": False, "public_cases": 0, "classes": []}
+    elif missing == "manifest":
+        integrity = {"manifest": {"entries": 0, "mismatches": ["missing"]}}
+    elif missing == "symlink":
+        symlinks["capable"] = False
+    elif missing == "case_failure":
+        passed_results[0]["passed"] = False
+        passed_results[0]["gates"]["G1"] = {
+            "applies": True, "result": "fail", "failures": ["synthetic_failure"],
+        }
+    elif missing == "lone_surrogate":
+        for case in cases:
+            if case["cls"] == "L" and "\ud800" in case["event"]["content"]:
+                case["event"]["content"] = "ordinary text"
+    elif missing == "sc_ambiguous":
+        for case in cases:
+            if case["cls"] == "SC":
+                exp = passes[case["case_id"]][0][0]
+                for value in exp.numeric_outcomes.values():
+                    if value["matcher_outcome"] == "UNEVALUATED":
+                        value["primary_reason"] = "SOURCE_NOT_FOUND"
+                        value["unknown_reasons"] = ["SOURCE_NOT_FOUND"]
+    elif missing == "mr_row1":
+        case = next(c for c in cases if c["cls"] == "MR")
+        exp = passes[case["case_id"]][0][0]
+        exp.event_relevance = False
+
+    floor = gates.floors(cases, passes, public_evidence)
+    result = gates.decide(passed_results, floor, symlinks, "concealed", integrity)
+    assert result["verdict"] == ("INCOMPLETE" if missing == "symlink" else "FAIL")
+    if missing in ("public", "lone_surrogate", "sc_ambiguous", "mr_row1"):
+        assert not floor["coverage"]["met"]
