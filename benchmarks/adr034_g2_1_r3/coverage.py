@@ -103,6 +103,7 @@ def _l_features(case: dict, exp, obs: dict) -> set[str]:
         found.add("lone_surrogate")
     return found
 
+
 def inspect(cases: list, passes: dict, public_evidence: dict | None = None) -> dict:
     """Check extra frozen distribution rules; missing evidence is a failure.
 
@@ -195,12 +196,18 @@ def inspect(cases: list, passes: dict, public_evidence: dict | None = None) -> d
                     counts["MR:row2_violation_clean"] += 1
                 if (numeric and len(clean) == len(numeric)
                         and exp.disposition == "proceeded"
+                        and exp.evaluation_complete is True
                         and exp.event_relevance is True
                         and all(exp.per_rule_relevance.get(rid) is True
                                 for rid in exp.applied_rule_ids)):
                     counts["MR:row3_all_clean"] += 1
                 if (exp.literal_violations and exp.mode == "strict" and exp.disposition == "refused"
                     and exp.cause == "other_rule" and not violating
+                    and numeric and all(
+                        o.get("matcher_outcome") == "NO_VIOLATION"
+                        or (o.get("matcher_status") == "MATCHER_UNEVALUATED"
+                            and o.get("matcher_outcome") == "UNEVALUATED")
+                        for o in numeric)
                     and all(v is False for v in exp.per_rule_relevance.values())):
                     counts["MR:literal_only_refusal_analogue"] += 1
 
