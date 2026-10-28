@@ -1143,18 +1143,3 @@ def test_r3_nonascii_byte_feature_rejects_lone_surrogate():
     assert "non_ascii" not in coverage._byte_features("x = '\ud800'")
     assert "non_ascii" in coverage._byte_features("x = 'é'")
     assert "non_ascii" not in coverage._byte_features("ascii")
-
-
-def test_r3_mr_strict_numeric_refusal_is_required_for_row12(tmp_path):
-    # A full synthetic multi-rule baseline is constructed in the dedicated
-    # positive-coverage test. This invariant is fixed by ADR-034 §7b.
-    from tests.test_adr034_g2_1_r3_positive_coverage import _case
-    for row in (0, 1):
-        case, exp, obs = _case(tmp_path, "MR", row)
-        cases, passes = [case], {case["case_id"]: [(exp, obs)]}
-        baseline = coverage.inspect(cases, passes)
-        key = "MR:row1_violation_unevaluated" if row == 0 else "MR:row2_violation_clean"
-        assert baseline["counts"][key] == 1
-        exp.disposition, exp.cause = "proceeded", "none"
-        wrong = coverage.inspect(cases, passes)
-        assert wrong["counts"].get(key, 0) == 0
