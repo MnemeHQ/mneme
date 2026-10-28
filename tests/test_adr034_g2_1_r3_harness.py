@@ -1041,3 +1041,42 @@ def test_r3_unexpected_scoring_exception_is_case_local_and_redacted(tmp_path, mo
         {"ok": True}, HOST, [], "0.10.0", {},
     )
     assert healthy["passed"]
+
+
+# ── Scorer B G8 metadata confidentiality: observation-stage exceptions ──────
+
+
+@pytest.mark.parametrize("error_type, expected", [
+    (oracle.OracleError, "oracle_undetermined:OracleError"),
+    (runner.HarnessError, "harness:HarnessError"),
+    (RuntimeError, "harness:RuntimeError"),
+    (ValueError, "harness:ValueError"),
+])
+def test_r3_observe_safely_redacts_exception_messages_from_metadata(
+    tmp_path, monkeypatch, error_type, expected,
+):
+    """Reproduce scorer B's synthetic content/path leak without hidden cases."""
+    marker = "LEAKMARKER-synthetic-fixture-source"
+    case = _synthetic("syn-at-si")
+    case["event"]["content"] += "\n" + marker
+    private_detail = f'{marker} C:/private/cases/synthetic/root {case["event"]["content"]!r}'
+
+    def raise_during_observation(*args):
+        raise error_type(private_detail)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(runner, "observe", raise_during_observation)
+        exp, obs = runner.observe_safely(case, None, {"ok": True})
+
+    assert exp is None
+    assert obs == {"error": expected}
+    scored = gates.score_case_safely(
+        case, [(exp, obs), (exp, obs)], {"ok": True}, HOST, [], "0.10.0", {},
+    )
+    assert scored["passed"] is False
+    assert scored["gates"]["G8"]["failures"] == [expected]
+    assert all(scored["gates"][g]["result"] == "fail" for g in C.GATES)
+    report = json.dumps({"cases": [scored]}, sort_keys=True)
+    assert marker not in report
+    assert "C:/private/cases" not in report
+    assert "private_detail" not in report
