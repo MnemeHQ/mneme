@@ -10,6 +10,7 @@ from __future__ import annotations
 import base64
 import copy
 import hashlib
+import json
 import os
 from pathlib import Path
 
@@ -828,3 +829,39 @@ def test_f3_rejects_incomplete_lit_and_at_w0_distributions(tmp_path):
 
 def test_f3_missing_public_at_smoke_is_admission_failure():
     assert "public_AT_smoke_missing" in coverage.inspect([], {})["shortfalls"]
+
+
+def test_f2_compiled_version_binding_from_fixture_memory():
+    record = {"decision_index": {"rules": [
+        {"rule_id": "synthetic-rule-1", "decision_version_id": "dver-synthetic-1"},
+        {"rule_id": "synthetic-rule-2", "decision_version_id": "dver-synthetic-2"},
+    ]}}
+    raw_memory = _b64(json.dumps(record).encode("utf-8"))
+    assert runner.compiled_rule_versions(raw_memory) == {
+        "synthetic-rule-1": "dver-synthetic-1",
+        "synthetic-rule-2": "dver-synthetic-2",
+    }
+
+
+@pytest.mark.parametrize("rules", [
+    [{"rule_id": "rule-1", "decision_version_id": ""}],
+    [{"rule_id": "rule-1", "decision_version_id": None}],
+    [{"rule_id": "rule-1", "decision_version_id": "dver-x"},
+     {"rule_id": "rule-1", "decision_version_id": "dver-y"}],
+    [None],
+])
+def test_f2_compiled_version_binding_rejects_bad_memory(rules):
+    memory = _b64(json.dumps({"decision_index": {"rules": rules}}).encode("utf-8"))
+    with pytest.raises(runner.HarnessError):
+        runner.compiled_rule_versions(memory)
+
+
+def test_f3_rejects_unknown_classes_and_subclasses():
+    unknown_class = {"case_id": "synthetic-unknown", "cls": "not-a-class",
+                     "visibility": "concealed"}
+    unknown_at = {"case_id": "synthetic-at-unknown", "cls": "AT",
+                  "subclass": "AT-SN", "visibility": "concealed"}
+    status = coverage.inspect([unknown_class, unknown_at], {})
+    assert "unknown_class" in status["shortfalls"]
+    assert "unknown_AT_subclass" in status["shortfalls"]
+    assert not status["met"]
