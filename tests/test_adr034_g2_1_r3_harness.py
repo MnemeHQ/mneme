@@ -1106,3 +1106,22 @@ def test_r3_observed_disposition_values_are_redacted_from_metadata(at_si):
     assert "A:disposition_cause:mismatch" in g6_errors
     assert "A:hook_outcome:mismatch" in g6_errors
     assert marker not in json.dumps(result)
+
+
+def test_r3_attribution_malicious_observed_rule_id_is_not_reported(at_si):
+    case, exp, obs = at_si
+    marker = "LEAKMARKER-secret-rule-id"
+    obs["records"][0]["violations"].append({"rule_id": marker, "rule_type": C.LITERAL})
+    result = _score(case, exp, obs)
+    assert result["gates"]["G6"]["result"] == "fail"
+    assert "A:attribution:extra_identity:redacted" in _failures(result, "G6")
+    assert marker not in json.dumps(result)
+
+
+def test_r3_unexpected_relevance_key_is_redacted_from_metadata(at_si):
+    case, exp, obs = at_si
+    marker = "LEAKMARKER-private-rule-identity"
+    obs["pinned_g6"]["per_rule"][marker] = True
+    result = _score(case, exp, obs)
+    assert "A:unsafe_pass:unexpected_relevance" in _failures(result, "G1")
+    assert marker not in json.dumps(result)
