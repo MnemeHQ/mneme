@@ -189,6 +189,15 @@ candidate topology is a **sequential owner-mediated handoff** on `arxwn`:
 | Independent harness author/scorer | `MnemeAgent`, newly started Claude Code session B, only **after** handoff clearance | From normative contract and new public smoke fixtures only; has no concealed plaintext, author notes or author transcript before the owner-controlled unblind |
 | Administrator `hi` | Excluded from agent execution | No author or scorer session runs as admin |
 
+**Practical session configuration:** Author A and scorer B use
+different, pinned `CLAUDE_CONFIG_DIR` locations and distinct working
+directories. The [official Claude Code environment-variable reference](https://code.claude.com/docs/en/env-vars)
+documents that this controls the settings, session history and plugins
+location. This is **session organization, not an access control**;
+under the same Windows account B could still read A's directory until
+the owner verifies its removal/inaccessibility at the handoff. Do not
+copy hidden data or author transcripts into B's configuration.
+
 **Important limitation:** Two Claude sessions sharing `MnemeAgent` are
 *not an OS-enforced confidentiality boundary*. They share read authority
 over files in that Windows profile. Independence must be assessed on
@@ -251,26 +260,35 @@ property blocks sealing or scoring.
 
 ## 5. Roles and protocol sequence (proposed, not authorized)
 
-1. Owner reviews the inherited R2 gates, decides the R3-specific class
-   floors and new total; reviews role independence and closes custody gate.
-2. Pre-registration is reviewed and merged **before** any R3 corpus
-   authoring; modifications require dated, accepted pre-unblind amendment.
-3. New, eligible author creates R3 cases from normative specifications.
-   Separate sanitized ambiguity brief and owner rulings, if necessary,
-   before labels are frozen. Do not disclose hidden material to scorer.
-4. Owner-approved custodian seals the new corpus with deterministic tar,
-   manifest and public-key encryption; owner alone decrypt-verifies and
-   controls plaintext deletion. Publish metadata and hashes only.
-5. Independent scorer writes and pins an R3-specific harness, including
-   malformed-`rule_id` public synthetic regression tests; do not modify
-   R1/R2 harnesses.
-6. Pin scoring host and baseline, wheel, dependencies, exact harness bytes,
-   corpus integrity, symlink capability and all prerequisites in a
-   **pre-scoring completion record**. Merge it before decryption.
-7. Owner performs controlled unblind, scorer runs the prescribed two
-   equivalent passes, scores G1–G8 and publishes metadata-only result.
-   Evidence is sealed and plaintext copies removed under an explicitly
-   approved custody-close procedure. Any failure remains FAIL.
+1. Owner explicitly accepts the concealed-case floors (128 over 14
+   classes), the handoff policy and the frozen evaluation criteria.
+2. This pre-registration is reviewed and merged **before** any R3
+   corpus authoring. Later changes need a dated, accepted amendment
+   merged before unblind.
+3. New, eligible author creates R3 cases from normative specifications;
+   only sanitized ambiguity briefs reach the owner. The scorer sees
+   no hidden cases or author transcript.
+4. **Before sealing:** Complete the actual sealer's independent
+   synthetic decryption/backup-access checks and obtain the owner's
+   explicit #693 §9.5 custody gate decision. This is the normative
+   pre-seal deadline, **not** a requirement to finish Windows setup
+   before merging the pre-registration. Failure blocks sealing.
+5. Owner-approved custodian seals the corpus with deterministic tar,
+   manifest and owner public-key encryption. Owner alone decrypt-verifies,
+   controls plaintext deletion and verifies the same-account handoff.
+   Publish metadata/hashes only; scorer session B may not start until
+   the independently reviewed handoff returns GO.
+6. Independent scorer creates a new session/config, writes and pins
+   an R3 harness with malformed-`rule_id` public synthetic tests;
+   do not change R1/R2 harnesses. Independently reconfirm the scoring
+   session's owner-key isolation before any authorized unblind.
+7. Pin scoring host, baseline, wheel, dependencies, harness bytes,
+   corpus integrity and symlink capability in a **pre-scoring
+   completion record**. Merge that record before decryption.
+8. Owner controls unblind, scorer executes two equivalent passes,
+   scores G1–G8 and publishes metadata-only results. Seal evidence
+   and remove plaintext under a separately approved custody-close
+   procedure. Any gate failure remains FAIL.
 
 The original R1/R2 concealed corpora and old scoring/evidence folders
 remain off limits. All roles require a recorded identity and isolation
@@ -290,8 +308,10 @@ alone authorizes a scoring run.
   considered independent isolation. If the handoff cannot establish
   absence of readable hidden material, a separate execution identity is
   mandatory before proceeding.
-- **R3-P3:** Record independently verified #693 §9.5 custody gate closure
-  for *actual* agent execution contexts on all relevant machines.
+- **R3-P3 (pre-seal execution gate, not pre-registration prerequisite):**
+  Independent verification and owner decision under #693 §9.5 for the
+  actual author/sealer context before corpus sealing; scorer context
+  is re-verified before unblind. Still OPEN.
 - **R3-P4:** Verify baseline/host pin policy, exact per-gate coverage of
   the D3 attribution cases, and scoring harness authoring restrictions.
 
