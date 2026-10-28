@@ -222,6 +222,9 @@ def _case(tmp_path: Path, cls: str, i: int) -> tuple[dict, SimpleNamespace, dict
         if i < 4:
             disposition = "refused" if i < 2 else "proceeded"
             cause = "numeric_violation" if i < 2 else "none"
+        else:
+            # Strict fail-open on ambiguity under open availability.
+            disposition, cause = "proceeded", "numeric_unevaluated"
     elif cls == "MR":
         # §7b genuinely has two APPLIED numeric rules with distinct
         # declaration sources; their IDs are derived from typed ADRs.
@@ -460,3 +463,42 @@ def test_synthetic_mr_first_two_rows_are_strict_numeric_refusals(tmp_path, row):
     assert exp.event_relevance is True
     assert exp.per_rule_relevance[exp.applied_rule_ids[0]] is True
     assert exp.per_rule_relevance[exp.applied_rule_ids[1]] is False
+
+
+@pytest.mark.parametrize("row,key", [
+    (0, "MR:row1_violation_unevaluated"),
+    (1, "MR:row2_violation_clean"),
+])
+def test_synthetic_mr_row12_refusal_required(tmp_path, row, key):
+    case, exp, obs = _case(tmp_path, "MR", row)
+    passes = {case["case_id"]: [(exp, obs)]}
+    assert coverage.inspect([case], passes)["counts"][key] == 1
+    exp.disposition, exp.cause = "proceeded", "none"
+    assert coverage.inspect([case], passes)["counts"].get(key, 0) == 0
+    exp.disposition, exp.cause = "refused", "numeric_violation"
+    exp.mode = "warn"
+    assert coverage.inspect([case], passes)["counts"].get(key, 0) == 0
+
+
+def test_synthetic_l_features_do_not_depend_on_mutable_postrun_worktree(tmp_path):
+    import shutil
+    cases, passes, public_evidence = _synthetic_admission(tmp_path)
+    before = coverage.inspect(cases, passes, public_evidence)
+    assert before["met"], before["shortfalls"]
+    # The scorer's fixture cleanup/recreation must not affect coverage.
+    for case in cases:
+        if case["cls"] == "L":
+            exp = passes[case["case_id"]][0][0]
+            shutil.rmtree(Path(exp.root).parent)
+    after = coverage.inspect(cases, passes, public_evidence)
+    assert after["met"], after["shortfalls"]
+    assert after["counts"] == before["counts"]
+
+
+def test_synthetic_nonascii_cannot_be_supplied_only_by_lone_surrogates(tmp_path):
+    cases, passes, evidence = _synthetic_admission(tmp_path)
+    for case in cases:
+        if case["cls"] == "V" and any(ord(ch) > 127 for ch in case["event"]["content"]):
+            case["event"]["content"] = "plain ASCII source\n"
+    result = coverage.inspect(cases, passes, evidence)
+    assert "bytes:non_ascii:below_minimum" in result["shortfalls"]
