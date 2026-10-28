@@ -34,7 +34,10 @@ def _byte_features(content: str) -> set[str]:
         result.add("crlf")
     if re.search(r"\r(?!\n)", content):
         result.add("cr")
-    if any(ord(c) > 127 for c in content):
+    # "Non-ASCII byte variety" requires a real UTF-8 byte sequence.
+    # Lone surrogates are unencodable and count only toward L's explicit
+    # surrogate legacy subtype, never as non-ASCII source bytes.
+    if any(ord(c) > 127 and not 0xD800 <= ord(c) <= 0xDFFF for c in content):
         result.add("non_ascii")
     if not content:
         result.add("empty")
@@ -146,11 +149,27 @@ def inspect(cases: list, passes: dict, public_evidence: dict | None = None) -> d
                 shortfalls.append("MR:less_than_two_applied")
             else:
                 unevaluated = any(o.get("matcher_status") == "MATCHER_UNEVALUATED" for o in numeric)
-                if violating and unevaluated and exp.event_relevance is True:
+                # ADR-034 §7b rows 1–2 are strict refusals attributable
+                # to the violated numeric rule, not merely the same matcher
+                # output under warn/proceed (owner ruling, 2026-10-28).
+                numeric_refusal = (
+                    exp.mode == "strict" and exp.disposition == "refused"
+                    and exp.cause == "numeric_violation"
+                    and exp.event_relevance is True
+                    and any(exp.per_rule_relevance.get(rid) is True
+                            for rid, value in exp.numeric_outcomes.items()
+                            if value.get("matcher_outcome") == "VIOLATION")
+                )
+                if violating and unevaluated and numeric_refusal:
                     counts["MR:row1_violation_unevaluated"] += 1
-                if violating and clean and exp.event_relevance is True and exp.evaluation_complete is True:
+                if (violating and clean and numeric_refusal
+                        and exp.evaluation_complete is True):
                     counts["MR:row2_violation_clean"] += 1
-                if numeric and len(clean) == len(numeric) and exp.disposition == "proceeded":
+                if (numeric and len(clean) == len(numeric)
+                        and exp.disposition == "proceeded"
+                        and exp.event_relevance is True
+                        and all(exp.per_rule_relevance.get(rid) is True
+                                for rid in exp.applied_rule_ids)):
                     counts["MR:row3_all_clean"] += 1
                 if (exp.literal_violations and exp.mode == "strict" and exp.disposition == "refused"
                     and exp.cause == "other_rule" and not violating
