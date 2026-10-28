@@ -197,6 +197,13 @@ evidence.
 - Within-class coverage uses fixture-derived applicability and the frozen
   numeric labels, not checker observations. A missing or ambiguous eligibility
   proof fails corpus admission instead of relaxing the preregistered floor.
+- L-class link and missing-parent classification combines the declared
+  fixture with a first-pass pre-hook `pre_l` snapshot. The snapshot records
+  target symlink liveness (following link chains across root/outside),
+  whether the parent resolves to a directory through directory symlinks,
+  and whether a link component is present. After scoring, no filesystem
+  lookup is used to award those subtypes. Missing snapshot evidence
+  awards no symlink or missing-parent credit.
 - G5 Amendment 2 ignores only traceback frame bytes. Summary lines, chain
   separators and all stderr outside frames retain their exact newline bytes.
 - The F1-F4 corrections were made before unblind and must be independently
