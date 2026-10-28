@@ -421,6 +421,7 @@ def decide(results: list, floor: dict, symlinks: dict, scoring: str, integrity: 
         # otherwise passed. Do not let an absent/partial manifest earn PASS.
         for result in scored:
             gate = result["gates"]["G8"]
+            gate["applies"] = True  # No label can exempt a corpus-integrity failure.
             if "corpus_manifest_integrity" not in gate["failures"]:
                 gate["failures"].append("corpus_manifest_integrity")
             gate["result"] = "fail"
