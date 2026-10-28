@@ -45,8 +45,8 @@ def score(args: argparse.Namespace) -> int:
     for case in cases:
         try:
             compiled[case["case_id"]] = runner.compile_memory(case, ctx)
-        except runner.HarnessError as exc:
-            compiled[case["case_id"]] = {"ok": False, "error": str(exc)}
+        except Exception as exc:  # G8: a compile-step failure fails that case only
+            compiled[case["case_id"]] = {"ok": False, "error": f"{type(exc).__name__}: {exc}"}
     for _ in range(2):
         for case in cases:
             cid = case["case_id"]
