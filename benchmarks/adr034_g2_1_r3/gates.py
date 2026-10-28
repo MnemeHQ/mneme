@@ -403,21 +403,26 @@ def _finish(case: dict, gates: dict, notes: list) -> dict:
 # ── corpus ──────────────────────────────────────────────────────────────────
 
 
-def floors(cases: list, passes: Optional[dict] = None) -> dict:
+def floors(cases: list, passes: Optional[dict] = None,
+           public_evidence: Optional[dict] = None) -> dict:
     concealed = [c for c in cases if c.get("visibility") != "public"]
     public = [c for c in cases if c.get("visibility") == "public"]
     counts = Counter(c["cls"] for c in concealed)
     at = Counter(c.get("subclass") for c in concealed if c["cls"] == "AT")
     short = {k: (counts.get(k, 0), v) for k, v in C.CLASS_FLOORS.items() if counts.get(k, 0) < v}
     at_short = {k: (at.get(k, 0), v) for k, v in C.AT_SUBCLASS_FLOORS.items() if at.get(k, 0) < v}
-    total = len(concealed) + len(public)
-    public_classes = [c["cls"] for c in public]
-    public_ok = (not total or len(public) / total <= C.PUBLIC_SMOKE_MAX_FRACTION) and \
+    separate_count = (public_evidence.get("public_cases", 0)
+                      if public_evidence is not None and public_evidence.get("verified") is True else 0)
+    public_count = len(public) + separate_count
+    total = len(concealed) + public_count
+    public_classes = ([c["cls"] for c in public] +
+                      (public_evidence.get("classes", []) if separate_count else []))
+    public_ok = (not total or public_count / total <= C.PUBLIC_SMOKE_MAX_FRACTION) and \
         len(set(public_classes)) == len(public_classes)
-    coverage_result = (coverage.inspect(cases, passes) if passes is not None else
+    coverage_result = (coverage.inspect(cases, passes, public_evidence) if passes is not None else
                        {"met": False, "shortfalls": ["coverage_not_checked"], "counts": {}})
     return {
-        "concealed": len(concealed), "public": len(public),
+        "concealed": len(concealed), "public": public_count,
         "concealed_by_class": dict(sorted(counts.items())),
         "at_by_subclass": dict(sorted((str(k), v) for k, v in at.items())),
         "class_floor_shortfalls": short, "at_floor_shortfalls": at_short,
