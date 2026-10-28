@@ -9,7 +9,7 @@
 
 The protocol requires a **separate, merged metadata-only pre-scoring completion record** before owner-controlled decryption (R3 pre-registration §5 step 7 and §6.1). The current record is a *draft evidence checklist*, **not** that completion.
 
-**Snapshot from connected GitHub inspection at drafting:** PR #705 was reported `open/draft/merged=false` at head `26b1fa01336db909231b8d341feb182f1c35122d`; `main` did not yet contain `benchmarks/adr034_g2_1_r3/`. The user's message states that PR #705 was merged, but no verified merge commit on main is available in this record. **Merge verification is OPEN; do not use GitHub's proposed `merge_commit_sha` field as evidence of a completed merge.** Refresh this field before preparing the completion record.
+**GitHub merge state (rechecked after scorer B feedback):** PR #705 is **open/draft/unmerged**, head `26b1fa01336db909231b8d341feb182f1c35122d`. PR #707 is also **open/draft/unmerged**. Neither scorer B nor the owner has supplied a completed merge commit. There is **no merge discrepancy to reconcile**: #705 has simply not been merged. **Merge verification remains OPEN.** Do not treat GitHub's proposed `merge_commit_sha` field as evidence of a completed merge; after the actual merge, verify the committed harness files and hashes on `main`.
 
 Evidence provenance terms:
 - **FROZEN SOURCE:** values already committed in earlier accepted metadata-only freeze records; they are anchors, not new checks performed for this draft.
@@ -32,7 +32,9 @@ Evidence provenance terms:
 | Public classes and fraction | 14 public smoke, one per class; public 14/164 = 8.54%, excluded from concealed gates and floors | FROZEN SOURCE |
 | Scorer handoff authority | #704: owner-authorized public-only independent scorer B after targeted cleanup; shares Windows user with author A under conditional isolation | FROZEN SOURCE, not an unblind GO |
 | Scorer B actual effective identity, config dir, session, host, workspace, integrity level, isolation statement | Independently pin exact current session; do not reuse author A or prior hidden corpora | OPEN |
-| Owner-key isolation recheck in actual scoring session B | Synthetic-only probe, secret-key access denial, access inventory and reviewer attestation; no hidden plaintext access | OPEN |
+| Owner-key isolation recheck in actual scoring session B | Synthetic-only probe, secret-key access denial, **reviewer session/worktree and prior public/synthetic probe inventory (see below)**, and independent custodian attestation; no hidden plaintext access | OPEN |
+
+**Scorer B public/synthetic access-history inventory (REPORTED, pending host verification):** Scorer B reports extracting the **released public smoke tar**, not concealed material, from `r3-sealed-staging/public-smoke-NOT-RELEASED/` into its probe workspace. Its review tree `wt-review-705` and run folders `runs/review705*` contain public/synthetic inputs and probe artifacts. Before the custody recheck is signed, independently inventory the actual paths, contents/categories, ACL/accessibility and residual author artefacts; document whether each public/synthetic folder is retained or removed. Do **not** indiscriminately delete needed audit evidence or owner-held archives. Scorer B reports no access to concealed plaintext, ciphertext or owner author provenance; this is **REPORTED**, not independent custody verification.
 
 **Strict custody:** The owner-only author provenance and earlier concealed corpora/results are never inputs to scorer B. Do not move concealed case files, ciphertext or keys into repository artifacts or this PR. On unexpected author material, **STOP/NO-GO**.
 
@@ -54,7 +56,7 @@ A green PR battery is not the full main-only R3 harness battery. Record environm
 
 **Implementation (D3 accepted source):** R3 preregistration §2 lists commit `1b0957af01df3ad036b12698663e167ae413885e` and `mneme/` tree `656554d21ec1ef4ee474b6e6f69f681f0364a501`. It reports candidate wheel `mneme_hq-0.10.0-py3-none-any.whl`, SHA-256 `f2ed395a6517006971f49baf169b957c10d0dfff4784ad36b3bb53eb9c024289`, CPython 3.12.10, pip 25.0.1 and an installed freeze-file SHA-256 `253e5bc832f81786e3cac033724d09f1196889572cb87ad72445c125543a00c2`. These are **owner-reported preregistration candidates, not newly verified R3 scoring attestations**.
 
-**Baseline:** Frozen pre-G2 parity *source commit* `f8591102b2693379dabec9b5704862e194eca4ce`. Its accepted source/tree identity must be independently verified. Scorer B reports building a baseline wheel with SHA prefix `b24a2f83…`; a prefix and one scorer-built wheel are **not** an accepted independent reference. Older R2 baseline wheel SHA-256 in the R2 completion record is historical evidence, not automatic R3 proof.
+**Baseline:** Frozen pre-G2 parity *source commit* `f8591102b2693379dabec9b5704862e194eca4ce`. Its accepted source/tree identity must be independently verified. Scorer B reports that the baseline wheel they built has full SHA-256 **`b24a2f8328855d2e41e6ae43eb16c7ae488afcc5944713e66300bc061f132421`**. This is **REPORTED, from scorer B's own build, not an independently accepted reference or an R3 installation attestation**. The independent comparison/reference remains OPEN. Older R2 baseline wheel SHA-256 in the R2 completion record is historical evidence only, not automatic R3 proof.
 
 | Verification requirement for **both** installed environments | Status |
 |---|---|
@@ -76,8 +78,8 @@ R3 §6.1 requires a **new, merged §8.B live-host characterization** using the R
 
 | Required evidence | Status |
 |---|---|
-| Exact scorer machine and Windows user, Claude Code executable path and `claude --version` | OPEN; scorer B reports version 2.1.312 |
-| Executable SHA-256 (full 64 hex), shim/PATH origin, timestamp, signed provenance if available | OPEN; scorer B reports SHA prefix `6099672e…` only |
+| Exact scorer machine and Windows user, Claude Code executable path and `claude --version` | OPEN; scorer B reports Claude Code 2.1.312 at `C:\\Users\\MnemeAgent\\.local\\bin\\claude.exe` (its own observation; actual scoring-host characterization not yet independently accepted) |
+| Executable SHA-256 (full 64 hex), shim/PATH origin, timestamp, signed provenance if available | OPEN; scorer B reports its locally observed executable SHA-256 `6099672ebe5dcb518b67d1d32dde1e3360bc6bee1dae7f8d28a69c49acc7c865` (**REPORTED**, not the independently accepted host pin) |
 | Separately executed, documented live host §8.B tests with R3 implementation; report/PR merged before unblind | OPEN |
 | Exact `--host-version` and `--host-sha256` pinned to *verified* host | OPEN |
 | Provenance binding and ability to reproduce the required pinned host throughout scoring | OPEN |
@@ -109,9 +111,22 @@ R3's accepted pre-unblind interpretation record adds required structural determi
 
 **Independence and timing:**
 1. **Before any unblind:** owner names the structural reviewer and backup, accepts this exact checklist and status mapping, pins the accepted harness and reviewer session. Scorer B can serve as reviewer only if independent from author A and D3 implementation. A second reviewer is optional. Record evidence method before reviewing cases.
-2. **After separate owner-authorized unblind, before *any* G1–G8 scoring execution or per-case results are shown to the reviewer:** structural reviewer reads *only the authorized, frozen decrypted case files* (including the separate released public AT), **not** the generated checker/hook results, score labels or diagnosis. No Mneme runs, gate scoring, implementation tuning or corpus mutation during review.
-3. For each pending identifier, record `present/missing/undetermined`, opaque case IDs and non-disclosing structural rationale. Hash the determination artifact and owner-commit/escrow its hash **before** running the G1–G8 scoring command. The reviewer must not consult gate results in preparing or revising the determinations.
+2. **After separate owner-authorized unblind, before *any* G1–G8 scoring execution or per-case results are shown to the reviewer:** structural reviewer reads only the authorized, frozen decrypted `case.json` fixtures (including the separate released public AT). **Author labels are embedded in each `case.json` and may be visible; visibility is unavoidable and is not, by itself, a protocol breach after authorized unblind.** Independently verify structural presence from fixture source and declaration rather than accepting an author's label as proof. **Generated checker output, hook output, G1–G8 gate results, scoring report and diagnosis must not be consulted.** No Mneme runs, implementation tuning, re-labelling or corpus mutation during review.
+3. Record exactly one metadata-only determination for each pending identifier using the **canonical JSON artifact and hash recipe below**. The owner/custodian commits or escrows the canonical artifact privately and records its SHA-256 **before** running the G1–G8 scoring command. The reviewer must not consult gate results in preparing or revising the determinations.
 4. Scorer then runs the frozen two passes. The final metadata-only results record reproduces the unmodified `decision.verdict`, `structural_review` (including `final_claim_ready` and three determinations), hash of the sealed structural assessment, and the owner-level final outcome separately. No manual override of G1–G8 or post-hoc reclassification.
+
+**Canonical structural-determination artifact (proposed pre-unblind format):**
+
+Write a **JSON array with exactly three objects**, one per ID, ordered lexicographically by `id`:
+`AT_material_distinctness`, `SC_lexical_families`, `public_vs_concealed_AT`.
+Each object has **exactly** the four fields below:
+
+- `id`: one of the three frozen identifiers;
+- `determination`: `present`, `missing` or `undetermined`;
+- `opaque_case_refs`: array of unique, lexicographically sorted **opaque case IDs** only (no paths, rule values or code); empty only when nothing can be evidenced;
+- `rationale`: a short metadata-only assessment, containing no source excerpt, filesystem path, ADR text, hidden label, selector or numeric threshold from concealed cases.
+
+Serialization and commitment: construct the three records, sort by `id`, then serialize the array using Python `json.dumps(records, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("utf-8")`. Hash **exactly those UTF-8 bytes**, with **no BOM and no trailing newline**, using SHA-256. The artifact must not include gate outputs or implementation observations. The owner privately escrows the exact artifact and publishes **only its SHA-256, schema/serialization version `r3-structural-v1`, reviewer identity, timestamp and custody attestation** before any gate scoring. A scorer/verifier can reproduce the digest from those bytes. This hash is a commitment to the pre-score judgment, not a determination that all three are present.
 
 **Exact criteria, frozen before opening concealed case files:**
 
