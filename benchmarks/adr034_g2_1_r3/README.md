@@ -96,6 +96,40 @@ The corpus decision requires every scored case to pass:
 
 Public cases count toward no denominator.
 
+### Structural-coverage determination (pre-closure metadata)
+
+Every concealed score report includes `structural_review` with
+`status: pending_independent_structural_review`,
+`final_claim_ready: false`, and three named pending determinations:
+`SC_lexical_families`, `AT_material_distinctness` and
+`public_vs_concealed_AT`. These are **not** automatically established
+by the class/subclass counters. For public smoke the status is
+`not_applicable_public_smoke` and final-claim readiness is also false.
+
+**The frozen `decision.verdict` remains PASS/FAIL/INCOMPLETE (or
+NO_VERDICT_PUBLIC_SMOKE); no new verdict category or G1–G8 gate is added.**
+If all numeric gates PASS, the CLI explicitly prints that structural
+review is still pending and this is **not** a final R3 validation claim.
+A separate owner-controlled structural determination must close before
+any complete PASS claim can be published. This report cannot self-certify
+structural completeness.
+
+After owner-authorized unblind, the independent reviewer must:
+- verify R2 §4.2's named SC lexical-family presence with opaque case IDs;
+- determine whether the concealed AT pairs are materially different,
+  not merely syntactic path renames, while preserving AT-SI's distinct
+  literal identities and include scopes and AT-SX's exclude mechanism;
+- compare the frozen public AT with concealed AT for independently
+  different proposed source, ADR and literal-rule identity (R3 §3).
+
+The reviewer records a metadata-only owner-reviewed determination
+(present/missing/undetermined, with opaque case references) in the
+completion/results record. Missing or unverifiable frozen coverage
+prevents a complete R3 PASS claim; it does **not** authorize rewriting
+case labels, tuning the implementation or rescoring a revealed corpus.
+Do not move the structural determination into a secret self-reported
+boolean that can override `decision.verdict`.
+
 ### Synthetic corpus-admission positive control
 
 `tests/test_adr034_g2_1_r3_positive_coverage.py` builds an independent
