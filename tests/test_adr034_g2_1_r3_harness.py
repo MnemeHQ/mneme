@@ -800,7 +800,7 @@ def test_f3_at_si_and_at_sx_mechanism_derived_from_fixture(tmp_path):
     assert "AT-SI:wrong_exclusion_mechanism" not in result["shortfalls"]
     assert "AT-SX:wrong_exclusion_mechanism" not in result["shortfalls"]
     assert "AT-SI:not_two_distinct_literal_identities_and_scopes" in result["shortfalls"]
-    assert "AT-SX:not_two_distinct_literal_identities_and_scopes" in result["shortfalls"]
+    assert "AT-SX:not_two_distinct_ADR_fixtures_or_literal_identities" in result["shortfalls"]
 
     si = cases[1]
     si["subclass"] = "AT-SX"
