@@ -10,7 +10,6 @@ Counts and shortfall names are the only exported evidence.
 from __future__ import annotations
 
 import json
-import posixpath
 import re
 from collections import Counter
 from pathlib import PurePosixPath
@@ -49,8 +48,9 @@ def _l_features(case: dict, exp, obs: dict) -> set[str]:
     """R1 §4 L classification from frozen fixture declarations + pre-snapshot.
 
     Never inspect paths after the two score passes: the fixture worktree may
-    have been recreated or removed. A link only qualifies as live when its
-    target is present in the fixture's declared file/directory inventory.
+    have been recreated or removed. Link/parent reachability comes from
+    runner's first-pass pre-mutation snapshot of the materialized fixture.
+    The declared fixture still binds the target and link-component types.
     """
     found: set[str] = set()
     target = case["event"]["target"]
@@ -60,42 +60,39 @@ def _l_features(case: dict, exp, obs: dict) -> set[str]:
     by_path = {(sp["base"], sp["path"]): sp for sp in specs}
     dest_spec = by_path.get((base, rel))
 
-    # The runner materializer implicitly mkdirs the parent of every declared
-    # entry, in addition to explicitly declared directory entries.
-    directories = {(b, "") for b in ("root", "outside")}
-    for spec in specs:
-        path = PurePosixPath(spec["path"])
-        for parent in path.parents:
-            if str(parent) != ".":
-                directories.add((spec["base"], parent.as_posix()))
-        if spec["type"] in ("dir", "dir_symlink"):
-            directories.add((spec["base"], spec["path"]))
+    pre_l = obs.get("pre_l") or {}
 
+    # The declared fixture verifies that the target really is the specified
+    # kind; physical link resolution was captured once before the mutation.
+    # Never guess liveness from a same-base inventory lookup: links can
+    # cross to outside/ or resolve through other symlinks.
     if pre.get("kind") == "file" and dest_spec and dest_spec["type"] == "file":
         found.add("existing_empty" if dest_spec["text"] == "" else "existing_file")
 
     if pre.get("kind") == "symlink" and dest_spec and dest_spec["type"] == "symlink":
-        link_target = dest_spec.get("target", "")
-        if link_target and not link_target.startswith("/"):
-            resolved = posixpath.normpath(posixpath.join(
-                posixpath.dirname(rel), link_target))
-            live = (base, resolved) in by_path or (base, resolved) in directories
-            found.add("symlink" if live else "dangling_symlink")
+        if pre_l.get("target_link_live") is True:
+            found.add("symlink")
+        elif pre_l.get("target_link_live") is False:
+            found.add("dangling_symlink")
+        # Missing/incomplete pre-run link observation earns neither subtype.
 
-    # A directory symlink in any parent component is an L link-component
-    # case even when the final target itself is absent.
     parts = PurePosixPath(rel).parts
-    if any((base, "/".join(parts[:i])) in by_path
-           and by_path[(base, "/".join(parts[:i]))]["type"] == "dir_symlink"
-           for i in range(1, len(parts))):
+    declared_link_parent = any(
+        (base, "/".join(parts[:i])) in by_path
+        and by_path[(base, "/".join(parts[:i]))]["type"] == "dir_symlink"
+        for i in range(1, len(parts))
+    )
+    if declared_link_parent and pre_l.get("link_component") is True:
         found.add("link_component")
 
     if base == "outside":
         found.add("outside_root")
     if PurePosixPath(rel).suffix != ".py":
         found.add("non_python")
-    parent = PurePosixPath(rel).parent.as_posix()
-    if (base, "" if parent == "." else parent) not in directories:
+    # A parent reached through a directory link exists even if that
+    # lexical path has no explicit "dir" entry. Conversely a missing
+    # first-pass observation must not award the missing-parent floor.
+    if pre_l.get("parent_is_dir") is False:
         found.add("missing_parent")
     try:
         case["event"]["content"].encode("utf-8")
