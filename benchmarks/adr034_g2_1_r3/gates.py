@@ -13,7 +13,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any, Optional
 
-from . import attribution
+from . import attribution, coverage
 from . import contract as C
 from .runner import raw
 
@@ -400,7 +400,7 @@ def _finish(case: dict, gates: dict, notes: list) -> dict:
 # ── corpus ──────────────────────────────────────────────────────────────────
 
 
-def floors(cases: list) -> dict:
+def floors(cases: list, passes: Optional[dict] = None) -> dict:
     concealed = [c for c in cases if c.get("visibility") != "public"]
     public = [c for c in cases if c.get("visibility") == "public"]
     counts = Counter(c["cls"] for c in concealed)
@@ -411,14 +411,17 @@ def floors(cases: list) -> dict:
     public_classes = [c["cls"] for c in public]
     public_ok = (not total or len(public) / total <= C.PUBLIC_SMOKE_MAX_FRACTION) and \
         len(set(public_classes)) == len(public_classes)
+    coverage_result = (coverage.inspect(cases, passes) if passes is not None else
+                       {"met": False, "shortfalls": ["coverage_not_checked"], "counts": {}})
     return {
         "concealed": len(concealed), "public": len(public),
         "concealed_by_class": dict(sorted(counts.items())),
         "at_by_subclass": dict(sorted((str(k), v) for k, v in at.items())),
         "class_floor_shortfalls": short, "at_floor_shortfalls": at_short,
         "total_floor_met": len(concealed) >= C.TOTAL_FLOOR,
-        "public_smoke_rules_met": public_ok,
-        "met": not short and not at_short and len(concealed) >= C.TOTAL_FLOOR and public_ok,
+        "public_smoke_rules_met": public_ok, "coverage": coverage_result,
+        "met": (not short and not at_short and len(concealed) >= C.TOTAL_FLOOR
+                and public_ok and coverage_result["met"]),
     }
 
 
@@ -451,7 +454,8 @@ def decide(results: list, floor: dict, symlinks: dict, scoring: str, integrity: 
         verdict = "NO_VERDICT_PUBLIC_SMOKE"
     elif not symlinks.get("capable"):
         verdict = "INCOMPLETE"  # R1 G2V-F2: a validation FAIL, never a narrowed PASS
-    elif all_pass and floor["met"] and integrity_ok and scored:
+    elif (all_pass and floor["met"] and floor.get("coverage", {}).get("met") is True
+          and integrity_ok and scored):
         verdict = "PASS"
     else:
         verdict = "FAIL"
