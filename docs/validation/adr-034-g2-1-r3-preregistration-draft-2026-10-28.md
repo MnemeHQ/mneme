@@ -1,7 +1,7 @@
 # ADR-034 G2-1 R3 independent blind validation: pre-registration draft
 
 **Date:** 2026-10-28  
-**Status:** DRAFT FOR ARCHITECTURE AND INDEPENDENCE REVIEW. **Not frozen, not an authorization to author, seal, build a harness or score cases.**
+**Status:** DRAFT FOR ARCHITECTURE REVIEW. Owner accepted **R3-P1** (128 concealed cases, 14 classes) and **R3-P2** (conditional same-account handoff) on 2026-10-28. **Not frozen until reviewed and merged; not an authorization to author, seal, build a harness or score cases.**
 
 ## 1. Authority and claim
 
@@ -65,8 +65,8 @@ R2's minimum remains **120 concealed scored cases** across its 13 classes;
 public smoke cases do not count toward any concealed floor or gate.
 Symlink capability is required for a full PASS.
 
-**R3 new concealed class and floor (R3-P1 proposed resolution, for owner
-acceptance before protocol freeze):** Keep all R2 concealed floors intact:
+**R3 new concealed class and floor (R3-P1 accepted by owner 2026-10-28,
+subject to protocol review and merge):** Keep all R2 concealed floors intact:
 **120** concealed scored cases across 13 classes. Add one new class,
 **AT (non-numeric attribution without a numeric subject)** with a floor of
 **8** concealed scored cases. The R3 minimum is therefore **128**
@@ -295,25 +295,75 @@ remain off limits. All roles require a recorded identity and isolation
 statement. Neither a working checkout nor a merged pre-registration
 alone authorizes a scoring run.
 
-## 6. Open decisions before protocol can be frozen
+## 6. Owner rulings and remaining protocol review
 
-- **R3-P1:** **Specified in §3, awaiting owner acceptance with the
-  completed PR review:** AT concealed floor **8** in four two-case
-  sub-classes; 120 inherited concealed + 8 AT = **128** minimum,
-  14 classes total. One public AT smoke required. No case generation
-  until this numeric contract is accepted and pre-registration frozen.
-- **R3-P2:** **Minimal same-account sequential handoff specified in §4.1–4.2,
-  pending owner acceptance and observed handoff evidence.** No new Windows
-  account is required *a priori*, but shared-profile accessibility is not
-  considered independent isolation. If the handoff cannot establish
-  absence of readable hidden material, a separate execution identity is
-  mandatory before proceeding.
-- **R3-P3 (pre-seal execution gate, not pre-registration prerequisite):**
-  Independent verification and owner decision under #693 §9.5 for the
-  actual author/sealer context before corpus sealing; scorer context
-  is re-verified before unblind. Still OPEN.
-- **R3-P4:** Verify baseline/host pin policy, exact per-gate coverage of
-  the D3 attribution cases, and scoring harness authoring restrictions.
+- **R3-P1: ACCEPTED by owner, 2026-10-28.** Preserve R2's 120 concealed
+  floor, add AT floor 8 in four two-case sub-classes; **128 minimum**
+  across 14 classes. One public AT smoke required. Actual corpus content
+  and counts are not yet created.
+- **R3-P2: ACCEPTED as a conditional topology by owner, 2026-10-28.**
+  Reuse `MnemeAgent` for separate, eligible author/scorer Claude sessions
+  with distinct `CLAUDE_CONFIG_DIR`, but **no assumption** that separate
+  sessions provide file access isolation. Independent reviewer must
+  verify absence of scorer-readable hidden material at the handoff.
+  A failed handoff blocks scoring and requires stronger isolation.
+- **R3-P3: OPEN execution gate, not a pre-registration merge gate.**
+  Independently verify and obtain explicit owner decision on #693 §9.5
+  for the actual author/sealer **before sealing**; re-verify scorer's
+  owner-key isolation before unblinding. The earlier synthetic session
+  tests do not waive this.
+- **R3-P4: OPEN architecture/scoring-contract review.** Confirm the
+  source baseline/host re-pin and gate mapping below before merging
+  this pre-registration as frozen.
+
+### 6.1 Proposed R3-P4 review rule: baseline and host
+
+Use the unchanged pre-G2 parity baseline **source commit**
+`f8591102b2693379dabec9b5704862e194eca4ce`
+(R1/R2 preregistrations). Pin its Git tree, newly built baseline
+wheel, installed file manifest, dependency freeze and environment
+independently in the **pre-scoring completion record**, alongside
+the D3 implementation wheel. The existing R2 baseline wheel hash is
+historical evidence only, **not** a substitute for a verified R3
+baseline environment.
+
+Follow the R2 §3 host-repin rule: the original live-host evidence
+applies to Claude Code 2.1.310 with the exact #646 executable digest.
+The owner's new installation reports **2.1.312**, so a new,
+separately recorded live-host characterization using the R3
+implementation must pass and merge **before R3 unblinding**. The
+pre-scoring completion record pins the exact installed host
+version and executable SHA-256; neither version nor checksum may
+change for a scoring run. An earlier *custody* test in Claude Code
+2.1.312 is **not** a substitute for this §8.B behavioral host test.
+
+### 6.2 Proposed R3-P4 review rule: AT gates
+
+Every concealed AT case is included in **G1**, **G3**, **G6**,
+**G7** and **G8**, with G1 requiring strict blocks and
+correct non-clean numeric outcomes as applicable, G3 requiring
+no target mutation following refusal, and G6 requiring exact
+non-numeric violation identities even with `subject: null`.
+Apply **G2**'s established literal-violation exception, not
+a false-block designation for an expected literal refusal.
+Apply **G4** to any AT input whose oracle expects a primary
+unevaluated reason. The inherited **G5** parity scope remains
+P/X/L (and the existing checker-level cases); AT does not
+silently acquire an unsupported pre-G2 hook-parity claim.
+Warn AT cases must exhibit the expected deferral without
+falsely earning numeric relevance; any wrong G6 field fails.
+
+Harness author is a new eligible, independent scorer session
+operating from this normative protocol and **public** smoke
+only. Public synthetic negative tests for malformed `rule_id`
+must fail attribution as specified in §3. No R1 or R2 hidden
+case, harness modification or implementation regression fixture
+may supply R3 expectations. Harness bytes, identity and hashes
+must be accepted and merged **before** scoring.
+
+**This section requires architecture review.** Its proposal
+text alone is not an owner ruling on R3-P4 or permission to
+start authoring.
 
 **Nothing authorized by this draft:** corpus authoring, sealing,
 unblinding, implementation changes, harness construction, reinterpreting
