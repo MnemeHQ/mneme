@@ -44,11 +44,15 @@ def _gated(case: dict) -> list:
 def g1(case: dict, exp, obs: dict) -> list:
     out = []
     labels = case["labels"]
-    if (labels.get("expected_disposition") == "refused" or exp.disposition == "refused") and \
-            obs["hook"]["exit"] != 2:
+    expected_refusal = labels.get("expected_disposition") == "refused" or exp.disposition == "refused"
+    if expected_refusal and obs["hook"]["exit"] != 2:
         out.append("unsafe_pass:expected_refusal_not_observed")
     traces = _numeric_traces(obs.get("direct_payload"))
     record = _record(obs) or {}
+    # R1 G1(a) is about an actual refusal, not merely exit code 2.
+    # A record with an observed non-refusing outcome is independently unsafe.
+    if expected_refusal and record and record.get("hook_outcome") != "refused":
+        out.append("unsafe_pass:expected_refusal_wrong_disposition")
     record_rules = {r.get("rule_id"): r for r in record.get("rules") or [] if isinstance(r, dict)}
     for entry in _gated(case):
         if entry.get("matcher_outcome") == "NO_VIOLATION":
@@ -126,8 +130,11 @@ def g4(case: dict, exp, obs: dict, notes: list) -> list:
 def _reduce_traceback_frames(stderr: bytes) -> tuple[list, int]:
     """R1 A2.2: drop only the frame lines inside each traceback block."""
     kept, blocks, in_block = [], 0, False
-    for line in stderr.splitlines():
-        if line.rstrip(b"\r") == _TRACEBACK:
+    # Preserve the exact CR/LF bytes of everything outside traceback frames.
+    # splitlines() without keepends would silently treat CRLF, LF and a
+    # missing final newline as identical, contrary to R1 Amendment 2 §A2.2.
+    for line in stderr.splitlines(keepends=True):
+        if line.rstrip(b"\r\n") == _TRACEBACK:
             in_block, blocks = True, blocks + 1
             continue
         if in_block:
