@@ -27,11 +27,11 @@ _BYTE_MINIMA = ("lf", "crlf", "cr", "non_ascii", "empty")
 
 def _byte_features(content: str) -> set[str]:
     result = set()
-    if re.search(r"(?<!\\r)\\n", content):
+    if re.search(r"(?<!\r)\n", content):
         result.add("lf")
-    if "\\r\\n" in content:
+    if "\r\n" in content:
         result.add("crlf")
-    if re.search(r"\\r(?!\\n)", content):
+    if re.search(r"\r(?!\n)", content):
         result.add("cr")
     if any(ord(c) > 127 for c in content):
         result.add("non_ascii")
