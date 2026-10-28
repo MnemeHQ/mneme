@@ -68,6 +68,37 @@ before the harness can be pinned.
    completion record are still required. Package version equality alone is
    not a complete artifact attestation.
 
+## Structural determination protocol to pin before unblind
+
+The future **R3 pre-scoring completion record** must reproduce this procedure
+and these exact pending identifiers **before** any owner-authorized unblind.
+No such completed R3 pin record is established by this interpretation
+document or by the harness review.
+
+| Pending identifier | Required independent determination |
+|---|---|
+| `SC_lexical_families` | Examine the frozen SC sources and independently assess the named R2 §4.2 lexical families (class-body/method, parameter/local/comprehension/nested binding, enclosing scope, global/nonlocal, indirect namespace mutation, plain string data), without inventing new per-family numeric floors |
+| `AT_material_distinctness` | Check the concealed AT pairs for meaningful semantic differences beyond ID and path renaming, including AT-SI distinct literal identities and include scopes, and AT-SX's exclude-selector mechanism |
+| `public_vs_concealed_AT` | Check the public AT against concealed AT for distinct proposed source, ADR and literal-rule identity under frozen R3 §3 |
+
+Before unblind, the completion record must state all three as **PENDING**,
+name the independent reviewer and authority, and fix the evidence method.
+The reviewer performs these determinations only **after the owner's
+authorized unblind** and records `present`, `missing` or `undetermined`,
+with opaque case identifiers and non-disclosing rationale, in the
+metadata-only results/closure record. The qualitative review must not
+alter hidden cases, frozen expectations, numeric gates or the declared
+noncoverage. Missing or undetermined required coverage prevents a
+**complete R3 PASS claim**, regardless of the gate verdict.
+
+A published results record must quote **both** the raw
+`decision.verdict` and `structural_review` (including
+`final_claim_ready` and each pending determination). A consumer reading
+`decision.verdict` alone is not receiving a complete validation outcome.
+Neither a reviewer nor a results publisher may turn a passing gate verdict
+into a final PASS while the structural review is unresolved. This procedure
+does not introduce a new scoring verdict or change G1-G8.
+
 ## Review and scoring boundary
 
 Only public/synthetic tests may be used to review these implementations.
