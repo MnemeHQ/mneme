@@ -122,11 +122,22 @@ After owner-authorized unblind, the independent reviewer must:
 - compare the frozen public AT with concealed AT for independently
   different proposed source, ADR and literal-rule identity (R3 §3).
 
-The reviewer records a metadata-only owner-reviewed determination
-(present/missing/undetermined, with opaque case references) in the
-completion/results record. Missing or unverifiable frozen coverage
-prevents a complete R3 PASS claim; it does **not** authorize rewriting
-case labels, tuning the implementation or rescoring a revealed corpus.
+**Before unblind**, the separate R3 pre-scoring completion record must
+freeze the three pending identifiers, independent reviewer/owner authority
+and the post-unblind method set out in
+[`adr-034-g2-1-r3-pre-unblind-interpretations-2026-10-28.md`](../../docs/validation/adr-034-g2-1-r3-pre-unblind-interpretations-2026-10-28.md).
+That future completion record must not claim that a review requiring
+concealed source access has already happened.
+
+**After authorized unblind**, the independent reviewer records a
+metadata-only owner-reviewed determination (`present`, `missing` or
+`undetermined`, with opaque case references) in the results/closure
+record. That record must reproduce **both** `decision.verdict` and
+`structural_review`; publishing `decision.verdict` in isolation
+would omit a mandatory coverage limitation. Missing or unverifiable frozen
+coverage prevents a complete R3 PASS claim; it does **not** authorize
+rewriting case labels, tuning the implementation or rescoring a revealed
+corpus.
 Do not move the structural determination into a secret self-reported
 boolean that can override `decision.verdict`.
 
