@@ -536,3 +536,95 @@ def test_synthetic_at_adr_id_rename_does_not_count_as_material_difference(tmp_pa
     }
     report = coverage.inspect(cases, passes)
     assert "AT-S0:not_two_materially_distinct_rule_fixtures" in report["shortfalls"]
+
+
+@pytest.mark.parametrize("shape, expected", [
+    ("root_to_outside", "symlink"),
+    ("link_to_dangling_link", "dangling_symlink"),
+    ("nested_directory_link", "link_component"),
+])
+def test_synthetic_l_link_resolution_matches_materialized_filesystem(
+    tmp_path, shape, expected,
+):
+    """Scorer B's three L false-PASS/false-FAIL reproductions.
+
+    The immutable pre-run snapshot, not a post-hook path probe, determines
+    liveness. These declared fixtures use the real runner materializer.
+    """
+    root, outside = tmp_path / "root", tmp_path / "outside"
+    files = [{"base": "root", "path": "src", "type": "dir"}]
+    if shape == "root_to_outside":
+        rel = "src/link.py"
+        files += [
+            {"base": "outside", "path": "o.py", "type": "file", "text": "x=1\n"},
+            {"base": "root", "path": rel, "type": "symlink",
+             "target": "../../outside/o.py"},
+        ]
+    elif shape == "link_to_dangling_link":
+        rel = "src/link.py"
+        files += [
+            {"base": "root", "path": "src/mid.py", "type": "symlink",
+             "target": "missing.py"},
+            {"base": "root", "path": rel, "type": "symlink", "target": "mid.py"},
+        ]
+    else:
+        rel = "alias/sub/new.py"
+        files += [
+            {"base": "root", "path": "real/sub", "type": "dir"},
+            {"base": "root", "path": "alias", "type": "dir_symlink",
+             "target": "real"},
+        ]
+    case = {
+        "fixture": {"files": files},
+        "event": {"target": {"base": "root", "path": rel},
+                  "content": "x=1\n"},
+    }
+    try:
+        runner.materialize(case, root, outside)
+    except OSError as exc:
+        pytest.skip(f"symlink capability unavailable: {type(exc).__name__}")
+    target = root / rel
+    obs = {
+        "pre": runner.snapshot(target),
+        "pre_l": runner.snapshot_l_preconditions(target, root, outside, "root", rel),
+    }
+    assert obs["pre_l"].get("parent_is_dir") is True
+    features = coverage._l_features(case, None, obs)
+    assert expected in features
+    if shape == "root_to_outside":
+        assert "dangling_symlink" not in features
+        assert obs["pre_l"]["target_link_live"] is True
+    elif shape == "link_to_dangling_link":
+        assert "symlink" not in features
+        assert obs["pre_l"]["target_link_live"] is False
+    else:
+        assert "missing_parent" not in features
+        assert obs["pre_l"]["link_component"] is True
+    # Coverage must not depend on the filesystem after the scoring passes.
+    runner.remove_tree(root)
+    runner.remove_tree(outside)
+    assert coverage._l_features(case, None, obs) == features
+    # No first-pass liveness evidence -> no guessed link subtype.
+    without_snapshot = coverage._l_features(case, None, {"pre": obs["pre"]})
+    assert expected not in without_snapshot
+
+
+def test_synthetic_l_missing_parent_requires_pre_snapshot(tmp_path):
+    root, outside = tmp_path / "root", tmp_path / "outside"
+    case = {
+        "fixture": {"files": [{"base": "root", "path": "src", "type": "dir"}]},
+        "event": {"target": {"base": "root", "path": "missing/deep/new.py"},
+                  "content": "x=1\n"},
+    }
+    runner.materialize(case, root, outside)
+    target = root / "missing/deep/new.py"
+    obs = {
+        "pre": runner.snapshot(target),
+        "pre_l": runner.snapshot_l_preconditions(
+            target, root, outside, "root", "missing/deep/new.py",
+        ),
+    }
+    assert "missing_parent" in coverage._l_features(case, None, obs)
+    assert "missing_parent" not in coverage._l_features(
+        case, None, {"pre": obs["pre"]},
+    )
