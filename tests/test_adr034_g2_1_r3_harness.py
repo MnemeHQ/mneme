@@ -865,3 +865,9 @@ def test_f3_rejects_unknown_classes_and_subclasses():
     assert "unknown_class" in status["shortfalls"]
     assert "unknown_AT_subclass" in status["shortfalls"]
     assert not status["met"]
+
+
+def test_f2_malformed_nonhashable_record_rule_id_fails_step1(vp_like):
+    case, exp, obs = vp_like
+    obs["records"][0]["rules"][0]["rule_id"] = {"malformed": "id"}
+    assert "A:step1_rule_id_set" in _failures(_score(case, exp, obs), "G6")
