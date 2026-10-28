@@ -19,7 +19,7 @@ from types import SimpleNamespace
 import pytest
 
 from benchmarks.adr034_g2_1_r3 import contract as C
-from benchmarks.adr034_g2_1_r3 import coverage, gates, oracle, public_smoke, synthetic
+from benchmarks.adr034_g2_1_r3 import coverage, gates, oracle, public_smoke, runner, synthetic
 
 
 def _public_archive(tmp_path: Path) -> dict:
@@ -304,7 +304,12 @@ def _case(tmp_path: Path, cls: str, i: int) -> tuple[dict, SimpleNamespace, dict
         record_subject=record_subject, event_relevance=event_relevance,
         per_rule_relevance=rule_relevance, evaluation_complete=complete,
     )
-    return case, exp, {"pre": pre}
+    observed = {"pre": pre}
+    if cls == "L":
+        observed["pre_l"] = runner.snapshot_l_preconditions(
+            target, root, outside, target_base, target_rel,
+        )
+    return case, exp, observed
 
 
 def _synthetic_admission(tmp_path: Path):
