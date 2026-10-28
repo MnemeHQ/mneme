@@ -955,3 +955,89 @@ def test_f3_public_archive_manifest_tamper_fails_closed(tmp_path):
     result = public_smoke.verify(archive, digest)
     assert not result["verified"]
     assert result["reason"] in ("public_manifest_invalid", "public_manifest_digest_mismatch")
+
+
+# ── Scorer B follow-up: malformed G4 data must fail one case, not the run ──
+
+
+def _partial_g4_observation(tmp_path):
+    """Public synthetic numeric PARTIAL, with a G4-gated unknown source."""
+    case = _synthetic("syn-lit-mixed")
+    entry = case["labels"]["checker"]["numeric_rules"][0]
+    entry.update(matcher_status="PARTIAL", primary_reason="SOURCE_NOT_FOUND",
+                 unknown_reasons=["SOURCE_NOT_FOUND"])
+    case["labels"]["checker"]["evaluation_complete"] = False
+    case["labels"]["evidence"]["evaluation_complete"] = False
+    case["labels"]["gates"].append("G4")
+    exp = _derive(case, tmp_path)
+    assert exp.conflicts == []
+    obs = _good_obs(case, exp)
+    return case, exp, obs
+
+
+@pytest.mark.parametrize("bad_reason", [
+    ["SOURCE_NOT_FOUND"], {"reason": "SOURCE_NOT_FOUND"}, None, 123, True,
+])
+def test_r3_g4_non_string_reason_fails_single_case_under_g8(tmp_path, bad_reason):
+    case, exp, obs = _partial_g4_observation(tmp_path)
+    obs["direct_payload"]["applicability"][0]["unknown_sources"] = [{"reason": bad_reason}]
+    versions = {rid: "dver-x" for rid in exp.applied_rule_ids}
+    result = gates.score_case_safely(
+        case, [(exp, obs), (exp, obs)], {"ok": True},
+        HOST, [], "0.10.0", versions,
+    )
+    assert not result["passed"]
+    assert result["gates"]["G8"]["result"] == "fail"
+    assert result["gates"]["G8"]["failures"] == ["case_scoring_exception:ValueError"]
+    assert result["gates"]["G4"]["result"] == "fail"
+    assert result["gates"]["G4"]["failures"] == ["case_not_scored"]
+
+
+@pytest.mark.parametrize("bad_unknowns", [
+    {"reason": "SOURCE_NOT_FOUND"}, "SOURCE_NOT_FOUND", [None], [10],
+])
+def test_r3_g4_malformed_unknown_sources_fails_under_g8(tmp_path, bad_unknowns):
+    case, exp, obs = _partial_g4_observation(tmp_path)
+    obs["direct_payload"]["applicability"][0]["unknown_sources"] = bad_unknowns
+    versions = {rid: "dver-x" for rid in exp.applied_rule_ids}
+    result = gates.score_case_safely(
+        case, [(exp, obs), (exp, obs)], {"ok": True},
+        HOST, [], "0.10.0", versions,
+    )
+    assert not result["passed"] and result["gates"]["G8"]["result"] == "fail"
+
+
+def test_r3_g4_unknown_reason_set_difference_remains_diagnostic_only(tmp_path):
+    case, exp, obs = _partial_g4_observation(tmp_path)
+    obs["direct_payload"]["applicability"][0]["unknown_sources"] = [
+        {"reason": "AMBIGUOUS_BINDING"}
+    ]
+    assert _score(case, exp, obs)["passed"]
+    result = _score(case, exp, obs)
+    assert result["gates"]["G4"]["result"] == "pass"
+    assert any("unknown_reason_set_differs:" in note for note in result["notes"])
+
+
+def test_r3_unexpected_scoring_exception_is_case_local_and_redacted(tmp_path, monkeypatch):
+    case, exp, obs = _partial_g4_observation(tmp_path)
+    versions = {rid: "dver-x" for rid in exp.applied_rule_ids}
+    def broken_g4(*args):
+        raise RuntimeError("private synthetic content must not leak")
+    with monkeypatch.context() as patch:
+        patch.setattr(gates, "g4", broken_g4)
+        result = gates.score_case_safely(
+            case, [(exp, obs), (exp, obs)], {"ok": True},
+            HOST, [], "0.10.0", versions,
+        )
+    assert result["gates"]["G8"]["failures"] == ["case_scoring_exception:RuntimeError"]
+    assert not result["passed"]
+    assert "private synthetic content" not in str(result)
+    # The next case is still scoreable; the exception has not aborted the run.
+    healthy_case = _synthetic("syn-at-si")
+    healthy_exp = _derive(healthy_case, tmp_path)
+    healthy_obs = _good_obs(healthy_case, healthy_exp)
+    healthy = gates.score_case_safely(
+        healthy_case, [(healthy_exp, healthy_obs), (healthy_exp, healthy_obs)],
+        {"ok": True}, HOST, [], "0.10.0", {},
+    )
+    assert healthy["passed"]
