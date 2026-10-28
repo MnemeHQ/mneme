@@ -334,7 +334,8 @@ def memory_guard(memory_b64: Optional[str], derived_rule_ids: list) -> list:
     problems = []
     for decision in memory.get("decisions") or []:
         if decision.get("constraints") or decision.get("anti_patterns"):
-            problems.append(f"legacy_rules_compiled:{decision.get('id')}")
+            # Decision IDs are fixture-derived and not for metadata reports.
+            problems.append("legacy_rules_compiled")
     index = (memory.get("decision_index") or {}).get("rules") or []
     compiled = sorted(r.get("rule_id") for r in index if isinstance(r, dict))
     if compiled != sorted(derived_rule_ids):
