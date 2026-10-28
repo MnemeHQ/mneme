@@ -68,7 +68,7 @@ def score(args: argparse.Namespace) -> int:
             case, passes[cid], compiled[cid], host, guards.get(cid, []),
             environments["implementation"].get("mneme_version", ""), versions,
         ))
-    floor = gates.floors(cases)
+    floor = gates.floors(cases, passes)
     decision = gates.decide(results, floor, symlinks, args.scoring, integrity)
     report = {
         "harness": {"version": HARNESS_VERSION, "files_sha256": harness_files()},
