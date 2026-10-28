@@ -168,6 +168,33 @@ def snapshot(path: Path) -> dict:
     return {"kind": "other"}
 
 
+
+
+def snapshot_l_preconditions(target: Path, root: Path, outside: Path,
+                             target_base: str, target_rel: str) -> dict:
+    """Capture L filesystem facts *before* hook mutation or fixture cleanup.
+
+    os.path.exists follows the complete link chain, including a declared
+    root-to-outside link or a link to a dangling link. isdir on the parent
+    resolves directory symlinks and their nested components. None of these
+    post-materialization facts is consulted again during coverage scoring.
+    """
+    base = {"root": root, "outside": outside}[target_base]
+    parts = target_rel.split("/")
+    try:
+        link_component = any(
+            os.path.islink(base.joinpath(*parts[:i]))
+            for i in range(1, len(parts))
+        )
+        return {
+            "target_link_live": os.path.exists(target) if os.path.islink(target) else None,
+            "parent_is_dir": os.path.isdir(target.parent),
+            "link_component": link_component,
+        }
+    except OSError as exc:
+        return {"error": type(exc).__name__}
+
+
 def symlink_capability(work: Path) -> dict:
     """R1 §5 G2V-F2: the scoring environment must create file and dir links."""
     probe = work / "symlink-probe"
@@ -440,6 +467,11 @@ def observe(case: dict, ctx: Context, compiled: dict) -> tuple:
     if case["hook"].get("availability") != "open":
         raise HarnessError("only availability open is scored")
     obs: dict = {"memory_sha256": compiled.get("memory_sha256"), "pre": snapshot(target)}
+    if case.get("cls") == "L":
+        loc = case["event"]["target"]
+        obs["pre_l"] = snapshot_l_preconditions(
+            target, root, outside, loc["base"], loc["path"],
+        )
     stdin = json.dumps(envelope(case, str(target), root, outside), ensure_ascii=True).encode("ascii")
     env = hook_env(mode, io / "evidence-impl.jsonl", ctx.host)
 
