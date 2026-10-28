@@ -203,6 +203,9 @@ def _case(tmp_path: Path, cls: str, i: int) -> tuple[dict, SimpleNamespace, dict
         content = ("def check(x): return x\ncheck(7)\n" if i < 2
                    else "def check(x): return x\ncheck(3)\n" if i < 4
                    else "def check(x): return x\ndef wrapper(check):\n    return check(3)\n")
+        if i < 4:
+            disposition = "refused" if i < 2 else "proceeded"
+            cause = "numeric_violation" if i < 2 else "none"
     elif cls == "MR":
         # §7b genuinely has two APPLIED numeric rules with distinct
         # declaration sources; their IDs are derived from typed ADRs.
@@ -243,6 +246,12 @@ def _case(tmp_path: Path, cls: str, i: int) -> tuple[dict, SimpleNamespace, dict
     if cls == "MR":
         rule_relevance = {rid: event_relevance and (i == 2 or rid == applied[0])
                           for rid in applied}
+    elif cls == "LIT":
+        event_relevance, complete = i < 2, True
+        rule_relevance = {rid: event_relevance for rid in applied}
+    elif cls == "SC":
+        event_relevance, complete = i < 4, i < 4
+        rule_relevance = {rid: event_relevance for rid in applied}
     else:
         rule_relevance = {rid: False for rid in applied}
         event_relevance, complete = False, True
