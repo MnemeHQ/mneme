@@ -342,6 +342,32 @@ def memory_guard(memory_b64: Optional[str], derived_rule_ids: list) -> list:
     return problems
 
 
+
+
+def compiled_rule_versions(memory_b64: Optional[str]) -> dict[str, str]:
+    """Expected version bindings from the pinned, fixture-compiled memory.
+
+    Never read them from the observed hook evidence. Missing or duplicate
+    bindings remain an invalid expectation and will fail G6.
+    """
+    if memory_b64 is None:
+        return {}
+    memory = json.loads(base64.b64decode(memory_b64).decode("utf-8"))
+    rows = (memory.get("decision_index") or {}).get("rules") or []
+    versions: dict[str, str] = {}
+    for item in rows:
+        if not isinstance(item, dict):
+            raise HarnessError("malformed compiled rule binding")
+        rid = item.get("rule_id")
+        ver = item.get("decision_version_id")
+        if not isinstance(rid, str) or not rid or not isinstance(ver, str) or not ver:
+            raise HarnessError("invalid compiled decision version binding")
+        if rid in versions:
+            raise HarnessError("duplicate compiled rule version binding")
+        versions[rid] = ver
+    return versions
+
+
 def _write_memory(root: Path, memory_b64: Optional[str]) -> None:
     if memory_b64 is None:
         return
