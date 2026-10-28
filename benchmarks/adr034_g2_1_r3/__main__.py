@@ -61,7 +61,12 @@ def score(args: argparse.Namespace) -> int:
             exp, obs = runner.observe_safely(case, ctx, compiled[cid])
             passes[cid].append((exp, obs))
             if exp is not None and cid not in guards:
-                guards[cid] = runner.memory_guard(compiled[cid].get("memory_b64"), exp.rule_ids)
+                try:
+                    guards[cid] = runner.memory_guard(compiled[cid].get("memory_b64"), exp.rule_ids)
+                except Exception as exc:
+                    # Broken compiled-memory provenance fails this case only.
+                    # Never include raw exception text in a metadata report.
+                    guards[cid] = [f"memory_guard_exception:{type(exc).__name__}"]
     results = []
     for case in cases:
         cid = case["case_id"]
@@ -72,7 +77,7 @@ def score(args: argparse.Namespace) -> int:
             # scoring-process crash or an implicit version wildcard.
             guards.setdefault(cid, []).append(f"compiled_version_binding:{type(exc).__name__}")
             versions = {}
-        results.append(gates.score_case(
+        results.append(gates.score_case_safely(
             case, passes[cid], compiled[cid], host, guards.get(cid, []),
             environments["implementation"].get("mneme_version", ""), versions,
         ))
