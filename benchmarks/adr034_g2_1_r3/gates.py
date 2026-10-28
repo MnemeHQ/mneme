@@ -287,14 +287,14 @@ def g6(case: dict, exp, obs: dict, host: tuple, envelope_ids: dict, cwd: str,
         kind = payload["subject"].get("input_kind") if isinstance(payload.get("subject"), dict) \
             else ("absent" if "subject" not in payload else "malformed")
         if kind != exp.checker_subject_kind:
-            out.append(f"checker_subject_kind:{kind}")
+            out.append("checker_subject_kind:mismatch")
     # Cause, mode and outcome (AMB-R2-08 mapping fixed in contract.py).
     if record["disposition"].get("mode") != exp.mode:
         out.append("disposition_mode")
     if record["disposition"].get("cause") != exp.cause:
-        out.append(f"disposition_cause:{record['disposition'].get('cause')}")
+        out.append("disposition_cause:mismatch")
     if record["hook_outcome"] != exp.disposition:
-        out.append(f"hook_outcome:{record['hook_outcome']}")
+        out.append("hook_outcome:mismatch")
     # Exact non-numeric and numeric violation identities (ADR-034 §7c; R3 §3).
     out.extend("attribution:" + f for f in
                attribution.identity_failures(record, exp.violations, digest))
@@ -330,7 +330,7 @@ def g6(case: dict, exp, obs: dict, host: tuple, envelope_ids: dict, cwd: str,
     if pinned.get("event") is not exp.event_relevance:
         out.append("step3_event_relevance")
     if pinned.get("complete") is not exp.evaluation_complete:
-        out.append(f"step4_evaluation_complete:{pinned.get('complete')}")
+        out.append("step4_evaluation_complete:mismatch")
     return out
 
 
@@ -354,7 +354,10 @@ def score_case(case: dict, passes: list, compiled: dict, host: tuple, guard: lis
         errors.append("memory_compile_failed")
     errors.extend(guard)
     if exp0 is not None:
-        errors.extend(f"oracle_conflict:{c}" for c in exp0.conflicts)
+        # Frozen-label conflict details may carry original fixture text or
+        # values. The metadata-only report records stable conflict kinds;
+        # raw expectations remain in custodian-only observations if requested.
+        errors.extend(f"oracle_conflict:{c.split(':', 1)[0]}" for c in exp0.conflicts)
         notes.extend(exp0.notes)
     if errors or exp0 is None:
         gates["G8"]["failures"] = sorted(set(errors)) or ["case_not_scored"]
