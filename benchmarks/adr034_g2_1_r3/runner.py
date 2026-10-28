@@ -40,6 +40,12 @@ class HarnessError(Exception):
     """An operational failure of the scoring process (a G8 case failure)."""
 
 
+def implementation_version_guard(env: dict) -> list[str]:
+    """Check independently frozen R3 package version, never self-attestation."""
+    return ([] if env.get("mneme_version") == C.PINNED_MNEME_VERSION
+            else ["implementation_mneme_version_mismatch"])
+
+
 # ── processes ───────────────────────────────────────────────────────────────
 
 
