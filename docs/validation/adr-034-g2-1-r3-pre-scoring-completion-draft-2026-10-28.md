@@ -9,7 +9,7 @@
 
 The protocol requires a **separate, merged metadata-only pre-scoring completion record** before owner-controlled decryption (R3 pre-registration §5 step 7 and §6.1). The current record is a *draft evidence checklist*, **not** that completion.
 
-**Verified GitHub merge state, updated after the prior draft:** PR #705 is **merged** into `main` by squash commit `086bbbf7556297f19f13cb2c5c2682687bcf41b4` (accepted PR head `26b1fa01336db909231b8d341feb182f1c35122d`). GitHub confirmed `merged=true`, and a repository-API comparison confirmed **17/17 changed Git blobs identical** at the reviewed head and merge commit. PR #707 remains **open/draft/unmerged**. **This is verified remote Git source identity only**, not the bytes of scorer B's Windows checkout, the complete tree pin, or the installed build provenance.
+**Verified GitHub merge state, updated after the prior draft:** PR #705 is **merged** into `main` by squash commit `086bbbf7556297f19f13cb2c5c2682687bcf41b4` (accepted PR head `26b1fa01336db909231b8d341feb182f1c35122d`). GitHub confirmed `merged=true`, and a repository-API comparison confirmed **17/17 changed Git blobs identical** at the reviewed head and merge commit. PR #708's separately characterized Claude Code 2.1.312 host record was squash merged at `2cab939077f9f413ba3b33b41ce9249bf54cd3ce` after independent document-consistency review, with a disclosed limitation that raw run artifacts were not independently opened. PR #707 remains **open/draft/unmerged**. **This is verified remote Git source identity only**, not the bytes of scorer B's Windows checkout, the complete tree pin, or the installed build provenance.
 
 Evidence provenance terms:
 - **FROZEN SOURCE:** values already committed in earlier accepted metadata-only freeze records; they are anchors, not new checks performed for this draft.
@@ -82,17 +82,17 @@ Every full SHA must be recorded and verified before changing status to complete.
 
 ## 4. Claude Code scoring host and live-host test
 
-R3 §6.1 requires a **new, merged §8.B live-host characterization** using the R3 implementation because Claude Code 2.1.312 is different from the previously characterized 2.1.310 (#646). A scorer's local install digest or a synthetic replay is not live-host proof.
+R3 §6.1 required a **new, merged §8.B live-host characterization** using the R3 implementation because Claude Code 2.1.312 differs from the previously characterized 2.1.310 (#646). This requirement is satisfied at the **record/host-characterization level** by PR #708, squash merged as `2cab939077f9f413ba3b33b41ce9249bf54cd3ce`. The recorded host identity is Claude Code `2.1.312`, SHA-256 `6099672ebe5dcb518b67d1d32dde1e3360bc6bee1dae7f8d28a69c49acc7c865`, measured on ten public-fixture runs. The independent reviewer checked the executable and document consistency but did **not** independently inspect the raw ten-run envelopes/evidence; the owner accepted the record for merge. A scorer's current installation identity, command-line binding and reproducible pinned scoring environment remain separate OPEN gates.
 
 | Required evidence | Status |
 |---|---|
-| Exact scorer machine and Windows user, Claude Code executable path and `claude --version` | OPEN; scorer B reports Claude Code 2.1.312 at `C:\\Users\\MnemeAgent\\.local\\bin\\claude.exe` (its own observation; actual scoring-host characterization not yet independently accepted) |
-| Executable SHA-256 (full 64 hex), shim/PATH origin, timestamp, signed provenance if available | OPEN; scorer B reports its locally observed executable SHA-256 `6099672ebe5dcb518b67d1d32dde1e3360bc6bee1dae7f8d28a69c49acc7c865` (**REPORTED**, not the independently accepted host pin) |
-| Separately executed, documented live host §8.B tests with R3 implementation; report/PR merged before unblind | OPEN |
+| Exact scorer machine and Windows user, Claude Code executable path and `claude --version` | OPEN for actual scorer B run environment; scorer B reports Claude Code 2.1.312 at `C:\\Users\\MnemeAgent\\.local\\bin\\claude.exe`. PR #708 established the separate characterization host identity, not scorer B's final runtime pin. |
+| Executable SHA-256 (full 64 hex), shim/PATH origin, timestamp, signed provenance if available | Characterization pin VERIFIED in merged #708: `6099672ebe5dcb518b67d1d32dde1e3360bc6bee1dae7f8d28a69c49acc7c865`. Scorer B's exact current executable and invocation path remain OPEN for independent scoring-environment verification. |
+| Separately executed, documented live host §8.B tests with R3 implementation; report/PR merged before unblind | **CLOSED for the §6.1 record prerequisite**: ten public-fixture runs documented and PR #708 independently reviewed and squash merged. The review did not open raw run artifacts. This is not a concealed-scoring result. |
 | Exact `--host-version` and `--host-sha256` pinned to *verified* host | OPEN |
 | Provenance binding and ability to reproduce the required pinned host throughout scoring | OPEN |
 
-The host re-pin and execution authorization are **owner tasks outside scorer B's self-reported observations**.
+The host characterization pin is accepted by the owner through #708's merge. Scorer B's **actual scoring-host matching pin**, custody verification and separate owner unblind authorization remain OPEN; they cannot be inferred solely from #708 or scorer B's reports.
 
 ## 5. Filesystem, public archive and runtime readiness
 
@@ -154,7 +154,7 @@ Serialization and commitment: construct the three records, sort by `id`, then se
 - [ ] D3 source/wheel/installed-file manifest/dependency freeze independently attested.
 - [x] Baseline **source-equivalence comparison reviewed and candidate retained**: distinct R2/R3 wheel hashes recorded and newline-only source difference explained. This check is **not** the complete environment attestation.
 - [ ] Baseline source/tree, newly built wheel, installed-file `RECORD`, dependency freeze and actual scoring environment **independently attested**. Scorer B's observations and reproduced source-content equivalence do not, alone, complete this item.
-- [ ] R3 Claude Code 2.1.312 **live-host** characterization independently executed and **merged**; exact executable digest and host pin verified.
+- [x] R3 Claude Code 2.1.312 **live-host** characterization recorded under frozen §6.1, independently reviewed for documentary/source consistency, and merged as #708 (`2cab9390`); exact executable digest `6099672e…c865` documented and re-hashed by the reviewer. This does **not** attest scorer B's final runtime or the unpublished run artifacts.
 - [ ] Actual scorer account/session/key-isolation and no-author-material custody recheck approved by owner.
 - [ ] Symlink capability demonstrated in actual scoring environment and run root.
 - [ ] Frozen public tar/manifest and verified distinct-class inventory checked at final scoring checkout.
