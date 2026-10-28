@@ -290,8 +290,8 @@ def g6(case: dict, exp, obs: dict, host: tuple, envelope_ids: dict, cwd: str,
                attribution.identity_failures(record, exp.violations, digest))
     # Ordered steps (R2 §5 G6 1-4; R2V-F3 first).
     ids = [r.get("rule_id") if isinstance(r, dict) else None for r in record["rules"]]
-    if len(set(ids)) != len(ids) or sorted(i for i in ids if isinstance(i, str)) != exp.applied_rule_ids \
-            or any(not isinstance(i, str) or not i for i in ids):
+    if (any(not isinstance(i, str) or not i for i in ids)
+            or len(set(ids)) != len(ids) or sorted(ids) != exp.applied_rule_ids):
         out.append("step1_rule_id_set")
         return out
     for rule in record["rules"]:
