@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import base64
 import copy
+import io
+import tarfile
 import hashlib
 import json
 import os
@@ -17,7 +19,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from benchmarks.adr034_g2_1_r3 import attribution, coverage, gates, oracle, runner, synthetic
+from benchmarks.adr034_g2_1_r3 import attribution, coverage, gates, oracle, public_smoke, runner, synthetic
 from benchmarks.adr034_g2_1_r3 import contract as C
 
 HOST = ("2.1.312", "a" * 64)
@@ -871,3 +873,85 @@ def test_f2_malformed_nonhashable_record_rule_id_fails_step1(vp_like):
     case, exp, obs = vp_like
     obs["records"][0]["rules"][0]["rule_id"] = {"malformed": "id"}
     assert "A:step1_rule_id_set" in _failures(_score(case, exp, obs), "G6")
+
+
+# ── Frozen #703 public smoke stays in its own tar ─────────────────────────────
+
+
+def _synthetic_public_tar(tmp_path, *, omit_at=False, damage_manifest=False):
+    """An artificial separate public tar with its own complete manifest."""
+    files = {}
+    for cls in C.CLASS_FLOORS:
+        if omit_at and cls == "AT":
+            continue
+        cid = "synthetic-public-" + cls
+        files[f"{cid}/case.json"] = json.dumps({
+            "schema": C.CASE_SCHEMA, "case_id": cid,
+            "cls": cls, "visibility": "public",
+        }, sort_keys=True).encode("utf-8")
+    manifest = "".join(
+        f"{hashlib.sha256(data).hexdigest()}  {name}\n"
+        for name, data in sorted(files.items())
+    ).encode("ascii")
+    if damage_manifest:
+        manifest = manifest.replace(b"a", b"b", 1)
+    files["MANIFEST.sha256"] = manifest
+    archive = tmp_path / "synthetic-public.tar"
+    with tarfile.open(archive, "w", format=tarfile.USTAR_FORMAT) as tf:
+        for name, data in sorted(files.items()):
+            info = tarfile.TarInfo("r3-public-smoke/" + name)
+            info.size = len(data)
+            info.mode = 0o644
+            tf.addfile(info, io.BytesIO(data))
+    return archive, hashlib.sha256(archive.read_bytes()).hexdigest()
+
+
+def test_f3_concealed_only_accepts_verified_separate_public_archive(tmp_path):
+    archive, digest = _synthetic_public_tar(tmp_path)
+    evidence = public_smoke.verify(archive, digest)
+    assert evidence["verified"]
+    assert evidence["public_cases"] == 14
+    assert set(evidence["classes"]) == set(C.CLASS_FLOORS)
+    # No public cases are inserted into the concealed input or its manifest.
+    cases = _concealed_corpus()
+    floor = gates.floors(cases, passes={}, public_evidence=evidence)
+    assert floor["concealed"] == 128
+    assert floor["public"] == 14
+    assert floor["public_smoke_rules_met"]
+    assert "public_AT_smoke_missing" not in floor["coverage"]["shortfalls"]
+    assert "public_smoke_separate_archive_not_verified" not in floor["coverage"]["shortfalls"]
+    # Other distribution minima remain unproved, so the whole floor stays FAIL.
+    assert floor["met"] is False
+
+
+def test_f3_separate_public_tar_is_required_for_concealed_admission(tmp_path):
+    cases = _concealed_corpus()
+    missing = gates.floors(cases, passes={}, public_evidence={
+        "verified": False, "reason": "public_smoke_tar_not_supplied",
+        "public_cases": 0, "classes": [],
+    })
+    assert "public_smoke_separate_archive_not_verified" in missing["coverage"]["shortfalls"]
+    assert missing["met"] is False
+    result = gates.decide(
+        [_result(c["case_id"], c["cls"], subclass=c["subclass"]) for c in cases],
+        missing, {"capable": True}, "concealed",
+        {"manifest": {"entries": 128, "mismatches": []}},
+    )
+    assert result["verdict"] == "FAIL"
+
+
+def test_f3_public_archive_hash_mismatch_fails_closed(tmp_path):
+    archive, _ = _synthetic_public_tar(tmp_path)
+    assert public_smoke.verify(archive, "0" * 64)["reason"] == "public_tar_digest_mismatch"
+
+
+def test_f3_public_archive_missing_at_fails_closed(tmp_path):
+    archive, digest = _synthetic_public_tar(tmp_path, omit_at=True)
+    assert public_smoke.verify(archive, digest)["reason"] == "public_case_count"
+
+
+def test_f3_public_archive_manifest_tamper_fails_closed(tmp_path):
+    archive, digest = _synthetic_public_tar(tmp_path, damage_manifest=True)
+    result = public_smoke.verify(archive, digest)
+    assert not result["verified"]
+    assert result["reason"] in ("public_manifest_invalid", "public_manifest_digest_mismatch")
