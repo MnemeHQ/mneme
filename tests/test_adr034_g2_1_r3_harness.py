@@ -459,8 +459,8 @@ def test_g4_primary_reason_mismatch(tmp_path):
     (lambda o, e: o["records"][0]["host"].update(version="2.1.310"), "A:host_identity"),
     (lambda o, e: o["records"].append(copy.deepcopy(o["records"][0])), "A:record_count:2"),
     (lambda o, e: o["direct_payload"].update(subject={"input_kind": "proposed_new_source"}),
-     "A:checker_subject_kind:proposed_new_source"),
-    (lambda o, e: o["pinned_g6"].update(complete=None), "A:step4_evaluation_complete:None"),
+     "A:checker_subject_kind:mismatch"),
+    (lambda o, e: o["pinned_g6"].update(complete=None), "A:step4_evaluation_complete:mismatch"),
 ])
 def test_g6_failures(at_si, mutate, code):
     case, exp, obs = at_si
@@ -496,7 +496,7 @@ def test_routed_fallback_trusted_false_passes_and_null_fails(tmp_path):
     obs = _good_obs(case, exp)
     assert _score(case, exp, obs)["passed"]
     obs["pinned_g6"]["complete"] = None
-    assert "A:step4_evaluation_complete:None" in _failures(_score(case, exp, obs), "G6")
+    assert "A:step4_evaluation_complete:mismatch" in _failures(_score(case, exp, obs), "G6")
 
 
 _TB = b"Traceback (most recent call last):\n"
@@ -1080,3 +1080,29 @@ def test_r3_observe_safely_redacts_exception_messages_from_metadata(
     assert marker not in report
     assert "C:/private/cases" not in report
     assert "private_detail" not in report
+
+
+def test_r3_oracle_conflict_values_are_redacted_in_metadata(tmp_path):
+    case, exp, obs = _partial_g4_observation(tmp_path)
+    marker = "LEAKMARKER-opaque-label-value-and-source"
+    exp.conflicts.append("evidence.per_rule_relevance:derived=" + marker + ":label=private")
+    result = gates.score_case_safely(
+        case, [(exp, obs), (exp, obs)], {"ok": True}, HOST, [], "0.10.0",
+        {rid: "dver-x" for rid in exp.applied_rule_ids},
+    )
+    assert result["gates"]["G8"]["result"] == "fail"
+    assert "oracle_conflict:evidence.per_rule_relevance" in result["gates"]["G8"]["failures"]
+    assert marker not in json.dumps(result)
+    assert "private" not in json.dumps(result)
+
+
+def test_r3_observed_disposition_values_are_redacted_from_metadata(at_si):
+    case, exp, obs = at_si
+    marker = "LEAKMARKER-concealed-source-fragment"
+    obs["records"][0]["disposition"]["cause"] = marker
+    obs["records"][0]["hook_outcome"] = marker
+    result = _score(case, exp, obs)
+    g6_errors = _failures(result, "G6")
+    assert "A:disposition_cause:mismatch" in g6_errors
+    assert "A:hook_outcome:mismatch" in g6_errors
+    assert marker not in json.dumps(result)
