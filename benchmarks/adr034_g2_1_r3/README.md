@@ -77,11 +77,11 @@ Every derived value is cross-checked against the frozen labels (README I2).
 | G1 | An expected refusal observed without exit 2 **or with a non-refusing recorded disposition**. A gated non-clean numeric rule observed `NO_VIOLATION` (checker payload or record). Any pinned per-rule or event relevance `true` that the oracle does not expect |
 | G2 | A case expected to proceed (contract exit 0) observed with exit 2. Baseline-observed cases are exempt (R1 A1.4) |
 | G3 | The target is unchanged by the checker calls and by the hook, and an absent target stays absent |
-| G4 | The primary reason of every gated unevaluated rule, in the checker payload and in the record. Unknown-reason **sets** are compared and reported as notes; only the primary reason is gated (AMB-R2-05) |
+| G4 | The primary reason of every gated unevaluated rule, in the checker payload and in the record. Well-formed unknown-reason **sets** are compared and reported as notes; only the primary reason is gated (AMB-R2-05). Malformed reason types are scoring-integrity failures under G8, not an exception that aborts the run |
 | G5 | Hook level: stdout, stderr and exit byte-identical to the baseline hook, with R1 Amendment 2 traceback handling decided by the baseline's run. Checker level: `--proposed-new-file` against `--input` on the same carrier. The routed-CR exception moves a case to checker level only |
 | G6 | Exactly one complete record for a routed case and none otherwise. Independently pinned Mneme version and host identity, decision-version bindings from fixture-compiled memory, event fields, digest and path joins, expected record subject and checker subject kind, mode, cause, hook outcome, exact violation identities. Then, in order: (1) the rule-ID set (short-circuits), record rule bindings and matcher fields; (2) per-rule relevance keys and values; (3) event relevance; (4) `evaluation_complete`, all from the pinned functions |
 | G7 | The two full passes give identical observation bundles and identical expectations |
-| G8 | Any harness, compile or oracle failure, or any oracle/label conflict, fails the case and every other gate for it |
+| G8 | Any harness, compile, oracle or per-case scoring failure, including malformed checker reason data, or any oracle/label conflict, fails that case and every other gate for it. Unexpected exception messages are redacted from metadata reports; subsequent cases remain scoreable |
 
 The corpus decision requires every scored case to pass:
 - the R3 floors (128 concealed cases over 14 classes, AT at least 2 per subclass), plus independently checked frozen within-class L/LIT/SC/MR/AT distributions, byte variety and AT smoke presence;
