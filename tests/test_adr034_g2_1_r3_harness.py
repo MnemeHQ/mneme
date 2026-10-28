@@ -21,6 +21,7 @@ import yaml
 
 from benchmarks.adr034_g2_1_r3 import attribution, coverage, gates, oracle, public_smoke, runner, synthetic
 from benchmarks.adr034_g2_1_r3 import contract as C
+from benchmarks.adr034_g2_1_r3.__main__ import structural_review_status
 
 HOST = ("2.1.312", "a" * 64)
 LIT_ID = "ADR-9102:FORBID_LITERAL:" + "0" * 32
@@ -1143,3 +1144,39 @@ def test_r3_nonascii_byte_feature_rejects_lone_surrogate():
     assert "non_ascii" not in coverage._byte_features("x = '\ud800'")
     assert "non_ascii" in coverage._byte_features("x = 'é'")
     assert "non_ascii" not in coverage._byte_features("ascii")
+
+
+
+def test_r3_structural_review_pending_is_visible_without_changing_frozen_verdict():
+    review = structural_review_status("concealed")
+    assert review["status"] == "pending_independent_structural_review"
+    assert review["pending"] == [
+        "SC_lexical_families", "AT_material_distinctness",
+        "public_vs_concealed_AT",
+    ]
+    assert review["final_claim_ready"] is False
+    assert "case" not in json.dumps(review).lower()
+
+    # Preserve the R3 frozen gate verdict. The structural-review marker is
+    # a documented closure prerequisite, not an extra invented verdict or
+    # a silent change to the scoring denominator.
+    results = [_result("synthetic-case", "SC")]
+    valid = {"manifest": {"entries": 1, "mismatches": []}}
+    nominal_floor = {"met": True, "coverage": {"met": True}}
+    decision = gates.decide(results, nominal_floor, {"capable": True},
+                            "concealed", valid)
+    assert decision["verdict"] == "PASS"
+    assert review["final_claim_ready"] is False
+
+
+def test_r3_public_smoke_never_claims_structural_review_complete():
+    review = structural_review_status("public")
+    assert review["status"] == "not_applicable_public_smoke"
+    assert review["pending"] == []
+    assert review["final_claim_ready"] is False
+    decision = gates.decide(
+        [_result("synthetic-public", "AT", visibility="public")],
+        {"met": False}, {"capable": True}, "public",
+        {"manifest": None},
+    )
+    assert decision["verdict"] == "NO_VERDICT_PUBLIC_SMOKE"
