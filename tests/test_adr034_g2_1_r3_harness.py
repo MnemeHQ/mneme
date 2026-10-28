@@ -675,3 +675,26 @@ def test_public_scoring_without_manifest_never_claims_pass():
                             {"manifest": {"entries": 0, "mismatches": ["manifest_missing"]}})
     assert decision["verdict"] == "NO_VERDICT_PUBLIC_SMOKE"
     assert not decision["integrity_ok"]
+
+
+
+def test_manifest_rejects_files_outside_inner_root(tmp_path):
+    parent = tmp_path / "extracted"
+    parent.mkdir()
+    root, case_path = _synthetic_manifest_corpus(parent)
+    _write_file_manifest(root, [case_path])
+    (parent / "unlisted.txt").write_text("unlisted", encoding="utf-8")
+    _, integrity = runner.load_corpus(parent)
+    assert "file_outside_manifest_scope" in integrity["manifest"]["mismatches"]
+
+
+def test_manifest_rejects_non_regular_symlink(tmp_path):
+    root, case_path = _synthetic_manifest_corpus(tmp_path)
+    target = root / "linked"
+    try:
+        target.symlink_to(case_path)
+    except OSError:
+        pytest.skip("symlinks not available on this test host")
+    _write_file_manifest(root, [case_path])
+    _, integrity = runner.load_corpus(root)
+    assert "manifest_incomplete_inventory" in integrity["manifest"]["mismatches"]
