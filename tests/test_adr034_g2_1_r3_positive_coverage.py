@@ -91,7 +91,7 @@ def _case(tmp_path: Path, cls: str, i: int) -> tuple[dict, SimpleNamespace, dict
     target_base, target_rel = "root", "src/new.py"
     content = "LIMIT_S = 3\n"
     pre = {"kind": "absent"}
-    fixture_files = []
+    fixture_files = [{"base": "root", "path": "src", "type": "dir"}]
     numeric_outcomes = {}
     applied = []
     literals = []
@@ -120,14 +120,29 @@ def _case(tmp_path: Path, cls: str, i: int) -> tuple[dict, SimpleNamespace, dict
             (root / "src" / f"actual{i}.py").write_text("a=1")
             (root / target_rel).symlink_to(f"actual{i}.py")
             pre = {"kind": "symlink"}
+            fixture_files.extend([
+                {"base": "root", "path": f"src/actual{i}.py", "type": "file",
+                 "text": "a=1"},
+                {"base": "root", "path": target_rel, "type": "symlink",
+                 "target": f"actual{i}.py"},
+            ])
         elif kind == 3:
             target_rel = f"src/dangling{i}.py"
             (root / target_rel).symlink_to(f"missing-{i}.py")
             pre = {"kind": "symlink"}
+            fixture_files.append({
+                "base": "root", "path": target_rel, "type": "symlink",
+                "target": f"missing-{i}.py",
+            })
         elif kind == 4:
             (root / "real").mkdir()
             (root / f"alias{i}").symlink_to("real", target_is_directory=True)
             target_rel = f"alias{i}/new.py"
+            fixture_files.extend([
+                {"base": "root", "path": "real", "type": "dir"},
+                {"base": "root", "path": f"alias{i}", "type": "dir_symlink",
+                 "target": "real"},
+            ])
         elif kind == 5:
             target_base, target_rel = "outside", f"outside{i}.py"
         elif kind == 6:
@@ -154,6 +169,7 @@ def _case(tmp_path: Path, cls: str, i: int) -> tuple[dict, SimpleNamespace, dict
         elif sub == "AT-SX":
             target_rel = f"src/excluded{i}/new.py"
             (root / f"src/excluded{i}").mkdir()
+            fixture_files.append({"base": "root", "path": f"src/excluded{i}", "type": "dir"})
             fixture_files.append(_num_rule(
                 f"ADR-{9900+i}", include="src/**", exclude=f"src/excluded{i}/**"))
             checker_subject = "unverified_input"
