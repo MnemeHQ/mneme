@@ -15,7 +15,7 @@ import re
 import sys
 from pathlib import Path
 
-from . import HARNESS_VERSION, gates, public_smoke, runner
+from . import HARNESS_VERSION, contract as C, gates, public_smoke, runner
 
 
 def harness_files() -> dict:
@@ -50,6 +50,15 @@ def score(args: argparse.Namespace) -> int:
     }
 
     compiled, guards, passes = {}, {}, {c["case_id"]: [] for c in cases}
+    # The expected package version comes from the frozen R3 §2 contract,
+    # NEVER the package under test. Its installed version is an independent
+    # observation and an operational provenance precondition for every case.
+    installed_version = environments["implementation"].get("mneme_version")
+    version_pin_matches = installed_version == C.PINNED_MNEME_VERSION
+    if not version_pin_matches:
+        for case in cases:
+            guards.setdefault(case["case_id"], []).append(
+                "implementation_mneme_version_mismatch")
     for case in cases:
         try:
             compiled[case["case_id"]] = runner.compile_memory(case, ctx)
@@ -79,7 +88,7 @@ def score(args: argparse.Namespace) -> int:
             versions = {}
         results.append(gates.score_case_safely(
             case, passes[cid], compiled[cid], host, guards.get(cid, []),
-            environments["implementation"].get("mneme_version", ""), versions,
+            C.PINNED_MNEME_VERSION, versions,
         ))
     floor = gates.floors(cases, passes, public_evidence)
     decision = gates.decide(results, floor, symlinks, args.scoring, integrity)
@@ -88,6 +97,10 @@ def score(args: argparse.Namespace) -> int:
         "scoring": args.scoring,
         "pinned_host": {"version": host[0], "executable_sha256": host[1]},
         "environments": environments,
+        "implementation_version_pin": {
+            "expected": C.PINNED_MNEME_VERSION,
+            "matched": version_pin_matches,
+        },
         "symlink_capability": symlinks,
         "corpus_integrity": integrity,
         "public_smoke_integrity": public_evidence,
