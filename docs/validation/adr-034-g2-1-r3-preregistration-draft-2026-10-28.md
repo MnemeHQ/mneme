@@ -1,7 +1,7 @@
 # ADR-034 G2-1 R3 independent blind validation: pre-registration draft
 
 **Date:** 2026-10-28  
-**Status:** DRAFT FOR ARCHITECTURE REVIEW. Owner accepted **R3-P1** (128 concealed cases, 14 classes) and **R3-P2** (conditional same-account handoff) on 2026-10-28. **Not frozen until reviewed and merged; not an authorization to author, seal, build a harness or score cases.**
+**Status:** OWNER-APPROVED PRE-REGISTRATION, **frozen upon merge** (2026-10-28). Owner accepted **R3-P1** (128 concealed cases, 14 classes), **R3-P2** (conditional same-account handoff), and explicitly directed merging this reviewed protocol. **This is not authorization to author, seal, unblind, build a harness or score cases.**
 
 ## 1. Authority and claim
 
@@ -56,7 +56,7 @@ a scoring artifact. The protocol must explicitly identify and reproduce
 the accepted baseline source and wheel with hashes. No unpinned package
 upgrades or host-version substitution.
 
-## 3. Fixed evaluation contract proposed for R3
+## 3. R3 evaluation contract (frozen upon merge)
 
 **Inheritance:** Adopt R2's §4 corpus classes, concealed floors, smoke
 limit, the §4.1 labels, §4.3 noncoverage, all G1–G8 gates, §6 fail policy,
@@ -292,7 +292,7 @@ mounted paths, exact identities of future agents, and host configuration
 if scoring moves machines. Any unverified secrecy or independence
 property blocks sealing or scoring.
 
-## 5. Roles and protocol sequence (proposed, not authorized)
+## 5. Roles and protocol sequence (frozen on merge; execution not yet authorized)
 
 1. Owner explicitly accepts the concealed-case floors (128 over 14
    classes), the handoff policy and the frozen evaluation criteria.
@@ -352,11 +352,18 @@ alone authorizes a scoring run.
   scoring host/account via synthetic-only probes **before sealing**;
   the scorer's actual session is rechecked before unblind. The
   previously reported synthetic checks do not waive this.
-- **R3-P4: OPEN architecture/scoring-contract review.** Confirm the
-  source baseline/host re-pin and gate mapping below before merging
-  this pre-registration as frozen.
+- **R3-P4: REVIEWED for source consistency before the owner-directed
+  merge (2026-10-28).** The §6.1 baseline/host re-pin follows R2 §2–§3
+  and the accepted pre-G2 parity pin. The §6.2 AT gate mapping and
+  malformed-identity attribution follow ADR-034 §7c, ADR-029 §2,
+  G2-1 charter §5.2 and the inherited R2 G1–G8 checks.
+  This documents **protocol alignment review**, not an independent
+  security audit, completion of the host test, or execution-gate PASS.
+  Owner's explicit merge instruction accepts the reviewed protocol;
+  subsequent artifact/host/custody pins remain OPEN until their own
+  required records.
 
-### 6.1 Proposed R3-P4 review rule: baseline and host
+### 6.1 R3-P4 protocol rule: baseline and host
 
 Use the unchanged pre-G2 parity baseline **source commit**
 `f8591102b2693379dabec9b5704862e194eca4ce`
@@ -377,7 +384,7 @@ version and executable SHA-256; neither version nor checksum may
 change for a scoring run. An earlier *custody* test in Claude Code
 2.1.312 is **not** a substitute for this §8.B behavioral host test.
 
-### 6.2 Proposed R3-P4 review rule: AT gates
+### 6.2 R3-P4 protocol rule: AT gates
 
 Every concealed AT case is included in **G1**, **G3**, **G6**,
 **G7** and **G8**, with G1 requiring strict blocks and
@@ -406,9 +413,11 @@ case, harness modification or implementation regression fixture
 may supply R3 expectations. Harness bytes, identity and hashes
 must be accepted and merged **before** scoring.
 
-**This section requires architecture review.** Its proposal
-text alone is not an owner ruling on R3-P4 or permission to
-start authoring.
+**Review and authorization boundary:** These rules were checked against
+the cited accepted architecture before the owner-directed merge.
+The merge freezes this written protocol, not the candidate wheel,
+future harness, host characterization, custody gate or corpus.
+It is **not** a go-ahead to start authoring or scoring.
 
 **Nothing authorized by this draft:** corpus authoring, sealing,
 unblinding, implementation changes, harness construction, reinterpreting
