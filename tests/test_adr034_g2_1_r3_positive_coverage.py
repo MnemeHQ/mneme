@@ -152,6 +152,8 @@ def _case(tmp_path: Path, cls: str, i: int) -> tuple[dict, SimpleNamespace, dict
             fixture_files.append(_num_rule(f"ADR-98{i:02}N", include=f"elsewhere{i}/**"))
             checker_subject = "unverified_input"
         trusted, record_subject = False, None
+        if sub == "AT-S0":
+            checker_subject = "absent"
     elif cls == "LIT":
         literals = [("synthetic-literal", C.LITERAL)]
         if i < 2:
@@ -224,7 +226,10 @@ def _case(tmp_path: Path, cls: str, i: int) -> tuple[dict, SimpleNamespace, dict
         "subclass": ([s for s, n in C.AT_SUBCLASS_FLOORS.items()
                       for _ in range(n)][i] if cls == "AT" else None),
         "visibility": "concealed",
-        "fixture": {"files": fixture_files},
+        "fixture": {
+            "files": fixture_files,
+            "memory": {"compile_from": "docs/adr", "path": ".mneme/project_memory.json"},
+        },
         "event": {
             "content": content,
             "target": {"base": target_base, "path": target_rel},
