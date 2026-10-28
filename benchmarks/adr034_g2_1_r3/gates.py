@@ -25,7 +25,8 @@ def _numeric_traces(payload: Optional[dict]) -> dict:
         return {}
     return {
         item.get("rule_id"): item for item in payload.get("applicability") or []
-        if isinstance(item, dict) and item.get("rule_type") == C.NUMERIC
+        if (isinstance(item, dict) and item.get("rule_type") == C.NUMERIC
+            and isinstance(item.get("rule_id"), str))
     }
 
 
@@ -53,7 +54,8 @@ def g1(case: dict, exp, obs: dict) -> list:
     # A record with an observed non-refusing outcome is independently unsafe.
     if expected_refusal and record and record.get("hook_outcome") != "refused":
         out.append("unsafe_pass:expected_refusal_wrong_disposition")
-    record_rules = {r.get("rule_id"): r for r in record.get("rules") or [] if isinstance(r, dict)}
+    record_rules = {r.get("rule_id"): r for r in record.get("rules") or []
+                    if isinstance(r, dict) and isinstance(r.get("rule_id"), str)}
     for entry in _gated(case):
         if entry.get("matcher_outcome") == "NO_VIOLATION":
             continue
@@ -102,7 +104,8 @@ def g4(case: dict, exp, obs: dict, notes: list) -> list:
     out = []
     traces = _numeric_traces(obs.get("direct_payload"))
     record = _record(obs) or {}
-    record_rules = {r.get("rule_id"): r for r in record.get("rules") or [] if isinstance(r, dict)}
+    record_rules = {r.get("rule_id"): r for r in record.get("rules") or []
+                    if isinstance(r, dict) and isinstance(r.get("rule_id"), str)}
     for entry in _gated(case):
         expected = entry.get("primary_reason")
         if expected is None:
