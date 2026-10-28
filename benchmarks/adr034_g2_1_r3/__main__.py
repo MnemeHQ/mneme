@@ -1,0 +1,105 @@
+"""``python -m benchmarks.adr034_g2_1_r3 score ...`` (see README.md).
+
+Two equivalent full passes over the corpus (G7), one report. The report is
+metadata only: opaque case ids, classes, gate results and failure codes,
+never case content. Raw observations go to ``--observations`` only when
+requested, and stay with whoever controls the corpus.
+"""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import re
+import sys
+from pathlib import Path
+
+from . import HARNESS_VERSION, gates, runner
+
+
+def harness_files() -> dict:
+    here = Path(__file__).resolve().parent
+    return {
+        p.name: hashlib.sha256(p.read_bytes()).hexdigest()
+        for p in sorted(here.iterdir()) if p.suffix in (".py", ".md")
+    }
+
+
+def score(args: argparse.Namespace) -> int:
+    if not re.fullmatch(r"[0-9a-f]{64}", args.host_sha256):
+        raise SystemExit("--host-sha256 must be a lowercase SHA-256")
+    host = (args.host_version, args.host_sha256)
+    work = runner.check_work_dir(Path(args.work))
+    cases, integrity = runner.load_corpus(Path(args.corpus))
+    if args.scoring == "public" and any(c.get("visibility") != "public" for c in cases):
+        raise SystemExit("public scoring refuses non-public cases")
+    ctx = runner.Context(work, Path(args.impl_python), Path(args.base_python), host)
+    symlinks = runner.symlink_capability(work)
+    environments = {
+        "implementation": runner.child(ctx.impl_python, "env"),
+        "baseline": runner.child(ctx.base_python, "env"),
+    }
+
+    compiled, guards, passes = {}, {}, {c["case_id"]: [] for c in cases}
+    for case in cases:
+        try:
+            compiled[case["case_id"]] = runner.compile_memory(case, ctx)
+        except runner.HarnessError as exc:
+            compiled[case["case_id"]] = {"ok": False, "error": str(exc)}
+    for _ in range(2):
+        for case in cases:
+            cid = case["case_id"]
+            exp, obs = runner.observe_safely(case, ctx, compiled[cid])
+            passes[cid].append((exp, obs))
+            if exp is not None and cid not in guards:
+                guards[cid] = runner.memory_guard(compiled[cid].get("memory_b64"), exp.rule_ids)
+    results = [
+        gates.score_case(c, passes[c["case_id"]], compiled[c["case_id"]], host,
+                         guards.get(c["case_id"], []))
+        for c in cases
+    ]
+    floor = gates.floors(cases)
+    decision = gates.decide(results, floor, symlinks, args.scoring, integrity)
+    report = {
+        "harness": {"version": HARNESS_VERSION, "files_sha256": harness_files()},
+        "scoring": args.scoring,
+        "pinned_host": {"version": host[0], "executable_sha256": host[1]},
+        "environments": environments,
+        "symlink_capability": symlinks,
+        "corpus_integrity": integrity,
+        "floors": floor if args.scoring == "concealed" else None,
+        "decision": decision,
+        "cases": results,
+    }
+    Path(args.report).write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    if args.observations:
+        dump = {
+            cid: [{"expectation": e.to_json() if e else None, "observation": o} for e, o in runs]
+            for cid, runs in passes.items()
+        }
+        Path(args.observations).write_text(json.dumps(dump, sort_keys=True), encoding="utf-8")
+    print(f"{decision['verdict']}: {decision['cases_passed']}/{decision['cases_scored']} cases passed")
+    return 0
+
+
+def main(argv: list | None = None) -> int:
+    parser = argparse.ArgumentParser(prog="python -m benchmarks.adr034_g2_1_r3")
+    sub = parser.add_subparsers(dest="command", required=True)
+    p = sub.add_parser("score", help="score a corpus directory (two full passes)")
+    p.add_argument("--corpus", required=True, help="directory holding <case>/case.json files")
+    p.add_argument("--work", required=True, help="empty scratch directory (fixed fixture paths)")
+    p.add_argument("--impl-python", required=True, help="interpreter of the pinned D3 build")
+    p.add_argument("--base-python", required=True, help="interpreter of the pinned pre-G2 baseline")
+    p.add_argument("--host-version", required=True, help="pinned Claude Code version")
+    p.add_argument("--host-sha256", required=True, help="pinned Claude Code executable SHA-256")
+    p.add_argument("--scoring", choices=("public", "concealed"), required=True)
+    p.add_argument("--report", required=True, help="metadata-only JSON report path")
+    p.add_argument("--observations", default=None, help="optional raw observation dump")
+    p.set_defaults(func=score)
+    args = parser.parse_args(argv)
+    return args.func(args)
+
+
+if __name__ == "__main__":
+    sys.exit(main())
