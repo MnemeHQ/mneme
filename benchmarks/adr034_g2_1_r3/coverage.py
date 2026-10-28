@@ -10,9 +10,10 @@ Counts and shortfall names are the only exported evidence.
 from __future__ import annotations
 
 import json
+import posixpath
 import re
 from collections import Counter
-from pathlib import Path
+from pathlib import PurePosixPath
 
 from . import contract as C
 from . import oracle
@@ -45,35 +46,62 @@ def _byte_features(content: str) -> set[str]:
 
 
 def _l_features(case: dict, exp, obs: dict) -> set[str]:
-    found = set()
-    event = case["event"]
-    target = event["target"]
-    path = Path(exp.target)
+    """R1 §4 L classification from frozen fixture declarations + pre-snapshot.
+
+    Never inspect paths after the two score passes: the fixture worktree may
+    have been recreated or removed. A link only qualifies as live when its
+    target is present in the fixture's declared file/directory inventory.
+    """
+    found: set[str] = set()
+    target = case["event"]["target"]
+    base, rel = target["base"], target["path"]
     pre = obs.get("pre") or {}
-    specs = [s for s in case["fixture"]["files"]
-             if s["base"] == target["base"] and s["path"] == target["path"]]
-    if pre.get("kind") == "file":
-        if any(s["type"] == "file" and s["text"] == "" for s in specs):
-            found.add("existing_empty")
-        elif any(s["type"] == "file" and s["text"] != "" for s in specs):
-            found.add("existing_file")
-    if pre.get("kind") == "symlink":
-        found.add("symlink" if path.exists() else "dangling_symlink")
-    if any(parent.is_symlink() for parent in path.parents
-           if parent != Path(exp.root) and Path(exp.root) in parent.parents):
+    specs = case["fixture"]["files"]
+    by_path = {(sp["base"], sp["path"]): sp for sp in specs}
+    dest_spec = by_path.get((base, rel))
+
+    # The runner materializer implicitly mkdirs the parent of every declared
+    # entry, in addition to explicitly declared directory entries.
+    directories = {(b, "") for b in ("root", "outside")}
+    for spec in specs:
+        path = PurePosixPath(spec["path"])
+        for parent in path.parents:
+            if str(parent) != ".":
+                directories.add((spec["base"], parent.as_posix()))
+        if spec["type"] in ("dir", "dir_symlink"):
+            directories.add((spec["base"], spec["path"]))
+
+    if pre.get("kind") == "file" and dest_spec and dest_spec["type"] == "file":
+        found.add("existing_empty" if dest_spec["text"] == "" else "existing_file")
+
+    if pre.get("kind") == "symlink" and dest_spec and dest_spec["type"] == "symlink":
+        link_target = dest_spec.get("target", "")
+        if link_target and not link_target.startswith("/"):
+            resolved = posixpath.normpath(posixpath.join(
+                posixpath.dirname(rel), link_target))
+            live = (base, resolved) in by_path or (base, resolved) in directories
+            found.add("symlink" if live else "dangling_symlink")
+
+    # A directory symlink in any parent component is an L link-component
+    # case even when the final target itself is absent.
+    parts = PurePosixPath(rel).parts
+    if any((base, "/".join(parts[:i])) in by_path
+           and by_path[(base, "/".join(parts[:i]))]["type"] == "dir_symlink"
+           for i in range(1, len(parts))):
         found.add("link_component")
-    if target["base"] == "outside":
+
+    if base == "outside":
         found.add("outside_root")
-    if path.suffix != ".py":
+    if PurePosixPath(rel).suffix != ".py":
         found.add("non_python")
-    if not path.parent.is_dir():
+    parent = PurePosixPath(rel).parent.as_posix()
+    if (base, "" if parent == "." else parent) not in directories:
         found.add("missing_parent")
     try:
-        event["content"].encode("utf-8")
+        case["event"]["content"].encode("utf-8")
     except UnicodeEncodeError:
         found.add("lone_surrogate")
     return found
-
 
 def inspect(cases: list, passes: dict, public_evidence: dict | None = None) -> dict:
     """Check extra frozen distribution rules; missing evidence is a failure.
