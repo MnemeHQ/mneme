@@ -413,9 +413,19 @@ def decide(results: list, floor: dict, symlinks: dict, scoring: str, integrity: 
             "denominator": len(applicable),
             "failed": sorted(r["case_id"] for r in applicable if r["gates"][gate]["result"] == "fail"),
         }
-    all_pass = all(r["passed"] for r in scored)
     manifest = integrity.get("manifest")
-    integrity_ok = manifest is None or not manifest["mismatches"]
+    integrity_ok = (isinstance(manifest, dict) and manifest.get("entries", 0) > 0
+                    and not manifest.get("mismatches"))
+    if scoring == "concealed" and not integrity_ok:
+        # Corpus-integrity failure is G8, even if every individual hook event
+        # otherwise passed. Do not let an absent/partial manifest earn PASS.
+        for result in scored:
+            gate = result["gates"]["G8"]
+            if "corpus_manifest_integrity" not in gate["failures"]:
+                gate["failures"].append("corpus_manifest_integrity")
+            gate["result"] = "fail"
+            result["passed"] = False
+    all_pass = all(r["passed"] for r in scored)
     if scoring != "concealed":
         verdict = "NO_VERDICT_PUBLIC_SMOKE"
     elif not symlinks.get("capable"):
