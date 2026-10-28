@@ -25,7 +25,8 @@ python -m benchmarks.adr034_g2_1_r3 score \
   --corpus <dir with <case>/case.json> --work <empty resolved dir> \
   --impl-python <pinned D3 build python> --base-python <pinned pre-G2 baseline python> \
   --host-version <pinned Claude Code version> --host-sha256 <pinned executable sha256> \
-  --scoring public|concealed --report report.json [--observations obs.json]
+  --scoring public|concealed --report report.json [--observations obs.json] \
+  [--public-smoke-tar <separate #703 public tar, for concealed scoring>]
 ```
 
 The command makes two equivalent full passes over the corpus. Its report is
@@ -42,6 +43,7 @@ Scorer-authored synthetic cases: `python -m benchmarks.adr034_g2_1_r3.synthetic 
 | `attribution.py` | Exact `(rule_id, rule_type)` comparison (ADR-034 §7c; R3 §3 G6) |
 | `gates.py` | G1-G8 per case; floors; corpus decision |
 | `coverage.py` | Independently checks frozen within-class and subtype distribution; no observed hook output used to award coverage |
+| `public_smoke.py` | Verifies separately frozen public archive SHA-256, complete manifest and 14-class inventory; no concealed contents read |
 | `runner.py` | Materializes fixtures and runs the pinned builds. Observation only |
 | `pinned_child.py` | Runs inside the pinned build. Calls its `relevant_enforcement_per_rule()`, `relevant_enforcement_observed()` and `recorded_evaluation_complete()` (R2 §5 G6 steps 2-4) |
 | `contract.py` | Frozen constants: floors, cause mapping, schemas |
@@ -83,7 +85,12 @@ Every derived value is cross-checked against the frozen labels (README I2).
 
 The corpus decision requires every scored case to pass:
 - the R3 floors (128 concealed cases over 14 classes, AT at least 2 per subclass), plus independently checked frozen within-class L/LIT/SC/MR/AT distributions, byte variety and AT smoke presence;
-- the public-smoke rules;
+- the public-smoke rules, validated using the **separately archived** frozen
+  public tar. Concealed scoring uses `--public-smoke-tar`: the harness
+  verifies #703's exact tar SHA-256, the public archive's own
+  `MANIFEST.sha256`, 14 public case files and one case per class, including
+  AT. The public and concealed manifests are never combined. If the tar
+  is absent or verification fails, the concealed verdict cannot PASS;
 - manifest integrity;
 - symlink capability. Without it the result is `INCOMPLETE`.
 
