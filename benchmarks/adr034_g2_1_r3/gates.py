@@ -66,7 +66,7 @@ def g1(case: dict, exp, obs: dict) -> list:
     pinned = obs.get("pinned_g6") or {}
     for rid, value in sorted((pinned.get("per_rule") or {}).items()):
         if value is True and exp.per_rule_relevance.get(rid) is not True:
-            out.append(f"unsafe_pass:unexpected_relevance:{rid}")
+            out.append("unsafe_pass:unexpected_relevance")
     if pinned.get("event") is True and exp.event_relevance is not True:
         out.append("unsafe_pass:unexpected_event_relevance")
     return out
@@ -296,8 +296,17 @@ def g6(case: dict, exp, obs: dict, host: tuple, envelope_ids: dict, cwd: str,
     if record["hook_outcome"] != exp.disposition:
         out.append("hook_outcome:mismatch")
     # Exact non-numeric and numeric violation identities (ADR-034 §7c; R3 §3).
-    out.extend("attribution:" + f for f in
-               attribution.identity_failures(record, exp.violations, digest))
+    # Violation identity diagnostics may contain raw rule IDs supplied by
+    # the observed payload. Preserve the reason/category (and safe malformed
+    # index), never leak those identity values into metadata-only results.
+    for failure in attribution.identity_failures(record, exp.violations, digest):
+        reason, sep, detail = failure.partition(":")
+        if reason in ("malformed_entry", "malformed_rule_id", "malformed_rule_type"):
+            out.append("attribution:" + failure)
+        elif sep:
+            out.append("attribution:" + reason + ":redacted")
+        else:
+            out.append("attribution:" + reason)
     # Ordered steps (R2 §5 G6 1-4; R2V-F3 first).
     ids = [r.get("rule_id") if isinstance(r, dict) else None for r in record["rules"]]
     if (any(not isinstance(i, str) or not i for i in ids)
