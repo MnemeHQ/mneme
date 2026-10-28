@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+# R3 §2: canonical D3 implementation package version, not an observed echo.
+PINNED_MNEME_VERSION = "0.10.0"
 CASE_SCHEMA = "mneme-r3-case/v1"
 EVIDENCE_SCHEMA = "mneme.hook_evidence/v1"
 EVIDENCE_SURFACE = "claude_code.PreToolUse"
