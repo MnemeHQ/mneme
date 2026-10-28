@@ -480,9 +480,15 @@ def observe_safely(case: dict, ctx: Context, compiled: dict) -> tuple:
     try:
         exp, obs = observe(case, ctx, compiled)
         return exp, obs
-    except oracle.OracleError as exc:
-        return None, {"error": f"oracle_undetermined: {exc}"}
-    except HarnessError as exc:
-        return None, {"error": f"harness: {exc}"}
+    except oracle.OracleError:
+        # Metadata-only reports must never include exception text: oracle
+        # errors can contain concealed ADR source, selectors or rule values.
+        return None, {"error": "oracle_undetermined:OracleError"}
+    except HarnessError:
+        # Harness errors can contain fixture paths and content. Preserve the
+        # category for G8, not its potentially private message.
+        return None, {"error": "harness:HarnessError"}
     except Exception as exc:  # G8: any scoring-process failure is a case failure
-        return None, {"error": f"harness: {type(exc).__name__}: {exc}"}
+        # A stable exception *type* is sufficient to attribute G8 without
+        # leaking concealed content in report["cases"][].gates.G8.failures.
+        return None, {"error": f"harness:{type(exc).__name__}"}
