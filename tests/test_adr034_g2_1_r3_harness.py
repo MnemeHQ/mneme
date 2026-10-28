@@ -803,7 +803,7 @@ def test_f3_at_si_and_at_sx_mechanism_derived_from_fixture(tmp_path):
     assert "AT-SI:wrong_exclusion_mechanism" not in result["shortfalls"]
     assert "AT-SX:wrong_exclusion_mechanism" not in result["shortfalls"]
     assert "AT-SI:not_two_distinct_literal_identities_and_scopes" in result["shortfalls"]
-    assert "AT-SX:not_two_distinct_ADR_fixtures_or_literal_identities" in result["shortfalls"]
+    assert "AT-SX:not_two_materially_distinct_rule_fixtures" in result["shortfalls"]
 
     si = cases[1]
     si["subclass"] = "AT-SX"
@@ -1125,3 +1125,36 @@ def test_r3_unexpected_relevance_key_is_redacted_from_metadata(at_si):
     result = _score(case, exp, obs)
     assert "A:unsafe_pass:unexpected_relevance" in _failures(result, "G1")
     assert marker not in json.dumps(result)
+
+
+@pytest.mark.parametrize("installed", ["0.9.9", "", None, "0.10.0+dirty"])
+def test_r3_independently_pinned_mneme_version_rejects_other_builds(installed):
+    assert runner.implementation_version_guard({"mneme_version": installed}) == [
+        "implementation_mneme_version_mismatch"
+    ]
+
+
+def test_r3_independently_pinned_mneme_version_matches_frozen_r3():
+    assert C.PINNED_MNEME_VERSION == "0.10.0"
+    assert runner.implementation_version_guard({"mneme_version": "0.10.0"}) == []
+
+
+def test_r3_nonascii_byte_feature_rejects_lone_surrogate():
+    assert "non_ascii" not in coverage._byte_features("x = '\ud800'")
+    assert "non_ascii" in coverage._byte_features("x = 'é'")
+    assert "non_ascii" not in coverage._byte_features("ascii")
+
+
+def test_r3_mr_strict_numeric_refusal_is_required_for_row12(tmp_path):
+    # A full synthetic multi-rule baseline is constructed in the dedicated
+    # positive-coverage test. This invariant is fixed by ADR-034 §7b.
+    from tests.test_adr034_g2_1_r3_positive_coverage import _case
+    for row in (0, 1):
+        case, exp, obs = _case(tmp_path, "MR", row)
+        cases, passes = [case], {case["case_id"]: [(exp, obs)]}
+        baseline = coverage.inspect(cases, passes)
+        key = "MR:row1_violation_unevaluated" if row == 0 else "MR:row2_violation_clean"
+        assert baseline["counts"][key] == 1
+        exp.disposition, exp.cause = "proceeded", "none"
+        wrong = coverage.inspect(cases, passes)
+        assert wrong["counts"].get(key, 0) == 0
