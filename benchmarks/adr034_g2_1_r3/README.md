@@ -96,6 +96,23 @@ The corpus decision requires every scored case to pass:
 
 Public cases count toward no denominator.
 
+### Synthetic corpus-admission positive control
+
+`tests/test_adr034_g2_1_r3_positive_coverage.py` builds an independent
+synthetic 128-case metadata/fixture set and separately verifies an artificial
+14-case public tar. It exercises every **currently implemented** within-class
+coverage threshold (including L subtypes, byte variety, LIT, SC, MR and AT),
+then requires real `coverage.inspect(...).met`, `gates.floors(...).met` and
+`gates.decide(...).verdict == "PASS"`. It does **not** set `met = True`
+manually. A missing-LIT negative must revert to FAIL.
+
+This is a **coverage/admission logic unit test**, not a full Mneme
+implementation or G1–G8 execution test: gate-pass observations and matching
+outcome labels are scorer-authored synthetic controls. No concealed fixtures
+are used. Owner interpretations of byte variety, AT pair identity and L
+feature provenance, plus the complete SC lexical-shape inventory, remain
+separate open review items. This positive control does not resolve them.
+
 ## Interpretations fixed before decryption (for review)
 
 - **I1** Gate participation is the **union** of the protocol-derived set and the
