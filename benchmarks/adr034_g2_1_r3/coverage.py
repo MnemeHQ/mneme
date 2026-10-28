@@ -9,6 +9,7 @@ Counts and shortfall names are the only exported evidence.
 
 from __future__ import annotations
 
+import json
 import re
 from collections import Counter
 from pathlib import Path
@@ -82,7 +83,15 @@ def inspect(cases: list, passes: dict) -> dict:
     counts = Counter()
     shortfalls: list[str] = []
     at_signatures: dict[str, list] = {"AT-SI": [], "AT-SX": []}
+    at_fixture_signatures: dict[str, set] = {sub: set() for sub in C.AT_SUBCLASS_FLOORS}
     concealed = [c for c in cases if c.get("visibility") != "public"]
+    if any(c.get("cls") not in C.CLASS_FLOORS for c in cases):
+        shortfalls.append("unknown_class")
+    if any(c.get("visibility") not in ("public", "concealed") for c in cases):
+        shortfalls.append("invalid_visibility")
+    if any(c.get("cls") == "AT" and c.get("subclass") not in C.AT_SUBCLASS_FLOORS
+           for c in cases):
+        shortfalls.append("unknown_AT_subclass")
 
     for case in concealed:
         cid, cls = case["case_id"], case["cls"]
@@ -114,7 +123,7 @@ def inspect(cases: list, passes: dict) -> dict:
             try:
                 rules = oracle.fixture_rules(case)
                 has_call = any(r.rule_type == C.NUMERIC and
-                               "call" in __import__("json").loads(r.value)
+                               "call" in json.loads(r.value)
                                and r.rule_id in exp.applied_rule_ids for r in rules)
             except (oracle.OracleError, ValueError, TypeError):
                 has_call = False
@@ -162,6 +171,15 @@ def inspect(cases: list, passes: dict) -> dict:
             if not basic or not mode_ok or exp.cause != "other_rule":
                 shortfalls.append("AT:invalid_subject_or_attribution")
                 continue
+            # Ignore mere file/target renaming. Distinct ADR source text or a
+            # distinct literal-rule identity is required by R3 §3.
+            adr_sources = tuple(sorted(
+                s["text"] for s in case["fixture"]["files"]
+                if s.get("type") == "file" and s.get("path", "").startswith("docs/adr/")
+            ))
+            at_fixture_signatures[sub].add(
+                (adr_sources, tuple(sorted(tuple(v) for v in exp.literal_violations)))
+            )
             if sub == "AT-S0":
                 if rules:
                     shortfalls.append("AT-S0:has_numeric_rule")
@@ -204,7 +222,13 @@ def inspect(cases: list, passes: dict) -> dict:
         if counts[key] < minimum:
             shortfalls.append(key + ":below_minimum")
     for sub, signatures in at_signatures.items():
-        if len({sig[0] for sig in signatures}) < 2 or len({sig[1] for sig in signatures}) < 2:
-            shortfalls.append(sub + ":not_two_distinct_literal_identities_and_scopes")
+        # AT-SI amendment §2 specifically demands *both* different literal
+        # identities and path scopes; AT-SX has no such stronger condition.
+        if sub == "AT-SI" and (len({sig[0] for sig in signatures}) < 2 or
+                              len({sig[1] for sig in signatures}) < 2):
+            shortfalls.append("AT-SI:not_two_distinct_literal_identities_and_scopes")
+    for sub, fingerprints in at_fixture_signatures.items():
+        if len(fingerprints) < C.AT_SUBCLASS_FLOORS[sub]:
+            shortfalls.append(sub + ":not_two_distinct_ADR_fixtures_or_literal_identities")
     return {"met": not shortfalls, "shortfalls": sorted(set(shortfalls)),
             "counts": dict(sorted(counts.items()))}
