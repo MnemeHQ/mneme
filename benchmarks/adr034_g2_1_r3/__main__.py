@@ -15,7 +15,7 @@ import re
 import sys
 from pathlib import Path
 
-from . import HARNESS_VERSION, gates, runner
+from . import HARNESS_VERSION, gates, public_smoke, runner
 
 
 def harness_files() -> dict:
@@ -30,6 +30,14 @@ def score(args: argparse.Namespace) -> int:
     if not re.fullmatch(r"[0-9a-f]{64}", args.host_sha256):
         raise SystemExit("--host-sha256 must be a lowercase SHA-256")
     host = (args.host_version, args.host_sha256)
+    # Public and concealed archives are separate by frozen #703. The
+    # published digest is a pre-unblind public-data pin, not a new criterion.
+    public_evidence = None
+    if args.scoring == "concealed":
+        public_evidence = (public_smoke.verify(Path(args.public_smoke_tar))
+                           if args.public_smoke_tar else
+                           {"verified": False, "reason": "public_smoke_tar_not_supplied",
+                            "public_cases": 0, "classes": []})
     work = runner.check_work_dir(Path(args.work))
     cases, integrity = runner.load_corpus(Path(args.corpus))
     if args.scoring == "public" and any(c.get("visibility") != "public" for c in cases):
@@ -68,7 +76,7 @@ def score(args: argparse.Namespace) -> int:
             case, passes[cid], compiled[cid], host, guards.get(cid, []),
             environments["implementation"].get("mneme_version", ""), versions,
         ))
-    floor = gates.floors(cases, passes)
+    floor = gates.floors(cases, passes, public_evidence)
     decision = gates.decide(results, floor, symlinks, args.scoring, integrity)
     report = {
         "harness": {"version": HARNESS_VERSION, "files_sha256": harness_files()},
@@ -77,6 +85,7 @@ def score(args: argparse.Namespace) -> int:
         "environments": environments,
         "symlink_capability": symlinks,
         "corpus_integrity": integrity,
+        "public_smoke_integrity": public_evidence,
         "floors": floor if args.scoring == "concealed" else None,
         "decision": decision,
         "cases": results,
@@ -103,6 +112,8 @@ def main(argv: list | None = None) -> int:
     p.add_argument("--host-version", required=True, help="pinned Claude Code version")
     p.add_argument("--host-sha256", required=True, help="pinned Claude Code executable SHA-256")
     p.add_argument("--scoring", choices=("public", "concealed"), required=True)
+    p.add_argument("--public-smoke-tar", default=None,
+                   help="separate frozen #703 public tar, SHA-256 and manifest verified for concealed scoring")
     p.add_argument("--report", required=True, help="metadata-only JSON report path")
     p.add_argument("--observations", default=None, help="optional raw observation dump")
     p.set_defaults(func=score)
