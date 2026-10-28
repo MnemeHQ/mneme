@@ -220,7 +220,8 @@ def _record_structure(record: dict) -> list:
     return out
 
 
-def g6(case: dict, exp, obs: dict, host: tuple, envelope_ids: dict, cwd: str) -> list:
+def g6(case: dict, exp, obs: dict, host: tuple, envelope_ids: dict, cwd: str,
+       expected_mneme_version: str, expected_versions: dict[str, str]) -> list:
     records = obs.get("records") or []
     if not exp.record_expected:
         return ["unexpected_record"] if records else []
@@ -233,6 +234,10 @@ def g6(case: dict, exp, obs: dict, host: tuple, envelope_ids: dict, cwd: str) ->
     if out:
         return out
     digest = exp.content_sha256
+    # Control provenance is pinned independently of the observed hook.
+    # The executable host identity and installed Mneme version are separate.
+    if not expected_mneme_version or record.get("mneme_version") != expected_mneme_version:
+        out.append("mneme_version_mismatch")
     # Control, event, join by digest and path (charter §6.2; ADR-034 §7a).
     if (record["host"].get("version"), record["host"].get("executable_sha256")) != tuple(host):
         out.append("host_identity")
@@ -292,6 +297,11 @@ def g6(case: dict, exp, obs: dict, host: tuple, envelope_ids: dict, cwd: str) ->
     for rule in record["rules"]:
         rid = rule["rule_id"]
         want = exp.numeric_outcomes.get(rid, {})
+        # ADR-034 §7a: bind every applied rule to the version in the
+        # compiled canonical memory, never to a value copied from the record.
+        expected_version = expected_versions.get(rid)
+        if not expected_version or rule.get("decision_version_id") != expected_version:
+            out.append(f"record_decision_version_id:{rid}")
         if rule.get("applicability") != "APPLIED" or rule.get("governed_path") != exp.governed_path \
                 or rule.get("subject_sha256") != digest:
             out.append(f"record_rule_binding:{rid}")
@@ -323,7 +333,8 @@ def _bundle_digest(obs: dict) -> str:
     return hashlib.sha256(json.dumps(obs, sort_keys=True).encode("utf-8")).hexdigest()
 
 
-def score_case(case: dict, passes: list, compiled: dict, host: tuple, guard: list) -> dict:
+def score_case(case: dict, passes: list, compiled: dict, host: tuple, guard: list,
+               expected_mneme_version: str, expected_versions: dict[str, str]) -> dict:
     """``passes`` is ``[(expectation, observation), ...]`` for the two full runs."""
     gates: dict = {g: {"applies": True, "failures": []} for g in C.GATES}
     notes: list = []
@@ -350,7 +361,8 @@ def score_case(case: dict, passes: list, compiled: dict, host: tuple, guard: lis
             "G3": g3(case, exp, obs),
             "G4": g4(case, exp, obs, notes),
             "G5": g5(case, exp, obs, notes),
-            "G6": g6(case, exp, obs, host, _envelope_ids(case), exp.root),
+            "G6": g6(case, exp, obs, host, _envelope_ids(case), exp.root,
+                     expected_mneme_version, expected_versions),
         }
         for gate, failures in results.items():
             if gates[gate]["applies"]:
