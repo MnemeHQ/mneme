@@ -707,3 +707,124 @@ def test_manifest_rejects_non_regular_symlink(tmp_path):
     _write_file_manifest(root, [case_path])
     _, integrity = runner.load_corpus(root)
     assert "manifest_incomplete_inventory" in integrity["manifest"]["mismatches"]
+
+
+# ── F1/F2/F3/F4 independent synthetic regression controls ────────────────────
+
+
+@pytest.mark.parametrize("current, baseline", [
+    (b'Traceback (most recent call last):\\n  File "a.py", line 1\\nE: boom',
+     b'Traceback (most recent call last):\\n  File "b.py", line 2\\nE: boom\\n'),
+    (b'Traceback (most recent call last):\\r\\n  File "a.py", line 1\\r\\nE: boom\\r\\n',
+     b'Traceback (most recent call last):\\n  File "b.py", line 2\\nE: boom\\n'),
+    (b'Traceback (most recent call last):\\n  File "a.py", line 1\\nE: boom\\nnext\\n',
+     b'Traceback (most recent call last):\\n  File "b.py", line 2\\nE: boom\\nnext'),
+    (b'Traceback (most recent call last):\\n  File "a.py", line 1\\nE: boom\\n'
+     b'During handling of the above exception, another exception occurred:\\n'
+     b'Traceback (most recent call last):\\n  File "a.py", line 3\\nF: bang\\n',
+     b'Traceback (most recent call last):\\n  File "b.py", line 2\\nE: boom\\n'
+     b'During handling of the above exception, another exception occurred:\\r\\n'
+     b'Traceback (most recent call last):\\n  File "b.py", line 4\\nF: bang\\n'),
+])
+def test_f1_amendment2_preserves_nonframe_bytes(current, baseline):
+    assert "hook_parity:a2_stderr" in gates.hook_parity(
+        _proc(1, b"", current), _proc(1, b"", baseline))
+
+
+def test_f1_amendment2_still_ignores_only_frame_bytes():
+    a = (b'Traceback (most recent call last):\\n  File "a.py", line 4\\n'
+         b'E: boom\\nDuring handling of the above exception, another exception occurred:\\n'
+         b'Traceback (most recent call last):\\n  File "a.py", line 5\\nF: bang\\n')
+    b = a.replace(b'a.py", line 4', b'b.py", line 80').replace(
+        b'a.py", line 5', b'b.py", line 70')
+    assert gates.hook_parity(_proc(1, b"", a), _proc(1, b"", b)) == []
+
+
+def test_f2_mneme_version_mismatch_fails_g6(at_si):
+    case, exp, obs = at_si
+    obs["records"][0]["mneme_version"] = "9.9.9"
+    assert "A:mneme_version_mismatch" in _failures(_score(case, exp, obs), "G6")
+
+
+def test_f2_missing_mneme_pin_fails_g6(at_si):
+    case, exp, obs = at_si
+    result = gates.score_case(case, [(exp, obs), (exp, obs)], {"ok": True},
+                              HOST, [], "", {})
+    assert "A:mneme_version_mismatch" in _failures(result, "G6")
+
+
+@pytest.mark.parametrize("version", ["", None, "dver-other"])
+def test_f2_wrong_compiled_decision_version_fails_g6(vp_like, version):
+    case, exp, obs = vp_like
+    obs["records"][0]["rules"][0]["decision_version_id"] = version
+    assert any("record_decision_version_id:" in err
+               for err in _failures(_score(case, exp, obs), "G6"))
+
+
+def test_f2_missing_compiled_version_map_fails_g6(vp_like):
+    case, exp, obs = vp_like
+    result = gates.score_case(case, [(exp, obs), (exp, obs)], {"ok": True},
+                              HOST, [], "0.10.0", {})
+    assert any("record_decision_version_id:" in err
+               for err in _failures(result, "G6"))
+
+
+def test_f4_wrong_nonrefusing_disposition_is_unsafe_pass(at_si):
+    case, exp, obs = at_si
+    assert obs["hook"]["exit"] == 2
+    obs["records"][0]["hook_outcome"] = "proceeded"
+    assert "A:unsafe_pass:expected_refusal_wrong_disposition" in _failures(
+        _score(case, exp, obs), "G1")
+
+
+def test_f3_class_floors_alone_cannot_earn_pass():
+    cases = _concealed_corpus()
+    floor = gates.floors(cases)
+    assert floor["total_floor_met"] and not floor["met"]
+    results = [_result(c["case_id"], c["cls"], subclass=c["subclass"]) for c in cases]
+    assert gates.decide(results, floor, {"capable": True}, "concealed",
+                        {"manifest": {"entries": 128, "mismatches": []}})["verdict"] == "FAIL"
+
+
+def test_f3_at_si_and_at_sx_mechanism_derived_from_fixture(tmp_path):
+    public = _synthetic("syn-at-w0-lit")
+    cases, passes = [public], {}
+    for cid in ("syn-at-si", "syn-at-sx"):
+        case = copy.deepcopy(_synthetic(cid))
+        case["visibility"] = "concealed"
+        exp = _derive(case, tmp_path)
+        cases.append(case)
+        passes[cid] = [(exp, _good_obs(case, exp))]
+    result = coverage.inspect(cases, passes)
+    # Both mechanisms are valid, but one case each is not two distinct pairs.
+    assert "AT-SI:wrong_exclusion_mechanism" not in result["shortfalls"]
+    assert "AT-SX:wrong_exclusion_mechanism" not in result["shortfalls"]
+    assert "AT-SI:not_two_distinct_literal_identities_and_scopes" in result["shortfalls"]
+    assert "AT-SX:not_two_distinct_literal_identities_and_scopes" in result["shortfalls"]
+
+    si = cases[1]
+    si["subclass"] = "AT-SX"
+    mislabeled = coverage.inspect(cases, passes)
+    assert "AT-SX:wrong_exclusion_mechanism" in mislabeled["shortfalls"]
+
+
+def test_f3_rejects_incomplete_lit_and_at_w0_distributions(tmp_path):
+    public = _synthetic("syn-at-si")
+    cases, passes = [public], {}
+    for cid in ("syn-lit-mixed", "syn-at-w0-lit"):
+        case = copy.deepcopy(_synthetic(cid))
+        case["visibility"] = "concealed"
+        exp = _derive(case, tmp_path)
+        cases.append(case)
+        passes[cid] = [(exp, _good_obs(case, exp))]
+    coverage_result = coverage.inspect(cases, passes)
+    assert coverage_result["counts"]["LIT:mixed_violation"] == 1
+    assert "LIT:mixed_violation:below_minimum" in coverage_result["shortfalls"]
+    assert "LIT:mixed_clean_refusal:below_minimum" in coverage_result["shortfalls"]
+    assert "AT-W0:excluded_numeric:below_minimum" in coverage_result["shortfalls"]
+    assert "SC:recognized_clean:below_minimum" in coverage_result["shortfalls"]
+    assert "MR:literal_only_refusal_analogue:below_minimum" in coverage_result["shortfalls"]
+
+
+def test_f3_missing_public_at_smoke_is_admission_failure():
+    assert "public_AT_smoke_missing" in coverage.inspect([], {})["shortfalls"]
