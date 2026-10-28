@@ -54,11 +54,20 @@ def score(args: argparse.Namespace) -> int:
             passes[cid].append((exp, obs))
             if exp is not None and cid not in guards:
                 guards[cid] = runner.memory_guard(compiled[cid].get("memory_b64"), exp.rule_ids)
-    results = [
-        gates.score_case(c, passes[c["case_id"]], compiled[c["case_id"]], host,
-                         guards.get(c["case_id"], []))
-        for c in cases
-    ]
+    results = []
+    for case in cases:
+        cid = case["case_id"]
+        try:
+            versions = runner.compiled_rule_versions(compiled[cid].get("memory_b64"))
+        except Exception as exc:
+            # A bad compiled binding is a case-level G8 failure, never a
+            # scoring-process crash or an implicit version wildcard.
+            guards.setdefault(cid, []).append(f"compiled_version_binding:{type(exc).__name__}")
+            versions = {}
+        results.append(gates.score_case(
+            case, passes[cid], compiled[cid], host, guards.get(cid, []),
+            environments["implementation"].get("mneme_version", ""), versions,
+        ))
     floor = gates.floors(cases)
     decision = gates.decide(results, floor, symlinks, args.scoring, integrity)
     report = {
