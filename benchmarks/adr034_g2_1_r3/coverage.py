@@ -72,7 +72,7 @@ def _l_features(case: dict, exp, obs: dict) -> set[str]:
     return found
 
 
-def inspect(cases: list, passes: dict) -> dict:
+def inspect(cases: list, passes: dict, public_evidence: dict | None = None) -> dict:
     """Check extra frozen distribution rules; missing evidence is a failure.
 
     This is not a separate scoring oracle. Numeric matcher outcomes are taken
@@ -207,8 +207,16 @@ def inspect(cases: list, passes: dict) -> dict:
                 else:
                     shortfalls.append("AT-W0:invalid_variant")
 
-    # R3 §3: the public smoke must contain at least one newly authored AT case.
-    if not any(c.get("visibility") == "public" and c.get("cls") == "AT" for c in cases):
+    # R3 #703 freezes public smoke as a *separate* independently
+    # manifest-checked tar. Never require it inside the concealed archive.
+    # A metadata claim alone cannot satisfy this requirement: the separate
+    # public archive must pass its frozen digest and inventory verification.
+    if public_evidence is not None:
+        if (public_evidence.get("verified") is not True or
+                public_evidence.get("public_cases") != len(C.CLASS_FLOORS) or
+                set(public_evidence.get("classes") or ()) != set(C.CLASS_FLOORS)):
+            shortfalls.append("public_smoke_separate_archive_not_verified")
+    elif not any(c.get("visibility") == "public" and c.get("cls") == "AT" for c in cases):
         shortfalls.append("public_AT_smoke_missing")
     expected = {
         **{"L:" + k: 2 for k in _L_MINIMA},
