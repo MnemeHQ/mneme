@@ -68,7 +68,7 @@ Symlink capability is required for a full PASS.
 **R3 new concealed class and floor (R3-P1 accepted by owner 2026-10-28,
 subject to protocol review and merge):** Keep all R2 concealed floors intact:
 **120** concealed scored cases across 13 classes. Add one new class,
-**AT (non-numeric attribution without a numeric subject)** with a floor of
+**AT (non-numeric attribution without an APPLIED numeric rule)** with a floor of
 **8** concealed scored cases. The R3 minimum is therefore **128**
 concealed scored cases across **14** classes, not including public smoke.
 No earlier class may be reduced to make room for AT.
@@ -77,24 +77,47 @@ No earlier class may be reduced to make room for AT.
 |---|---|---:|
 | **AT-S0** | Strict; one or more `FORBID_LITERAL` violations; memory has **no numeric rule** | 2 |
 | **AT-SN** | Strict; a literal violation and at least one numeric rule **present in memory** but with **no numeric applicability record** for this target | 2 |
-| **AT-SX** | Strict; a literal violation and a numeric rule explicitly **EXCLUDED** for this target under ADR-020 | 2 |
-| **AT-W0** | Warn; literal violation with **no numeric applicability record**. At least one case is literal-only and one has a numeric rule excluded from the target | 2 |
+| **AT-SX** | Strict; a literal violation and a numeric rule explicitly **EXCLUDED** for this target under ADR-020; require an EXCLUDED numeric applicability trace in the checker payload | 2 |
+| **AT-W0** | Warn; literal violation with **no APPLIED numeric rule**. At least one case is literal-only (no numeric applicability trace) and one has a numeric rule EXCLUDED from the target with an EXCLUDED trace | 2 |
 | **AT total** | | **8** |
 
-For every AT case, the independent label must establish **no applied numeric
-record**, a trusted checker violation for the applicable literal rule(s),
-`checker.subject: null`, `rules: []`, and `violations` containing
-the **exact independently derived** `(rule_id, rule_type)` pairs of
-the violating rules. Strict cases must refuse with exit 2 and leave the
-target absent; warn cases must defer with exit 0. The disposition cause is
-`other_rule` in all AT cases; the harness maps it to the labelled
-`literal_violation` **only if** a well-formed expected literal
-`rule_id` is present. Each AT case labels empty per-rule numeric
-relevance `{}`, event-level numeric relevance `false`, and completeness
-from the applicable trusted checker contract, not from the observed
-record. AT cases must not be copies or derived mutations of R1/R2 held-out
-cases. Both members of every pair must have meaningfully different ADR
-fixtures or rule identities, not just renamed paths.
+**AT subject contract, independently labelled from the fixture (ADR-034
+§7a/§7c; G2-1 charter §5.2):** Every AT case is routed by the hook but
+has **no numeric rule whose applicability outcome is `APPLIED`**.
+Distinguish the **checker's JSON payload `subject`** from the
+**hook evidence record's `checker.subject`**:
+
+| AT cases | Checker's `subject` | Hook evidence `checker.subject` | Hook `rules` |
+|---|---|---|---|
+| AT-S0; AT-SN without any numeric applicability trace; AT-W0 literal-only | **absent** (`null` when read) | `null` | `[]` |
+| AT-SX, and AT-W0's EXCLUDED-numeric variant | `input_kind: unverified_input` (the numeric EXCLUDED trace is in checker applicability, but none is APPLIED) | `null` | `[]` |
+
+This follows the pinned CLI fallback: if the proposed-file check
+finds no APPLIED numeric rule it reverts to the legacy `--input`
+evaluation. The CLI may emit `unverified_input` when a numeric trace
+exists, including an EXCLUDED trace. The hook evidence only binds a
+`proposed_new_source` subject, so its own `checker.subject` is
+`null` in both rows. **Do not score a valid unverified checker
+subject as a missing-subject defect.** An unexpected
+`proposed_new_source` in AT fails G6; the exact expected checker
+subject kind and relevant trace outcomes must be labelled independently.
+For EXCLUDED traces, the excluded rule's `rule_id` is informational,
+not part of G6's APPLIED numeric rule-ID set (R2 AMB-R2-07).
+
+For every AT case, the independent label requires a trusted checker
+literal violation and hook `violations` containing **exactly** the
+independently derived `(rule_id, rule_type)` identities of the violating
+rules. Strict cases refuse with exit 2, leaving the target absent; warn
+cases defer with exit 0. The disposition cause is `other_rule`; the
+scorer recognizes the labelled `literal_violation` attribution only
+when the expected literal `rule_id` is well formed and correctly
+reported. The numeric APPLIED rule-ID set and per-rule numeric relevance
+are both `{}`; event-level numeric relevance is `false`.
+Record-wide completeness is independently derived from the
+applicable trusted checker contract and R2 amendments, never copied
+from the observed hook record. AT cases must not be copies or derived
+mutations of R1/R2 held-out cases. Each pair must differ meaningfully
+in ADR fixtures or literal-rule identity, not just renamed paths.
 
 **Inherited LIT control tightened without raising its floor:** Its existing
 6-case concealed floor must include at least **2 mixed literal/numeric
@@ -135,7 +158,7 @@ checker payloads cannot earn attribution. Preserve R2's ordered G6 checks
 for numeric rule-ID set, per-rule relevance, event relevance and
 completeness. `violations` alone never supports numeric relevance.
 
-**Mandatory public synthetic scorer-negative tests before sealing:** Give
+**Mandatory public synthetic scorer-negative tests after the owner-approved handoff and before unblinding:** Give
 the independent harness its **own** fabricated record examples:
 (a) missing `rule_id`; (b) empty-string `rule_id`;
 (c) non-string values, at least null and number, with valid
@@ -216,15 +239,22 @@ the protocol cannot simply waive independence.
    statements. Neither may have authored the D3 implementation,
    inspected the earlier concealed corpora, or read prior score
    diagnosis details outside the accepted public contract.
-2. **Complete custody checks before sealing (#693 §9.5):** Independently
-   confirm that the **actual** author/sealer agent session cannot
-   decrypt synthetic owner-key ciphertext, has no owner credentials
-   or elevated execution path, and cannot reach private-key exports or
-   backups through profile, shared/mounted or working locations.
-   Repeat or explicitly revalidate on the **actual** scoring agent
-   session and host before any unblind. Record owner decision. The
-   earlier owner-reported Claude Code test is supporting evidence,
-   not automatic closure.
+2. **Complete pre-seal custody checks (#693 §9.5) for BOTH designated
+   environments:** Independently verify the actual author/sealer agent
+   context and a **disposable synthetic-only probe** in the designated
+   scoring host/account, before any R3 corpus is sealed. Each must
+   demonstrably fail decryption of a synthetic owner-key ciphertext,
+   lack owner credentials and elevation, and have no access to
+   secret-key exports or backups through profile, worktree,
+   shared/mounted or transfer locations. The scoring probe must not
+   start the future scorer B, inspect author material, or retain any
+   synthetic outputs or session history accessible to B. Pin the
+   execution identities and host(s), verification actor, limitations
+   and explicit owner GO/NO-GO **before sealing**. Recheck the actual
+   scoring session B after the owner-approved handoff and before
+   unblinding. The earlier owner-reported Claude Code test is supporting
+   evidence only; the #693 §9.5 pre-seal two-environment requirement
+   is not waived.
 3. **Seal and verify:** Deterministically seal the corpus for the owner,
    record metadata/hash only, owner decrypt-verifies outside
    `MnemeAgent`. The owner controls the sealed archive and any
@@ -243,11 +273,15 @@ the protocol cannot simply waive independence.
    performed, unresolved visibility, and an explicit owner GO/NO-GO
    for starting B. If any hidden material is still accessible,
    **NO-GO**; separate sessions alone cannot substitute.
-6. **New scorer session:** Start B only after GO. B builds and pins
-   the independent harness using contract/public smoke, then owner
-   conducts authorized unblind and B scores. If B encounters
-   inaccessible/accessible prior author content unexpectedly, stop
-   and record a protocol breach; no PASS may be claimed.
+6. **New scorer session:** Start B only after handoff GO. B builds and
+   tests the independent harness using contract and public smoke cases;
+   all §3 malformed-`rule_id` synthetic negative tests must be
+   reviewed and pinned **before owner-authorized unblind**, not before
+   corpus sealing. The pre-scoring completion record also pins the
+   harness and relevant test hashes before unblind. Then owner
+   conducts authorized unblind and B scores. If B encounters author
+   content unexpectedly before unblind, stop and record a protocol
+   breach; no PASS may be claimed.
 
 The owner handoff and synthetic custody checks are **not yet complete**.
 This is a protocol design, not a statement that the existing same-account
@@ -268,20 +302,25 @@ property blocks sealing or scoring.
 3. New, eligible author creates R3 cases from normative specifications;
    only sanitized ambiguity briefs reach the owner. The scorer sees
    no hidden cases or author transcript.
-4. **Before sealing:** Complete the actual sealer's independent
-   synthetic decryption/backup-access checks and obtain the owner's
-   explicit #693 §9.5 custody gate decision. This is the normative
-   pre-seal deadline, **not** a requirement to finish Windows setup
-   before merging the pre-registration. Failure blocks sealing.
+4. **Before sealing:** Independently verify **both** the actual
+   author/sealer context and designated scorer environment using
+   disposable synthetic-only key-custody probes (§4.2 step 2);
+   record the owner's explicit #693 §9.5 gate decision. Do **not**
+   start scorer B here: the scorer environment is probed independently
+   without exposing author or corpus material. The pre-seal deadline
+   does **not** require Windows setup before merging this
+   pre-registration. Failure blocks sealing.
 5. Owner-approved custodian seals the corpus with deterministic tar,
    manifest and owner public-key encryption. Owner alone decrypt-verifies,
    controls plaintext deletion and verifies the same-account handoff.
    Publish metadata/hashes only; scorer session B may not start until
    the independently reviewed handoff returns GO.
-6. Independent scorer creates a new session/config, writes and pins
-   an R3 harness with malformed-`rule_id` public synthetic tests;
-   do not change R1/R2 harnesses. Independently reconfirm the scoring
-   session's owner-key isolation before any authorized unblind.
+6. After the owner-approved handoff, independent scorer B starts a new
+   session/config, develops an R3-specific harness using the contract and
+   public smoke, and executes its own malformed-`rule_id` synthetic
+   negative tests. Do not change R1/R2 harnesses. Reconfirm the actual
+   scoring session's owner-key isolation and pin the negative-test
+   evidence before any authorized unblind.
 7. Pin scoring host, baseline, wheel, dependencies, harness bytes,
    corpus integrity and symlink capability in a **pre-scoring
    completion record**. Merge that record before decryption.
@@ -308,10 +347,11 @@ alone authorizes a scoring run.
   verify absence of scorer-readable hidden material at the handoff.
   A failed handoff blocks scoring and requires stronger isolation.
 - **R3-P3: OPEN execution gate, not a pre-registration merge gate.**
-  Independently verify and obtain explicit owner decision on #693 §9.5
-  for the actual author/sealer **before sealing**; re-verify scorer's
-  owner-key isolation before unblinding. The earlier synthetic session
-  tests do not waive this.
+  Independently verify and obtain an explicit owner decision on
+  #693 §9.5 for **both** the actual author/sealer and designated
+  scoring host/account via synthetic-only probes **before sealing**;
+  the scorer's actual session is rechecked before unblind. The
+  previously reported synthetic checks do not waive this.
 - **R3-P4: OPEN architecture/scoring-contract review.** Confirm the
   source baseline/host re-pin and gate mapping below before merging
   this pre-registration as frozen.
@@ -343,7 +383,11 @@ Every concealed AT case is included in **G1**, **G3**, **G6**,
 **G7** and **G8**, with G1 requiring strict blocks and
 correct non-clean numeric outcomes as applicable, G3 requiring
 no target mutation following refusal, and G6 requiring exact
-non-numeric violation identities even with `subject: null`.
+non-numeric violation identities when the **hook's**
+`checker.subject` is `null`, including cases whose **checker
+payload** has `subject.input_kind: unverified_input`.
+G6 also checks the independently expected checker subject kind
+and excludes `EXCLUDED` numeric IDs from the applied-rule set.
 Apply **G2**'s established literal-violation exception, not
 a false-block designation for an expected literal refusal.
 Apply **G4** to any AT input whose oracle expects a primary
@@ -356,7 +400,8 @@ falsely earning numeric relevance; any wrong G6 field fails.
 Harness author is a new eligible, independent scorer session
 operating from this normative protocol and **public** smoke
 only. Public synthetic negative tests for malformed `rule_id`
-must fail attribution as specified in §3. No R1 or R2 hidden
+must fail attribution as specified in §3, **after scorer B begins
+following the sealed-corpus handoff and before unblinding**. No R1 or R2 hidden
 case, harness modification or implementation regression fixture
 may supply R3 expectations. Harness bytes, identity and hashes
 must be accepted and merged **before** scoring.
