@@ -68,11 +68,11 @@ def _num_rule(adr_id: str, *, include: str, exclude: str | None = None,
     ]
     if exclude:
         source += ["    exclude_paths:", f'      - "{exclude}"']
-    return synthetic._adr(adr_id, f"Synthetic numeric {adr_id}", "\n".join(source) + "\n")
+    return synthetic._adr(adr_id, f"Synthetic numeric {adr_id[4:]}", "\n".join(source) + "\n")
 
 
 def _literal_rule(adr_id: str, value: str) -> dict:
-    return synthetic._adr(adr_id, f"Synthetic literal {adr_id}",
+    return synthetic._adr(adr_id, f"Synthetic literal {adr_id[4:]}",
                           f"- FORBID_LITERAL: {value}\n")
 
 
@@ -133,23 +133,23 @@ def _case(tmp_path: Path, cls: str, i: int) -> tuple[dict, SimpleNamespace, dict
         cause = "other_rule"
         disposition = "deferred" if sub == "AT-W0" else "refused"
         lit_value = ("eval(" if i % 2 == 0 else "exec(")
-        lit = _literal_rule(f"ADR-98{i:02}L", lit_value)
+        lit = _literal_rule(f"ADR-{9800+i}", lit_value)
         fixture_files.append(lit)
         literals = [(r.rule_id, r.rule_type)
                     for r in oracle.fixture_rules({"fixture": {"files": [lit]}})]
         content = f"result = {lit_value}1)\n"
         # Both AT-SI cases have different literal IDs *and* include scopes.
         if sub == "AT-SI":
-            fixture_files.append(_num_rule(f"ADR-98{i:02}N", include=f"lib{i}/**"))
+            fixture_files.append(_num_rule(f"ADR-{9900+i}", include=f"lib{i}/**"))
             checker_subject = "unverified_input"
         elif sub == "AT-SX":
             target_rel = f"src/excluded{i}/new.py"
             (root / f"src/excluded{i}").mkdir()
             fixture_files.append(_num_rule(
-                f"ADR-98{i:02}N", include="src/**", exclude=f"src/excluded{i}/**"))
+                f"ADR-{9900+i}", include="src/**", exclude=f"src/excluded{i}/**"))
             checker_subject = "unverified_input"
         elif sub == "AT-W0" and i % 2:
-            fixture_files.append(_num_rule(f"ADR-98{i:02}N", include=f"elsewhere{i}/**"))
+            fixture_files.append(_num_rule(f"ADR-{9900+i}", include=f"elsewhere{i}/**"))
             checker_subject = "unverified_input"
         trusted, record_subject = False, None
         if sub == "AT-S0" or (sub == "AT-W0" and i % 2 == 0):
