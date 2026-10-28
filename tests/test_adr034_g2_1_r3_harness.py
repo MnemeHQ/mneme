@@ -560,10 +560,21 @@ def test_concealed_floors_and_decision():
     assert floor["met"] and floor["concealed"] == C.TOTAL_FLOOR
     results = [_result(c["case_id"], c["cls"], subclass=c["subclass"]) for c in cases]
     ok = {"capable": True}
-    assert gates.decide(results, floor, ok, "concealed", {"manifest": None})["verdict"] == "PASS"
+    valid = {"manifest": {"entries": len(results), "mismatches": []}}
+    assert gates.decide(results, floor, ok, "concealed", valid)["verdict"] == "PASS"
+    no_manifest = copy.deepcopy(results)
+    blocked = gates.decide(no_manifest, floor, ok, "concealed", {"manifest": None})
+    assert blocked["verdict"] == "FAIL"
+    assert not blocked["integrity_ok"]
+    assert blocked["per_gate"]["G8"]["denominator"] == len(results)
+    assert len(blocked["per_gate"]["G8"]["failed"]) == len(results)
+    assert all("corpus_manifest_integrity" in r["gates"]["G8"]["failures"] for r in no_manifest)
+    partial = gates.decide(copy.deepcopy(results), floor, ok, "concealed",
+                           {"manifest": {"entries": 1, "mismatches": ["manifest_incomplete_inventory"]}})
+    assert partial["verdict"] == "FAIL"
     results[0]["passed"] = False
-    assert gates.decide(results, floor, ok, "concealed", {"manifest": None})["verdict"] == "FAIL"
-    assert gates.decide(results, floor, {"capable": False}, "concealed", {"manifest": None})["verdict"] == "INCOMPLETE"
+    assert gates.decide(results, floor, ok, "concealed", valid)["verdict"] == "FAIL"
+    assert gates.decide(copy.deepcopy(results), floor, {"capable": False}, "concealed", valid)["verdict"] == "INCOMPLETE"
 
 
 def test_floor_shortfall_and_superseded_at_sn():
@@ -573,3 +584,94 @@ def test_floor_shortfall_and_superseded_at_sn():
             case["subclass"] = "AT-SN"
     floor = gates.floors(cases)
     assert not floor["met"] and "AT-SI" in floor["at_floor_shortfalls"]
+
+
+# ── sealed corpus manifest integrity: synthetic files only ────────────────────
+
+
+def _synthetic_manifest_corpus(tmp_path):
+    root = tmp_path / "synthetic-r3"
+    root.mkdir()
+    data = {"schema": C.CASE_SCHEMA, "case_id": "synthetic-1"}
+    path = root / "synthetic-1" / "case.json"
+    path.parent.mkdir()
+    path.write_text(__import__("json").dumps(data) + "\n", encoding="utf-8")
+    return root, path
+
+
+def _write_file_manifest(root, paths):
+    lines = []
+    for path in paths:
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        lines.append(f"{digest}  {path.relative_to(root).as_posix()}\n")
+    (root / "MANIFEST.sha256").write_text("".join(sorted(lines)), encoding="utf-8")
+
+
+def test_manifest_complete_synthetic_inventory(tmp_path):
+    root, case_path = _synthetic_manifest_corpus(tmp_path)
+    readme = root / "README.txt"
+    readme.write_text("synthetic metadata\n", encoding="utf-8")
+    _write_file_manifest(root, [case_path, readme])
+    cases, integrity = runner.load_corpus(root)
+    assert len(cases) == 1
+    assert integrity["manifest"] == {"entries": 2, "mismatches": []}
+
+
+def test_manifest_missing_fails_closed(tmp_path):
+    root, _ = _synthetic_manifest_corpus(tmp_path)
+    _, integrity = runner.load_corpus(root)
+    assert "manifest_missing" in integrity["manifest"]["mismatches"]
+
+
+def test_manifest_subset_fails_closed(tmp_path):
+    root, case_path = _synthetic_manifest_corpus(tmp_path)
+    extra = root / "metadata.txt"
+    extra.write_text("extra", encoding="utf-8")
+    _write_file_manifest(root, [case_path])
+    _, integrity = runner.load_corpus(root)
+    assert "manifest_incomplete_inventory" in integrity["manifest"]["mismatches"]
+
+
+def test_manifest_missing_case_entry_fails_closed(tmp_path):
+    root, case_path = _synthetic_manifest_corpus(tmp_path)
+    _write_file_manifest(root, [])
+    _, integrity = runner.load_corpus(root)
+    assert "manifest_incomplete_inventory" in integrity["manifest"]["mismatches"]
+
+
+def test_manifest_modified_file_fails_closed(tmp_path):
+    root, case_path = _synthetic_manifest_corpus(tmp_path)
+    _write_file_manifest(root, [case_path])
+    case_path.write_text(case_path.read_text(encoding="utf-8") + " ", encoding="utf-8")
+    # The payload stays valid JSON; only its digest no longer matches.
+    _, integrity = runner.load_corpus(root)
+    assert "manifest_digest_mismatch" in integrity["manifest"]["mismatches"]
+
+
+def test_manifest_duplicate_entry_fails_closed(tmp_path):
+    root, case_path = _synthetic_manifest_corpus(tmp_path)
+    _write_file_manifest(root, [case_path])
+    manifest = root / "MANIFEST.sha256"
+    manifest.write_text(manifest.read_text(encoding="utf-8") * 2, encoding="utf-8")
+    _, integrity = runner.load_corpus(root)
+    assert "manifest_duplicate_entry" in integrity["manifest"]["mismatches"]
+
+
+@pytest.mark.parametrize("invalid", ["../outside.txt", "/absolute.txt", "folder/../../escape"])
+def test_manifest_traversal_fails_closed(tmp_path, invalid):
+    root, case_path = _synthetic_manifest_corpus(tmp_path)
+    _write_file_manifest(root, [case_path])
+    manifest = root / "MANIFEST.sha256"
+    manifest.write_text(
+        manifest.read_text(encoding="utf-8") + "0" * 64 + "  " + invalid + "\n",
+        encoding="utf-8")
+    _, integrity = runner.load_corpus(root)
+    assert "manifest_invalid_path" in integrity["manifest"]["mismatches"]
+
+
+def test_public_scoring_without_manifest_never_claims_pass():
+    decision = gates.decide([_result("public-1", "V", visibility="public")],
+                            {"met": True}, {"capable": True}, "public",
+                            {"manifest": {"entries": 0, "mismatches": ["manifest_missing"]}})
+    assert decision["verdict"] == "NO_VERDICT_PUBLIC_SMOKE"
+    assert not decision["integrity_ok"]
