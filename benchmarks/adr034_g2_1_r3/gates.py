@@ -119,8 +119,15 @@ def g4(case: dict, exp, obs: dict, notes: list) -> list:
             if rule is None or rule.get("primary_reason") != expected:
                 out.append(f"primary_reason:record:{rid}")
         if trace is not None:
-            seen = sorted({u.get("reason") for u in trace.get("unknown_sources") or []
-                           if isinstance(u, dict)})
+            # AMB-R2-05 keeps the unknown-reason set diagnostic-only, but
+            # malformed data must not crash the entire blind scorer or earn
+            # a silent PASS. Fail that case under G8 via score_case_safely.
+            raw_unknown = trace.get("unknown_sources") or []
+            if not isinstance(raw_unknown, list) or any(
+                    not isinstance(u, dict) or not isinstance(u.get("reason"), str)
+                    for u in raw_unknown):
+                raise ValueError("malformed_checker_unknown_reason")
+            seen = sorted({u["reason"] for u in raw_unknown})
             if seen != sorted(set(entry.get("unknown_reasons") or [])):
                 # AMB-R2-05: set equality is compared and reported; G4 gates the primary only.
                 notes.append(f"unknown_reason_set_differs:{rid}")
@@ -376,6 +383,27 @@ def score_case(case: dict, passes: list, compiled: dict, host: tuple, guard: lis
     for gate in gates.values():
         gate["failures"] = sorted(set(gate["failures"]))
     return _finish(case, gates, sorted(set(notes)))
+
+
+def score_case_safely(case: dict, passes: list, compiled: dict, host: tuple, guard: list,
+                      expected_mneme_version: str,
+                      expected_versions: dict[str, str]) -> dict:
+    """Turn an unexpected scorer exception into a single-case G8 FAIL.
+
+    Do not expose an exception message: it may contain a concealed case path
+    or source fragment. The per-case result still appears in the report and
+    the remaining cases can be scored. This never converts a failure to PASS.
+    """
+    try:
+        return score_case(case, passes, compiled, host, guard,
+                          expected_mneme_version, expected_versions)
+    except Exception as exc:
+        gates = {
+            g: {"applies": True, "failures": ["case_not_scored"]}
+            for g in C.GATES
+        }
+        gates["G8"]["failures"] = [f"case_scoring_exception:{type(exc).__name__}"]
+        return _finish(case, gates, [])
 
 
 def _envelope_ids(case: dict) -> dict:
