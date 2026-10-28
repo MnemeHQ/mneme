@@ -206,8 +206,10 @@ def inspect(cases: list, passes: dict, public_evidence: dict | None = None) -> d
 
         if cls == "AT":
             try:
-                rules = [r for r in oracle.fixture_rules(case) if r.rule_type == C.NUMERIC]
+                fixture_rules = oracle.fixture_rules(case)
+                rules = [r for r in fixture_rules if r.rule_type == C.NUMERIC]
             except (oracle.OracleError, TypeError, ValueError):
+                fixture_rules = []
                 rules = []
                 shortfalls.append("AT:invalid_fixture")
             sub = case.get("subclass")
@@ -221,15 +223,18 @@ def inspect(cases: list, passes: dict, public_evidence: dict | None = None) -> d
             if not basic or not mode_ok or exp.cause != "other_rule":
                 shortfalls.append("AT:invalid_subject_or_attribution")
                 continue
-            # Ignore mere file/target renaming. Distinct ADR source text or a
-            # distinct literal-rule identity is required by R3 §3.
-            adr_sources = tuple(sorted(
-                s["text"] for s in case["fixture"]["files"]
-                if s.get("type") == "file" and s.get("path", "").startswith("docs/adr/")
+            # Rule semantics, not file paths or ADR front-matter IDs, are
+            # evidence of a materially different fixture. A changed ID or
+            # moved file alone is never a diversity witness. The remaining
+            # qualitative source/fixture distinction requires owner review.
+            semantic_signature = tuple(sorted(
+                (r.rule_type, r.value, tuple(r.include or ()), tuple(r.exclude or ()))
+                for r in fixture_rules
             ))
-            at_fixture_signatures[sub].add(
-                (adr_sources, tuple(sorted(tuple(v) for v in exp.literal_violations)))
-            )
+            if not semantic_signature:
+                shortfalls.append("AT:cannot_derive_fixture_semantics")
+            else:
+                at_fixture_signatures[sub].add(semantic_signature)
             if sub == "AT-S0":
                 if rules:
                     shortfalls.append("AT-S0:has_numeric_rule")
@@ -287,6 +292,6 @@ def inspect(cases: list, passes: dict, public_evidence: dict | None = None) -> d
             shortfalls.append("AT-SI:not_two_distinct_literal_identities_and_scopes")
     for sub, fingerprints in at_fixture_signatures.items():
         if len(fingerprints) < C.AT_SUBCLASS_FLOORS[sub]:
-            shortfalls.append(sub + ":not_two_distinct_ADR_fixtures_or_literal_identities")
+            shortfalls.append(sub + ":not_two_materially_distinct_rule_fixtures")
     return {"met": not shortfalls, "shortfalls": sorted(set(shortfalls)),
             "counts": dict(sorted(counts.items()))}
