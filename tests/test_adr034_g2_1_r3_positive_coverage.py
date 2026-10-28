@@ -482,7 +482,10 @@ def test_synthetic_mr_row12_refusal_required(tmp_path, row, key):
 
 def test_synthetic_l_features_do_not_depend_on_mutable_postrun_worktree(tmp_path):
     import shutil
-    cases, passes, public_evidence = _synthetic_admission(tmp_path)
+    try:
+        cases, passes, public_evidence = _synthetic_admission(tmp_path)
+    except OSError as exc:
+        pytest.skip(f"symlink capability unavailable: {type(exc).__name__}")
     before = coverage.inspect(cases, passes, public_evidence)
     assert before["met"], before["shortfalls"]
     # The scorer's fixture cleanup/recreation must not affect coverage.
@@ -496,9 +499,35 @@ def test_synthetic_l_features_do_not_depend_on_mutable_postrun_worktree(tmp_path
 
 
 def test_synthetic_nonascii_cannot_be_supplied_only_by_lone_surrogates(tmp_path):
-    cases, passes, evidence = _synthetic_admission(tmp_path)
+    try:
+        cases, passes, evidence = _synthetic_admission(tmp_path)
+    except OSError as exc:
+        pytest.skip(f"symlink capability unavailable: {type(exc).__name__}")
     for case in cases:
         if case["cls"] == "V" and any(ord(ch) > 127 for ch in case["event"]["content"]):
             case["event"]["content"] = "plain ASCII source\n"
     result = coverage.inspect(cases, passes, evidence)
     assert "bytes:non_ascii:below_minimum" in result["shortfalls"]
+
+
+def test_synthetic_at_adr_id_rename_does_not_count_as_material_difference(tmp_path):
+    first, first_exp, first_obs = _case(tmp_path, "AT", 0)
+    second, second_exp, second_obs = _case(tmp_path, "AT", 1)
+    # Both now constrain the same literal semantic value; the independent
+    # ADR ID remains different, proving an ID change alone is insufficient.
+    literal = _literal_rule("ADR-8899", "eval(")
+    second["fixture"]["files"] = [
+        spec for spec in second["fixture"]["files"]
+        if not spec["path"].startswith("docs/adr/")
+    ] + [literal]
+    second["event"]["content"] = first["event"]["content"]
+    second_exp.literal_violations = [
+        (r.rule_id, r.rule_type) for r in _fixture_rules([literal])
+    ]
+    cases = [first, second]
+    passes = {
+        first["case_id"]: [(first_exp, first_obs)],
+        second["case_id"]: [(second_exp, second_obs)],
+    }
+    report = coverage.inspect(cases, passes)
+    assert "AT-S0:not_two_materially_distinct_rule_fixtures" in report["shortfalls"]
