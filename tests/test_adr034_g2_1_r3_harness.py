@@ -16,7 +16,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from benchmarks.adr034_g2_1_r3 import attribution, gates, oracle, runner, synthetic
+from benchmarks.adr034_g2_1_r3 import attribution, coverage, gates, oracle, runner, synthetic
 from benchmarks.adr034_g2_1_r3 import contract as C
 
 HOST = ("2.1.312", "a" * 64)
@@ -366,7 +366,9 @@ def _good_obs(case, exp):
 
 def _score(case, exp, obs, obs_b=None):
     obs_b = obs if obs_b is None else obs_b
-    return gates.score_case(case, [(exp, obs), (exp, obs_b)], {"ok": True}, HOST, [])
+    expected_versions = {rid: "dver-x" for rid in exp.applied_rule_ids}
+    return gates.score_case(case, [(exp, obs), (exp, obs_b)], {"ok": True}, HOST, [],
+                            "0.10.0", expected_versions)
 
 
 def _failures(result, gate):
@@ -525,9 +527,10 @@ def test_g7_runs_differ(at_si):
 def test_g8_operational_failure_fails_every_gate(at_si):
     case, exp, obs = at_si
     result = gates.score_case(case, [(exp, obs), (None, {"error": "harness: timeout"})],
-                              {"ok": True}, HOST, [])
+                              {"ok": True}, HOST, [], "0.10.0", {})
     assert not result["passed"] and "harness: timeout" in _failures(result, "G8")
-    bad_compile = gates.score_case(case, [(exp, obs), (exp, obs)], {"ok": False}, HOST, [])
+    bad_compile = gates.score_case(case, [(exp, obs), (exp, obs)], {"ok": False}, HOST,
+                                   [], "0.10.0", {})
     assert "memory_compile_failed" in _failures(bad_compile, "G8")
 
 
@@ -557,7 +560,13 @@ def test_public_scoring_never_yields_a_verdict():
 def test_concealed_floors_and_decision():
     cases = _concealed_corpus()
     floor = gates.floors(cases)
-    assert floor["met"] and floor["concealed"] == C.TOTAL_FLOOR
+    assert floor["total_floor_met"] and floor["concealed"] == C.TOTAL_FLOOR
+    assert not floor["met"] and "coverage_not_checked" in floor["coverage"]["shortfalls"]
+    # This unit tests verdict aggregation, not corpus eligibility. Supply a
+    # synthetic positive coverage control explicitly; the real entry point
+    # requires independent passes and will never infer one from counts.
+    floor["coverage"] = {"met": True}
+    floor["met"] = True
     results = [_result(c["case_id"], c["cls"], subclass=c["subclass"]) for c in cases]
     ok = {"capable": True}
     valid = {"manifest": {"entries": len(results), "mismatches": []}}
