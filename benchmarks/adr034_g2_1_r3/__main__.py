@@ -53,12 +53,11 @@ def score(args: argparse.Namespace) -> int:
     # The expected package version comes from the frozen R3 §2 contract,
     # NEVER the package under test. Its installed version is an independent
     # observation and an operational provenance precondition for every case.
-    installed_version = environments["implementation"].get("mneme_version")
-    version_pin_matches = installed_version == C.PINNED_MNEME_VERSION
-    if not version_pin_matches:
-        for case in cases:
-            guards.setdefault(case["case_id"], []).append(
-                "implementation_mneme_version_mismatch")
+    version_errors = runner.implementation_version_guard(environments["implementation"])
+    version_pin_matches = not version_errors
+    for case in cases:
+        if version_errors:
+            guards.setdefault(case["case_id"], []).extend(version_errors)
     for case in cases:
         try:
             compiled[case["case_id"]] = runner.compile_memory(case, ctx)
