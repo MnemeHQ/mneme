@@ -406,13 +406,6 @@ def floors(cases: list) -> dict:
 def decide(results: list, floor: dict, symlinks: dict, scoring: str, integrity: dict) -> dict:
     """Corpus decision. Public smoke never yields a verdict (R3 §3)."""
     scored = [r for r in results if r["visibility"] != "public"] if scoring == "concealed" else results
-    per_gate = {}
-    for gate in C.GATES:
-        applicable = [r for r in scored if r["gates"][gate]["applies"]]
-        per_gate[gate] = {
-            "denominator": len(applicable),
-            "failed": sorted(r["case_id"] for r in applicable if r["gates"][gate]["result"] == "fail"),
-        }
     manifest = integrity.get("manifest")
     integrity_ok = (isinstance(manifest, dict) and manifest.get("entries", 0) > 0
                     and not manifest.get("mismatches"))
@@ -426,6 +419,14 @@ def decide(results: list, floor: dict, symlinks: dict, scoring: str, integrity: 
                 gate["failures"].append("corpus_manifest_integrity")
             gate["result"] = "fail"
             result["passed"] = False
+    # Count gate failures only after corpus-integrity failures are attributed.
+    per_gate = {}
+    for gate in C.GATES:
+        applicable = [r for r in scored if r["gates"][gate]["applies"]]
+        per_gate[gate] = {
+            "denominator": len(applicable),
+            "failed": sorted(r["case_id"] for r in applicable if r["gates"][gate]["result"] == "fail"),
+        }
     all_pass = all(r["passed"] for r in scored)
     if scoring != "concealed":
         verdict = "NO_VERDICT_PUBLIC_SMOKE"
