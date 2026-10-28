@@ -1,9 +1,9 @@
 # ADR-034 G2-1 R3: pre-unblind amendment 1 (AT-SN -> AT-SI)
 
 **Date:** 2026-10-28  
-**Status:** PROPOSED, **not accepted**. No change to the frozen R3 protocol until explicit owner acceptance and merge.  
+**Status:** OWNER-ACCEPTED 2026-10-28, pending PR review and merge. The original frozen R3 protocol remains operative until the amendment merges.  
 **Parent freeze:** [R3 pre-registration](adr-034-g2-1-r3-preregistration-draft-2026-10-28.md), PR #699, merge `6d86358e66734556400d92f9cbe28194a9763ac5`.  
-**Requested ruling:** AMB-R3-01, reported during independent corpus authoring. Only sanitized author metadata was reviewed; no concealed case, label or author scratch was inspected.
+**Owner ruling:** AMB-R3-01 **ACCEPT**. Replace AT-SN with AT-SI at the same 2-case floor, retain distinct AT-SX. This owner approval is not custody or scoring authorization. Reported during independent corpus authoring. Only sanitized author metadata was reviewed; no concealed case, label or author scratch was inspected.
 
 ## 1. Conflict with accepted architecture
 
@@ -30,7 +30,7 @@ The author correctly withheld AT-SN rather than guessing.
 
 ## 2. Exact replacement requested
 
-**Replace only the AT-SN sub-class (floor 2) with AT-SI (floor 2):
+**Owner-accepted replacement, effective upon merge: AT-SN (floor 2) becomes AT-SI (floor 2):
 "numeric present, scope include-miss."**
 
 For both new concealed AT-SI cases:
@@ -71,7 +71,7 @@ those cases or weakening AT-SX.
 
 The original R3 §3 table row for `AT-SN` and the checker-subject
 table's `AT-SN` reference are superseded by this section **only
-when this amendment is accepted and merged**. For `AT-SI`, the
+when this owner-accepted amendment is merged**. For `AT-SI`, the
 expected checker subject belongs in the `unverified_input` row
 alongside AT-SX; the hook's `checker.subject` remains null.
 
@@ -98,13 +98,13 @@ alongside AT-SX; the hook's `checker.subject` remains null.
 
 ## 4. Decision and execution boundary
 
-**Owner ruling required:** ACCEPT or REJECT AT-SN -> AT-SI,
-including the distinct AT-SI include-miss and AT-SX exclude-match
-cases. Record the ruling and merge the amendment **before**
-author A proceeds with the replacement cases. No separate Windows
-account or implementation change is requested.
+**Owner ruling: ACCEPT, 2026-10-28.** AT-SN is replaced by AT-SI
+with two include-miss cases, while AT-SX retains two exclude-match
+cases. This approval is effective as a protocol amendment **only after
+review and merge**, and before author A proceeds with the replacement
+cases. No separate Windows account or implementation change is requested.
 
-After acceptance and merge, send author A **only this normative
+After merge, send author A **only this normative
 amendment and the owner ruling**, not implementation source,
 earlier hidden corpora, scorer diagnostics or research transcripts.
 The author will add/reconcile the **two** cases and perform a
