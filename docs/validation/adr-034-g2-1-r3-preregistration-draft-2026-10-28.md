@@ -65,24 +65,87 @@ R2's minimum remains **120 concealed scored cases** across its 13 classes;
 public smoke cases do not count toward any concealed floor or gate.
 Symlink capability is required for a full PASS.
 
-**R3 change required by D3:** Add fresh, independently authored cases with
-non-numeric literal-rule refusal attribution where the checker has **no
-`proposed_new_source` subject**; include cases with and without applicable
-numeric rules, and warn-mode deferrals as permitted by the charter. Define
-the new class/floor and total denominator **before authoring any case**.
-The owner must explicitly approve those numeric additions; **no count is
-assumed by this draft**.
+**R3 new concealed class and floor (R3-P1 proposed resolution, for owner
+acceptance before protocol freeze):** Keep all R2 concealed floors intact:
+**120** concealed scored cases across 13 classes. Add one new class,
+**AT (non-numeric attribution without a numeric subject)** with a floor of
+**8** concealed scored cases. The R3 minimum is therefore **128**
+concealed scored cases across **14** classes, not including public smoke.
+No earlier class may be reduced to make room for AT.
 
-**Normative independent attribution oracle:** For every trusted record,
-the scorer derives expected non-numeric attribution independently from
-the decision fixture and ADR-034 §7c, not by copying the hook's reported
-`violations`. Missing, empty or non-string `rule_id` is **unattributed**
-even when a recognized `rule_type` is present. No `rule_type`-only
-fallback may earn a G6 PASS. Inconsistent/untrusted payloads cannot earn
-attribution. The scorer must check exact expected identities, absence
-of extras/duplicates, and G6's existing applied-numeric-rule set,
-per-rule relevance, event relevance and completeness in the inherited
-order. `violations` alone never supports numeric relevance.
+| AT sub-class | Scenario, all routed verified-new `.py` writes under `open` availability | Required concealed minimum |
+|---|---|---:|
+| **AT-S0** | Strict; one or more `FORBID_LITERAL` violations; memory has **no numeric rule** | 2 |
+| **AT-SN** | Strict; a literal violation and at least one numeric rule **present in memory** but with **no numeric applicability record** for this target | 2 |
+| **AT-SX** | Strict; a literal violation and a numeric rule explicitly **EXCLUDED** for this target under ADR-020 | 2 |
+| **AT-W0** | Warn; literal violation with **no numeric applicability record**. At least one case is literal-only and one has a numeric rule excluded from the target | 2 |
+| **AT total** | | **8** |
+
+For every AT case, the independent label must establish **no applied numeric
+record**, a trusted checker violation for the applicable literal rule(s),
+`checker.subject: null`, `rules: []`, and `violations` containing
+the **exact independently derived** `(rule_id, rule_type)` pairs of
+the violating rules. Strict cases must refuse with exit 2 and leave the
+target absent; warn cases must defer with exit 0. The disposition cause is
+`other_rule` in all AT cases; the harness maps it to the labelled
+`literal_violation` **only if** a well-formed expected literal
+`rule_id` is present. Each AT case labels empty per-rule numeric
+relevance `{}`, event-level numeric relevance `false`, and completeness
+from the applicable trusted checker contract, not from the observed
+record. AT cases must not be copies or derived mutations of R1/R2 held-out
+cases. Both members of every pair must have meaningfully different ADR
+fixtures or rule identities, not just renamed paths.
+
+**Inherited LIT control tightened without raising its floor:** Its existing
+6-case concealed floor must include at least **2 mixed literal/numeric
+cases** with numeric violation and a `proposed_new_source` subject,
+and at least **2 mixed cases** with applied, recognized-clean numeric
+rules and literal refusal. In the latter, a numeric clean result must
+not inherit the unrelated literal refusal as numeric relevance
+(ADR-034 §7b). These cases check that the D3 evidence change did not alter
+the existing subject-present path. All original LIT requirements,
+including presence and absence of numeric violation, still hold.
+
+**Smoke and denominators:** Require **one newly authored public AT smoke**
+case for scorer development, using different source, ADR and literal-rule
+identity from concealed AT. Each public smoke case must come from a different
+class, and public cases remain at most **10% of all cases**; with 128
+concealed cases, at most **14** public smoke cases are permitted (14/142
+is below 10%). Public smoke cases count toward **none** of the 128
+concealed-floor or G1-G8 gate denominators. The final metadata-only corpus
+freeze record reports the actual concealed and smoke counts per class.
+
+**Scope boundary:** All AT cases use the charter's native `Write` event
+and actual pinned-hook result, not a hand-mutated record. Synthetic,
+deliberately malformed evidence records are **harness-level negative
+fixtures**, never presented as native events or counted toward the
+concealed floor.
+
+**Normative independent attribution oracle / G6:** For every trusted
+record, the scorer derives expected non-numeric attribution **from the
+fixture ADRs and ADR-034 §7c**, including the independently derived
+`rule_id` (ADR-034 §5), never from the observed hook `violations`
+array. Compare the exact expected set of well-formed
+`(rule_id, rule_type)` identities: any missing identity, extra
+identity, duplicate or wrong type fails G6. Missing `rule_id`, empty
+string, or non-string `rule_id` attributes **nothing**, even when
+`rule_type` equals `FORBID_LITERAL`; no `rule_type`-only fallback can
+turn `other_rule` into a passing literal cause. Untrusted or inconsistent
+checker payloads cannot earn attribution. Preserve R2's ordered G6 checks
+for numeric rule-ID set, per-rule relevance, event relevance and
+completeness. `violations` alone never supports numeric relevance.
+
+**Mandatory public synthetic scorer-negative tests before sealing:** Give
+the independent harness its **own** fabricated record examples:
+(a) missing `rule_id`; (b) empty-string `rule_id`;
+(c) non-string values, at least null and number, with valid
+`FORBID_LITERAL` type; (d) wrong but well-formed `rule_id`;
+(e) duplicate `rule_id`; (f) extraneous valid identity; and
+(g) untrusted/inconsistent checker data. Each must **fail** attribution
+where a valid literal identity is required. A positive synthetic control
+with correct id and type must pass. These tests do not count as R3
+concealed cases and do not use D3 implementation regression fixtures.
+Pin test and harness hashes in the pre-scoring completion record.
 
 **Independence of oracle:** No use of actual implementation outputs,
 D3 regression fixtures, R1/R2 concealed cases or their labels to create
@@ -161,8 +224,11 @@ alone authorizes a scoring run.
 
 ## 6. Open decisions before protocol can be frozen
 
-- **R3-P1:** Approve exact new D3 class definitions, their concealed floors,
-  and total denominator, preserving R2's 120 floor.
+- **R3-P1:** **Specified in §3, awaiting owner acceptance with the
+  completed PR review:** AT concealed floor **8** in four two-case
+  sub-classes; 120 inherited concealed + 8 AT = **128** minimum,
+  14 classes total. One public AT smoke required. No case generation
+  until this numeric contract is accepted and pre-registration frozen.
 - **R3-P2:** Approve role eligibility, independent author/scorer identities,
   and read-isolated execution directories or separate OS identities.
 - **R3-P3:** Record independently verified #693 §9.5 custody gate closure
