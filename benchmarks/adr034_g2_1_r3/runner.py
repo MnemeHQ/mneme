@@ -199,26 +199,74 @@ def check_work_dir(work: Path) -> Path:
 
 
 def load_corpus(corpus: Path) -> tuple[list, dict]:
+    """Load cases and independently check the frozen archive's complete file manifest.
+
+    Missing, malformed, partial or extra-file manifests are *not* evidence of
+    integrity. Return metadata-only failure codes rather than hidden content.
+    A concealed verdict cannot pass unless the inventory was fully verified.
+    """
     corpus = Path(corpus)
-    integrity: dict = {"manifest": None}
     manifests = sorted(corpus.rglob("MANIFEST.sha256"))
-    if len(manifests) > 1:
-        raise HarnessError("several MANIFEST.sha256 files")
-    if manifests:
-        base = manifests[0].parent
-        bad = []
-        lines = manifests[0].read_text(encoding="utf-8").splitlines()
-        for line in lines:
-            if not line.strip():
-                continue
-            digest, name = line.split(maxsplit=1)
-            name = name.lstrip("*")
-            target = base.joinpath(*_relative(name.strip()))
-            if not target.is_file() or hashlib.sha256(target.read_bytes()).hexdigest() != digest:
-                bad.append(name)
-        integrity["manifest"] = {"entries": len([x for x in lines if x.strip()]), "mismatches": bad}
+    integrity: dict = {"manifest": {"entries": 0, "mismatches": []}}
+    bad: list[str] = integrity["manifest"]["mismatches"]
+    listed: set[str] = set()
+    manifest_root: Optional[Path] = None
+
+    if len(manifests) != 1:
+        bad.append("manifest_missing" if not manifests else "multiple_manifests")
+    else:
+        manifest = manifests[0]
+        manifest_root = manifest.parent
+        if manifest.is_symlink() or not manifest.is_file():
+            bad.append("manifest_not_regular")
+        else:
+            try:
+                lines = manifest.read_text(encoding="utf-8").splitlines()
+            except (UnicodeError, OSError):
+                lines = []
+                bad.append("manifest_unreadable")
+            for line in lines:
+                if not line:
+                    bad.append("manifest_invalid_entry")
+                    continue
+                match = re.fullmatch(r"([0-9a-f]{64}) [ *](.+)", line)
+                if match is None:
+                    bad.append("manifest_invalid_entry")
+                    continue
+                digest, name = match.groups()
+                if name in listed:
+                    bad.append("manifest_duplicate_entry")
+                    continue
+                try:
+                    relative = _relative(name)
+                except HarnessError:
+                    bad.append("manifest_invalid_path")
+                    continue
+                listed.add(name)
+                target = manifest_root.joinpath(*relative)
+                # Never follow links out of the sealed corpus, even if a digest matches.
+                if target.is_symlink() or not target.is_file() or not target.resolve().is_relative_to(
+                        manifest_root.resolve()):
+                    bad.append("manifest_file_missing_or_unsafe")
+                elif hashlib.sha256(target.read_bytes()).hexdigest() != digest:
+                    bad.append("manifest_digest_mismatch")
+            integrity["manifest"]["entries"] = len(listed)
+            # A valid hash for a *subset* is not a complete manifest. Check both
+            # directions, including non-case metadata files and unsafe symlinks.
+            present = {
+                p.relative_to(manifest_root).as_posix()
+                for p in manifest_root.rglob("*")
+                if not p.is_dir() or p.is_symlink()
+            }
+            present.discard("MANIFEST.sha256")
+            if listed != present:
+                bad.append("manifest_incomplete_inventory")
+
     cases, digests = [], []
     for path in sorted(corpus.rglob("case.json")):
+        if manifest_root is not None and (
+                not path.is_relative_to(manifest_root) or path.is_symlink()):
+            bad.append("case_outside_manifest_scope")
         data = path.read_bytes()
         digests.append(f"{path.relative_to(corpus).as_posix()}:{hashlib.sha256(data).hexdigest()}\n")
         case = json.loads(data.decode("utf-8"))
@@ -228,6 +276,7 @@ def load_corpus(corpus: Path) -> tuple[list, dict]:
     ids = [c["case_id"] for c in cases]
     if len(set(ids)) != len(ids):
         raise HarnessError("duplicate case_id")
+    integrity["manifest"]["mismatches"] = sorted(set(bad))
     integrity["case_files"] = len(cases)
     integrity["case_files_sha256"] = hashlib.sha256("".join(digests).encode("utf-8")).hexdigest()
     return cases, integrity
