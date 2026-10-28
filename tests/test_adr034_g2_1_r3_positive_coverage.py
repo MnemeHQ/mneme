@@ -407,3 +407,40 @@ def test_synthetic_positive_control_ablations_fail(tmp_path, missing):
     assert result["verdict"] == ("INCOMPLETE" if missing == "symlink" else "FAIL")
     if missing in ("public", "lone_surrogate", "sc_ambiguous", "mr_row1"):
         assert not floor["coverage"]["met"]
+
+
+def test_synthetic_control_rule_ids_and_attribution_are_fixture_derived(tmp_path):
+    """Prevent fabricated rule identities from masquerading as an admission proof."""
+    try:
+        cases, passes, _ = _synthetic_admission(tmp_path)
+    except OSError as exc:
+        pytest.skip(f"symlink capability unavailable: {type(exc).__name__}")
+    for case in cases:
+        if case["cls"] not in {"AT", "LIT", "MR", "SC"}:
+            continue
+        exp = passes[case["case_id"]][0][0]
+        rules = _fixture_rules(case["fixture"]["files"])
+        expected_applied = sorted(
+            r.rule_id for r in rules if r.rule_type == C.NUMERIC
+            and oracle.applicability(r, exp.governed_path)[0] == "APPLIED"
+        )
+        expected_literal = sorted(
+            (r.rule_id, r.rule_type) for r in rules if r.rule_type == C.LITERAL
+            and oracle.literal_occurs(r.value, case["event"]["content"])
+            and oracle.applicability(r, exp.governed_path)[0] == "APPLIED"
+        )
+        assert sorted(exp.applied_rule_ids) == expected_applied, case["case_id"]
+        assert sorted(exp.literal_violations) == expected_literal, case["case_id"]
+        assert sorted(exp.numeric_outcomes) == expected_applied, case["case_id"]
+
+
+@pytest.mark.parametrize("row", [0, 1])
+def test_synthetic_mr_first_two_rows_are_strict_numeric_refusals(tmp_path, row):
+    case, exp, _ = _case(tmp_path, "MR", row)
+    assert case["cls"] == "MR"
+    assert exp.mode == "strict"
+    assert exp.disposition == "refused"
+    assert exp.cause == "numeric_violation"
+    assert exp.event_relevance is True
+    assert exp.per_rule_relevance[exp.applied_rule_ids[0]] is True
+    assert exp.per_rule_relevance[exp.applied_rule_ids[1]] is False
