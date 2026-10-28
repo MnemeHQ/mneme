@@ -176,23 +176,78 @@ Owner reports a working separation on `arxwn`:
 - searched agent home and TEMP revealed only `trustdb.gpg` and a
   synthetic ciphertext, since deleted (`Test-Path` false).
 
-**Not established:** System-wide absence of exports, coverage of shared
-or mounted locations, exact permissions and process identities of future
-author, sealer and scorer, independently audited separation of author
-and scorer when both use the same Windows account, and host configurations
-if scoring moves machines. A Standard account is not itself a blind-corpus
-confidentiality boundary between separate sessions of that same account.
+### 4.1 Minimal topology: reuse the existing accounts
 
-**Blocking before sealing (#693 §9.5):** Pin the exact host, identities and
-working roots of actual author/sealer/scorer. Have a verification actor
-separate from the scoring and authoring roles confirm, using synthetic
-ciphertext **within each actual agent context**, that owner decryption is
-impossible; verify owner-only decrypt outside the agent, backup/export
-reachability, elevation and session boundary, then record the owner's
-explicit decision. Design and test file-level read restrictions or
-separate OS identities so the scorer cannot read author plaintext or
-labels before unblind. **If independence or custody remains unverified,
-do not seal or score.**
+**No additional Windows user is a prerequisite of this proposal.** The
+candidate topology is a **sequential owner-mediated handoff** on `arxwn`:
+
+| Role | Account and session | Boundary |
+|---|---|---|
+| New corpus author | `MnemeAgent`, new Claude Code session A | Normative ADR/charter and this protocol only; no former held-out corpora, D3 implementation tests or scorer transcript |
+| Public-key sealer | `MnemeAgent`, after author completion | Encrypt only to the owner's public key; must not decrypt |
+| Key custodian / handoff reviewer | Human owner acting under `MnemeOwner` only for private-key tasks | Owner decrypt-verifies, controls sealed materials, and verifies plaintext/transcript cleanup **without exposing secret keys to agents** |
+| Independent harness author/scorer | `MnemeAgent`, newly started Claude Code session B, only **after** handoff clearance | From normative contract and new public smoke fixtures only; has no concealed plaintext, author notes or author transcript before the owner-controlled unblind |
+| Administrator `hi` | Excluded from agent execution | No author or scorer session runs as admin |
+
+**Important limitation:** Two Claude sessions sharing `MnemeAgent` are
+*not an OS-enforced confidentiality boundary*. They share read authority
+over files in that Windows profile. Independence must be assessed on
+both (a) separate eligible sessions and work products and (b) a
+**verified absence of readable hidden material at the handoff**. If the
+required material cannot be made inaccessible to session B, the owner
+must use a genuinely isolated execution identity/environment instead;
+the protocol cannot simply waive independence.
+
+### 4.2 Mandatory handoff gates before any scorer session
+
+1. **Pin roles:** Identify author A, sealer, new scorer B, their versioned
+   Claude sessions, effective Windows identities, execution roots and
+   retained artifacts. Author A and scorer B may not be the same
+   conversation, a fork, or a reused transcript. Record isolation
+   statements. Neither may have authored the D3 implementation,
+   inspected the earlier concealed corpora, or read prior score
+   diagnosis details outside the accepted public contract.
+2. **Complete custody checks before sealing (#693 §9.5):** Independently
+   confirm that the **actual** author/sealer agent session cannot
+   decrypt synthetic owner-key ciphertext, has no owner credentials
+   or elevated execution path, and cannot reach private-key exports or
+   backups through profile, shared/mounted or working locations.
+   Repeat or explicitly revalidate on the **actual** scoring agent
+   session and host before any unblind. Record owner decision. The
+   earlier owner-reported Claude Code test is supporting evidence,
+   not automatic closure.
+3. **Seal and verify:** Deterministically seal the corpus for the owner,
+   record metadata/hash only, owner decrypt-verifies outside
+   `MnemeAgent`. The owner controls the sealed archive and any
+   recovery material. Do not give session B decryption capability.
+4. **Sanitize and inspect:** Before B starts, remove plaintext corpus,
+   labels, generation scratch, console history containing hidden
+   labels, and accessible author transcripts/caches from the
+   `MnemeAgent` account. Owner retains needed audit artifacts only in
+   owner-controlled encrypted/inaccessible storage. Check the
+   author workspace, repository worktree, `TEMP`, reachable shared
+   locations and Claude local session/history storage for accessible
+   remnants, using metadata-only reports. Do not delete unrelated
+   user data. File absence is not forensic SSD erasure.
+5. **Owner handoff record:** A **separate verifier** reviews the
+   evidence for the actual paths and sessions, records checks
+   performed, unresolved visibility, and an explicit owner GO/NO-GO
+   for starting B. If any hidden material is still accessible,
+   **NO-GO**; separate sessions alone cannot substitute.
+6. **New scorer session:** Start B only after GO. B builds and pins
+   the independent harness using contract/public smoke, then owner
+   conducts authorized unblind and B scores. If B encounters
+   inaccessible/accessible prior author content unexpectedly, stop
+   and record a protocol breach; no PASS may be claimed.
+
+The owner handoff and synthetic custody checks are **not yet complete**.
+This is a protocol design, not a statement that the existing same-account
+arrangement has already proved blind independence.
+
+**Other remaining checks:** System-wide absence of exports, shared or
+mounted paths, exact identities of future agents, and host configuration
+if scoring moves machines. Any unverified secrecy or independence
+property blocks sealing or scoring.
 
 ## 5. Roles and protocol sequence (proposed, not authorized)
 
@@ -229,8 +284,12 @@ alone authorizes a scoring run.
   sub-classes; 120 inherited concealed + 8 AT = **128** minimum,
   14 classes total. One public AT smoke required. No case generation
   until this numeric contract is accepted and pre-registration frozen.
-- **R3-P2:** Approve role eligibility, independent author/scorer identities,
-  and read-isolated execution directories or separate OS identities.
+- **R3-P2:** **Minimal same-account sequential handoff specified in §4.1–4.2,
+  pending owner acceptance and observed handoff evidence.** No new Windows
+  account is required *a priori*, but shared-profile accessibility is not
+  considered independent isolation. If the handoff cannot establish
+  absence of readable hidden material, a separate execution identity is
+  mandatory before proceeding.
 - **R3-P3:** Record independently verified #693 §9.5 custody gate closure
   for *actual* agent execution contexts on all relevant machines.
 - **R3-P4:** Verify baseline/host pin policy, exact per-gate coverage of
