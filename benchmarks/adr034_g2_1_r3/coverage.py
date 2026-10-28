@@ -137,7 +137,7 @@ def inspect(cases: list, passes: dict) -> dict:
                                    o.get("matcher_outcome") == "NO_VIOLATION" for o in numeric):
                     counts["SC:recognized_clean"] += 1
                 if any(o.get("primary_reason") == "AMBIGUOUS_BINDING" or
-                       "AMBIGUOUS_BINDING" in o.get("unknown_reasons", [])
+                       "AMBIGUOUS_BINDING" in (o.get("unknown_reasons") or [])
                        for o in numeric):
                     counts["SC:ambiguous_binding"] += 1
 
@@ -164,6 +164,9 @@ def inspect(cases: list, passes: dict) -> dict:
                 rules = []
                 shortfalls.append("AT:invalid_fixture")
             sub = case.get("subclass")
+            if sub not in at_fixture_signatures:
+                shortfalls.append("AT:unknown_subclass")
+                continue
             basic = (exp.routed and exp.literal_violations and not exp.applied_rule_ids
                      and exp.record_subject is None and exp.event_relevance is False
                      and exp.per_rule_relevance == {})
