@@ -152,7 +152,7 @@ def _case(tmp_path: Path, cls: str, i: int) -> tuple[dict, SimpleNamespace, dict
             fixture_files.append(_num_rule(f"ADR-98{i:02}N", include=f"elsewhere{i}/**"))
             checker_subject = "unverified_input"
         trusted, record_subject = False, None
-        if sub == "AT-S0":
+        if sub == "AT-S0" or (sub == "AT-W0" and i % 2 == 0):
             checker_subject = "absent"
     elif cls == "LIT":
         literals = [("synthetic-literal", C.LITERAL)]
