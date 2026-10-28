@@ -54,14 +54,14 @@ def _public_archive(tmp_path: Path) -> dict:
 
 
 def _num_rule(adr_id: str, *, include: str, exclude: str | None = None,
-              call: bool = False) -> dict:
+              call: bool = False, symbol: str = "LIMIT_S") -> dict:
     source = [
         "- FORBID_NUMERIC_ABOVE:", "    language: python",
     ]
     if call:
         source += ["    call:", "      function: check", "      position: 0"]
     else:
-        source += ["    symbol: LIMIT_S"]
+        source += [f"    symbol: {symbol}"]
     source += [
         "    max: 5", "    inclusive: true", "    unit: seconds",
         "    include_paths:", f'      - "{include}"',
@@ -74,6 +74,13 @@ def _num_rule(adr_id: str, *, include: str, exclude: str | None = None,
 def _literal_rule(adr_id: str, value: str) -> dict:
     return synthetic._adr(adr_id, f"Synthetic literal {adr_id[4:]}",
                           f"- FORBID_LITERAL: {value}\n")
+
+
+def _fixture_rules(files: list[dict]) -> list[oracle.Rule]:
+    """Parse synthetic fixture ADRs under the same memory contract as R3."""
+    return oracle.fixture_rules({
+        "fixture": {"files": files, "memory": {"compile_from": "docs/adr"}}
+    })
 
 
 def _case(tmp_path: Path, cls: str, i: int) -> tuple[dict, SimpleNamespace, dict]:
@@ -105,6 +112,9 @@ def _case(tmp_path: Path, cls: str, i: int) -> tuple[dict, SimpleNamespace, dict
             (root / target_rel).write_text("")
             pre = {"kind": "file"}
             fixture_files.append({"base": "root", "path": target_rel, "type": "file", "text": ""})
+            # R1 A1.2: blank content cannot be a routed V, but is valid
+            # byte variety on a legacy/unrouted L event.
+            content = ""
         elif kind == 2:
             target_rel = f"src/link{i}.py"
             (root / "src" / f"actual{i}.py").write_text("a=1")
@@ -135,8 +145,7 @@ def _case(tmp_path: Path, cls: str, i: int) -> tuple[dict, SimpleNamespace, dict
         lit_value = ("eval(" if i % 2 == 0 else "exec(")
         lit = _literal_rule(f"ADR-{9800+i}", lit_value)
         fixture_files.append(lit)
-        literals = [(r.rule_id, r.rule_type)
-                    for r in oracle.fixture_rules({"fixture": {"files": [lit]}})]
+        literals = [(r.rule_id, r.rule_type) for r in _fixture_rules([lit])]
         content = f"result = {lit_value}1)\n"
         # Both AT-SI cases have different literal IDs *and* include scopes.
         if sub == "AT-SI":
@@ -172,8 +181,7 @@ def _case(tmp_path: Path, cls: str, i: int) -> tuple[dict, SimpleNamespace, dict
         applied = list(numeric_outcomes)
     elif cls == "SC":
         fixture_files.append(_num_rule(f"ADR-97{i:02}", include="src/**", call=True))
-        rule = next(r for r in oracle.fixture_rules(
-            {"fixture": {"files": fixture_files}}) if r.rule_type == C.NUMERIC)
+        rule = next(r for r in _fixture_rules(fixture_files) if r.rule_type == C.NUMERIC)
         applied = [rule.rule_id]
         if i < 2:
             status, outcome, reason = "RECOGNIZED", "VIOLATION", None
@@ -194,9 +202,11 @@ def _case(tmp_path: Path, cls: str, i: int) -> tuple[dict, SimpleNamespace, dict
         if i == 0:
             statuses = [("RECOGNIZED", "VIOLATION"), ("MATCHER_UNEVALUATED", "UNEVALUATED")]
             event_relevance, complete = True, False
+            disposition, cause = "refused", "numeric_violation"
         elif i == 1:
             statuses = [("RECOGNIZED", "VIOLATION"), ("RECOGNIZED", "NO_VIOLATION")]
             event_relevance, complete = True, True
+            disposition, cause = "refused", "numeric_violation"
         elif i == 2:
             statuses = [("RECOGNIZED", "NO_VIOLATION"), ("RECOGNIZED", "NO_VIOLATION")]
             event_relevance, complete = True, True
@@ -209,15 +219,15 @@ def _case(tmp_path: Path, cls: str, i: int) -> tuple[dict, SimpleNamespace, dict
         for rid, (status, outcome) in zip(applied, statuses):
             numeric_outcomes[rid] = {"matcher_status": status, "matcher_outcome": outcome}
     if cls == "MR":
-        rule_relevance = {rid: event_relevance and rid == applied[0]
+        rule_relevance = {rid: event_relevance and (i == 2 or rid == applied[0])
                           for rid in applied}
     else:
         rule_relevance = {rid: False for rid in applied}
         event_relevance, complete = False, True
 
-    if cls == "V" and i < 10:
+    if cls == "V" and i < 8:
         content = ["x\n", "y\n", "x\r\n", "y\r\n",
-                   "x\r", "y\r", "é", "ñ", "", ""][i]
+                   "x\r", "y\r", "é", "ñ"][i]
 
     target = (root if target_base == "root" else outside) / target_rel
     case = {
@@ -242,7 +252,7 @@ def _case(tmp_path: Path, cls: str, i: int) -> tuple[dict, SimpleNamespace, dict
         applied_rule_ids=applied, mode=mode, cause=cause,
         disposition=disposition, checker_subject_kind=checker_subject,
         record_subject=record_subject, event_relevance=event_relevance,
-        per_rule_relevance=rule_relevance,
+        per_rule_relevance=rule_relevance, evaluation_complete=complete,
     )
     return case, exp, {"pre": pre}
 
