@@ -283,6 +283,10 @@ GATE_EXCLUSIONS: tuple[tuple[str, str], ...] = (
         "main-only: benchmark tooling (ADR-034 G2-1 R3 scoring harness)",
     ),
     (
+        "tests/test_adr034_g2_1_r3_positive_coverage.py",
+        "main-only: synthetic corpus-admission positive control (ADR-034 G2-1 R3)",
+    ),
+    (
         "tests/test_adr034_g2_1_r3_harness_smoke.py",
         "main-only: opt-in, needs the G2-1 R3 public smoke cases and both pinned "
         "environments (skipped unless the MNEME_G2R3_* variables are set)",
