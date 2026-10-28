@@ -261,6 +261,11 @@ def load_corpus(corpus: Path) -> tuple[list, dict]:
             present.discard("MANIFEST.sha256")
             if listed != present:
                 bad.append("manifest_incomplete_inventory")
+            # The caller may pass the tar extraction parent instead of its
+            # inner root; files outside the manifest's root must not be ignored.
+            if any((p.is_file() or p.is_symlink()) and not p.is_relative_to(manifest_root)
+                   for p in corpus.rglob("*")):
+                bad.append("file_outside_manifest_scope")
 
     cases, digests = [], []
     for path in sorted(corpus.rglob("case.json")):
