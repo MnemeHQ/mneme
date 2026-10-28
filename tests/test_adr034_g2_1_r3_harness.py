@@ -713,18 +713,18 @@ def test_manifest_rejects_non_regular_symlink(tmp_path):
 
 
 @pytest.mark.parametrize("current, baseline", [
-    (b'Traceback (most recent call last):\\n  File "a.py", line 1\\nE: boom',
-     b'Traceback (most recent call last):\\n  File "b.py", line 2\\nE: boom\\n'),
-    (b'Traceback (most recent call last):\\r\\n  File "a.py", line 1\\r\\nE: boom\\r\\n',
-     b'Traceback (most recent call last):\\n  File "b.py", line 2\\nE: boom\\n'),
-    (b'Traceback (most recent call last):\\n  File "a.py", line 1\\nE: boom\\nnext\\n',
-     b'Traceback (most recent call last):\\n  File "b.py", line 2\\nE: boom\\nnext'),
-    (b'Traceback (most recent call last):\\n  File "a.py", line 1\\nE: boom\\n'
-     b'During handling of the above exception, another exception occurred:\\n'
-     b'Traceback (most recent call last):\\n  File "a.py", line 3\\nF: bang\\n',
-     b'Traceback (most recent call last):\\n  File "b.py", line 2\\nE: boom\\n'
-     b'During handling of the above exception, another exception occurred:\\r\\n'
-     b'Traceback (most recent call last):\\n  File "b.py", line 4\\nF: bang\\n'),
+    (b'Traceback (most recent call last):\n  File "a.py", line 1\nE: boom',
+     b'Traceback (most recent call last):\n  File "b.py", line 2\nE: boom\n'),
+    (b'Traceback (most recent call last):\r\n  File "a.py", line 1\r\nE: boom\r\n',
+     b'Traceback (most recent call last):\n  File "b.py", line 2\nE: boom\n'),
+    (b'Traceback (most recent call last):\n  File "a.py", line 1\nE: boom\nnext\n',
+     b'Traceback (most recent call last):\n  File "b.py", line 2\nE: boom\nnext'),
+    (b'Traceback (most recent call last):\n  File "a.py", line 1\nE: boom\n'
+     b'During handling of the above exception, another exception occurred:\n'
+     b'Traceback (most recent call last):\n  File "a.py", line 3\nF: bang\n',
+     b'Traceback (most recent call last):\n  File "b.py", line 2\nE: boom\n'
+     b'During handling of the above exception, another exception occurred:\r\n'
+     b'Traceback (most recent call last):\n  File "b.py", line 4\nF: bang\n'),
 ])
 def test_f1_amendment2_preserves_nonframe_bytes(current, baseline):
     assert "hook_parity:a2_stderr" in gates.hook_parity(
@@ -732,9 +732,9 @@ def test_f1_amendment2_preserves_nonframe_bytes(current, baseline):
 
 
 def test_f1_amendment2_still_ignores_only_frame_bytes():
-    a = (b'Traceback (most recent call last):\\n  File "a.py", line 4\\n'
-         b'E: boom\\nDuring handling of the above exception, another exception occurred:\\n'
-         b'Traceback (most recent call last):\\n  File "a.py", line 5\\nF: bang\\n')
+    a = (b'Traceback (most recent call last):\n  File "a.py", line 4\n'
+         b'E: boom\nDuring handling of the above exception, another exception occurred:\n'
+         b'Traceback (most recent call last):\n  File "a.py", line 5\nF: bang\n')
     b = a.replace(b'a.py", line 4', b'b.py", line 80').replace(
         b'a.py", line 5', b'b.py", line 70')
     assert gates.hook_parity(_proc(1, b"", a), _proc(1, b"", b)) == []
