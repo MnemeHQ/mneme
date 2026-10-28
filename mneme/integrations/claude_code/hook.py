@@ -1189,8 +1189,11 @@ def build_evidence_record(
             if item.get("rule_type") == _NUMERIC_RULE_TYPE
             and item.get("outcome") == "APPLIED"
         ]
-        # Identities only: which rules the checker reported violated, so a
-        # refusal can be attributed (or not) to the numeric rule.
+    if payload is not None:
+        # ADR-034 §7c: identities only, from every trusted payload, with or
+        # without a subject. Attribution, never relevance. Entries are copied
+        # verbatim: one whose rule_id is not a non-empty string names no rule
+        # and attributes nothing (§7c.3); every consumer here requires one.
         violations = [
             {"rule_id": v.get("rule_id"), "rule_type": v.get("rule_type")}
             for v in payload.get("violations") or []
