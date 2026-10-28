@@ -17,6 +17,8 @@ TOTAL_FLOOR = 128
 # AT-SN is superseded by AT-SI (amendment 1, PR #701).
 AT_SUBCLASS_FLOORS = {"AT-S0": 2, "AT-SI": 2, "AT-SX": 2, "AT-W0": 2}
 PUBLIC_SMOKE_MAX_FRACTION = 0.10
+# Owner-decrypt-verified separate public tar, frozen #703 (not concealed input).
+PUBLIC_SMOKE_SHA256 = "feee204134fb4dd339f6efcbde9053c7d1f37a880f74f5ec411eb4cf2f5020a4"
 
 # G5 scope (R1 §5, R3 §6.2: AT does not acquire hook parity).
 HOOK_PARITY_CLASSES = frozenset({"P", "X", "L"})
