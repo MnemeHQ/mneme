@@ -26,6 +26,29 @@ def harness_files() -> dict:
     }
 
 
+def structural_review_status(scoring: str) -> dict:
+    """Publish an explicit pre-closure limitation, without redefining G1-G8.
+
+    R2 §4.2 and R3 §3 prescribe semantic scenario families whose coverage is
+    not proved by numerical floors. They require a separate independent
+    determination after authorized unblind. This metadata marker does not
+    inspect or expose concealed fixtures and never changes a frozen verdict.
+    """
+    if scoring != "concealed":
+        return {"status": "not_applicable_public_smoke", "pending": [],
+                "final_claim_ready": False}
+    return {
+        "status": "pending_independent_structural_review",
+        "pending": [
+            "SC_lexical_families",
+            "AT_material_distinctness",
+            "public_vs_concealed_AT",
+        ],
+        "final_claim_ready": False,
+        "basis": ["R2_section_4_2", "R3_section_3", "R3_pre_unblind_interpretations"],
+    }
+
+
 def score(args: argparse.Namespace) -> int:
     if not re.fullmatch(r"[0-9a-f]{64}", args.host_sha256):
         raise SystemExit("--host-sha256 must be a lowercase SHA-256")
@@ -91,6 +114,9 @@ def score(args: argparse.Namespace) -> int:
         ))
     floor = gates.floors(cases, passes, public_evidence)
     decision = gates.decide(results, floor, symlinks, args.scoring, integrity)
+    # This is a disclosure of unresolved qualitative coverage, not a new
+    # scoring gate. A numerical PASS alone is not a completed R3 claim.
+    structural_review = structural_review_status(args.scoring)
     report = {
         "harness": {"version": HARNESS_VERSION, "files_sha256": harness_files()},
         "scoring": args.scoring,
@@ -105,6 +131,7 @@ def score(args: argparse.Namespace) -> int:
         "public_smoke_integrity": public_evidence,
         "floors": floor if args.scoring == "concealed" else None,
         "decision": decision,
+        "structural_review": structural_review,
         "cases": results,
     }
     Path(args.report).write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -114,7 +141,11 @@ def score(args: argparse.Namespace) -> int:
             for cid, runs in passes.items()
         }
         Path(args.observations).write_text(json.dumps(dump, sort_keys=True), encoding="utf-8")
-    print(f"{decision['verdict']}: {decision['cases_passed']}/{decision['cases_scored']} cases passed")
+    if args.scoring == "concealed" and decision["verdict"] == "PASS":
+        print("PASS (gate verdict only; structural review pending, not a final R3 claim): "
+              f"{decision['cases_passed']}/{decision['cases_scored']} cases passed")
+    else:
+        print(f"{decision['verdict']}: {decision['cases_passed']}/{decision['cases_scored']} cases passed")
     return 0
 
 
