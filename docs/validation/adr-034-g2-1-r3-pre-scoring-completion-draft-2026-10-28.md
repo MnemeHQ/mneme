@@ -9,7 +9,7 @@
 
 The protocol requires a **separate, merged metadata-only pre-scoring completion record** before owner-controlled decryption (R3 pre-registration §5 step 7 and §6.1). The current record is a *draft evidence checklist*, **not** that completion.
 
-**GitHub merge state (rechecked after scorer B feedback):** PR #705 is **open/draft/unmerged**, head `26b1fa01336db909231b8d341feb182f1c35122d`. PR #707 is also **open/draft/unmerged**. Neither scorer B nor the owner has supplied a completed merge commit. There is **no merge discrepancy to reconcile**: #705 has simply not been merged. **Merge verification remains OPEN.** Do not treat GitHub's proposed `merge_commit_sha` field as evidence of a completed merge; after the actual merge, verify the committed harness files and hashes on `main`.
+**Verified GitHub merge state, updated after the prior draft:** PR #705 is **merged** into `main` by squash commit `086bbbf7556297f19f13cb2c5c2682687bcf41b4` (accepted PR head `26b1fa01336db909231b8d341feb182f1c35122d`). GitHub confirmed `merged=true`, and a repository-API comparison confirmed **17/17 changed Git blobs identical** at the reviewed head and merge commit. PR #707 remains **open/draft/unmerged**. **This is verified remote Git source identity only**, not the bytes of scorer B's Windows checkout, the complete tree pin, or the installed build provenance.
 
 Evidence provenance terms:
 - **FROZEN SOURCE:** values already committed in earlier accepted metadata-only freeze records; they are anchors, not new checks performed for this draft.
@@ -17,7 +17,7 @@ Evidence provenance terms:
 - **OPEN:** primary evidence missing, stale, incomplete, or not separately attested. An OPEN row cannot silently become PASS.
 - **VERIFIED FOR THIS RECORD:** only when the reviewer includes the actual command/tool, host identity, timestamp, digest, run path, result and independent corroboration. No runtime field below currently qualifies.
 
-**Owner GO/NO-GO:** **NO-GO.** The following sections have open requirements. This draft may be reviewed before PR #705 merges, but its completion successor must identify the exact merged harness and all environment evidence.
+**Owner GO/NO-GO:** **NO-GO.** The following sections have open requirements. The harness merge is now known, but the completed successor must pin actual LF checkout bytes, environment/host/custody evidence and all required structural-review decisions before a distinct owner unblind authorization.
 
 ## 1. Contract, corpus and roles
 
@@ -36,27 +36,29 @@ Evidence provenance terms:
 
 **Scorer B public/synthetic access-history inventory (REPORTED, pending host verification):** Scorer B reports extracting the **released public smoke tar**, not concealed material, from `r3-sealed-staging/public-smoke-NOT-RELEASED/` into its probe workspace. Its review tree `wt-review-705` and run folders `runs/review705*` contain public/synthetic inputs and probe artifacts. Before the custody recheck is signed, independently inventory the actual paths, contents/categories, ACL/accessibility and residual author artefacts; document whether each public/synthetic folder is retained or removed. Do **not** indiscriminately delete needed audit evidence or owner-held archives. Scorer B reports no access to concealed plaintext, ciphertext or owner author provenance; this is **REPORTED**, not independent custody verification.
 
+**Scoring checkout Git configuration (REPORTED, custody inventory item):** Scorer B reports enabling `extensions.worktreeConfig=true` in its own clone to allow worktree-specific `core.autocrlf=false` for `wt-r3-merged-086bbbf7`. The recheck must inventory this configuration change as well as `wt-review-705`, `runs/review705*` and new LF-checkout probe outputs; it must not assume that worktree configuration is an access-control boundary.
+
 **Strict custody:** The owner-only author provenance and earlier concealed corpora/results are never inputs to scorer B. Do not move concealed case files, ciphertext or keys into repository artifacts or this PR. On unexpected author material, **STOP/NO-GO**.
 
 ## 2. Harness and accepted tests
 
 | Required pin | Candidate / reported source | Status |
 |---|---|---|
-| Scorer harness PR | #705 reviewed and accepted at head `26b1fa01336db909231b8d341feb182f1c35122d` | REPORTED acceptance; **main merge OPEN** |
-| Merge commit, main tree, clean detached scoring checkout | Record actual merge commit SHA, `benchmarks/adr034_g2_1_r3/` Git tree SHA, checkout path, `git status` and tree-vs-head comparison | OPEN |
-| Every harness and README `.py/.md` byte SHA-256 | Recalculate from the *merged* tree and scorer-installed checkout; compare to PR head rather than assuming squash bytes match | OPEN |
+| Scorer harness PR | #705 accepted at head `26b1fa01336db909231b8d341feb182f1c35122d`, **squash merged** on `main` as `086bbbf7556297f19f13cb2c5c2682687bcf41b4`; 17/17 changed Git blobs matched by connected repository inspection | VERIFIED GITHUB SOURCE; scoring machine pin OPEN |
+| Merge commit, main tree, clean detached scoring checkout | Merged commit verified as `086bbbf7556297f19f13cb2c5c2682687bcf41b4`; scorer B **reports** tree prefix `bde6c9d6…` at both head and merge and detached LF worktree `wt-r3-merged-086bbbf7`. Record complete tree SHA, absolute checkout path, config, clean `git status` and platform readback from the scorer's evidence file | REMOTE MERGE VERIFIED; full tree/local pin OPEN |
+| Every harness and README `.py/.md` byte SHA-256 | **Mandatory LF checkout**: the R3 report hashes actual on-disk `.py/.md` bytes. Scorer B reports ordinary Windows `core.autocrlf=true` converted all 16 pinned text files to CRLF, making their working hashes differ from committed blobs. A fresh detached worktree with `core.autocrlf=false` reportedly made all 16 match. Recompute and record complete on-disk SHA-256 for all 16 pinned files and compare with Git blobs; compare the 12 `harness.files_sha256` entries in the smoke report. Check the actual worktree's Git configuration and clean status. No newline normalization is permitted *during* hash verification | REPORTED LF fix; exact local bytes/table OPEN |
 | Full relevant test SHA-256 | Record all `tests/test_adr034_g2_1_r3_*.py` and `scripts/run_test_battery.py` digest/pin; no test edits after the freeze | OPEN |
-| Targeted independent tests | Scorer B reports `232 passed, 0 failed, 0 skipped` on previously reviewed `6d0b64e9`; doc-only `26b1fa01` subsequently accepted | REPORTED; exact merged-tree evidence OPEN |
-| Public smoke / synthetic operational test | Scorer B reports 14/14 public and 10/10 scorer synthetic with `NO_VERDICT_PUBLIC_SMOKE`, no concealed inputs | REPORTED; rerun/pin against completed scoring environments OPEN |
+| Targeted independent tests | Scorer B reports a **new merged-LF-checkout run** at `086bbbf7`: `232 passed, 0 failed, 0 skipped`; earlier review at `6d0b64e9` and doc-only acceptance at `26b1fa01` remain historical | REPORTED; exact commands, host/run evidence and attached source log OPEN |
+| Public smoke / synthetic operational test | Scorer B reports merged-LF-checkout public **14/14**, synthetic **10/10**, `NO_VERDICT_PUBLIC_SMOKE`; report's 12 harness file hashes match committed bytes and implementation version pin is `0.10.0`, matched | REPORTED; exact report hash/command/build binding OPEN |
 | Attribution negative controls | Missing, empty, wrong, duplicate, non-string and extraneous rule IDs plus untrusted checker data; required by R3 §3 | REPORTED as reviewed; final exact-head test hashes/results OPEN |
 
-A green PR battery is not the full main-only R3 harness battery. Record environment, commands, exit codes, counts and a clean worktree for the final source pin.
+A green PR battery is not the full main-only R3 harness battery. Record environment, commands, exit codes, counts and a clean worktree for the final source pin. **Scorer B's local evidence is reported to be in** `C:\Users\MnemeAgent\r3-work\r3-scorer-workspace\evidence-707-scorer-b-2026-10-28.md`; that Windows file is not attached to this PR or accessible to this reviewer. Do not infer its uninspected full SHA table or promote `REPORTED` to `VERIFIED FOR THIS RECORD` until the sanitized evidence is transferred and independently checked.
 
 ## 3. Pinned implementation and baseline
 
 **Implementation (D3 accepted source):** R3 preregistration §2 lists commit `1b0957af01df3ad036b12698663e167ae413885e` and `mneme/` tree `656554d21ec1ef4ee474b6e6f69f681f0364a501`. It reports candidate wheel `mneme_hq-0.10.0-py3-none-any.whl`, SHA-256 `f2ed395a6517006971f49baf169b957c10d0dfff4784ad36b3bb53eb9c024289`, CPython 3.12.10, pip 25.0.1 and an installed freeze-file SHA-256 `253e5bc832f81786e3cac033724d09f1196889572cb87ad72445c125543a00c2`. These are **owner-reported preregistration candidates, not newly verified R3 scoring attestations**.
 
-**Baseline:** Frozen pre-G2 parity *source commit* `f8591102b2693379dabec9b5704862e194eca4ce`. Its accepted source/tree identity must be independently verified. Scorer B reports that the baseline wheel they built has full SHA-256 **`b24a2f8328855d2e41e6ae43eb16c7ae488afcc5944713e66300bc061f132421`**. This is **REPORTED, from scorer B's own build, not an independently accepted reference or an R3 installation attestation**. The independent comparison/reference remains OPEN. Older R2 baseline wheel SHA-256 in the R2 completion record is historical evidence only, not automatic R3 proof.
+**Baseline:** Frozen pre-G2 parity source commit `f8591102b2693379dabec9b5704862e194eca4ce`, with previously accepted R2 `mneme/` Git tree `002fdddb254267d42a3810cfea669d75700372f2` (historical reference; must re-verify for R3). The merged [R2 completion record](adr-034-g2-1-r2-pre-scoring-completion-2026-10-27.md) documents a **historically independently reproduced** baseline wheel SHA-256 `3497b5dd83942ef5df06fe522acaaa7e6e2833759dfdd25daa8866f65dacd1b2`. Scorer B separately reports the R3 baseline wheel it built has SHA-256 `b24a2f8328855d2e41e6ae43eb16c7ae488afcc5944713e66300bc061f132421`. **These wheel hashes differ.** The R2 value is an eligible independent historical *comparison anchor*, not an automatic accepted R3 wheel pin. Establish whether the difference is only deterministic wheel metadata / newline policy by independently comparing payload and installed-file inventories against the same frozen source tree. R3's fresh baseline build, installed `RECORD` and dependency freeze remain OPEN.
 
 | Verification requirement for **both** installed environments | Status |
 |---|---|
@@ -69,6 +71,8 @@ A green PR battery is not the full main-only R3 harness battery. Record environm
 | `pip freeze --all` full text and SHA-256 in the **actual scoring venvs** | OPEN |
 | Dependency integrity, `pip check`, executable runtime manifest and clean checkout | OPEN |
 | Implementation `mneme` package version equals independently frozen `0.10.0`; reported hook evidence version also checked separately | OPEN (version-string equality alone insufficient) |
+
+**Scorer B implementation observation (REPORTED only):** its pinned D3 wheel reportedly matches the R3 §2 digest `f2ed395a…`. A new build at `1b0957af…` reportedly produced a different wheel hash but identical payload for **111/111 package files**, with wheel metadata differing. Its installed package matches the wheel's `RECORD`, the installed dependency-freeze SHA matches the preregistered `253e5bc8…`, and `pip check` is clean. Scorer B also reports **107/111 installed source files differ bytewise from Git sources only in CRLF/LF line endings**, and all match after newline conversion. This normalized equality is useful explanatory evidence but **is not raw byte equality** and does not replace exact wheel/installed-file attestation. The baseline installation similarly is reported internally consistent but independently unreferenced. The detailed file-by-file evidence is not yet available here.
 
 Every full SHA must be recorded and verified before changing status to complete. Do not borrow R2 build hashes as evidence of R3 reproduction.
 
@@ -90,9 +94,9 @@ The host re-pin and execution authorization are **owner tasks outside scorer B's
 
 | Requirement | Evidence and action | Status |
 |---|---|---|
-| File + directory symlink capability on the actual scoring host and run directory | Re-run harness probe on actual pinned checkout/run root; record outputs and errors | OPEN |
+| File + directory symlink capability on the actual scoring host and run directory | Scorer B reports file + directory link support under its **development** run folder. Repeat at the exact final scorer run root, after pinning its path/ACLs, and capture probe output, OS identity and exit status | REPORTED development probe; final run-root OPEN |
 | First-pass L pre-mutation evidence | Scorer B approved synthetic nine-shape symlink classification; confirm exact merged harness code and tests | REPORTED, merged pin OPEN |
-| Separate public tar exact hash + its internal manifest and 14-class inventory | Verify from frozen separately distributed public tar, using merged `public_smoke.verify`; include command and metadata-only result | OPEN |
+| Separate public tar exact hash + its internal manifest and 14-class inventory | Scorer B reports hash match against #703 and merged verifier acceptance of the tar's internal manifest and **14 cases / 14 distinct classes**; independently check its command/output and exact digest from the evidence file | REPORTED; transcript/attestation OPEN |
 | Concealed ciphertext and owner decryption custody | Owner alone checks frozen ciphertext hash and private-key access when authorizing unblind; scorer B may not pre-read it | FROZEN SOURCE, scoring-time owner check OPEN |
 | Concealed plaintext archive `MANIFEST.sha256`, safe entries, 150-case count | Verify at **authorized** decryption/score boundary only; **never** require pre-unblind scorer access | PENDING AFTER UNBLIND |
 | Two equivalent scorer passes; G7 stability; G1–G8 metadata-only report and optional owner-retained raw observations | Required future execution, NOT completed | PENDING AFTER UNBLIND |
@@ -140,7 +144,8 @@ Serialization and commitment: construct the three records, sort by `id`, then se
 
 ## 7. Exact pre-unblind completion gates (all OPEN unless independently evidenced)
 
-- [ ] PR #705 is verified **merged**, with actual merge SHA and main tree; recomputed byte hashes all match the reviewed harness.
+- [x] PR #705 squash merge **verified on GitHub**: commit `086bbbf7556297f19f13cb2c5c2682687bcf41b4`, 17/17 changed Git blobs match reviewed head. This does not verify any local working-tree bytes.
+- [ ] LF-only scoring checkout attested: final directory uses `core.autocrlf=false` with actual on-disk byte hashes equal to Git blobs and complete harness/test files pinned.
 - [ ] Exact complete independent scorer B tests and synthetic attribution negatives rechecked at that merged commit; no unknown omissions.
 - [ ] D3 source/wheel/installed-file manifest/dependency freeze independently attested.
 - [ ] Baseline source/tree, rebuild, wheel and installed-file/dependency manifests independently attested with an independent reference.
