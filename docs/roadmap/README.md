@@ -288,6 +288,16 @@ The question is not generic workspace governance. It is whether Mneme can remain
 
 Retain the existing AgentCore experiment: use AgentCore as a controlled multi-agent execution substrate for architecture-compliance benchmarking before deciding whether a deeper product integration is justified.
 
+### P2 — Dapr Agents / Diagrid durable-agent governance interoperability (DA-01)
+
+Investigate whether durable agent workflows can consume **Mneme's canonical decision authority and deterministic enforcement** through supported pre-tool boundaries, and link the resulting decision evidence to verifiable workflow histories. This is a **scoped research spike**, not a supported adapter, a Diagrid partnership, or a commitment to run Mneme inside the orchestrator. Track evaluation gates and limitations in [DA-01 issue #712](https://github.com/MnemeHQ/mneme/issues/712).
+
+- **Gate 0, capability map:** pin framework/SDK versions and sample inputs; contrast Dapr Agents `before_tool_call` hooks with Dapr MCPServer `beforeCallTool` middleware. Prove which tool calls can be blocked before a supported mutation, including nested-agent paths. Document bypasses, unsupported mutation paths and failure behavior.
+- **Gate 1, bounded sandbox:** on one public sample service, validate two human-reviewed decisions (approved storage adapter and deployment resource profile). Demonstrate a denied forbidden action, successful compliant work, benign controls, and explicit protected / detection-only / unevaluated coverage. Keep the Decision Index and rule evaluator authoritative; do not duplicate policy logic inside Dapr.
+- **Gate 2, replay and evidence:** pin the effective decision/rule revision; prove replay-safe enforcement via immutable snapshot or recorded activity; inject crash/retry and verify idempotency rather than assuming exactly-once side effects. Where Catalyst signing is available and explicitly enabled, test decision-verdict linkage to independently verifiable workflow history while distinguishing signed execution events from verified architectural conformance. Reconcile with independent CI evidence.
+
+**Exit:** reproducible version-pinned evidence, latency/setup cost, false blocks, bypass matrix, decision-linked trace and a defensible go/no-go decision for maintained integration. This belongs to the existing **Guidance → Pre-mutation → CI → Evidence** model and DG1 authority semantics; **DG2 remains deterministic federation of known decision sources**, not this enforcement adapter. Prioritize a technical conversation with Casper Nielsen as exploratory design-partner discovery, with no assumed participation.
+
 ### P2 — Salesforce Skills interoperability
 
 Test whether Mneme adds measurable project-specific architectural compliance when Claude Code is already using Salesforce's domain Skills.
