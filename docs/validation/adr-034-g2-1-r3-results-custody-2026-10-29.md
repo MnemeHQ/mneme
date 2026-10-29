@@ -53,6 +53,16 @@ The recorded pre-scoring structural assessment is `SC_lexical_families=missing`.
 
 The owner script reported `NUMERICAL REPORT: VERIFIED` and `GATE COUNT EXTRACTION: PASS`. **Limitations:** This is an owner-run read of a private report, not a fresh independent inspection by the PR drafter or post-scoring reviewer. Each gate reported six failed entries; this does **not** prove they are the same six case IDs or 48 distinct failed cases. Gate denominators reflect *applicability* rather than 150 for every gate. The output deliberately contains no private case IDs, concealed inputs or raw observations. Independent verification of arithmetic and retained-report identity remains required before merge.
 
+**Owner-side escrow verification (post-scoring; not an independent review):** The owner read the existing private `r3-structural-v1.json` without modifying it. The SHA-256 check matched `aca7a09af4bec66a791aab2ef2c95beb4b22931f5aff8b3e57e155440ba7570c`; the prior read-only size check passed for 2,377 bytes. A corrected PowerShell parse confirmed a root JSON array of exactly three records. The final owner-side validation reported `STRUCTURAL DETERMINATIONS: VERIFIED` after checking the exact four keys (`id`, `determination`, `opaque_case_refs`, `rationale`) and these ordered values:
+
+| Structural record | Escrowed determination |
+|---|---|
+| `AT_material_distinctness` | `present` |
+| `SC_lexical_families` | **`missing`** |
+| `public_vs_concealed_AT` | `present` |
+
+The first owner PowerShell parse attempted to count records with an expression that produced an unexpected count and correctly stopped; the corrected parser reported `ROOT_TYPE: System.Object[]`, `RECORD_COUNT: 3`, and `STRUCTURAL RECORD COUNT: PASS`, followed by the determinations check above. The hash and artifact remained unchanged. **Not verified by these public outputs:** private `rationale` contents, opaque-case-reference values, reserialization against the canonical-byte recipe, reviewer-before-scorer process separation, or an independent custodian's reproduction. The owner-reported check does not remove the need for independent authorized review.
+
 Structural escrow JSON SHA-256: `aca7a09af4bec66a791aab2ef2c95beb4b22931f5aff8b3e57e155440ba7570c`. The owner escrowed it before numerical scoring. Original G1 result and correction history remain historical and unchanged; R3 does not replace them.
 
 ## 3. Owner custody: preserved artifacts
