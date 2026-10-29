@@ -38,7 +38,20 @@
 
 The recorded pre-scoring structural assessment is `SC_lexical_families=missing`. Under the frozen criteria, **any required SC family missing is enough for an overall R3 FAIL**, irrespective of numeric scoring. The structural reviewer's narrative reported absent comprehension-binding, nested-function-binding and indirect-namespace-mutation families across the 14 SC cases. **Provenance boundary:** these three family names are reviewer-reported explanatory detail; the author has **not** inspected the owner-held hashed `r3-structural-v1.json` to determine whether they are actually present in its committed rationale. Do not represent that detail as independently authenticated by the escrow hash until a custody-authorized reviewer verifies it. The sealed structural determinations themselves remain unchanged. The numerical FAIL is separately retained as-is. Neither the corpus nor the implementation, harness, baseline, labels or rubric is changed here. The six case-level observations remain **private** and are not included in this record.
 
-**Unverified numeric detail:** the sealed numerical report includes a `per_gate` breakdown, but the case-free per-gate counts have not been independently extracted and verified for this draft. Do **not** infer that six failed cases imply exactly six failed gates. A custody-authorized reviewer must reconcile the unmodified `decision.verdict`, per-gate arithmetic and total 144/150 without publishing case identifiers, raw observations or concealed inputs.
+**Owner-extracted numeric gate summary (not yet independently verified):** The owner ran a read-only PowerShell check over the unchanged private report, verified its previously recorded SHA-256 `d9ab08946cb795a2dff08ffdb36138ca99f8399782bf9b0c3243563c6df4c566`, checked `scoring=concealed`, `decision.verdict=FAIL`, `decision.cases_scored=150`, `decision.cases_passed=144`, and confirmed the eight expected `per_gate` keys. This table copies **only** the resulting aggregate counts:
+
+| Gate | Applicable denominator | Failed gate entries |
+|---|---:|---:|
+| G1 | 132 | 6 |
+| G2 | 104 | 6 |
+| G3 | 150 | 6 |
+| G4 | 54 | 6 |
+| G5 | 40 | 6 |
+| G6 | 150 | 6 |
+| G7 | 150 | 6 |
+| G8 | 150 | 6 |
+
+The owner script reported `NUMERICAL REPORT: VERIFIED` and `GATE COUNT EXTRACTION: PASS`. **Limitations:** This is an owner-run read of a private report, not a fresh independent inspection by the PR drafter or post-scoring reviewer. Each gate reported six failed entries; this does **not** prove they are the same six case IDs or 48 distinct failed cases. Gate denominators reflect *applicability* rather than 150 for every gate. The output deliberately contains no private case IDs, concealed inputs or raw observations. Independent verification of arithmetic and retained-report identity remains required before merge.
 
 Structural escrow JSON SHA-256: `aca7a09af4bec66a791aab2ef2c95beb4b22931f5aff8b3e57e155440ba7570c`. The owner escrowed it before numerical scoring. Original G1 result and correction history remain historical and unchanged; R3 does not replace them.
 
@@ -75,7 +88,7 @@ Owner capture and integrity evidence:
 4. The accepted shared-account residual risk, wheel reproduction provenance limitation, and CRLF/raw-versus-normalized limitations from the pre-scoring record remain operative.
 5. A successful harness process exit and `144/150` are **not** an R3 PASS. The separate structural failure is not collapsed into or erased by the numerical result.
 6. No concealed cases, raw observations, detailed hidden responses, or owner private key appear in this repository record.
-7. Per-gate counts, escrow rationale wording, the verified reviewer termination and scorer restart time remain **unverified/open**. The available public evidence supports the overall FAIL but does not prove every custody/order requirement was met. The separate independent reviewer reported **BLOCKED** on PR #711, pending these facts and owner-authorized private evidence review.
+7. Per-gate counts have been **owner-extracted and published only as aggregates**, but independent confirmation is pending. Escrow rationale wording, the verified reviewer termination and scorer restart time also remain **unverified/open**. The available public evidence supports the overall FAIL but does not prove every custody/order requirement was met. The separate independent reviewer reported **BLOCKED** on PR #711, pending owner-authorized private evidence review.
 
 ## 5. Required independent results review before merge
 
