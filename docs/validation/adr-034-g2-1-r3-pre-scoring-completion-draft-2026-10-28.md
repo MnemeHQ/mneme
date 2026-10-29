@@ -3,7 +3,7 @@
 **Date:** 2026-10-28  
 **Status:** **DRAFT / NO-GO. NOT a completed evidence record.**  
 **Scope:** ADR-034 G2-1 independent R3; frozen R3 pre-registration (#699), accepted AT-SI amendment (#701), held-out freeze (#703), scorer handoff (#704), scorer harness PR #705 and owner interpretation record.  
-**Authority:** This draft does **not** authorize a merge, unblind, decrypt, read concealed material, run concealed scoring, change a case/label, or claim validation PASS. Owner and independent verifier must approve a fully evidenced successor before a distinct owner unblind decision.
+**Authority:** At the owner's direction, this **DRAFT / NO-GO** checklist may be merged **only as an interim documentation record**. That merge is **not** the separately required completed pre-scoring record and does **not** authorize unblinding, decryption, reading concealed material, scoring, changing cases/labels, or claiming PASS. A fully evidenced successor, independent review and distinct owner unblind GO remain mandatory.
 
 ## 0. State and evidence rules
 
