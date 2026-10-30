@@ -278,6 +278,14 @@ Promotion requires evidence; no support claim before the capability gate passes.
 
 ## RESEARCH — evidence before integration
 
+### P2 — UIGraph structural-evidence evaluation (research only)
+
+Evaluate [UIGraph](https://github.com/uigraph-oss/uigraph) as an optional producer of repository-versioned architecture diagrams, dependency maps, API/schema artifacts and change-impact context for the **existing Data Engine architecture-reconstruction programme**, not as a new Mneme diagramming product or a supported integration. Track the bounded hypothesis and exit criteria in [Data Engine #47](https://github.com/MnemeHQ/mneme-data-engine/issues/47), alongside existing [P0 evidence reconstruction #40](https://github.com/MnemeHQ/mneme-data-engine/issues/40).
+
+On one separately pinned repository, compare native passive structural observations with the same observations enriched by UIGraph-produced artifacts against independently reviewed relationships and decision-to-component links. Check provenance, source locators, versions, contradictions between observed and intended architecture, stale diagrams, false links, replayability, reviewer effort, license/privacy fit, and incremental accuracy. Generated views and impact reports remain **unverified source artifacts**, not architectural truth, decision authority, verified enforcement evidence, or protection claims.
+
+**Gate:** preserve the `ArtifactRecord → EvidenceObservation → EvidenceLink → DecisionCandidate` research boundary and the canonical Decision Index authority transition. Do not alter frozen O1A/M4 evaluations, Core semantics, or enforcement. Advance to an adapter only if independent comparison demonstrates reproducible additional value; closing with no integration is valid.
+
 ### P2 — Slack Code and shared multi-agent constraints
 
 Investigate whether a shared coding workspace can consume one project architectural contract across multiple coding agents and sessions.
