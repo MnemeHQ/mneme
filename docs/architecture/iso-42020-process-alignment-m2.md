@@ -130,3 +130,30 @@ data_trust                         provenance + authorization + observation fres
 Ask architects/platform leaders: **Would an export showing which approved architecture directive governed a specific software change, what was actually checked, and what remains unverified help your governance review or procurement process?** Follow with whether 42020 alignment is a real requirement, where approvals are recorded, and which human role must sign off.
 
 **Roadmap recommendation:** Maintain **P2 research**; promote to **P1 only with an evidence-backed pilot requirement**. Do not displace the design-partner wedge, independent validation, DG1/DG2 reliability or CI evidence work.
+
+---
+
+## 9. Post-orchestrator product/research reconciliation (2026-11-01)
+
+This 42020 research profile must **not** treat the 20 October synthetic orchestrator experiment as a current inventory of all supported Core enforcement. The experiment's results are historical and remain unchanged; subsequent work introduces separate evidence, not retrospective success for the same fixture.
+
+| Governance activity / relevant capability | Correct evidence and current status |
+| --- | --- |
+| **Directive implementation and semantic checking** | [ADR-034](../adr/ADR-034-static-numeric-upper-bound-typed-rule.md) adds an explicitly authored Python numeric upper-bound rule. Its **whole-file checker** independently scored **PASS: all 12 frozen gates, 161/161 synthetic cases** in [M4](../validation/adr-034-m4-heldout-scoring-2026-10-24.md), pinned at `f25f0e84`. Original G1 149/155 FAIL is preserved and not reclassified. This is a bounded numeric-rule capability, not a general architecture-process or semantic compliance result. |
+| **Pre-change control** | [G2-1](../plans/2026-10-24-adr-034-g2-1-behavioral-charter.md) explores a narrow *new-file Write* numeric pre-mutation route. R1 and [R2](../validation/adr-034-g2-1-r2-blind-scoring-results-2026-10-27.md) blind validations **FAIL**. [R3 pre-scoring](../validation/adr-034-g2-1-r3-pre-scoring-completion-2026-10-29.md) remained **SEALED; no R3 blind scoring and no PASS**. Do not count as delivered pre-write numeric protection. |
+| **Other semantic directive types** | [P0-A offline experiment](../../validation/semantic-constraint-p0a/RESULTS.md) demonstrated a structural fallback detector (C3: 3/3 on its *visible* synthetic whole-file set), but **no Core activation or blind validation**. A deletion-only edit remained unevaluated at its pre-write gate. A lexical alternative reduced some literal false positives only offline. |
+| **Correct target/policy binding** | [#573](https://github.com/MnemeHQ/mneme/pull/573) fixed relative path snapshot resolution; [T-08 correction](../../CHANGELOG.md) makes supported direct writes discover decision memory from the target, not only session cwd. Neither proves arbitrary-tool or cross-project coverage. |
+| **Review of actual implementation / trusted host merge control** | [CI1 #540](https://github.com/MnemeHQ/mneme/issues/540) has **isolated GitHub lab** evidence: V0 permitted merge, V1 prohibited merge refused by required status check (HTTP 405), and a V11 freshness experiment. Production CI gate adoption remains **deferred**; do not equate a successful lab with shipped merge-blocking across users. |
+| **Governance authority and change management** | [DG1 #497](https://github.com/MnemeHQ/mneme/issues/497) records canonical effective resolution/evidence identity and incomplete waiver and runtime-convergence gates; DG2 remains declared-source federation work. These determine **what governs**, not whether an arbitrary structural/semantic code mutation is forbidden. |
+
+### Allocation for process support
+
+1. **Semantic Enforcement (SE, Core rule contracts and validation):** make a narrowly defined rule mechanically decidable (e.g. numeric bound), handle uncertainty and false positives, independently validate. Future C3 fallback semantics and broader C1 modes belong here if justified; **not** to DG or CI.
+2. **DG1/DG2 (Core decision semantics):** effective, authorized decision/version, actual target applicability, conflicts, exception/waiver authority and (planned) declared federation.
+3. **Agent integration / pre-mutation seam:** invoke the approved evaluator on trustworthy proposed change inputs for a mapped tool. Unmapped custom tools, out-of-root changes and raw graph execution have no universal guardrail.
+4. **CI1:** trusted policy/evaluator revision, actual assessed change and merge refusal on a host. It can backstop a modeled rule but **cannot solve an unmodeled C3**.
+5. **Enterprise/customer process:** accountable decision owners, architecture governance meetings, delegated approvals, review records and architecture collection management. Mneme supplies evidence and optional interoperability, not an entire conforming 42020 governance process.
+
+**42020 process claim remains narrow:** Mneme now has stronger separately verified *evaluation evidence* for an authorized numeric rule, but neither a complete organizational architecture process nor certified alignment. **Audit Protected** is a governability/protection tier, **not** a metric of all semantic sub-constraints.
+
+The full constraints-by-case evidence reconciliation and distinction between the 42010/42020 claims are also documented in [42010 M1 PR #716](https://github.com/MnemeHQ/mneme/pull/716). These profile revisions update **research attribution only**, not product code, CI rollout, rule syntax or the immutable historical experiment records.
