@@ -1687,6 +1687,37 @@ comment.
 The earlier freeze amendments, including ADR-033 C2a, C2b, C2b Amendment 1 and
 C4 and ADR-034 G1/G2-1/D1/D2 with their errata, remain unchanged.
 
+## Amendment — clarify the R0 S5 activation of `mneme-ci-gate` (2026-11-02)
+
+**Status:** clarification of the R0 scope amendment above, authorized on the
+squash merge of the `[layer1-freeze]` PR that adds this section with the
+owner's approval recorded in that PR. **It authorizes the execution of
+nothing.** S5 still needs its own owner authorization, every S4 case as
+expected and a clean S4→S5 configuration equivalence check.
+
+**Section amended:** the R0 scope amendment's eligible-changes table, S5 row.
+
+**Rationale (Amendment Procedure §3(b)).** S2 created the dedicated gate
+ruleset `mneme-ci-gate` (id `26391853`) **disabled**, as the S2 row allows
+("no required check yet, or created disabled"); see the
+[S2 record](../validation/ci-r0-s2-gate-ruleset-2026-11-02.md) (#719,
+`4969cf83`). The S5 row lists adding the required check and strict up-to-date
+in that ruleset but does not name switching its enforcement on, without which
+the S5 change has no effect. This section closes that gap only.
+
+**Clarified S5 row.** The single recorded S5 change set may, in addition to
+the changes already listed, set `mneme-ci-gate` (`26391853`) from
+`enforcement: disabled` to `enforcement: active`. Nothing else is added:
+
+- no other ruleset's enforcement, bypass list or conditions;
+- the bypass list stays exactly one `User` actor in `pull_request` mode;
+- `enforcement: evaluate` and any second bypass actor remain excluded;
+- the §5.4 emergency control "remove the gate from the gate ruleset's required
+  checks (or disable that ruleset)" is unchanged.
+
+All other rows, exclusions and the remainder of the R0 scope amendment are
+unchanged.
+
 ---
 
 ## Amendment Procedure
