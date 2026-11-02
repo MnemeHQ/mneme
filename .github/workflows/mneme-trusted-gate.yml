@@ -34,7 +34,7 @@ name: Mneme trusted gate
 on:
   pull_request_target:
     types: [opened, synchronize, reopened]
-    branches: [main]
+    branches: [main, r0/recovery-staging]
 
 permissions:
   contents: read
