@@ -264,6 +264,20 @@ Improve the existing Audit, enforcement evidence and readiness reporting without
 
 Use version-pinned decisions and rule/evaluator contracts across supported surfaces. Maintain a tested compatibility matrix, explicit timeout/failure behavior and rollback guidance; do not silently alter active enforcement via tool updates. This work refines the existing four layers (especially Enforcement, CI and Evidence) and builds on CI1 (#540), rather than adding a new layer.
 
+### P1 (discovery) — Agent sensitive-data access governance (PII pre-read control)
+
+**Status: discovery only; not implemented or implementation-authorized.** [Core #738](https://github.com/MnemeHQ/mneme/issues/738) records scope, governing architecture and acceptance gates. Mneme currently evaluates supported code mutations, **not** general agent reads or sensitive-data release. An architectural PII-handling rule must not be presented as protection against agents seeing PII.
+
+Evaluate whether a *trusted, mediated* tool/data-access boundary can deny unauthorized sensitive reads **before** a result reaches the model, using canonical Mneme decision identity/effectiveness and existing source-system IAM/RBAC/OPA controls. No blanket interception claim or elevation of source privileges. ADR-031 DG1 labels are **not** user/agent identity, role or directory authority; ADR-020 path selectors are **not** field-access permissions; ADR-027 decision retrieval is **not** access authorization. Any new access-decision or rule semantics require a separate architecture review and applicable Layer 1 freeze amendment, not an implicit DG1 extension or second resolver.
+
+**Sequential gates (authorize individually):**
+
+1. **M0A discovery:** read-only architecture/threat-model review of trusted identities, source/operation/field scopes, tool interception and bypass paths, fail-closed sensitive-read semantics, model-context visibility, evidence and source permissions. Select one demonstrably mediated surface; explicitly classify unsupported/unwired paths.
+2. **M0B conditional synthetic feasibility:** one pinned tool route and synthetic customer-data fixture; permitted read succeeds, forbidden read is denied before returning to the model, and alternative/unwired paths are independently accounted for. Do not turn the current mutation fail-open behavior into an access-allow default.
+3. **M0C conditional independent validation:** versioned decisions, frozen fixtures, actual access/outcome observation, identity spoofing, policy loss/timeouts, indirect tool paths, mixed-field responses, false blocks and sensitive-data leakage via traces/logs. Report PREVENTED versus DETECTED_ONLY, UNEVALUATED and UNGOVERNED honestly.
+
+**Out of scope:** general PII detection/redaction, DLP, unrestricted filesystem or database interception, organization-wide RBAC administration, compliance certification, new Decision MCP capabilities without ADR-027 review, or any product/production claim before independent evidence. Do not displace ongoing DG1, CI1 or independent benchmark closeout. Align site security/compliance claims with shipped behavior.
+
 ### P1 — Migration-aware Architecture Audit
 
 Extend the existing Audit workflow for long-running migrations and modernization, where legacy and target architectures coexist and path applicability matters.
