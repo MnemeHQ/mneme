@@ -29,7 +29,7 @@ name: mneme self-check (warn mode)
 
 on:
   pull_request:
-    branches: [main, r0/recovery-staging]
+    branches: [main]
 
 permissions:
   contents: read

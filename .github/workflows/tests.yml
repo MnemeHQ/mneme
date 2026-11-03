@@ -20,7 +20,7 @@ name: tests
 
 on:
   pull_request:
-    branches: [main, r0/recovery-staging]
+    branches: [main]
   push:
     branches: [main]
   workflow_dispatch:
