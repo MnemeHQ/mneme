@@ -1,0 +1,54 @@
+{
+  "id": 4886951160,
+  "actor_id": 351593097,
+  "actor_name": "mneme-agent",
+  "before_sha": "bc5644114fdfd998dfd5efb3b528525048dc2065",
+  "after_sha": "5335c722b5a82ca43328e5b907efbbef5be18766",
+  "ref": "refs/heads/main",
+  "repository_id": 1444435705,
+  "repository_name": "mneme-gate-repro",
+  "pushed_at": "2026-11-03T14:01:13-05:00",
+  "result": "pass",
+  "rule_evaluations": [
+    {
+      "rule_source": {
+        "type": "ruleset",
+        "id": 26459082,
+        "name": "main-pr-only"
+      },
+      "enforcement": "active",
+      "result": "pass",
+      "rule_type": "non_fast_forward"
+    },
+    {
+      "rule_source": {
+        "type": "ruleset",
+        "id": 26459082,
+        "name": "main-pr-only"
+      },
+      "enforcement": "active",
+      "result": "pass",
+      "rule_type": "deletion"
+    },
+    {
+      "rule_source": {
+        "type": "ruleset",
+        "id": 26459082,
+        "name": "main-pr-only"
+      },
+      "enforcement": "active",
+      "result": "pass",
+      "rule_type": "pull_request"
+    },
+    {
+      "rule_source": {
+        "type": "ruleset",
+        "id": 26459083,
+        "name": "mneme-ci-gate"
+      },
+      "enforcement": "active",
+      "result": "pass",
+      "rule_type": "required_status_checks"
+    }
+  ]
+}

@@ -272,7 +272,10 @@ change. PRs from forks and first-time contributors have not been observed.
 
 Open three test PRs into the default branch and attempt each merge with an
 account that is **not** the bypass actor (for example a collaborator with
-write access), so the result reflects the rules rather than a bypass:
+write access), so the result reflects the rules rather than a bypass. On a
+private repository of a paid organization, adding an outside collaborator
+needs a free seat (otherwise GitHub returns HTTP 422 `seat_limit`); public
+repositories need none.
 
 | Test | PR | Expected check | Expected merge attempt |
 |---|---|---|---|
