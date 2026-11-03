@@ -1,0 +1,10 @@
+== 20261022T122543Z Batch R + controls P-1/P-3/P-4 with per-probe E4 capture ==
+harness_head=e299874201f4a84e06df2188e04e4152a3ceee87
+tshark=TShark (Wireshark) 4.6.9 (v4.6.9-0-g2d548b197c75).
+golden={"phase": "AUTHORIZED", "tip": "0530b644d5f695869af6b264cce12b29783bf443", "url": "https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture", "date": "2026-10-22T12:25:53Z"}
+
+R-1-Write-1 headless PASS
+R-1-Write-2 headless PASS
+R-1-Edit-1 headless PASS
+R-1-Edit-2 headless FAIL
+STOPPED after R-1: not all four R-1 runs PASS (PASS, PASS, PASS, FAIL). Evidence preserved; nothing else run.

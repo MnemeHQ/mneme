@@ -83,7 +83,8 @@ and is never reclassified as protection (ADR-033 gate 5).
   creation is decision Q1.** No test repository exists, and this document
   creates none.
 - **Probe edits:** violating `import psycopg2`; compliant `return 2`. Each is
-  issued as `Write`, `Edit` and `MultiEdit`.
+  issued as `Write`, `Edit` and `MultiEdit` (but see Amendment 1: MultiEdit is
+  not offered by Claude Code 2.1.303).
 - **Host:** Claude Code at a pinned version, run headless as
   `claude -p … --output-format stream-json --verbose --permission-mode
   acceptEdits --setting-sources project` (decision Q2 covers the interactive
@@ -109,7 +110,7 @@ block delivered. "Proceed" means file changed.
 |---|---|---|---|---|
 | R-1 | `M` deleted | compliant | Refuse `MEMORY_MISSING` | §4.4 row 2; first practical proof |
 | R-2 | `L` altered (one field changed) | compliant | Refuse `LOCAL_DECLARATION_TAMPERED` (diverges) | §4.4 row 3 |
-| R-3 | `L` replaced by an older copy (one event behind) | compliant | Refuse `LOCAL_DECLARATION_TAMPERED` (behind) | §4.2 rollback |
+| R-3 | `L` replaced by an older copy (one event behind; a valid, nonempty earlier declaration, see Amendment 2) | compliant | Refuse `LOCAL_DECLARATION_TAMPERED` (behind) | §4.2 rollback |
 | R-4 | `L` corrupted (invalid JSON) | compliant | Refuse `LOCAL_DECLARATION_TAMPERED` (invalid) | §4.4 row 3 |
 | R-5 | `M` malformed, so the check crashes | compliant | Refuse `CHECK_UNTRUSTED` | §3 crash row |
 | R-6 | `MNEME_MEMORY` set to other memory in the launching shell | compliant | Refuse `MEMORY_PATH_MISMATCH` | §4.1 SS-3 |
@@ -236,3 +237,102 @@ Changing one needs an amendment to this document.
   they do not authorize, and no document says whether an evidence-only C3
   needs its own. C3 changes no behavior. *Accepted:* no amendment;
   record the owner's decision in this document instead.
+
+## Amendment 1: MultiEdit not offered by Claude Code 2.1.303 (2026-10-22)
+
+**Decided by the owner on 2026-10-22,** after the ABSENT batch evidence record
+([`adr033-c3-absent-batch-2026-10-22.md`](../validation/adr033-c3-absent-batch-2026-10-22.md),
+finding F1).
+
+- **Fact.** The init event of every Claude Code 2.1.303 session in that batch
+  lists the available tools. `Write` and `Edit` are present, and `MultiEdit` is
+  not. Asked for a MultiEdit call, the model reported that the tool does not
+  exist and did not substitute another tool.
+- **Decision.** For Claude Code 2.1.303, MultiEdit is **`NOT_OFFERED` (N/A)**.
+  N/A counts as neither PASS nor FAIL: the host cannot exercise that
+  enforcement surface. Coverage under this pin is `Write` and `Edit` only. This
+  is a version-specific coverage limitation, recorded in every claim.
+- **Historical evidence is unchanged.** The two ABSENT-batch MultiEdit probes
+  stay recorded as `PROTOCOL_DEVIATION`, an accurate description of what
+  happened. Reported as: 4/4 supported probes PASS; 2/2 MultiEdit probes N/A
+  after review. Never "6/6 PASS".
+- **Harness.** The matrix no longer schedules MultiEdit for this pin. If a
+  requested tool is missing from the init event's tool list, the classifier
+  labels the probe `NOT_OFFERED` instead of PASS or FAIL.
+- **Unchanged.** The hook matcher (`Edit|Write|MultiEdit`) and all Mneme
+  runtime behavior. If a later Claude Code version offers MultiEdit again, it
+  needs its own host validation before any MultiEdit claim.
+- **Not affected.** Every other section of this scope, and the separate gates
+  for the AUTHORIZED and REVOKED phases, interactive arms and C4.
+
+## Amendment 2: R-3 must test a genuine rollback; phase 4 (2026-10-23)
+
+**Status:** proposed for review. This is documentation only. It authorizes no
+fixture change and no run.
+
+**Basis:**
+- the R-3 design assessment
+  ([`2026-10-23-c3-r3-rollback-test-design-assessment.md`](2026-10-23-c3-r3-rollback-test-design-assessment.md),
+  #623, accepted by the owner);
+- its step 1, the R-3 harness guard (#624, `85b43d5c`).
+
+- **Why.** Against the one-event fixture baseline (`[authorize]`), R-3's
+  "one event behind" copy is an empty event list.
+  - That is not a valid declaration (C2b `validate_events`), yet the runtime
+    classes it `BEHIND` and refuses (finding F-R3-1, recorded in #623 and not
+    changed here).
+  - A live R-3 could therefore pass without testing rollback.
+  - Since #624, the harness refuses that setup before Claude Code runs.
+- **Phases.** The fixture moves through four phases. Each transition is a
+  fixture PR prepared by `seed_fixture.sh` and merged by a human, with an E5
+  record:
+
+  | Phase | Baseline events | Result | Rows |
+  |---|---|---|---|
+  | 1 ABSENT | none | `VERIFIED_ABSENT` | P-6 (done) |
+  | 2 AUTHORIZED | `[authorize]` | `AUTHORIZED` | R-1 (#601, revalidated #620), R-2 with P-1/P-3/P-4 (#622) (done) |
+  | 3 REVOKED | `[authorize, revoke]` | `REVOKED` | **P-5**, as in §5.2 and §8 |
+  | 4 re-AUTHORIZED | `[authorize, revoke, authorize]` | `AUTHORIZED` | **R-3**; remaining AUTHORIZED-phase rows as separately authorized |
+
+- **R-3 definition (replaces "one event behind").**
+  - **Baseline `B`:** `AUTHORIZED` at phase 4, events
+    `[authorize, revoke, authorize]`.
+  - **Local `L`:** the baseline declaration minus exactly its last event,
+    `[authorize, revoke]`. It must:
+    - pass the shipped `validate_declaration`;
+    - be nonempty;
+    - be a strict prefix exactly one event shorter;
+    - have every other field equal to the baseline's.
+  - **Enforcement:** the harness guard (#624) enforces every condition and
+    otherwise ends the probe as a harness failure before Claude Code runs.
+  - **Expected:** refuse with `UNEVALUATED: LOCAL_DECLARATION_TAMPERED`,
+    target unchanged, and the hook's relation text "(local declaration
+    behind)". Probes: Write ×2 and Edit ×2.
+- **R-3 evidence: the earlier declaration must be shown to be genuine.**
+  `setup.json` records only the event operations (`declaration_history`), so
+  the R-3 evidence record must also carry:
+  - **E5 for both fixture PRs** (`revoke`, then `authorize`): PR numbers,
+    merge commits, who merged them, the merge order, and the attestation
+    (human-attested, not independent review);
+  - **a content match:** the R-3 local declaration, parsed, equals the
+    declaration file at the phase 3 (REVOKED) fixture merge commit. This
+    demonstrates that the harness-generated rollback copy matches, as a parsed
+    object, a declaration that previously existed in the public fixture's
+    merged history. Anyone can check it against the public fixture.
+- **Preserved, not rerun or reinterpreted.**
+  - R-1 (revalidated 4/4, #620), R-2 and the P-1/P-3/P-4 controls (16/16,
+    #622), and the F-R2 record (#616) stand as recorded on the one-event
+    baseline at `0530b644`.
+  - #601, including its R-1 Edit-2 FAIL, is unchanged.
+  - Phase 2 cannot be re-entered once the fixture is revoked. Any later
+    AUTHORIZED-phase row runs in phase 4 and records that baseline.
+- **P-5** stays in phase 3 (REVOKED), as originally scoped.
+- **Rows not affected by the event count.** R-4 to R-7, P-2, P-7, the D and
+  H rows, and the interactive arms do not depend on how many events the
+  baseline holds. R-2's field change still classes as `diverges` against a
+  three-event baseline. Each keeps its own separate authorization.
+- **Not authorized by this amendment:**
+  - the two fixture PRs;
+  - any live run, including P-5 and R-3;
+  - any change addressing F-R3-1;
+  - any runtime, matrix or harness change.

@@ -1,0 +1,567 @@
+{
+  "run": "run2",
+  "started_at": "2026-10-24T13:50:22.471Z",
+  "control_direct": {
+    "phase": "control-direct",
+    "ok": true,
+    "started_at": "2026-10-24T13:49:11.571Z",
+    "outcome": {
+      "result": {
+        "record_type": "canonical_decision",
+        "canonical_decision": {
+          "decision_id": "ADR-9901",
+          "version": "1",
+          "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+          "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+          "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+          "decision_class": "architecture",
+          "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+          "rationale": "Inventory and stdio handshake fixture only.",
+          "lifecycle_status": "active",
+          "owner": "",
+          "decided_at": "2026-01-01T00:00:00Z",
+          "updated_at": "2026-01-01T00:00:00Z",
+          "context_scope": [
+            "cache"
+          ],
+          "targets": [],
+          "constraints": [
+            "no external cache service"
+          ],
+          "anti_patterns": [
+            "external_cache_client"
+          ],
+          "source_evidence": [
+            {
+              "source_type": "runtime",
+              "source_locator": "",
+              "source_revision": "",
+              "observed_at": ""
+            }
+          ],
+          "test_evidence": [],
+          "relationships": [],
+          "derived_rule_ids": [
+            "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+          ]
+        }
+      },
+      "error": null,
+      "stats": {
+        "hostCalls": 1,
+        "resolvedCalls": 1,
+        "failedCalls": 0,
+        "rejectedCalls": 0,
+        "timedOut": false,
+        "interrupted": false,
+        "pendingAtEnd": 0,
+        "deferredDisposed": 1,
+        "cleanupErrors": []
+      }
+    },
+    "call": {
+      "seq": 1,
+      "name": "decision.get",
+      "args": {
+        "record_id": "ADR-9901"
+      },
+      "request_id": 2,
+      "started_at": "2026-10-24T13:49:13.704Z",
+      "pending": false,
+      "outcome": "fulfilled",
+      "settled_at": "2026-10-24T13:49:13.710Z",
+      "error": null,
+      "adapter_error": null
+    },
+    "adapter_calls": [
+      {
+        "seq": 1,
+        "tool": "decision.get",
+        "args": {
+          "record_id": "ADR-9901"
+        },
+        "isError": false,
+        "structuredContent": {
+          "record_type": "canonical_decision",
+          "canonical_decision": {
+            "decision_id": "ADR-9901",
+            "version": "1",
+            "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+            "decision_class": "architecture",
+            "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+            "rationale": "Inventory and stdio handshake fixture only.",
+            "lifecycle_status": "active",
+            "owner": "",
+            "decided_at": "2026-01-01T00:00:00Z",
+            "updated_at": "2026-01-01T00:00:00Z",
+            "context_scope": [
+              "cache"
+            ],
+            "targets": [],
+            "constraints": [
+              "no external cache service"
+            ],
+            "anti_patterns": [
+              "external_cache_client"
+            ],
+            "source_evidence": [
+              {
+                "source_type": "runtime",
+                "source_locator": "",
+                "source_revision": "",
+                "observed_at": ""
+              }
+            ],
+            "test_evidence": [],
+            "relationships": [],
+            "derived_rule_ids": [
+              "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+            ]
+          }
+        },
+        "toolResult": null,
+        "text": "{\n  \"record_type\": \"canonical_decision\",\n  \"canonical_decision\": {\n    \"decision_id\": \"ADR-9901\",\n    \"version\": \"1\",\n    \"version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n    \"decision_version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n    \"content_digest\": \"662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650\",\n    \"decision_class\": \"architecture\",\n    \"statement\": \"Synthetic M1 cache adapter uses the in-memory backend.\",\n    \"rationale\": \"Inventory and stdio handshake fixture only.\",\n    \"lifecycle_status\": \"active\",\n    \"owner\": \"\",\n    \"decided_at\": \"2026-01-01T00:00:00Z\",\n    \"updated_at\": \"2026-01-01T00:00:00Z\",\n    \"context_scope\": [\n      \"cache\"\n    ],\n    \"targets\": [],\n    \"constraints\": [\n      \"no external cache service\"\n    ],\n    \"anti_patterns\": [\n      \"external_cache_client\"\n    ],\n    \"source_evidence\": [\n      {\n        \"source_type\": \"runtime\",\n        \"source_locator\": \"\",\n        \"source_revision\": \"\",\n        \"observed_at\": \"\"\n      }\n    ],\n    \"test_evidence\": [],\n    \"relationships\": [],\n    \"derived_rule_ids\": [\n      \"ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584\"\n    ]\n  }\n}"
+      }
+    ],
+    "canonical_get_ok": true,
+    "cleanup": {
+      "phase": "control-direct",
+      "errors": [],
+      "client_pid": 7776,
+      "server_alive_after": false,
+      "server_exit_observed": true
+    },
+    "finished_at": "2026-10-24T13:49:13.978Z"
+  },
+  "control_relay": {
+    "phase": "control-relay",
+    "ok": true,
+    "started_at": "2026-10-24T13:49:13.978Z",
+    "outcome": {
+      "result": {
+        "record_type": "canonical_decision",
+        "canonical_decision": {
+          "decision_id": "ADR-9901",
+          "version": "1",
+          "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+          "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+          "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+          "decision_class": "architecture",
+          "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+          "rationale": "Inventory and stdio handshake fixture only.",
+          "lifecycle_status": "active",
+          "owner": "",
+          "decided_at": "2026-01-01T00:00:00Z",
+          "updated_at": "2026-01-01T00:00:00Z",
+          "context_scope": [
+            "cache"
+          ],
+          "targets": [],
+          "constraints": [
+            "no external cache service"
+          ],
+          "anti_patterns": [
+            "external_cache_client"
+          ],
+          "source_evidence": [
+            {
+              "source_type": "runtime",
+              "source_locator": "",
+              "source_revision": "",
+              "observed_at": ""
+            }
+          ],
+          "test_evidence": [],
+          "relationships": [],
+          "derived_rule_ids": [
+            "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+          ]
+        }
+      },
+      "error": null,
+      "stats": {
+        "hostCalls": 1,
+        "resolvedCalls": 1,
+        "failedCalls": 0,
+        "rejectedCalls": 0,
+        "timedOut": false,
+        "interrupted": false,
+        "pendingAtEnd": 0,
+        "deferredDisposed": 1,
+        "cleanupErrors": []
+      }
+    },
+    "call": {
+      "seq": 1,
+      "name": "decision.get",
+      "args": {
+        "record_id": "ADR-9901"
+      },
+      "request_id": 2,
+      "started_at": "2026-10-24T13:49:45.825Z",
+      "pending": false,
+      "outcome": "fulfilled",
+      "settled_at": "2026-10-24T13:49:45.838Z",
+      "error": null,
+      "adapter_error": null
+    },
+    "adapter_calls": [
+      {
+        "seq": 1,
+        "tool": "decision.get",
+        "args": {
+          "record_id": "ADR-9901"
+        },
+        "isError": false,
+        "structuredContent": {
+          "record_type": "canonical_decision",
+          "canonical_decision": {
+            "decision_id": "ADR-9901",
+            "version": "1",
+            "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+            "decision_class": "architecture",
+            "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+            "rationale": "Inventory and stdio handshake fixture only.",
+            "lifecycle_status": "active",
+            "owner": "",
+            "decided_at": "2026-01-01T00:00:00Z",
+            "updated_at": "2026-01-01T00:00:00Z",
+            "context_scope": [
+              "cache"
+            ],
+            "targets": [],
+            "constraints": [
+              "no external cache service"
+            ],
+            "anti_patterns": [
+              "external_cache_client"
+            ],
+            "source_evidence": [
+              {
+                "source_type": "runtime",
+                "source_locator": "",
+                "source_revision": "",
+                "observed_at": ""
+              }
+            ],
+            "test_evidence": [],
+            "relationships": [],
+            "derived_rule_ids": [
+              "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+            ]
+          }
+        },
+        "toolResult": null,
+        "text": "{\n  \"record_type\": \"canonical_decision\",\n  \"canonical_decision\": {\n    \"decision_id\": \"ADR-9901\",\n    \"version\": \"1\",\n    \"version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n    \"decision_version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n    \"content_digest\": \"662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650\",\n    \"decision_class\": \"architecture\",\n    \"statement\": \"Synthetic M1 cache adapter uses the in-memory backend.\",\n    \"rationale\": \"Inventory and stdio handshake fixture only.\",\n    \"lifecycle_status\": \"active\",\n    \"owner\": \"\",\n    \"decided_at\": \"2026-01-01T00:00:00Z\",\n    \"updated_at\": \"2026-01-01T00:00:00Z\",\n    \"context_scope\": [\n      \"cache\"\n    ],\n    \"targets\": [],\n    \"constraints\": [\n      \"no external cache service\"\n    ],\n    \"anti_patterns\": [\n      \"external_cache_client\"\n    ],\n    \"source_evidence\": [\n      {\n        \"source_type\": \"runtime\",\n        \"source_locator\": \"\",\n        \"source_revision\": \"\",\n        \"observed_at\": \"\"\n      }\n    ],\n    \"test_evidence\": [],\n    \"relationships\": [],\n    \"derived_rule_ids\": [\n      \"ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584\"\n    ]\n  }\n}"
+      }
+    ],
+    "canonical_get_ok": true,
+    "relay_status": {
+      "seq": 9,
+      "ts": "2026-10-24T13:49:45.838Z",
+      "pid": 72148,
+      "type": "status",
+      "child_alive": true,
+      "upstream_pid": 11908,
+      "target_request_id": 2,
+      "target_request_forwarded": true,
+      "upstream_response_received": true,
+      "held_request_id": null,
+      "mode": "passthrough",
+      "cancellation_events": [],
+      "requested_at": "2026-10-24T13:49:45.839Z"
+    },
+    "relay_events": {
+      "target_seen": true,
+      "target_forwarded": true,
+      "upstream_response_received": true,
+      "response_withheld": false,
+      "response_forwarded": true
+    },
+    "cleanup": {
+      "phase": "control-relay",
+      "errors": [],
+      "child_event_log": "C:\\dev\\mneme\\validation\\cm01\\p0-cancellation\\evidence\\raw\\run2-control-relay-child-events.jsonl",
+      "child_exit_event": {
+        "seq": 11,
+        "ts": "2026-10-24T13:49:46.137Z",
+        "pid": 72148,
+        "type": "child_exit",
+        "code": 0,
+        "signal": null,
+        "upstream_pid": 11908,
+        "observed_by": "top_level"
+      },
+      "child_exit_observed": true,
+      "relay_pid": 72148,
+      "relay_alive_after": false,
+      "relay_exit_observed": true,
+      "upstream_pid": 11908,
+      "upstream_alive_after": false,
+      "upstream_exit_observed": true
+    },
+    "finished_at": "2026-10-24T13:49:46.209Z"
+  },
+  "fault": {
+    "phase": "fault",
+    "started_at": "2026-10-24T13:49:46.209Z",
+    "timeout_ms": 1500,
+    "withheld_event": {
+      "seq": 8,
+      "ts": "2026-10-24T13:50:19.088Z",
+      "pid": 20856,
+      "type": "response_withheld",
+      "requestId": 2
+    },
+    "withheld_observed": true,
+    "execution": {
+      "result": null,
+      "error": "Code execution failed: execution exceeded 1500ms",
+      "error_name": "Error",
+      "stats": {
+        "hostCalls": 1,
+        "resolvedCalls": 0,
+        "failedCalls": 0,
+        "rejectedCalls": 1,
+        "timedOut": true,
+        "interrupted": true,
+        "pendingAtEnd": 0,
+        "deferredDisposed": 1,
+        "cleanupErrors": []
+      },
+      "duration_ms": 1510,
+      "finished_at": "2026-10-24T13:50:20.570Z"
+    },
+    "adapter_calls": [
+      {
+        "seq": 1,
+        "tool": "decision.get",
+        "args": {
+          "record_id": "ADR-9901"
+        },
+        "isError": false,
+        "structuredContent": {
+          "record_type": "canonical_decision",
+          "canonical_decision": {
+            "decision_id": "ADR-9901",
+            "version": "1",
+            "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+            "decision_class": "architecture",
+            "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+            "rationale": "Inventory and stdio handshake fixture only.",
+            "lifecycle_status": "active",
+            "owner": "",
+            "decided_at": "2026-01-01T00:00:00Z",
+            "updated_at": "2026-01-01T00:00:00Z",
+            "context_scope": [
+              "cache"
+            ],
+            "targets": [],
+            "constraints": [
+              "no external cache service"
+            ],
+            "anti_patterns": [
+              "external_cache_client"
+            ],
+            "source_evidence": [
+              {
+                "source_type": "runtime",
+                "source_locator": "",
+                "source_revision": "",
+                "observed_at": ""
+              }
+            ],
+            "test_evidence": [],
+            "relationships": [],
+            "derived_rule_ids": [
+              "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+            ]
+          }
+        },
+        "toolResult": null,
+        "text": "{\n  \"record_type\": \"canonical_decision\",\n  \"canonical_decision\": {\n    \"decision_id\": \"ADR-9901\",\n    \"version\": \"1\",\n    \"version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n    \"decision_version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n    \"content_digest\": \"662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650\",\n    \"decision_class\": \"architecture\",\n    \"statement\": \"Synthetic M1 cache adapter uses the in-memory backend.\",\n    \"rationale\": \"Inventory and stdio handshake fixture only.\",\n    \"lifecycle_status\": \"active\",\n    \"owner\": \"\",\n    \"decided_at\": \"2026-01-01T00:00:00Z\",\n    \"updated_at\": \"2026-01-01T00:00:00Z\",\n    \"context_scope\": [\n      \"cache\"\n    ],\n    \"targets\": [],\n    \"constraints\": [\n      \"no external cache service\"\n    ],\n    \"anti_patterns\": [\n      \"external_cache_client\"\n    ],\n    \"source_evidence\": [\n      {\n        \"source_type\": \"runtime\",\n        \"source_locator\": \"\",\n        \"source_revision\": \"\",\n        \"observed_at\": \"\"\n      }\n    ],\n    \"test_evidence\": [],\n    \"relationships\": [],\n    \"derived_rule_ids\": [\n      \"ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584\"\n    ]\n  }\n}"
+      }
+    ],
+    "client_side": {
+      "request": {
+        "id": 2,
+        "tool": "decision.get",
+        "args": {
+          "record_id": "ADR-9901"
+        },
+        "method": "tools/call"
+      },
+      "at_timeout_return": {
+        "seq": 1,
+        "name": "decision.get",
+        "args": {
+          "record_id": "ADR-9901"
+        },
+        "request_id": 2,
+        "started_at": "2026-10-24T13:50:19.063Z",
+        "pending": true,
+        "outcome": null,
+        "settled_at": null,
+        "error": null,
+        "adapter_error": null
+      },
+      "pending_after_timeout_return": true
+    },
+    "observation": {
+      "window_ms": 1500,
+      "reason": "window_elapsed",
+      "event": null,
+      "elapsed_ms": 1516,
+      "client_after_window": {
+        "seq": 1,
+        "name": "decision.get",
+        "args": {
+          "record_id": "ADR-9901"
+        },
+        "request_id": 2,
+        "started_at": "2026-10-24T13:50:19.063Z",
+        "pending": true,
+        "outcome": null,
+        "settled_at": null,
+        "error": null,
+        "adapter_error": null
+      },
+      "pending_after_window": true
+    },
+    "server_side": {
+      "relay_status_at_observation": {
+        "seq": 9,
+        "ts": "2026-10-24T13:50:22.086Z",
+        "pid": 20856,
+        "type": "status",
+        "child_alive": true,
+        "upstream_pid": 53624,
+        "target_request_id": 2,
+        "target_request_forwarded": true,
+        "upstream_response_received": true,
+        "held_request_id": 2,
+        "mode": "withhold",
+        "cancellation_events": [],
+        "requested_at": "2026-10-24T13:50:22.086Z"
+      },
+      "relay_events": {
+        "target_seen": true,
+        "target_forwarded": true,
+        "upstream_response_received": true,
+        "response_withheld": true
+      },
+      "cancellation_events_forwarded": []
+    },
+    "before_release": {
+      "ts": "2026-10-24T13:50:22.088Z",
+      "client_pending": true,
+      "cancellation_messages": 0,
+      "transport_messages_out": 4,
+      "transport_messages_in": 1
+    },
+    "release": {
+      "seq": 10,
+      "ts": "2026-10-24T13:50:22.088Z",
+      "pid": 20856,
+      "type": "response_released_downstream",
+      "requestId": 2,
+      "command_at": "2026-10-24T13:50:22.088Z"
+    },
+    "late_completion": {
+      "window_ms": 3000,
+      "settled": true,
+      "outcome": "fulfilled",
+      "error": null,
+      "elapsed_ms": 0,
+      "client_after_late": {
+        "seq": 1,
+        "name": "decision.get",
+        "args": {
+          "record_id": "ADR-9901"
+        },
+        "request_id": 2,
+        "started_at": "2026-10-24T13:50:19.063Z",
+        "pending": false,
+        "outcome": "fulfilled",
+        "settled_at": "2026-10-24T13:50:22.090Z",
+        "error": null,
+        "adapter_error": null
+      },
+      "delivered_response_observed": true,
+      "executor_stats_before_timeout": {
+        "hostCalls": 1,
+        "resolvedCalls": 0,
+        "failedCalls": 0,
+        "rejectedCalls": 1,
+        "timedOut": true,
+        "interrupted": true,
+        "pendingAtEnd": 0,
+        "deferredDisposed": 1,
+        "cleanupErrors": []
+      },
+      "executor_stats_after_late": {
+        "hostCalls": 1,
+        "resolvedCalls": 1,
+        "failedCalls": 0,
+        "rejectedCalls": 1,
+        "timedOut": true,
+        "interrupted": true,
+        "pendingAtEnd": 0,
+        "deferredDisposed": 1,
+        "cleanupErrors": []
+      },
+      "executor_resolved_calls_delta": 1
+    },
+    "classification": {
+      "genuine_upstream_request": true,
+      "timeout_error_returned": true,
+      "timeout_error": "Code execution failed: execution exceeded 1500ms",
+      "cancellation_notifications_sent": 0,
+      "cancellation_observed_by_relay": 0,
+      "pending_immediately_after_timeout": true,
+      "pending_after_observation_window": true,
+      "observation_end_reason": "window_elapsed",
+      "late_response_settled_request": true,
+      "required_harness_release_to_settle": true,
+      "transport_open_after_timeout": true,
+      "client_closed_after_timeout": false,
+      "relay_upstream_alive_at_observation": true,
+      "direct_response_delivered_after_release": true
+    },
+    "verdict": "FAIL",
+    "reason": "the underlying MCP client request was still pending when Code Mode returned its timeout error; the underlying MCP client request was still pending after a 1500ms bounded observation period; the withheld late response still fulfilled the abandoned MCP client request; no notifications/cancelled was emitted by the integration",
+    "cleanup": {
+      "phase": "fault",
+      "errors": [],
+      "child_event_log": "C:\\dev\\mneme\\validation\\cm01\\p0-cancellation\\evidence\\raw\\run2-fault-child-events.jsonl",
+      "child_exit_event": {
+        "seq": 12,
+        "ts": "2026-10-24T13:50:22.400Z",
+        "pid": 20856,
+        "type": "child_exit",
+        "code": 0,
+        "signal": null,
+        "upstream_pid": 53624,
+        "observed_by": "top_level"
+      },
+      "child_exit_observed": true,
+      "relay_pid": 20856,
+      "relay_alive_after": false,
+      "relay_exit_observed": true,
+      "upstream_pid": 53624,
+      "upstream_alive_after": false,
+      "upstream_exit_observed": true
+    },
+    "finished_at": "2026-10-24T13:50:22.471Z",
+    "process_cleanup_ok": true
+  },
+  "controls_ok": true,
+  "verdict": "FAIL",
+  "reason": "the underlying MCP client request was still pending when Code Mode returned its timeout error; the underlying MCP client request was still pending after a 1500ms bounded observation period; the withheld late response still fulfilled the abandoned MCP client request; no notifications/cancelled was emitted by the integration"
+}

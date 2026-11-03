@@ -1,0 +1,62 @@
+CM-01 S1-A1 M8 exact commands
+
+Worktree:
+  C:\dev\mneme\.worktrees\feat-cm01-s1a1-e0-local-executor
+
+Directory:
+  validation/cm01/s1a-local/m8
+
+Commands:
+  npm install --ignore-scripts --no-audit --no-fund
+  npm run m8
+
+Observed:
+  npm install: 98 packages added
+  npm run m8: pass=true, failed=[]
+  M8-UPSTREAM-SIX-1: true
+  M8-UPSTREAM-SIX-2: true
+  M8-E1-TYPED-NOT-FOUND: true
+  M8-E2-HOST-VALIDATION: true
+  M8-E3-MCP-REJECTION: true
+  M8-E4-TRANSPORT-FAILURE: true
+  M8-E5-MISSING-INDEX: true
+  M8-E6-EXECUTOR-FAILURE: true
+  M8-NO-PROPOSAL-CALLS: true
+  M8-REPEAT: true
+  M8-NO-MUTATION: true
+  M8-M4: true
+
+Error classifications:
+  E1: mcp_success / typed_not_found
+  E2: host_validation / argument_validation_error
+  E3: mcp_tool / mcp_tool_rejection
+  E4: transport / transport_failure
+  E5: startup / migration_required
+  E6: executor / executor_timeout
+
+Versions:
+  Node 24.13.1
+  npm 11.8.0
+  @cloudflare/codemode 0.5.5
+  @modelcontextprotocol/sdk 1.32.2
+  ajv 8.17.1
+  zod 4.6.7
+  Python 3.12.10
+  mneme 0.10.0
+  mcp 2.2.0
+
+Fixtures:
+  normal m4/fixture/canonical/project_memory.json
+  normal sha256 b4d83d0cc0f70f442e2a62bd0e527220ae99b07cba1238e39d0ad8c5685d4e7f
+  sectionless m8/fixture/sectionless.json
+
+Evidence:
+  evidence/m8.json
+  evidence/run1.json
+  evidence/run2.json
+  evidence/run1-stderr.log
+  evidence/run2-stderr.log
+  evidence/e4-run1-stderr.log
+  evidence/e4-run2-stderr.log
+  evidence/e5-run1-stderr.log
+  evidence/e5-run2-stderr.log

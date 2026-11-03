@@ -19,7 +19,11 @@ Fields:
 from __future__ import annotations
 
 FIXTURE_URL = "https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture"
-TOOLS = ("Write", "Edit", "MultiEdit")
+# Tools scheduled for the pinned host. Claude Code 2.1.303 does not offer
+# MultiEdit (scope Amendment 1); edit_plan keeps its plan for a later pin that
+# offers it again, which needs its own host validation.
+TOOLS = ("Write", "Edit")
+NOT_OFFERED_BY_PIN = ("MultiEdit",)
 
 ROWS = {
     # Batch R: required refusals (B = AUTHORIZED)
@@ -84,6 +88,15 @@ ROWS = {
     "H-2": dict(phase="AUTHORIZED", repo="clone", edit="violating", mutate=["hook_exceeds_timeout"],
                 expect="record", verifier=None, e4=False),
 }
+
+# C2b charter §17.5 live proof (batch FR2), all in the AUTHORIZED phase. The
+# first row is the deterministic UNVERIFIABLE proceed (origin removed:
+# VERIFIER_CONFIG_MISSING, no network block). The others are its paired
+# controls, which must show no diagnostic: P-1 the AUTHORIZED proceed, and D-1
+# the proceed with the local declaration absent (the C2a no-declaration path).
+# The VERIFIED_ABSENT proceed (P-6) needs the fixture in phase ABSENT, which
+# this batch does not change; it is covered offline and by its own batch.
+FR2_ROWS = ("D-2", "P-1", "D-1")
 
 # Scope §6: rows whose interactive arm (Q2) is required.
 INTERACTIVE_ROWS = ("R-1", "P-2")

@@ -221,9 +221,15 @@ when:
 - `MNEME_MEMORY` selects memory other than `.mneme/project_memory.json`.
 
 If the baseline cannot be verified (network, DNS, TLS, authentication,
-timeout, missing ref, invalid evidence, or no usable `origin`), the hook says
-so and proceeds. A trusted strict `FAIL` still blocks as usual. A revoked or
-never-authorized baseline never refuses on availability.
+timeout, missing ref, invalid evidence, or no usable `origin`), the hook does
+not refuse. It writes the reason to stderr, and it also tells Claude through
+one PreToolUse `additionalContext` message ("authorization could not be
+verified … proceeded without fail-closed availability enforcement"). That
+message means Mneme did not refuse the attempted edit. It is not evidence
+that the file was changed, and it is not a check result. In warn mode the
+text is appended to the warn-mode `defer` reason instead, which Claude Code
+does not show to Claude. A trusted strict `FAIL` still blocks as usual. A
+revoked or never-authorized baseline never refuses on availability.
 
 Limits:
 

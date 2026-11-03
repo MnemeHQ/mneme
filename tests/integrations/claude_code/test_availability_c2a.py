@@ -37,7 +37,7 @@ import pytest
 
 from mneme.integrations.claude_code import hook
 from mneme.integrations.claude_code.availability import (
-    SCHEMA, MEMORY_PATH, UNVERIFIABLE,
+    SCHEMA, MEMORY_PATH, UNVERIFIABLE, unverifiable_context,
     classify_observation, discover_declaration, emit_availability,
     routing_refuses, verifier_stub,
 )
@@ -91,6 +91,14 @@ MIXED_MEMORY = json.dumps({
 DIAG_PREFIX = (
     "mneme-hook: availability AUTHORIZATION_UNVERIFIABLE(VERIFIER_CONFIG_MISSING); "
 )
+
+
+def _context(mismatch=False):
+    """C2b section 17: the one stdout object on an UNVERIFIABLE exit-0 proceed."""
+    return json.dumps({"hookSpecificOutput": {
+        "hookEventName": "PreToolUse",
+        "additionalContext": unverifiable_context("VERIFIER_CONFIG_MISSING", mismatch),
+    }}) + "\n"
 
 
 def _diag(state, *extra):
@@ -246,7 +254,7 @@ def test_policy_root_is_first_mneme_ancestor(tmp_path):
 def test_d1_complete_pass_diagnostic(tmp_path):
     target = _project(tmp_path)
     rc, out, err = _invoke(_envelope(target), response=check_result("PASS"))
-    assert (rc, out) == (0, "")
+    assert (rc, out) == (0, _context())
     assert "AUTHORIZATION_UNVERIFIABLE(VERIFIER_CONFIG_MISSING)" in err
     assert "evaluation=TRUSTED_COMPLETE" in err
 
@@ -269,7 +277,7 @@ def test_d2_trusted_fail_blocks_exactly_as_baseline(tmp_path, monkeypatch, basel
 def test_d3_missing_memory_reports_but_does_not_refuse(tmp_path):
     target = _project(tmp_path, memory=False)
     rc, out, err = _invoke(_envelope(target))
-    assert (rc, out) == (0, "")
+    assert (rc, out) == (0, _context())
     assert "canonical memory missing" in err
     assert "evaluation=NOT_RUN" in err
 
@@ -432,7 +440,9 @@ def test_d_real_check_diagnostic_then_exact_baseline_output(
     stdin = _real_case(case, tmp_path, monkeypatch, declaration=True)
     rc, out, err = _main(hook, stdin)
     b_rc, b_out, b_err = _main(baseline_hook, stdin)
-    assert (rc, out) == (b_rc, b_out)
+    # C2b section 17: exit-0 UNVERIFIABLE proceeds add exactly one object.
+    extra = _context(mismatch=case in ("mismatch", "incomplete")) if rc == 0 else ""
+    assert (rc, out) == (b_rc, b_out + extra)
     assert rc == expected_rc
     assert err == diag + b_err
 
@@ -442,7 +452,8 @@ def test_d4_real_check_invalid_declaration(tmp_path, monkeypatch, real_transport
     (tmp_path / "repo" / ".mneme" / "availability.json").write_text("{broken", encoding="utf-8")
     rc, out, err = _main(hook, stdin)
     b_rc, b_out, b_err = _main(baseline_hook, stdin)
-    assert (rc, out) == (b_rc, b_out) == (0, "")
+    assert (rc, b_rc, b_out) == (0, 0, "")
+    assert out == _context()
     assert err == _diag(
         "TRUSTED_COMPLETE", "mneme-hook: declaration invalid: unreadable or invalid JSON",
     ) + b_err

@@ -1,0 +1,4 @@
+api.anthropic.com
+github.com
+release-assets.githubusercontent.com
+# 4 other host(s) observed, not published

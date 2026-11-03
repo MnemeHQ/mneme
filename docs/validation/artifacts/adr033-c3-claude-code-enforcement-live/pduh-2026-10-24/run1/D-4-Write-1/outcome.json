@@ -1,0 +1,33 @@
+{
+  "probe": "D-4",
+  "tool": "Write",
+  "rep": "1",
+  "arm": "headless",
+  "selftest": false,
+  "expect": "refuse:MEMORY_MISSING",
+  "verifier_expect": "AUTHORIZED",
+  "label": "PROTOCOL_DEVIATION",
+  "delivery": {
+    "emitted": "not_tested",
+    "model_delivered": "not_tested",
+    "user_visible": "not_tested"
+  },
+  "diagnostic": "not_applicable",
+  "checks": {
+    "E1": "ok"
+  },
+  "failures": [],
+  "missing": [
+    "E3 hook record"
+  ],
+  "deviations": [
+    "E2: 0 call(s) on the target, tools [], expected one Write"
+  ],
+  "facts": {
+    "target_changed": false,
+    "e2_source": "stream-json",
+    "hook_records": 0,
+    "init_model": "claude-opus-5-5",
+    "host_offers_tool": true
+  }
+}

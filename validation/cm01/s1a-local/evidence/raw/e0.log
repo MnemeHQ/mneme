@@ -1,0 +1,75 @@
+{
+  "checks": [
+    {
+      "id": "E0-ORDER",
+      "pass": true
+    },
+    {
+      "id": "E0-ERROR",
+      "pass": true
+    },
+    {
+      "id": "E0-TIMEOUT",
+      "pass": true
+    },
+    {
+      "id": "E0-MEMORY",
+      "pass": true
+    },
+    {
+      "id": "E0-GLOBALS",
+      "pass": true
+    },
+    {
+      "id": "E0-CLEANUP",
+      "pass": true
+    },
+    {
+      "id": "E0-REPEAT",
+      "pass": true
+    },
+    {
+      "id": "E0-M4",
+      "pass": true
+    }
+  ],
+  "native_probe": {
+    "pass": true,
+    "native_bridge_supported": true,
+    "asyncify_selected": false,
+    "result": [
+      "a",
+      "b",
+      "c"
+    ],
+    "error": null,
+    "starts": [
+      "a",
+      "b",
+      "c"
+    ],
+    "ends": [
+      "a",
+      "b",
+      "c"
+    ],
+    "stats": {
+      "hostCalls": 3,
+      "resolvedCalls": 3,
+      "failedCalls": 0,
+      "rejectedCalls": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "pendingAtEnd": 0,
+      "deferredDisposed": 3,
+      "cleanupErrors": []
+    }
+  },
+  "versions": {
+    "node": "v24.13.1",
+    "npm": "11.8.0",
+    "codemode": "0.5.5",
+    "quickjs": "0.32.0",
+    "platform": "win32 x64"
+  }
+}

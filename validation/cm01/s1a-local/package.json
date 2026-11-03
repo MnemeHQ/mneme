@@ -1,0 +1,19 @@
+{
+  "name": "mneme-cm01-s1a1-e0",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "CM-01 S1-A1 E0: local Code Mode executor proof only.",
+  "scripts": {
+    "m4-guard": "node m4-guard.mjs",
+    "probe:native": "node e0/probe-native-promise.mjs",
+    "e0": "node e0/run-e0.mjs"
+  },
+  "dependencies": {
+    "@cloudflare/codemode": "0.5.5",
+    "quickjs-emscripten": "0.32.0"
+  },
+  "engines": {
+    "node": "24.13.1"
+  }
+}

@@ -1,0 +1,16 @@
+{"seq":1,"ts":"2026-10-25T00:23:56.637Z","pid":22740,"type":"relay_start","mode":"withhold","delay_ms":0,"withhold_tools":["decision.search"],"upstream_pid":37616,"control_port":54993,"event_log":"C:\\dev\\mneme\\.worktrees\\feat-cm01-p0-f1-cancellation\\validation\\cm01\\p0-f1\\evidence\\raw\\run2-parallel-relay.jsonl"}
+{"seq":2,"ts":"2026-10-25T00:23:58.804Z","pid":22740,"type":"upstream_message_forwarded_downstream","requestId":0}
+{"seq":3,"ts":"2026-10-25T00:23:58.811Z","pid":22740,"type":"upstream_message_forwarded_downstream","requestId":1}
+{"seq":1,"ts":"2026-10-25T00:23:58.837Z","pid":22740,"type":"tools_call_from_client","requestId":2,"tool":"decision.get"}
+{"seq":2,"ts":"2026-10-25T00:23:58.839Z","pid":22740,"type":"tools_call_from_client","requestId":3,"tool":"decision.search"}
+{"seq":6,"ts":"2026-10-25T00:23:58.840Z","pid":22740,"type":"target_request_seen","requestId":3,"tool":"decision.search","mode":"withhold","delayMs":0}
+{"seq":7,"ts":"2026-10-25T00:23:58.841Z","pid":22740,"type":"target_request_forwarded","requestId":3}
+{"seq":8,"ts":"2026-10-25T00:23:58.847Z","pid":22740,"type":"upstream_message_forwarded_downstream","requestId":2}
+{"seq":9,"ts":"2026-10-25T00:23:58.850Z","pid":22740,"type":"upstream_response_received","requestId":3,"tool":"decision.search","has_result":true,"has_error":false}
+{"seq":10,"ts":"2026-10-25T00:23:58.851Z","pid":22740,"type":"response_withheld","requestId":3,"tool":"decision.search"}
+{"seq":11,"ts":"2026-10-25T00:23:59.141Z","pid":22740,"type":"cancel_from_client","requestId":3,"reason":"Error: Code Mode execution exceeded 300ms"}
+{"seq":12,"ts":"2026-10-25T00:23:59.146Z","pid":22740,"type":"response_released_downstream","requestId":3,"tool":"decision.search"}
+{"seq":13,"ts":"2026-10-25T00:23:59.146Z","pid":22740,"type":"release_ack","requestIds":[3],"command_at":"2026-10-25T00:23:59.145Z"}
+{"seq":14,"ts":"2026-10-25T00:23:59.361Z","pid":22740,"type":"relay_finishing","reason":"control_shutdown","held_request_ids":[],"withheld_discarded":0}
+{"seq":15,"ts":"2026-10-25T00:23:59.656Z","pid":22740,"type":"child_exit","code":0,"signal":null,"upstream_pid":37616,"observed_by":"top_level"}
+{"seq":16,"ts":"2026-10-25T00:23:59.658Z","pid":22740,"type":"client_stdin_end","held_request_ids":[]}

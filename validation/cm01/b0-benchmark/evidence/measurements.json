@@ -1,0 +1,189 @@
+{
+  "scope": "mechanical timing only",
+  "model_fields": {
+    "status": "NOT_MEASURED",
+    "note": "Model turns, input/output tokens, and model-visible intermediate context are not measured in B0-M."
+  },
+  "runs": {
+    "run1": [
+      {
+        "task": "T1",
+        "direct_ms": 15,
+        "code_ms": 100,
+        "direct_mcp_calls": 1,
+        "code_mcp_calls": 1,
+        "direct_result_bytes": 325,
+        "code_result_bytes": 325,
+        "direct_mcp_result_bytes": 3180,
+        "code_mcp_result_bytes": 3180
+      },
+      {
+        "task": "T2",
+        "direct_ms": 11,
+        "code_ms": 60,
+        "direct_mcp_calls": 1,
+        "code_mcp_calls": 1,
+        "direct_result_bytes": 42,
+        "code_result_bytes": 42,
+        "direct_mcp_result_bytes": 3008,
+        "code_mcp_result_bytes": 3008
+      },
+      {
+        "task": "T3",
+        "direct_ms": 10,
+        "code_ms": 46,
+        "direct_mcp_calls": 1,
+        "code_mcp_calls": 1,
+        "direct_result_bytes": 81,
+        "code_result_bytes": 81,
+        "direct_mcp_result_bytes": 2986,
+        "code_mcp_result_bytes": 2986
+      },
+      {
+        "task": "T4",
+        "direct_ms": 12,
+        "code_ms": 37,
+        "direct_mcp_calls": 1,
+        "code_mcp_calls": 1,
+        "direct_result_bytes": 411,
+        "code_result_bytes": 411,
+        "direct_mcp_result_bytes": 4996,
+        "code_mcp_result_bytes": 4996
+      },
+      {
+        "task": "T5",
+        "direct_ms": 22,
+        "code_ms": 59,
+        "direct_mcp_calls": 2,
+        "code_mcp_calls": 2,
+        "direct_result_bytes": 319,
+        "code_result_bytes": 319,
+        "direct_mcp_result_bytes": 5780,
+        "code_mcp_result_bytes": 5780
+      },
+      {
+        "task": "T6",
+        "direct_ms": 23,
+        "code_ms": 64,
+        "direct_mcp_calls": 2,
+        "code_mcp_calls": 2,
+        "direct_result_bytes": 299,
+        "code_result_bytes": 299,
+        "direct_mcp_result_bytes": 7148,
+        "code_mcp_result_bytes": 7148
+      },
+      {
+        "task": "T7",
+        "direct_ms": 32,
+        "code_ms": 77,
+        "direct_mcp_calls": 3,
+        "code_mcp_calls": 3,
+        "direct_result_bytes": 672,
+        "code_result_bytes": 672,
+        "direct_mcp_result_bytes": 10258,
+        "code_mcp_result_bytes": 10258
+      },
+      {
+        "task": "T8",
+        "direct_ms": 30,
+        "code_ms": 90,
+        "direct_mcp_calls": 3,
+        "code_mcp_calls": 3,
+        "direct_result_bytes": 429,
+        "code_result_bytes": 429,
+        "direct_mcp_result_bytes": 15230,
+        "code_mcp_result_bytes": 15230
+      }
+    ],
+    "run2": [
+      {
+        "task": "T1",
+        "direct_ms": 11,
+        "code_ms": 34,
+        "direct_mcp_calls": 1,
+        "code_mcp_calls": 1,
+        "direct_result_bytes": 325,
+        "code_result_bytes": 325,
+        "direct_mcp_result_bytes": 3180,
+        "code_mcp_result_bytes": 3180
+      },
+      {
+        "task": "T2",
+        "direct_ms": 11,
+        "code_ms": 41,
+        "direct_mcp_calls": 1,
+        "code_mcp_calls": 1,
+        "direct_result_bytes": 42,
+        "code_result_bytes": 42,
+        "direct_mcp_result_bytes": 3008,
+        "code_mcp_result_bytes": 3008
+      },
+      {
+        "task": "T3",
+        "direct_ms": 12,
+        "code_ms": 45,
+        "direct_mcp_calls": 1,
+        "code_mcp_calls": 1,
+        "direct_result_bytes": 81,
+        "code_result_bytes": 81,
+        "direct_mcp_result_bytes": 2986,
+        "code_mcp_result_bytes": 2986
+      },
+      {
+        "task": "T4",
+        "direct_ms": 13,
+        "code_ms": 37,
+        "direct_mcp_calls": 1,
+        "code_mcp_calls": 1,
+        "direct_result_bytes": 411,
+        "code_result_bytes": 411,
+        "direct_mcp_result_bytes": 4996,
+        "code_mcp_result_bytes": 4996
+      },
+      {
+        "task": "T5",
+        "direct_ms": 23,
+        "code_ms": 66,
+        "direct_mcp_calls": 2,
+        "code_mcp_calls": 2,
+        "direct_result_bytes": 319,
+        "code_result_bytes": 319,
+        "direct_mcp_result_bytes": 5780,
+        "code_mcp_result_bytes": 5780
+      },
+      {
+        "task": "T6",
+        "direct_ms": 24,
+        "code_ms": 46,
+        "direct_mcp_calls": 2,
+        "code_mcp_calls": 2,
+        "direct_result_bytes": 299,
+        "code_result_bytes": 299,
+        "direct_mcp_result_bytes": 7148,
+        "code_mcp_result_bytes": 7148
+      },
+      {
+        "task": "T7",
+        "direct_ms": 32,
+        "code_ms": 63,
+        "direct_mcp_calls": 3,
+        "code_mcp_calls": 3,
+        "direct_result_bytes": 672,
+        "code_result_bytes": 672,
+        "direct_mcp_result_bytes": 10258,
+        "code_mcp_result_bytes": 10258
+      },
+      {
+        "task": "T8",
+        "direct_ms": 35,
+        "code_ms": 57,
+        "direct_mcp_calls": 3,
+        "code_mcp_calls": 3,
+        "direct_result_bytes": 429,
+        "code_result_bytes": 429,
+        "direct_mcp_result_bytes": 15230,
+        "code_mcp_result_bytes": 15230
+      }
+    ]
+  }
+}

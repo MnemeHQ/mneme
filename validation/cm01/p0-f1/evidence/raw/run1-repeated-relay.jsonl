@@ -1,0 +1,30 @@
+{"seq":1,"ts":"2026-10-25T00:23:24.411Z","pid":73820,"type":"relay_start","mode":"withhold","delay_ms":0,"withhold_tools":["decision.get"],"upstream_pid":72300,"control_port":53845,"event_log":"C:\\dev\\mneme\\.worktrees\\feat-cm01-p0-f1-cancellation\\validation\\cm01\\p0-f1\\evidence\\raw\\run1-repeated-relay.jsonl"}
+{"seq":2,"ts":"2026-10-25T00:23:26.366Z","pid":73820,"type":"upstream_message_forwarded_downstream","requestId":0}
+{"seq":3,"ts":"2026-10-25T00:23:26.371Z","pid":73820,"type":"upstream_message_forwarded_downstream","requestId":1}
+{"seq":1,"ts":"2026-10-25T00:23:26.402Z","pid":73820,"type":"tools_call_from_client","requestId":2,"tool":"decision.get"}
+{"seq":5,"ts":"2026-10-25T00:23:26.403Z","pid":73820,"type":"target_request_seen","requestId":2,"tool":"decision.get","mode":"withhold","delayMs":0}
+{"seq":6,"ts":"2026-10-25T00:23:26.404Z","pid":73820,"type":"target_request_forwarded","requestId":2}
+{"seq":7,"ts":"2026-10-25T00:23:26.411Z","pid":73820,"type":"upstream_response_received","requestId":2,"tool":"decision.get","has_result":true,"has_error":false}
+{"seq":8,"ts":"2026-10-25T00:23:26.411Z","pid":73820,"type":"response_withheld","requestId":2,"tool":"decision.get"}
+{"seq":9,"ts":"2026-10-25T00:23:26.654Z","pid":73820,"type":"cancel_from_client","requestId":2,"reason":"Error: Code Mode execution exceeded 250ms"}
+{"seq":10,"ts":"2026-10-25T00:23:26.657Z","pid":73820,"type":"response_released_downstream","requestId":2,"tool":"decision.get"}
+{"seq":11,"ts":"2026-10-25T00:23:26.658Z","pid":73820,"type":"release_ack","requestIds":[2],"command_at":"2026-10-25T00:23:26.657Z"}
+{"seq":2,"ts":"2026-10-25T00:23:26.774Z","pid":73820,"type":"tools_call_from_client","requestId":3,"tool":"decision.get"}
+{"seq":13,"ts":"2026-10-25T00:23:26.775Z","pid":73820,"type":"target_request_seen","requestId":3,"tool":"decision.get","mode":"withhold","delayMs":0}
+{"seq":14,"ts":"2026-10-25T00:23:26.776Z","pid":73820,"type":"target_request_forwarded","requestId":3}
+{"seq":15,"ts":"2026-10-25T00:23:26.782Z","pid":73820,"type":"upstream_response_received","requestId":3,"tool":"decision.get","has_result":true,"has_error":false}
+{"seq":16,"ts":"2026-10-25T00:23:26.783Z","pid":73820,"type":"response_withheld","requestId":3,"tool":"decision.get"}
+{"seq":17,"ts":"2026-10-25T00:23:27.026Z","pid":73820,"type":"cancel_from_client","requestId":3,"reason":"Error: Code Mode execution exceeded 250ms"}
+{"seq":18,"ts":"2026-10-25T00:23:27.030Z","pid":73820,"type":"response_released_downstream","requestId":3,"tool":"decision.get"}
+{"seq":19,"ts":"2026-10-25T00:23:27.030Z","pid":73820,"type":"release_ack","requestIds":[3],"command_at":"2026-10-25T00:23:27.030Z"}
+{"seq":3,"ts":"2026-10-25T00:23:27.150Z","pid":73820,"type":"tools_call_from_client","requestId":4,"tool":"decision.get"}
+{"seq":21,"ts":"2026-10-25T00:23:27.151Z","pid":73820,"type":"target_request_seen","requestId":4,"tool":"decision.get","mode":"withhold","delayMs":0}
+{"seq":22,"ts":"2026-10-25T00:23:27.152Z","pid":73820,"type":"target_request_forwarded","requestId":4}
+{"seq":23,"ts":"2026-10-25T00:23:27.158Z","pid":73820,"type":"upstream_response_received","requestId":4,"tool":"decision.get","has_result":true,"has_error":false}
+{"seq":24,"ts":"2026-10-25T00:23:27.159Z","pid":73820,"type":"response_withheld","requestId":4,"tool":"decision.get"}
+{"seq":25,"ts":"2026-10-25T00:23:27.412Z","pid":73820,"type":"cancel_from_client","requestId":4,"reason":"Error: Code Mode execution exceeded 250ms"}
+{"seq":26,"ts":"2026-10-25T00:23:27.416Z","pid":73820,"type":"response_released_downstream","requestId":4,"tool":"decision.get"}
+{"seq":27,"ts":"2026-10-25T00:23:27.417Z","pid":73820,"type":"release_ack","requestIds":[4],"command_at":"2026-10-25T00:23:27.417Z"}
+{"seq":28,"ts":"2026-10-25T00:23:27.507Z","pid":73820,"type":"relay_finishing","reason":"control_shutdown","held_request_ids":[],"withheld_discarded":0}
+{"seq":29,"ts":"2026-10-25T00:23:27.789Z","pid":73820,"type":"child_exit","code":0,"signal":null,"upstream_pid":72300,"observed_by":"top_level"}
+{"seq":30,"ts":"2026-10-25T00:23:27.791Z","pid":73820,"type":"client_stdin_end","held_request_ids":[]}

@@ -11,7 +11,7 @@ name: encoding check
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, r0/recovery-staging]
   push:
     branches: [main]
 

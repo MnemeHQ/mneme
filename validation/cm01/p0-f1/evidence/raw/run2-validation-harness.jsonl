@@ -1,0 +1,6 @@
+{"seq":1,"ts":"2026-10-25T00:24:13.383Z","type":"connected_direct","phase":"validation","pid":20856,"tools":6}
+{"seq":2,"ts":"2026-10-25T00:24:13.408Z","type":"executor_cleanup","phase":"validation"}
+{"seq":3,"ts":"2026-10-25T00:24:13.667Z","type":"client_closed","phase":"validation"}
+{"seq":4,"ts":"2026-10-25T00:24:13.668Z","type":"cleanup_direct","kind":"direct","phase":"validation","errors":[],"pid":20856,"server_exit_observed":true,"server_alive_after":false}
+{"seq":5,"ts":"2026-10-25T00:24:13.669Z","type":"client_errors","phase":"validation","errors":[]}
+{"seq":6,"ts":"2026-10-25T00:24:13.670Z","type":"phase_end","name":"validation","ok":true,"error":null}

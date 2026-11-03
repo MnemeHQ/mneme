@@ -50,7 +50,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from mneme.adr_compiler import _directive_to_constraint_string
-from mneme.adr_constraints import parse_constraints_section
+from mneme.adr_constraints import TYPED_RULE_KINDS, parse_constraints_section
 from mneme.adr_import import project_decision_graph
 from mneme.adr_schema import ADR
 from mneme.rule_identity import rule_applicability, rule_id_for, rule_id_of
@@ -157,7 +157,8 @@ class CanonicalRuleRecord:
                           rule position (ADR-031 §10).
         decision_id:      Owning decision id.
         decision_version: Owning decision version.
-        rule_type:        Typed rule type (D0: ``FORBID_LITERAL`` only).
+        rule_type:        Typed rule type (``FORBID_LITERAL`` or ADR-034
+                          ``FORBID_NUMERIC_ABOVE``).
         rule_payload:     Typed payload; ``value`` carries the forbidden
                           literal exactly as the ADR declared it.
         applicability:    ADR-020 path selectors, e.g.
@@ -268,17 +269,17 @@ def _directive_to_canonical_rule(
     lifecycle_status: str,
     directive,  # ConstraintDirective; untyped to avoid a public-name dependency
 ) -> CanonicalRuleRecord:
-    """Translate one ``FORBID_LITERAL`` directive into a canonical rule."""
+    """Translate one typed-rule directive into a canonical rule."""
     applicability = _rule_applicability(
         directive.include_paths, directive.exclude_paths
     )
     return CanonicalRuleRecord(
         rule_id=rule_id_of(
-            decision_id, "FORBID_LITERAL", directive.value, applicability
+            decision_id, directive.kind, directive.value, applicability
         ),
         decision_id=decision_id,
         decision_version=version,
-        rule_type="FORBID_LITERAL",
+        rule_type=directive.kind,
         rule_payload={"value": directive.value},
         applicability=applicability,
         lifecycle_status=lifecycle_status,
@@ -293,15 +294,15 @@ def _directives_to_canonical(
 ) -> tuple[list[CanonicalRuleRecord], list[str]]:
     """Split a ``## Constraints`` body into canonical rules and constraints.
 
-    Mirrors ``adr_compiler.adrs_to_decisions`` exactly: ``FORBID_LITERAL``
-    becomes a typed rule; every other directive is rendered as a legacy
+    Mirrors ``adr_compiler.adrs_to_decisions`` exactly: typed rule kinds
+    (``FORBID_LITERAL``, ``FORBID_NUMERIC_ABOVE``) become typed rules; every other directive is rendered as a legacy
     constraint string through the compiler's own renderer so the two paths
     cannot drift.
     """
     rules: list[CanonicalRuleRecord] = []
     constraints: list[str] = []
     for directive in parse_constraints_section(body):
-        if directive.kind == "FORBID_LITERAL":
+        if directive.kind in TYPED_RULE_KINDS:
             rules.append(_directive_to_canonical_rule(
                 decision_id, version, lifecycle_status, directive
             ))

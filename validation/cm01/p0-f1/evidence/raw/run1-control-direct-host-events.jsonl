@@ -1,0 +1,8 @@
+{"ts":"2026-10-25T00:22:58.215Z","type":"host_call_started","callId":1,"provider":"codemode","method":"decision_get"}
+{"ts":"2026-10-25T00:22:58.227Z","type":"host_call_started","callId":2,"provider":"codemode","method":"decision_search"}
+{"ts":"2026-10-25T00:22:58.228Z","type":"host_call_settled","callId":1,"provider":"codemode","method":"decision_get","outcome":"fulfilled"}
+{"ts":"2026-10-25T00:22:58.236Z","type":"host_call_started","callId":3,"provider":"codemode","method":"decision_applicable_to"}
+{"ts":"2026-10-25T00:22:58.237Z","type":"host_call_settled","callId":2,"provider":"codemode","method":"decision_search","outcome":"fulfilled"}
+{"ts":"2026-10-25T00:22:58.244Z","type":"host_call_started","callId":4,"provider":"codemode","method":"decision_trace"}
+{"ts":"2026-10-25T00:22:58.245Z","type":"host_call_settled","callId":3,"provider":"codemode","method":"decision_applicable_to","outcome":"fulfilled"}
+{"ts":"2026-10-25T00:22:58.254Z","type":"host_call_settled","callId":4,"provider":"codemode","method":"decision_trace","outcome":"fulfilled"}

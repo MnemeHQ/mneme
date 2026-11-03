@@ -1,0 +1,180 @@
+{
+  "meta": {
+    "name": "numeric-g1-legacy",
+    "description": "No-numeric byte-identity fixture"
+  },
+  "items": [],
+  "decisions": [
+    {
+      "id": "ADR-005",
+      "decision": "Use the published distribution name",
+      "rationale": "Package name policy",
+      "scope": [
+        "install",
+        "packaging"
+      ],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "pip install legacy-pkg"
+        }
+      ],
+      "created_at": "2026-10-01",
+      "updated_at": "2026-10-01",
+      "status": "active"
+    },
+    {
+      "id": "ADR-101",
+      "decision": "Storage uses sqlite only",
+      "rationale": "Single-file deployment",
+      "scope": [
+        "storage",
+        "database"
+      ],
+      "constraints": [
+        "no postgres"
+      ],
+      "anti_patterns": [
+        "mongodb"
+      ],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "LEGACY_STORE",
+          "include_paths": [
+            "src/**"
+          ],
+          "exclude_paths": [
+            "src/vendor/**"
+          ]
+        }
+      ],
+      "created_at": "2026-10-01",
+      "updated_at": "2026-10-01",
+      "status": "active"
+    }
+  ],
+  "decision_index": {
+    "schema": "mneme.decision-index/v2",
+    "semantic_features": [],
+    "decisions": [
+      {
+        "decision_id": "ADR-005",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-f04b7de23e90d0f409fd2179f7b10fea",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": "2026-10-01"
+      },
+      {
+        "decision_id": "ADR-101",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-bb7fd657942020cddc66d2f31409b380",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": "2026-10-01"
+      }
+    ],
+    "versions": [
+      {
+        "version_id": "dver-f04b7de23e90d0f409fd2179f7b10fea",
+        "decision_id": "ADR-005",
+        "revision": "1",
+        "content_digest": "aaa8728ebda24515d6757241e0a65237c7cb63a8c8695b97e0aa37ff8169a9ad",
+        "statement": "Use the published distribution name",
+        "rationale": "Package name policy",
+        "context_scope": [
+          "install",
+          "packaging"
+        ],
+        "constraints": [],
+        "anti_patterns": [],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "",
+            "observed_at": "",
+            "verification_status": ""
+          }
+        ],
+        "occurrence_source_identity": [
+          "legacy-decisions",
+          "ADR-005"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-10-01"
+      },
+      {
+        "version_id": "dver-bb7fd657942020cddc66d2f31409b380",
+        "decision_id": "ADR-101",
+        "revision": "1",
+        "content_digest": "1ebd49e61e8b182901796dbaf73ede9991528c259108fc42992e9d513ab7c629",
+        "statement": "Storage uses sqlite only",
+        "rationale": "Single-file deployment",
+        "context_scope": [
+          "storage",
+          "database"
+        ],
+        "constraints": [
+          "no postgres"
+        ],
+        "anti_patterns": [
+          "mongodb"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "",
+            "observed_at": "",
+            "verification_status": ""
+          }
+        ],
+        "occurrence_source_identity": [
+          "legacy-decisions",
+          "ADR-101"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-10-01"
+      }
+    ],
+    "rules": [
+      {
+        "rule_id": "ADR-005:FORBID_LITERAL:164fc78c0494ef8be86319bf30e9a41f",
+        "decision_id": "ADR-005",
+        "decision_version_id": "dver-f04b7de23e90d0f409fd2179f7b10fea",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "pip install legacy-pkg"
+        },
+        "applicability": {},
+        "binding_authority": "legacy_unknown"
+      },
+      {
+        "rule_id": "ADR-101:FORBID_LITERAL:5c142ab1e5dce0de3462203c48a35ec7",
+        "decision_id": "ADR-101",
+        "decision_version_id": "dver-bb7fd657942020cddc66d2f31409b380",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "LEGACY_STORE"
+        },
+        "applicability": {
+          "include_paths": [
+            "src/**"
+          ],
+          "exclude_paths": [
+            "src/vendor/**"
+          ]
+        },
+        "binding_authority": "legacy_unknown"
+      }
+    ]
+  }
+}

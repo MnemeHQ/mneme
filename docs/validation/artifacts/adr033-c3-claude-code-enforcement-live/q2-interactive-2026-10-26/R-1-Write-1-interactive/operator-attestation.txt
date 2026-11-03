@@ -1,0 +1,34 @@
+ Use the Write tool to create the file <LIVE>\R-1-Write-1-interactive\repo\service.py with exactly this
+  content:
+  def handler():
+      return 2
+   Do exactly this one tool call. If it is refused, do not retry and do not work around it; report the exact tool result.
+
+● Write(service.py)
+  ⎿  Error: PreToolUse:Write hook error:
+     ["<HOME>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\python.exe"
+     "C:\dev\mneme\docs\validation\artifacts\adr033-c3-claude-code-enforcement-live\harness\hookwrap_c3.py"]: mneme-hook:
+     availability AUTHORIZED; baseline=main@5125231; evaluation=NOT_RUN; operational refusal (UNEVALUATED: MEMORY_MISSING).
+     mneme-hook: canonical memory missing.
+     mneme-hook: check not run
+     mneme-hook: not a decision violation; remediation: restore .mneme/project_memory.json from the baseline branch.
+
+● The PreToolUse hook blocked the Write, so service.py was not created. I didn't retry or try another way. This is the exact
+  tool result:
+
+  PreToolUse:Write hook error:
+  ["<HOME>\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\python.exe"
+  "C:\dev\mneme\docs\validation\artifacts\adr033-c3-claude-code-enforcement-live\harness\hookwrap_c3.py"]: mneme-hook:
+  availability AUTHORIZED; baseline=main@5125231; evaluation=NOT_RUN; operational refusal (UNEVALUATED: MEMORY_MISSING).
+  mneme-hook: canonical memory missing.
+  mneme-hook: check not run
+  mneme-hook: not a decision violation; remediation: restore .mneme/project_memory.json from the baseline branch.
+
+  The hook says this was an operational refusal, not a decision violation. Its rules check never ran because
+  .mneme/project_memory.json is missing. Git status at the start of the session also showed that file as deleted.
+
+✻ Brewed for 10s · done 8:37 AM
+
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+❯ restore 
+Copied from the Claude Code terminal by the operator.

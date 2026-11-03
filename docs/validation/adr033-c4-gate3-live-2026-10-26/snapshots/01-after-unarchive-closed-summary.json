@@ -1,0 +1,25 @@
+{
+  "tag": "01-after-unarchive-closed",
+  "archived": false,
+  "main": "560b973930203cb17cfd835e44e78da794ed917a",
+  "ruleset_enforcement": "active",
+  "ruleset_updated_at": "2026-10-19T11:57:44.208-05:00",
+  "bypass_actors": [],
+  "required_checks": [
+    {
+      "context": "CI1 trusted gate",
+      "integration_id": 15368
+    }
+  ],
+  "policy_enforcement": "active",
+  "policy_updated_at": "2026-10-17T14:39:01.705-05:00",
+  "variables": {
+    "MNEME_CI_AVAILABILITY": "closed"
+  },
+  "repo_sha256": "c45cd6fd5e6165ec",
+  "ruleset_sha256": "37a505d89d2e465c",
+  "policy_sha256": "44dc1848e312ce99",
+  "variables_sha256": "4ed30cd806a82832",
+  "actions-permissions_sha256": "0bffee97e4ad5267",
+  "main_sha256": "2a66947cc9bfcb00"
+}

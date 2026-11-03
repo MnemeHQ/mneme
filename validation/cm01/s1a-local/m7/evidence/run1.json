@@ -1,0 +1,958 @@
+{
+  "run": "run1",
+  "pid": 51228,
+  "upstream_inventory": {
+    "count": 6,
+    "names": [
+      "decision.applicable_to",
+      "decision.get",
+      "decision.propose",
+      "decision.propose_batch",
+      "decision.search",
+      "decision.trace"
+    ],
+    "exact_six": true
+  },
+  "adapter": {
+    "allowlist": [
+      "decision.get",
+      "decision.search",
+      "decision.applicable_to",
+      "decision.trace"
+    ],
+    "call_log": [
+      {
+        "seq": 1,
+        "tool": "decision.search",
+        "args": {
+          "query": "cache"
+        },
+        "isError": false
+      },
+      {
+        "seq": 2,
+        "tool": "decision.get",
+        "args": {
+          "record_id": "ADR-9901"
+        },
+        "isError": false
+      },
+      {
+        "seq": 3,
+        "tool": "decision.trace",
+        "args": {
+          "record_id": "ADR-9901"
+        },
+        "isError": false
+      }
+    ],
+    "schema_passthrough": {
+      "decision.get": true,
+      "decision.search": true,
+      "decision.applicable_to": true,
+      "decision.trace": true
+    }
+  },
+  "selected": {
+    "by": "canonical_decisions filtered by context_scope includes cache and lifecycle active",
+    "match_count": 1,
+    "decision_id": "ADR-9901",
+    "selected_identity": {
+      "decision_id": "ADR-9901",
+      "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+      "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+      "derived_rule_ids": [
+        "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+      ]
+    }
+  },
+  "direct": {
+    "calls": [
+      {
+        "tool": "decision.search",
+        "args": {
+          "query": "cache"
+        }
+      },
+      {
+        "tool": "decision.get",
+        "args": {
+          "record_id": "ADR-9901"
+        }
+      },
+      {
+        "tool": "decision.trace",
+        "args": {
+          "record_id": "ADR-9901"
+        }
+      }
+    ],
+    "raw": {
+      "search": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"proposals\": [],\n  \"canonical_decisions\": [\n    {\n      \"decision_id\": \"ADR-9901\",\n      \"version\": \"1\",\n      \"version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n      \"decision_version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n      \"content_digest\": \"662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650\",\n      \"decision_class\": \"architecture\",\n      \"statement\": \"Synthetic M1 cache adapter uses the in-memory backend.\",\n      \"rationale\": \"Inventory and stdio handshake fixture only.\",\n      \"lifecycle_status\": \"active\",\n      \"owner\": \"\",\n      \"decided_at\": \"2026-01-01T00:00:00Z\",\n      \"updated_at\": \"2026-01-01T00:00:00Z\",\n      \"context_scope\": [\n        \"cache\"\n      ],\n      \"targets\": [],\n      \"constraints\": [\n        \"no external cache service\"\n      ],\n      \"anti_patterns\": [\n        \"external_cache_client\"\n      ],\n      \"source_evidence\": [\n        {\n          \"source_type\": \"runtime\",\n          \"source_locator\": \"\",\n          \"source_revision\": \"\",\n          \"observed_at\": \"\"\n        }\n      ],\n      \"test_evidence\": [],\n      \"relationships\": [],\n      \"derived_rule_ids\": [\n        \"ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584\"\n      ]\n    },\n    {\n      \"decision_id\": \"ADR-9902\",\n      \"version\": \"1\",\n      \"version_id\": \"dver-1606ff8e8763eddde0d18d18ab72a30a\",\n      \"decision_version_id\": \"dver-1606ff8e8763eddde0d18d18ab72a30a\",\n      \"content_digest\": \"ee82d7d1d19eec5d43fbd5814ba8e6ad9032ea589e66f0da53784c898e72de58\",\n      \"decision_class\": \"architecture\",\n      \"statement\": \"Synthetic deprecated cache policy for M4-F1 lifecycle coverage.\",\n      \"rationale\": \"Deprecated lifecycle control only; no typed rules.\",\n      \"lifecycle_status\": \"deprecated\",\n      \"owner\": \"\",\n      \"decided_at\": \"2026-01-01T00:00:00Z\",\n      \"updated_at\": \"2026-01-01T00:00:00Z\",\n      \"context_scope\": [\n        \"cache\"\n      ],\n      \"targets\": [],\n      \"constraints\": [],\n      \"anti_patterns\": [],\n      \"source_evidence\": [\n        {\n          \"source_type\": \"runtime\",\n          \"source_locator\": \"\",\n          \"source_revision\": \"\",\n          \"observed_at\": \"\"\n        }\n      ],\n      \"test_evidence\": [],\n      \"relationships\": [],\n      \"derived_rule_ids\": []\n    }\n  ]\n}"
+          }
+        ],
+        "structuredContent": {
+          "proposals": [],
+          "canonical_decisions": [
+            {
+              "decision_id": "ADR-9901",
+              "version": "1",
+              "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+              "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+              "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+              "decision_class": "architecture",
+              "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+              "rationale": "Inventory and stdio handshake fixture only.",
+              "lifecycle_status": "active",
+              "owner": "",
+              "decided_at": "2026-01-01T00:00:00Z",
+              "updated_at": "2026-01-01T00:00:00Z",
+              "context_scope": [
+                "cache"
+              ],
+              "targets": [],
+              "constraints": [
+                "no external cache service"
+              ],
+              "anti_patterns": [
+                "external_cache_client"
+              ],
+              "source_evidence": [
+                {
+                  "source_type": "runtime",
+                  "source_locator": "",
+                  "source_revision": "",
+                  "observed_at": ""
+                }
+              ],
+              "test_evidence": [],
+              "relationships": [],
+              "derived_rule_ids": [
+                "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+              ]
+            },
+            {
+              "decision_id": "ADR-9902",
+              "version": "1",
+              "version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+              "decision_version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+              "content_digest": "ee82d7d1d19eec5d43fbd5814ba8e6ad9032ea589e66f0da53784c898e72de58",
+              "decision_class": "architecture",
+              "statement": "Synthetic deprecated cache policy for M4-F1 lifecycle coverage.",
+              "rationale": "Deprecated lifecycle control only; no typed rules.",
+              "lifecycle_status": "deprecated",
+              "owner": "",
+              "decided_at": "2026-01-01T00:00:00Z",
+              "updated_at": "2026-01-01T00:00:00Z",
+              "context_scope": [
+                "cache"
+              ],
+              "targets": [],
+              "constraints": [],
+              "anti_patterns": [],
+              "source_evidence": [
+                {
+                  "source_type": "runtime",
+                  "source_locator": "",
+                  "source_revision": "",
+                  "observed_at": ""
+                }
+              ],
+              "test_evidence": [],
+              "relationships": [],
+              "derived_rule_ids": []
+            }
+          ]
+        },
+        "isError": false
+      },
+      "get": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"record_type\": \"canonical_decision\",\n  \"canonical_decision\": {\n    \"decision_id\": \"ADR-9901\",\n    \"version\": \"1\",\n    \"version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n    \"decision_version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n    \"content_digest\": \"662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650\",\n    \"decision_class\": \"architecture\",\n    \"statement\": \"Synthetic M1 cache adapter uses the in-memory backend.\",\n    \"rationale\": \"Inventory and stdio handshake fixture only.\",\n    \"lifecycle_status\": \"active\",\n    \"owner\": \"\",\n    \"decided_at\": \"2026-01-01T00:00:00Z\",\n    \"updated_at\": \"2026-01-01T00:00:00Z\",\n    \"context_scope\": [\n      \"cache\"\n    ],\n    \"targets\": [],\n    \"constraints\": [\n      \"no external cache service\"\n    ],\n    \"anti_patterns\": [\n      \"external_cache_client\"\n    ],\n    \"source_evidence\": [\n      {\n        \"source_type\": \"runtime\",\n        \"source_locator\": \"\",\n        \"source_revision\": \"\",\n        \"observed_at\": \"\"\n      }\n    ],\n    \"test_evidence\": [],\n    \"relationships\": [],\n    \"derived_rule_ids\": [\n      \"ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584\"\n    ]\n  }\n}"
+          }
+        ],
+        "structuredContent": {
+          "record_type": "canonical_decision",
+          "canonical_decision": {
+            "decision_id": "ADR-9901",
+            "version": "1",
+            "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+            "decision_class": "architecture",
+            "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+            "rationale": "Inventory and stdio handshake fixture only.",
+            "lifecycle_status": "active",
+            "owner": "",
+            "decided_at": "2026-01-01T00:00:00Z",
+            "updated_at": "2026-01-01T00:00:00Z",
+            "context_scope": [
+              "cache"
+            ],
+            "targets": [],
+            "constraints": [
+              "no external cache service"
+            ],
+            "anti_patterns": [
+              "external_cache_client"
+            ],
+            "source_evidence": [
+              {
+                "source_type": "runtime",
+                "source_locator": "",
+                "source_revision": "",
+                "observed_at": ""
+              }
+            ],
+            "test_evidence": [],
+            "relationships": [],
+            "derived_rule_ids": [
+              "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+            ]
+          }
+        },
+        "isError": false
+      },
+      "trace": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"result_type\": \"canonical_trace\",\n  \"canonical_decision_id\": \"ADR-9901\",\n  \"canonical_record\": {\n    \"decision_id\": \"ADR-9901\",\n    \"version\": \"1\",\n    \"version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n    \"decision_version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n    \"content_digest\": \"662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650\",\n    \"decision_class\": \"architecture\",\n    \"statement\": \"Synthetic M1 cache adapter uses the in-memory backend.\",\n    \"rationale\": \"Inventory and stdio handshake fixture only.\",\n    \"lifecycle_status\": \"active\",\n    \"owner\": \"\",\n    \"decided_at\": \"2026-01-01T00:00:00Z\",\n    \"updated_at\": \"2026-01-01T00:00:00Z\",\n    \"context_scope\": [\n      \"cache\"\n    ],\n    \"targets\": [],\n    \"constraints\": [\n      \"no external cache service\"\n    ],\n    \"anti_patterns\": [\n      \"external_cache_client\"\n    ],\n    \"source_evidence\": [\n      {\n        \"source_type\": \"runtime\",\n        \"source_locator\": \"\",\n        \"source_revision\": \"\",\n        \"observed_at\": \"\"\n      }\n    ],\n    \"test_evidence\": [],\n    \"relationships\": [],\n    \"derived_rule_ids\": [\n      \"ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584\"\n    ]\n  },\n  \"derived_rules\": [\n    {\n      \"rule_id\": \"ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584\",\n      \"decision_id\": \"ADR-9901\",\n      \"decision_version\": \"1\",\n      \"decision_version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n      \"sequence\": 0,\n      \"rule_type\": \"FORBID_LITERAL\",\n      \"rule_payload\": {\n        \"value\": \"external_cache_client\"\n      },\n      \"applicability\": {},\n      \"lifecycle_status\": \"active\"\n    }\n  ],\n  \"declared_test_evidence\": [],\n  \"missing_links\": [\n    \"declared_test_evidence: none declared for canonical decision\",\n    \"enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)\"\n  ]\n}"
+          }
+        ],
+        "structuredContent": {
+          "result_type": "canonical_trace",
+          "canonical_decision_id": "ADR-9901",
+          "canonical_record": {
+            "decision_id": "ADR-9901",
+            "version": "1",
+            "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+            "decision_class": "architecture",
+            "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+            "rationale": "Inventory and stdio handshake fixture only.",
+            "lifecycle_status": "active",
+            "owner": "",
+            "decided_at": "2026-01-01T00:00:00Z",
+            "updated_at": "2026-01-01T00:00:00Z",
+            "context_scope": [
+              "cache"
+            ],
+            "targets": [],
+            "constraints": [
+              "no external cache service"
+            ],
+            "anti_patterns": [
+              "external_cache_client"
+            ],
+            "source_evidence": [
+              {
+                "source_type": "runtime",
+                "source_locator": "",
+                "source_revision": "",
+                "observed_at": ""
+              }
+            ],
+            "test_evidence": [],
+            "relationships": [],
+            "derived_rule_ids": [
+              "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+            ]
+          },
+          "derived_rules": [
+            {
+              "rule_id": "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584",
+              "decision_id": "ADR-9901",
+              "decision_version": "1",
+              "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+              "sequence": 0,
+              "rule_type": "FORBID_LITERAL",
+              "rule_payload": {
+                "value": "external_cache_client"
+              },
+              "applicability": {},
+              "lifecycle_status": "active"
+            }
+          ],
+          "declared_test_evidence": [],
+          "missing_links": [
+            "declared_test_evidence: none declared for canonical decision",
+            "enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)"
+          ]
+        },
+        "isError": false
+      }
+    },
+    "normalized": {
+      "search": {
+        "proposals": [],
+        "canonical_decisions": [
+          {
+            "decision_id": "ADR-9901",
+            "version": "1",
+            "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+            "decision_class": "architecture",
+            "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+            "rationale": "Inventory and stdio handshake fixture only.",
+            "lifecycle_status": "active",
+            "owner": "",
+            "decided_at": "2026-01-01T00:00:00Z",
+            "updated_at": "2026-01-01T00:00:00Z",
+            "context_scope": [
+              "cache"
+            ],
+            "targets": [],
+            "constraints": [
+              "no external cache service"
+            ],
+            "anti_patterns": [
+              "external_cache_client"
+            ],
+            "source_evidence": [
+              {
+                "source_type": "runtime",
+                "source_locator": "",
+                "source_revision": "",
+                "observed_at": ""
+              }
+            ],
+            "test_evidence": [],
+            "relationships": [],
+            "derived_rule_ids": [
+              "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+            ]
+          },
+          {
+            "decision_id": "ADR-9902",
+            "version": "1",
+            "version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+            "decision_version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+            "content_digest": "ee82d7d1d19eec5d43fbd5814ba8e6ad9032ea589e66f0da53784c898e72de58",
+            "decision_class": "architecture",
+            "statement": "Synthetic deprecated cache policy for M4-F1 lifecycle coverage.",
+            "rationale": "Deprecated lifecycle control only; no typed rules.",
+            "lifecycle_status": "deprecated",
+            "owner": "",
+            "decided_at": "2026-01-01T00:00:00Z",
+            "updated_at": "2026-01-01T00:00:00Z",
+            "context_scope": [
+              "cache"
+            ],
+            "targets": [],
+            "constraints": [],
+            "anti_patterns": [],
+            "source_evidence": [
+              {
+                "source_type": "runtime",
+                "source_locator": "",
+                "source_revision": "",
+                "observed_at": ""
+              }
+            ],
+            "test_evidence": [],
+            "relationships": [],
+            "derived_rule_ids": []
+          }
+        ]
+      },
+      "get": {
+        "record_type": "canonical_decision",
+        "canonical_decision": {
+          "decision_id": "ADR-9901",
+          "version": "1",
+          "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+          "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+          "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+          "decision_class": "architecture",
+          "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+          "rationale": "Inventory and stdio handshake fixture only.",
+          "lifecycle_status": "active",
+          "owner": "",
+          "decided_at": "2026-01-01T00:00:00Z",
+          "updated_at": "2026-01-01T00:00:00Z",
+          "context_scope": [
+            "cache"
+          ],
+          "targets": [],
+          "constraints": [
+            "no external cache service"
+          ],
+          "anti_patterns": [
+            "external_cache_client"
+          ],
+          "source_evidence": [
+            {
+              "source_type": "runtime",
+              "source_locator": "",
+              "source_revision": "",
+              "observed_at": ""
+            }
+          ],
+          "test_evidence": [],
+          "relationships": [],
+          "derived_rule_ids": [
+            "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+          ]
+        }
+      },
+      "trace": {
+        "result_type": "canonical_trace",
+        "canonical_decision_id": "ADR-9901",
+        "canonical_record": {
+          "decision_id": "ADR-9901",
+          "version": "1",
+          "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+          "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+          "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+          "decision_class": "architecture",
+          "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+          "rationale": "Inventory and stdio handshake fixture only.",
+          "lifecycle_status": "active",
+          "owner": "",
+          "decided_at": "2026-01-01T00:00:00Z",
+          "updated_at": "2026-01-01T00:00:00Z",
+          "context_scope": [
+            "cache"
+          ],
+          "targets": [],
+          "constraints": [
+            "no external cache service"
+          ],
+          "anti_patterns": [
+            "external_cache_client"
+          ],
+          "source_evidence": [
+            {
+              "source_type": "runtime",
+              "source_locator": "",
+              "source_revision": "",
+              "observed_at": ""
+            }
+          ],
+          "test_evidence": [],
+          "relationships": [],
+          "derived_rule_ids": [
+            "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+          ]
+        },
+        "derived_rules": [
+          {
+            "rule_id": "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584",
+            "decision_id": "ADR-9901",
+            "decision_version": "1",
+            "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "sequence": 0,
+            "rule_type": "FORBID_LITERAL",
+            "rule_payload": {
+              "value": "external_cache_client"
+            },
+            "applicability": {},
+            "lifecycle_status": "active"
+          }
+        ],
+        "declared_test_evidence": [],
+        "missing_links": [
+          "declared_test_evidence: none declared for canonical decision",
+          "enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)"
+        ]
+      },
+      "selected_identity": {
+        "decision_id": "ADR-9901",
+        "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+        "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+        "derived_rule_ids": [
+          "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+        ]
+      },
+      "get_identity": {
+        "decision_id": "ADR-9901",
+        "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+        "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+        "derived_rule_ids": [
+          "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+        ]
+      },
+      "trace_identity": {
+        "decision_id": "ADR-9901",
+        "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+        "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+        "derived_rule_ids": [
+          "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+        ]
+      }
+    }
+  },
+  "code_mode": {
+    "execute_calls": 1,
+    "raw": {
+      "result": {
+        "search": {
+          "proposals": [],
+          "canonical_decisions": [
+            {
+              "decision_id": "ADR-9901",
+              "version": "1",
+              "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+              "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+              "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+              "decision_class": "architecture",
+              "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+              "rationale": "Inventory and stdio handshake fixture only.",
+              "lifecycle_status": "active",
+              "owner": "",
+              "decided_at": "2026-01-01T00:00:00Z",
+              "updated_at": "2026-01-01T00:00:00Z",
+              "context_scope": [
+                "cache"
+              ],
+              "targets": [],
+              "constraints": [
+                "no external cache service"
+              ],
+              "anti_patterns": [
+                "external_cache_client"
+              ],
+              "source_evidence": [
+                {
+                  "source_type": "runtime",
+                  "source_locator": "",
+                  "source_revision": "",
+                  "observed_at": ""
+                }
+              ],
+              "test_evidence": [],
+              "relationships": [],
+              "derived_rule_ids": [
+                "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+              ]
+            },
+            {
+              "decision_id": "ADR-9902",
+              "version": "1",
+              "version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+              "decision_version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+              "content_digest": "ee82d7d1d19eec5d43fbd5814ba8e6ad9032ea589e66f0da53784c898e72de58",
+              "decision_class": "architecture",
+              "statement": "Synthetic deprecated cache policy for M4-F1 lifecycle coverage.",
+              "rationale": "Deprecated lifecycle control only; no typed rules.",
+              "lifecycle_status": "deprecated",
+              "owner": "",
+              "decided_at": "2026-01-01T00:00:00Z",
+              "updated_at": "2026-01-01T00:00:00Z",
+              "context_scope": [
+                "cache"
+              ],
+              "targets": [],
+              "constraints": [],
+              "anti_patterns": [],
+              "source_evidence": [
+                {
+                  "source_type": "runtime",
+                  "source_locator": "",
+                  "source_revision": "",
+                  "observed_at": ""
+                }
+              ],
+              "test_evidence": [],
+              "relationships": [],
+              "derived_rule_ids": []
+            }
+          ]
+        },
+        "get": {
+          "record_type": "canonical_decision",
+          "canonical_decision": {
+            "decision_id": "ADR-9901",
+            "version": "1",
+            "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+            "decision_class": "architecture",
+            "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+            "rationale": "Inventory and stdio handshake fixture only.",
+            "lifecycle_status": "active",
+            "owner": "",
+            "decided_at": "2026-01-01T00:00:00Z",
+            "updated_at": "2026-01-01T00:00:00Z",
+            "context_scope": [
+              "cache"
+            ],
+            "targets": [],
+            "constraints": [
+              "no external cache service"
+            ],
+            "anti_patterns": [
+              "external_cache_client"
+            ],
+            "source_evidence": [
+              {
+                "source_type": "runtime",
+                "source_locator": "",
+                "source_revision": "",
+                "observed_at": ""
+              }
+            ],
+            "test_evidence": [],
+            "relationships": [],
+            "derived_rule_ids": [
+              "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+            ]
+          }
+        },
+        "trace": {
+          "result_type": "canonical_trace",
+          "canonical_decision_id": "ADR-9901",
+          "canonical_record": {
+            "decision_id": "ADR-9901",
+            "version": "1",
+            "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+            "decision_class": "architecture",
+            "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+            "rationale": "Inventory and stdio handshake fixture only.",
+            "lifecycle_status": "active",
+            "owner": "",
+            "decided_at": "2026-01-01T00:00:00Z",
+            "updated_at": "2026-01-01T00:00:00Z",
+            "context_scope": [
+              "cache"
+            ],
+            "targets": [],
+            "constraints": [
+              "no external cache service"
+            ],
+            "anti_patterns": [
+              "external_cache_client"
+            ],
+            "source_evidence": [
+              {
+                "source_type": "runtime",
+                "source_locator": "",
+                "source_revision": "",
+                "observed_at": ""
+              }
+            ],
+            "test_evidence": [],
+            "relationships": [],
+            "derived_rule_ids": [
+              "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+            ]
+          },
+          "derived_rules": [
+            {
+              "rule_id": "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584",
+              "decision_id": "ADR-9901",
+              "decision_version": "1",
+              "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+              "sequence": 0,
+              "rule_type": "FORBID_LITERAL",
+              "rule_payload": {
+                "value": "external_cache_client"
+              },
+              "applicability": {},
+              "lifecycle_status": "active"
+            }
+          ],
+          "declared_test_evidence": [],
+          "missing_links": [
+            "declared_test_evidence: none declared for canonical decision",
+            "enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)"
+          ]
+        },
+        "selected_identity": {
+          "decision_id": "ADR-9901",
+          "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+          "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+          "derived_rule_ids": [
+            "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+          ]
+        },
+        "get_identity": {
+          "decision_id": "ADR-9901",
+          "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+          "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+          "derived_rule_ids": [
+            "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+          ]
+        },
+        "trace_identity": {
+          "decision_id": "ADR-9901",
+          "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+          "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+          "derived_rule_ids": [
+            "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+          ]
+        }
+      }
+    },
+    "normalized": {
+      "search": {
+        "proposals": [],
+        "canonical_decisions": [
+          {
+            "decision_id": "ADR-9901",
+            "version": "1",
+            "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+            "decision_class": "architecture",
+            "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+            "rationale": "Inventory and stdio handshake fixture only.",
+            "lifecycle_status": "active",
+            "owner": "",
+            "decided_at": "2026-01-01T00:00:00Z",
+            "updated_at": "2026-01-01T00:00:00Z",
+            "context_scope": [
+              "cache"
+            ],
+            "targets": [],
+            "constraints": [
+              "no external cache service"
+            ],
+            "anti_patterns": [
+              "external_cache_client"
+            ],
+            "source_evidence": [
+              {
+                "source_type": "runtime",
+                "source_locator": "",
+                "source_revision": "",
+                "observed_at": ""
+              }
+            ],
+            "test_evidence": [],
+            "relationships": [],
+            "derived_rule_ids": [
+              "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+            ]
+          },
+          {
+            "decision_id": "ADR-9902",
+            "version": "1",
+            "version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+            "decision_version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+            "content_digest": "ee82d7d1d19eec5d43fbd5814ba8e6ad9032ea589e66f0da53784c898e72de58",
+            "decision_class": "architecture",
+            "statement": "Synthetic deprecated cache policy for M4-F1 lifecycle coverage.",
+            "rationale": "Deprecated lifecycle control only; no typed rules.",
+            "lifecycle_status": "deprecated",
+            "owner": "",
+            "decided_at": "2026-01-01T00:00:00Z",
+            "updated_at": "2026-01-01T00:00:00Z",
+            "context_scope": [
+              "cache"
+            ],
+            "targets": [],
+            "constraints": [],
+            "anti_patterns": [],
+            "source_evidence": [
+              {
+                "source_type": "runtime",
+                "source_locator": "",
+                "source_revision": "",
+                "observed_at": ""
+              }
+            ],
+            "test_evidence": [],
+            "relationships": [],
+            "derived_rule_ids": []
+          }
+        ]
+      },
+      "get": {
+        "record_type": "canonical_decision",
+        "canonical_decision": {
+          "decision_id": "ADR-9901",
+          "version": "1",
+          "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+          "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+          "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+          "decision_class": "architecture",
+          "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+          "rationale": "Inventory and stdio handshake fixture only.",
+          "lifecycle_status": "active",
+          "owner": "",
+          "decided_at": "2026-01-01T00:00:00Z",
+          "updated_at": "2026-01-01T00:00:00Z",
+          "context_scope": [
+            "cache"
+          ],
+          "targets": [],
+          "constraints": [
+            "no external cache service"
+          ],
+          "anti_patterns": [
+            "external_cache_client"
+          ],
+          "source_evidence": [
+            {
+              "source_type": "runtime",
+              "source_locator": "",
+              "source_revision": "",
+              "observed_at": ""
+            }
+          ],
+          "test_evidence": [],
+          "relationships": [],
+          "derived_rule_ids": [
+            "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+          ]
+        }
+      },
+      "trace": {
+        "result_type": "canonical_trace",
+        "canonical_decision_id": "ADR-9901",
+        "canonical_record": {
+          "decision_id": "ADR-9901",
+          "version": "1",
+          "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+          "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+          "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+          "decision_class": "architecture",
+          "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+          "rationale": "Inventory and stdio handshake fixture only.",
+          "lifecycle_status": "active",
+          "owner": "",
+          "decided_at": "2026-01-01T00:00:00Z",
+          "updated_at": "2026-01-01T00:00:00Z",
+          "context_scope": [
+            "cache"
+          ],
+          "targets": [],
+          "constraints": [
+            "no external cache service"
+          ],
+          "anti_patterns": [
+            "external_cache_client"
+          ],
+          "source_evidence": [
+            {
+              "source_type": "runtime",
+              "source_locator": "",
+              "source_revision": "",
+              "observed_at": ""
+            }
+          ],
+          "test_evidence": [],
+          "relationships": [],
+          "derived_rule_ids": [
+            "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+          ]
+        },
+        "derived_rules": [
+          {
+            "rule_id": "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584",
+            "decision_id": "ADR-9901",
+            "decision_version": "1",
+            "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "sequence": 0,
+            "rule_type": "FORBID_LITERAL",
+            "rule_payload": {
+              "value": "external_cache_client"
+            },
+            "applicability": {},
+            "lifecycle_status": "active"
+          }
+        ],
+        "declared_test_evidence": [],
+        "missing_links": [
+          "declared_test_evidence: none declared for canonical decision",
+          "enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)"
+        ]
+      },
+      "selected_identity": {
+        "decision_id": "ADR-9901",
+        "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+        "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+        "derived_rule_ids": [
+          "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+        ]
+      },
+      "get_identity": {
+        "decision_id": "ADR-9901",
+        "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+        "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+        "derived_rule_ids": [
+          "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+        ]
+      },
+      "trace_identity": {
+        "decision_id": "ADR-9901",
+        "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+        "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+        "derived_rule_ids": [
+          "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+        ]
+      }
+    }
+  },
+  "parity": {
+    "differences": [],
+    "equal": true
+  },
+  "identity": {
+    "expected": {
+      "decision_id": "ADR-9901",
+      "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+      "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+      "derived_rule_ids": [
+        "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+      ]
+    },
+    "selected": {
+      "decision_id": "ADR-9901",
+      "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+      "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+      "derived_rule_ids": [
+        "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+      ]
+    },
+    "get": {
+      "decision_id": "ADR-9901",
+      "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+      "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+      "derived_rule_ids": [
+        "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+      ]
+    },
+    "trace": {
+      "decision_id": "ADR-9901",
+      "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+      "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+      "derived_rule_ids": [
+        "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+      ]
+    },
+    "consistent": true
+  },
+  "downstream_hardcoded_id": false,
+  "call_sequence": {
+    "direct": [
+      "decision.search",
+      "decision.get",
+      "decision.trace"
+    ],
+    "code_mode": [
+      "decision.search",
+      "decision.get",
+      "decision.trace"
+    ],
+    "expected": [
+      "decision.search",
+      "decision.get",
+      "decision.trace"
+    ]
+  },
+  "stderr": "",
+  "chain_code": "async () => {\n  const search = await codemode.decision_search({ query: \"cache\" });\n  const matches = (search.canonical_decisions ?? []).filter(\n    (row) => Array.isArray(row.context_scope) && row.context_scope.includes(\"cache\") && row.lifecycle_status === \"active\"\n  );\n  if (matches.length !== 1) throw new Error(\"expected exactly one canonical cache/active decision, got \" + matches.length);\n  const selected = matches[0];\n  const selectedId = selected.decision_id;\n  const get = await codemode.decision_get({ record_id: selectedId });\n  const gotId = get?.canonical_decision?.decision_id;\n  if (!gotId) throw new Error(\"decision.get returned no canonical decision id\");\n  const trace = await codemode.decision_trace({ record_id: gotId });\n  return {\n    search,\n    get,\n    trace,\n    selected_identity: {\n      decision_id: selected.decision_id,\n      version_id: selected.version_id,\n      content_digest: selected.content_digest,\n      derived_rule_ids: selected.derived_rule_ids\n    },\n    get_identity: {\n      decision_id: gotId,\n      version_id: get.canonical_decision.version_id,\n      content_digest: get.canonical_decision.content_digest,\n      derived_rule_ids: get.canonical_decision.derived_rule_ids\n    },\n    trace_identity: {\n      decision_id: trace.canonical_decision_id,\n      version_id: trace.canonical_record?.version_id,\n      content_digest: trace.canonical_record?.content_digest,\n      derived_rule_ids: trace.canonical_record?.derived_rule_ids\n    }\n  };\n}"
+}

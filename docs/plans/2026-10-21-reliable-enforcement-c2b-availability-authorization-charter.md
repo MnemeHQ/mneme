@@ -415,6 +415,10 @@ as R1 requires. A deleted local declaration is never a revocation (ADR-033
 - Diagnostics are **emitted** on the existing stderr channel. For exit 2 the
   Claude Code blocking transport feeds stderr to the model, but delivery
   claims wait for C3 (C2a §3.7).
+- **Amended by section 17 (2026-10-22):** C3 showed the exit-0 stderr
+  diagnostic of an `AUTHORIZATION_UNVERIFIABLE` proceed never reaches the
+  model (#601). Section 17 adds one PreToolUse `additionalContext` object for
+  that case only.
 
 ## 9. Regression matrix (deterministic, offline)
 
@@ -623,3 +627,210 @@ amendment.
   decision.
 - **Q7. Declaration filename (C2a Q2).** *Accepted:* keep
   `availability.json`; C2b's additive fields fit it.
+
+## 17. Amendment 1: deliver the UNVERIFIABLE proceed diagnostic to the model (2026-10-22)
+
+**Status:** **DRAFT**, proposed for review. It amends section 8 (diagnostics)
+only. Merging it authorizes no implementation. Implementation needs the
+section 17.8 `[layer1-freeze]` amendment, opened as its own PR after this
+amendment merges (Amendment Procedure §3(b)).
+**Decision:** the owner accepted Option 1 of the F-R2 assessment
+([`2026-10-22-c3-fr2-unverifiable-diagnostic-delivery-assessment.md`](2026-10-22-c3-fr2-unverifiable-diagnostic-delivery-assessment.md),
+#604) on 2026-10-22, with the scope fixed in 17.2 to 17.7.
+**Evidence:** C3 Batch R record (#601), probe R-1 Edit-2.
+
+### 17.1 Why
+
+When authorization is `AUTHORIZATION_UNVERIFIABLE`, the hook proceeds
+(section 5.3 R2) and writes its diagnostic to stderr with exit 0. Per the
+Claude Code hook contract, exit-0 stderr reaches the debug log only. In C3
+R-1 Edit-2 the model received no trace of it, so ADR-033 §4.3's "visible
+proceed" is unmet. Two things are distinct:
+
+- **F-R1:** an unverifiable baseline lets the edit proceed. That is the
+  accepted Architecture A limitation, **unchanged** by this amendment.
+- **F-R2:** the model is not told. **This amendment closes F-R2:** when Mneme
+  cannot verify authorization and allows an edit, the model must know the edit
+  proceeded without verified fail-closed enforcement. That does not make the
+  edit safe. It makes the limitation observable.
+
+### 17.2 Behavior (direct-write PreToolUse hook only)
+
+**Trigger, all conditions together:**
+
+- a local declaration is present (the C2a trigger, unchanged);
+- the verification result is `AUTHORIZATION_UNVERIFIABLE` (any reason);
+- the hook returns exit **0** on that invocation.
+
+**Output:** exactly **one** JSON object, on one stdout line:
+
+```json
+{"hookSpecificOutput": {"hookEventName": "PreToolUse", "additionalContext": "<text>"}}
+```
+
+with no `permissionDecision`, no `permissionDecisionReason` and no
+`systemMessage`.
+
+**Text:** fixed template, ASCII only. `<REASON>` is the closed-set reason code.
+
+```
+Mneme availability: authorization could not be verified (AUTHORIZATION_UNVERIFIABLE, reason <REASON>). This edit proceeded without fail-closed availability enforcement.
+```
+
+When an SS-3 memory mismatch is also present, one sentence is appended:
+`The effective memory differs from the declared memory.`
+
+**The text must never:**
+
+- include submitted source content, decision text, rule values, triggers or
+  file paths;
+- state or imply that the edit was checked, verified, compliant or safe;
+- be phrased as an instruction to the model (factual statements only, per
+  the hooks guidance on context text).
+
+**Unchanged:**
+
+- the exit code;
+- every existing stderr line, byte for byte;
+- permission behavior: no permission decision is added, removed or altered.
+
+**Not triggered by:**
+
+- `AUTHORIZED`, `REVOKED` or `VERIFIED_ABSENT`;
+- the no-declaration path, which stays byte-identical (C2a P1);
+- any exit-2 outcome. A trusted strict FAIL under UNVERIFIABLE still exits 2,
+  and its stderr already reaches the model through the blocking transport.
+
+### 17.3 Warn-mode `defer` interaction (explicit)
+
+Warn mode (`_emit_defer`) already writes a stdout object with
+`permissionDecision: "defer"` when a trusted WARN or FAIL verdict occurs in
+warn mode. Per the current hooks reference:
+
+- `additionalContext` is **ignored** when `permissionDecision` is `"defer"`;
+- in `claude -p`, `"defer"` **ends the turn** so the tool can be resumed
+  later. In interactive sessions Claude Code **ignores the hook result** with
+  a warning;
+- `permissionDecisionReason` for `"defer"` goes to the debug log only.
+
+Changing warn-mode output would change permission and flow behavior, which is
+outside this amendment. So when the 17.2 trigger holds **and** warn mode would
+emit `defer` on the same invocation, the rule is:
+
+- **Still one object.** Never two JSON objects.
+- **The warn-mode object is kept as it is** (`permissionDecision: "defer"`,
+  same reason text), and the 17.2 availability text is **appended** to
+  `permissionDecisionReason` on a new line. No output is dropped from the
+  object.
+- **No `additionalContext` field is added.** The docs say the host ignores it
+  with `defer`, so including it would imply a delivery that cannot happen.
+- **Delivery to the model is not claimed for this case.** It is recorded as a
+  disclosed limitation of this amendment, with the stderr diagnostic
+  unchanged.
+
+**Separate finding (F-W1), recorded for an owner decision and not changed
+here:** `_emit_defer`'s docstring assumes `defer` "hands the call back to the
+normal permission flow". The current docs give it different semantics: it
+ends the turn in `-p` and is ignored interactively. Warn mode may therefore
+not behave as documented in `docs/integrations/claude-code.md` ("Surface
+warning to Claude, never block"). C3's fixture runs strict mode, so C3 is
+unaffected. Any warn-mode change needs its own decision.
+
+### 17.4 Regression tests (deterministic, offline; implementation PR)
+
+| # | Case | Expected |
+|---|---|---|
+| A1 | Declaration present, UNVERIFIABLE (`VERIFIER_CONFIG_MISSING`), memory missing | exit 0; stdout is exactly one JSON object matching 17.2 with reason `VERIFIER_CONFIG_MISSING`; stderr byte-identical to `main` |
+| A2 | UNVERIFIABLE (each closed-set reason via the test seam), complete PASS | as A1, with the matching reason |
+| A3 | UNVERIFIABLE with an SS-3 `MNEME_MEMORY` mismatch | as A1 plus the mismatch sentence |
+| A4 | UNVERIFIABLE, strict trusted FAIL | exit 2; stdout empty; stderr unchanged (violation text plus availability line) |
+| A5 | UNVERIFIABLE, warn mode, trusted WARN/FAIL | exit 0; exactly one object with `permissionDecision: "defer"`, original reason plus the appended availability text; **no** `additionalContext` |
+| A6 | AUTHORIZED refusals (R3-R6) | unchanged: exit 2, stdout empty |
+| A7 | `REVOKED`, `VERIFIED_ABSENT` proceeds | stdout empty; stderr unchanged |
+| A8 | No declaration (C2a P1/P2) | byte-identical to `main`; no verifier call |
+| A9 | Every A1-A5 output | parses as one JSON object; ASCII only; contains no submitted-content marker, no decision text, no path; never "checked", "verified edit", "compliant" or "safe" |
+| A10 | All C2a and C2b tests | pass unchanged, apart from the stdout additions A1-A3 and A5 |
+
+### 17.5 Live proof (C3; separately authorized run)
+
+The implementation is not accepted as closing F-R2 until a live run on
+**Claude Code 2.1.303** shows that the 17.2 object reaches the model on an
+UNVERIFIABLE proceed. The proof is the text in a model-bound entry: the
+transcript `hook_additional_context` attachment, under the H1 rules R1-R3.
+Debug or host output does not count (rule R4).
+
+- **Setup:** a deterministic UNVERIFIABLE condition, for example scope row D-2
+  (`origin` removed, giving `VERIFIER_CONFIG_MISSING`), so no network block is
+  needed.
+- **Controls:** the paired ABSENT and AUTHORIZED controls.
+- **Harness:** the classifier is extended to check delivery for UNVERIFIABLE
+  proceed rows, which needs transcript capture in headless runs.
+- **Authorization:** that harness change and run are authorized separately.
+
+The C3 record #601 is not rewritten. R-1 Edit-2 stays a FAIL.
+
+### 17.6 Preserved
+
+- ADR-033 Architecture A, including F-R1 (no cache, no retry, no grace
+  window, no Architecture B).
+- All refusal behavior (section 5.3), exit codes, stderr text, permission
+  behavior.
+- Warn-mode output (except the 17.3 append).
+- `mneme check`, the verifier, the declaration schema.
+- Bash, SessionStart and Stop handlers.
+
+### 17.7 Not authorized
+
+- Any `systemMessage` (user-facing) output; it needs the interactive-arm
+  evidence first (C3 scope Q2).
+- `additionalContext` for any state other than `AUTHORIZATION_UNVERIFIABLE`.
+- Any warn-mode change beyond 17.3, including F-W1.
+- Any runtime change before the 17.8 amendment merges.
+- Any C3 run, R-1 re-run or C4 work.
+
+### 17.8 Proposed `[layer1-freeze]` amendment (draft; not applied here)
+
+To be opened as a separate PR titled
+`[layer1-freeze] Authorize ADR-033 C2b Amendment 1 UNVERIFIABLE diagnostic delivery`,
+appended after the C2b amendment in `docs/architecture/layer1-freeze-e73ff7d.md`
+once this amendment merges:
+
+> **Amendment — authorize ADR-033 C2b Amendment 1: UNVERIFIABLE diagnostic
+> delivery (YYYY-MM-DD)**
+>
+> This authorizes **one additional stdout output at one boundary**. It does
+> not authorize any refusal, permission or exit-code change, any other
+> availability state, `systemMessage`, or any warn-mode change beyond the
+> charter's 17.3 append.
+>
+> **Change:** at the Claude Code direct-write boundary (`handle_event`, the
+> `emit_availability` path in `mneme/integrations/claude_code/`), when a local
+> declaration is present, authorization is `AUTHORIZATION_UNVERIFIABLE` and
+> the hook exits 0, write exactly one stdout object
+> `{"hookSpecificOutput": {"hookEventName": "PreToolUse", "additionalContext": <17.2 text>}}`.
+> In the warn-mode `defer` case, append the 17.2 text to the existing
+> `permissionDecisionReason` instead, still as one object. Exit codes, stderr
+> and permission behavior are unchanged. Without a declaration, behavior is
+> byte-identical to `main`.
+>
+> **Sections referenced:** the Freeze Anchor **Status** clause and the
+> Amendment Procedure.
+>
+> **Rationale (Amendment Procedure §3(b)).** A distinct charter amendment was
+> already merged: C2b charter section 17 (PR #NNN, squash `<sha>`), following
+> the C3 Batch R record (#601) and the F-R2 assessment (#604), under accepted
+> ADR-033.
+>
+> **Governing authority:** accepted ADR-033 §4.3 and §7; the merged C2a and
+> C2b charters.
+>
+> No other code path is authorized.
+
+### 17.9 Sequence
+
+1. This amendment PR: review and merge (documentation only).
+2. The 17.8 `[layer1-freeze]` PR: review and merge.
+3. One implementation PR meeting 17.4, with no other change.
+4. Separately authorized: the 17.5 harness change and live proof on 2.1.303,
+   then the narrow R-1 re-run. #601's original results are never
+   overwritten.

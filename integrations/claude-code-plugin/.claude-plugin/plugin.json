@@ -1,8 +1,8 @@
 {
   "name": "mneme",
   "displayName": "Mneme",
-  "version": "0.1.0",
-  "description": "Enforce architectural decisions and engineering standards before Claude Code writes changes.",
+  "version": "0.1.1",
+  "description": "Enforce architectural decisions before Claude Code writes changes. Requires the mneme-hq CLI: pipx install mneme-hq.",
   "author": {
     "name": "Mneme HQ",
     "url": "https://mnemehq.com"

@@ -1,0 +1,1968 @@
+{
+  "run": "run2",
+  "started_at": "2026-10-25T13:54:55.232Z",
+  "tasks": [
+    {
+      "id": "T1",
+      "family": "single_get",
+      "expected": {
+        "decision_id": "ADR-B0-001",
+        "version": "1",
+        "version_id": "dver-6321b0b53db41080445166681c6546a9",
+        "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+        "lifecycle_status": "active",
+        "context_scope": [
+          "cache",
+          "storage"
+        ],
+        "derived_rule_ids": [
+          "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+        ]
+      },
+      "results": {
+        "direct": {
+          "task_id": "T1",
+          "family": "single_get",
+          "arm": "direct",
+          "started_at": "2026-10-25T13:54:23.295Z",
+          "ok": true,
+          "actual": {
+            "decision_id": "ADR-B0-001",
+            "version": "1",
+            "version_id": "dver-6321b0b53db41080445166681c6546a9",
+            "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+            "lifecycle_status": "active",
+            "context_scope": [
+              "cache",
+              "storage"
+            ],
+            "derived_rule_ids": [
+              "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+            ]
+          },
+          "expected": {
+            "decision_id": "ADR-B0-001",
+            "version": "1",
+            "version_id": "dver-6321b0b53db41080445166681c6546a9",
+            "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+            "lifecycle_status": "active",
+            "context_scope": [
+              "cache",
+              "storage"
+            ],
+            "derived_rule_ids": [
+              "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+            ]
+          },
+          "mcp_calls": [
+            {
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-B0-001"
+              },
+              "request_id": 2,
+              "outcome": "fulfilled",
+              "error_code": null,
+              "duration_ms": 11,
+              "result_bytes": 3180
+            }
+          ],
+          "model_turns": "NOT_MEASURED",
+          "input_tokens": "NOT_MEASURED",
+          "output_tokens": "NOT_MEASURED",
+          "intermediate_context_model_tokens": "NOT_MEASURED",
+          "no_proposal": true,
+          "functional_completion": true,
+          "decision_identity_ok": true,
+          "process_cleanup_ok": true,
+          "duration_ms": 11,
+          "mcp_call_count": 1,
+          "mcp_result_bytes": 3180,
+          "result_bytes": 325,
+          "host_calls": 0,
+          "host_events": [],
+          "cleanup": {
+            "kind": "direct",
+            "phase": "T1-direct",
+            "errors": [],
+            "pid": 4168,
+            "server_exit_observed": true,
+            "server_alive_after": false
+          },
+          "finished_at": "2026-10-25T13:54:24.962Z"
+        },
+        "code": {
+          "task_id": "T1",
+          "family": "single_get",
+          "arm": "code",
+          "started_at": "2026-10-25T13:54:24.963Z",
+          "ok": true,
+          "actual": {
+            "decision_id": "ADR-B0-001",
+            "version": "1",
+            "version_id": "dver-6321b0b53db41080445166681c6546a9",
+            "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+            "lifecycle_status": "active",
+            "context_scope": [
+              "cache",
+              "storage"
+            ],
+            "derived_rule_ids": [
+              "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+            ]
+          },
+          "expected": {
+            "decision_id": "ADR-B0-001",
+            "version": "1",
+            "version_id": "dver-6321b0b53db41080445166681c6546a9",
+            "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+            "lifecycle_status": "active",
+            "context_scope": [
+              "cache",
+              "storage"
+            ],
+            "derived_rule_ids": [
+              "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+            ]
+          },
+          "mcp_calls": [
+            {
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-B0-001"
+              },
+              "request_id": 2,
+              "outcome": "fulfilled",
+              "error_code": null,
+              "duration_ms": 11,
+              "result_bytes": 3180
+            }
+          ],
+          "model_turns": "NOT_MEASURED",
+          "input_tokens": "NOT_MEASURED",
+          "output_tokens": "NOT_MEASURED",
+          "intermediate_context_model_tokens": "NOT_MEASURED",
+          "no_proposal": true,
+          "functional_completion": true,
+          "decision_identity_ok": true,
+          "process_cleanup_ok": true,
+          "duration_ms": 34,
+          "mcp_call_count": 1,
+          "mcp_result_bytes": 3180,
+          "result_bytes": 325,
+          "host_calls": 1,
+          "host_events": [
+            {
+              "ts": "2026-10-25T13:54:26.608Z",
+              "type": "host_call_started",
+              "callId": 1,
+              "provider": "codemode",
+              "method": "decision_get"
+            },
+            {
+              "ts": "2026-10-25T13:54:26.619Z",
+              "type": "host_call_settled",
+              "callId": 1,
+              "provider": "codemode",
+              "method": "decision_get",
+              "outcome": "fulfilled"
+            }
+          ],
+          "cleanup": {
+            "kind": "direct",
+            "phase": "T1-code",
+            "errors": [],
+            "pid": 72968,
+            "server_exit_observed": true,
+            "server_alive_after": false
+          },
+          "finished_at": "2026-10-25T13:54:26.782Z"
+        }
+      }
+    },
+    {
+      "id": "T2",
+      "family": "single_search",
+      "expected": {
+        "canonical_ids": [
+          "ADR-B0-003"
+        ],
+        "count": 1
+      },
+      "results": {
+        "direct": {
+          "task_id": "T2",
+          "family": "single_search",
+          "arm": "direct",
+          "started_at": "2026-10-25T13:54:26.783Z",
+          "ok": true,
+          "actual": {
+            "canonical_ids": [
+              "ADR-B0-003"
+            ],
+            "count": 1
+          },
+          "expected": {
+            "canonical_ids": [
+              "ADR-B0-003"
+            ],
+            "count": 1
+          },
+          "mcp_calls": [
+            {
+              "name": "decision.search",
+              "args": {
+                "query": "marker_adr-b0-003",
+                "canonical_lifecycle_status": "active"
+              },
+              "request_id": 2,
+              "outcome": "fulfilled",
+              "error_code": null,
+              "duration_ms": 11,
+              "result_bytes": 3008
+            }
+          ],
+          "model_turns": "NOT_MEASURED",
+          "input_tokens": "NOT_MEASURED",
+          "output_tokens": "NOT_MEASURED",
+          "intermediate_context_model_tokens": "NOT_MEASURED",
+          "no_proposal": true,
+          "functional_completion": true,
+          "decision_identity_ok": true,
+          "process_cleanup_ok": true,
+          "duration_ms": 11,
+          "mcp_call_count": 1,
+          "mcp_result_bytes": 3008,
+          "result_bytes": 42,
+          "host_calls": 0,
+          "host_events": [],
+          "cleanup": {
+            "kind": "direct",
+            "phase": "T2-direct",
+            "errors": [],
+            "pid": 23268,
+            "server_exit_observed": true,
+            "server_alive_after": false
+          },
+          "finished_at": "2026-10-25T13:54:28.492Z"
+        },
+        "code": {
+          "task_id": "T2",
+          "family": "single_search",
+          "arm": "code",
+          "started_at": "2026-10-25T13:54:28.493Z",
+          "ok": true,
+          "actual": {
+            "canonical_ids": [
+              "ADR-B0-003"
+            ],
+            "count": 1
+          },
+          "expected": {
+            "canonical_ids": [
+              "ADR-B0-003"
+            ],
+            "count": 1
+          },
+          "mcp_calls": [
+            {
+              "name": "decision.search",
+              "args": {
+                "query": "marker_adr-b0-003",
+                "canonical_lifecycle_status": "active"
+              },
+              "request_id": 2,
+              "outcome": "fulfilled",
+              "error_code": null,
+              "duration_ms": 12,
+              "result_bytes": 3008
+            }
+          ],
+          "model_turns": "NOT_MEASURED",
+          "input_tokens": "NOT_MEASURED",
+          "output_tokens": "NOT_MEASURED",
+          "intermediate_context_model_tokens": "NOT_MEASURED",
+          "no_proposal": true,
+          "functional_completion": true,
+          "decision_identity_ok": true,
+          "process_cleanup_ok": true,
+          "duration_ms": 41,
+          "mcp_call_count": 1,
+          "mcp_result_bytes": 3008,
+          "result_bytes": 42,
+          "host_calls": 1,
+          "host_events": [
+            {
+              "ts": "2026-10-25T13:54:30.070Z",
+              "type": "host_call_started",
+              "callId": 1,
+              "provider": "codemode",
+              "method": "decision_search"
+            },
+            {
+              "ts": "2026-10-25T13:54:30.082Z",
+              "type": "host_call_settled",
+              "callId": 1,
+              "provider": "codemode",
+              "method": "decision_search",
+              "outcome": "fulfilled"
+            }
+          ],
+          "cleanup": {
+            "kind": "direct",
+            "phase": "T2-code",
+            "errors": [],
+            "pid": 65788,
+            "server_exit_observed": true,
+            "server_alive_after": false
+          },
+          "finished_at": "2026-10-25T13:54:30.235Z"
+        }
+      }
+    },
+    {
+      "id": "T3",
+      "family": "single_applicable_to",
+      "expected": {
+        "canonical_ids": [
+          "ADR-B0-001",
+          "ADR-B0-002",
+          "ADR-B0-013",
+          "ADR-B0-014"
+        ],
+        "count": 4
+      },
+      "results": {
+        "direct": {
+          "task_id": "T3",
+          "family": "single_applicable_to",
+          "arm": "direct",
+          "started_at": "2026-10-25T13:54:30.236Z",
+          "ok": true,
+          "actual": {
+            "canonical_ids": [
+              "ADR-B0-001",
+              "ADR-B0-002",
+              "ADR-B0-013",
+              "ADR-B0-014"
+            ],
+            "count": 4
+          },
+          "expected": {
+            "canonical_ids": [
+              "ADR-B0-001",
+              "ADR-B0-002",
+              "ADR-B0-013",
+              "ADR-B0-014"
+            ],
+            "count": 4
+          },
+          "mcp_calls": [
+            {
+              "name": "decision.applicable_to",
+              "args": {
+                "context": [
+                  "storage"
+                ]
+              },
+              "request_id": 2,
+              "outcome": "fulfilled",
+              "error_code": null,
+              "duration_ms": 12,
+              "result_bytes": 2986
+            }
+          ],
+          "model_turns": "NOT_MEASURED",
+          "input_tokens": "NOT_MEASURED",
+          "output_tokens": "NOT_MEASURED",
+          "intermediate_context_model_tokens": "NOT_MEASURED",
+          "no_proposal": true,
+          "functional_completion": true,
+          "decision_identity_ok": true,
+          "process_cleanup_ok": true,
+          "duration_ms": 12,
+          "mcp_call_count": 1,
+          "mcp_result_bytes": 2986,
+          "result_bytes": 81,
+          "host_calls": 0,
+          "host_events": [],
+          "cleanup": {
+            "kind": "direct",
+            "phase": "T3-direct",
+            "errors": [],
+            "pid": 19288,
+            "server_exit_observed": true,
+            "server_alive_after": false
+          },
+          "finished_at": "2026-10-25T13:54:31.964Z"
+        },
+        "code": {
+          "task_id": "T3",
+          "family": "single_applicable_to",
+          "arm": "code",
+          "started_at": "2026-10-25T13:54:31.965Z",
+          "ok": true,
+          "actual": {
+            "canonical_ids": [
+              "ADR-B0-001",
+              "ADR-B0-002",
+              "ADR-B0-013",
+              "ADR-B0-014"
+            ],
+            "count": 4
+          },
+          "expected": {
+            "canonical_ids": [
+              "ADR-B0-001",
+              "ADR-B0-002",
+              "ADR-B0-013",
+              "ADR-B0-014"
+            ],
+            "count": 4
+          },
+          "mcp_calls": [
+            {
+              "name": "decision.applicable_to",
+              "args": {
+                "context": [
+                  "storage"
+                ]
+              },
+              "request_id": 2,
+              "outcome": "fulfilled",
+              "error_code": null,
+              "duration_ms": 21,
+              "result_bytes": 2986
+            }
+          ],
+          "model_turns": "NOT_MEASURED",
+          "input_tokens": "NOT_MEASURED",
+          "output_tokens": "NOT_MEASURED",
+          "intermediate_context_model_tokens": "NOT_MEASURED",
+          "no_proposal": true,
+          "functional_completion": true,
+          "decision_identity_ok": true,
+          "process_cleanup_ok": true,
+          "duration_ms": 45,
+          "mcp_call_count": 1,
+          "mcp_result_bytes": 2986,
+          "result_bytes": 81,
+          "host_calls": 1,
+          "host_events": [
+            {
+              "ts": "2026-10-25T13:54:33.728Z",
+              "type": "host_call_started",
+              "callId": 1,
+              "provider": "codemode",
+              "method": "decision_applicable_to"
+            },
+            {
+              "ts": "2026-10-25T13:54:33.749Z",
+              "type": "host_call_settled",
+              "callId": 1,
+              "provider": "codemode",
+              "method": "decision_applicable_to",
+              "outcome": "fulfilled"
+            }
+          ],
+          "cleanup": {
+            "kind": "direct",
+            "phase": "T3-code",
+            "errors": [],
+            "pid": 68928,
+            "server_exit_observed": true,
+            "server_alive_after": false
+          },
+          "finished_at": "2026-10-25T13:54:33.931Z"
+        }
+      }
+    },
+    {
+      "id": "T4",
+      "family": "single_trace",
+      "expected": {
+        "canonical_decision_id": "ADR-B0-001",
+        "version": "1",
+        "version_id": "dver-6321b0b53db41080445166681c6546a9",
+        "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+        "derived_rule_ids": [
+          "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+        ],
+        "declared_test_evidence": [
+          {
+            "selector": "tests/b0/adr-b0-001.spec",
+            "sha": "aad3098acc972583962263cc7ff36bb950739edeeb779683050f6fde3d3f3cfc"
+          }
+        ]
+      },
+      "results": {
+        "direct": {
+          "task_id": "T4",
+          "family": "single_trace",
+          "arm": "direct",
+          "started_at": "2026-10-25T13:54:33.931Z",
+          "ok": true,
+          "actual": {
+            "canonical_decision_id": "ADR-B0-001",
+            "version": "1",
+            "version_id": "dver-6321b0b53db41080445166681c6546a9",
+            "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+            "derived_rule_ids": [
+              "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+            ],
+            "declared_test_evidence": [
+              {
+                "selector": "tests/b0/adr-b0-001.spec",
+                "sha": "aad3098acc972583962263cc7ff36bb950739edeeb779683050f6fde3d3f3cfc"
+              }
+            ]
+          },
+          "expected": {
+            "canonical_decision_id": "ADR-B0-001",
+            "version": "1",
+            "version_id": "dver-6321b0b53db41080445166681c6546a9",
+            "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+            "derived_rule_ids": [
+              "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+            ],
+            "declared_test_evidence": [
+              {
+                "selector": "tests/b0/adr-b0-001.spec",
+                "sha": "aad3098acc972583962263cc7ff36bb950739edeeb779683050f6fde3d3f3cfc"
+              }
+            ]
+          },
+          "mcp_calls": [
+            {
+              "name": "decision.trace",
+              "args": {
+                "record_id": "ADR-B0-001"
+              },
+              "request_id": 2,
+              "outcome": "fulfilled",
+              "error_code": null,
+              "duration_ms": 13,
+              "result_bytes": 4996
+            }
+          ],
+          "model_turns": "NOT_MEASURED",
+          "input_tokens": "NOT_MEASURED",
+          "output_tokens": "NOT_MEASURED",
+          "intermediate_context_model_tokens": "NOT_MEASURED",
+          "no_proposal": true,
+          "functional_completion": true,
+          "decision_identity_ok": true,
+          "process_cleanup_ok": true,
+          "duration_ms": 13,
+          "mcp_call_count": 1,
+          "mcp_result_bytes": 4996,
+          "result_bytes": 411,
+          "host_calls": 0,
+          "host_events": [],
+          "cleanup": {
+            "kind": "direct",
+            "phase": "T4-direct",
+            "errors": [],
+            "pid": 1468,
+            "server_exit_observed": true,
+            "server_alive_after": false
+          },
+          "finished_at": "2026-10-25T13:54:35.671Z"
+        },
+        "code": {
+          "task_id": "T4",
+          "family": "single_trace",
+          "arm": "code",
+          "started_at": "2026-10-25T13:54:35.671Z",
+          "ok": true,
+          "actual": {
+            "canonical_decision_id": "ADR-B0-001",
+            "version": "1",
+            "version_id": "dver-6321b0b53db41080445166681c6546a9",
+            "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+            "derived_rule_ids": [
+              "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+            ],
+            "declared_test_evidence": [
+              {
+                "selector": "tests/b0/adr-b0-001.spec",
+                "sha": "aad3098acc972583962263cc7ff36bb950739edeeb779683050f6fde3d3f3cfc"
+              }
+            ]
+          },
+          "expected": {
+            "canonical_decision_id": "ADR-B0-001",
+            "version": "1",
+            "version_id": "dver-6321b0b53db41080445166681c6546a9",
+            "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+            "derived_rule_ids": [
+              "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+            ],
+            "declared_test_evidence": [
+              {
+                "selector": "tests/b0/adr-b0-001.spec",
+                "sha": "aad3098acc972583962263cc7ff36bb950739edeeb779683050f6fde3d3f3cfc"
+              }
+            ]
+          },
+          "mcp_calls": [
+            {
+              "name": "decision.trace",
+              "args": {
+                "record_id": "ADR-B0-001"
+              },
+              "request_id": 2,
+              "outcome": "fulfilled",
+              "error_code": null,
+              "duration_ms": 12,
+              "result_bytes": 4996
+            }
+          ],
+          "model_turns": "NOT_MEASURED",
+          "input_tokens": "NOT_MEASURED",
+          "output_tokens": "NOT_MEASURED",
+          "intermediate_context_model_tokens": "NOT_MEASURED",
+          "no_proposal": true,
+          "functional_completion": true,
+          "decision_identity_ok": true,
+          "process_cleanup_ok": true,
+          "duration_ms": 37,
+          "mcp_call_count": 1,
+          "mcp_result_bytes": 4996,
+          "result_bytes": 411,
+          "host_calls": 1,
+          "host_events": [
+            {
+              "ts": "2026-10-25T13:54:37.162Z",
+              "type": "host_call_started",
+              "callId": 1,
+              "provider": "codemode",
+              "method": "decision_trace"
+            },
+            {
+              "ts": "2026-10-25T13:54:37.175Z",
+              "type": "host_call_settled",
+              "callId": 1,
+              "provider": "codemode",
+              "method": "decision_trace",
+              "outcome": "fulfilled"
+            }
+          ],
+          "cleanup": {
+            "kind": "direct",
+            "phase": "T4-code",
+            "errors": [],
+            "pid": 11100,
+            "server_exit_observed": true,
+            "server_alive_after": false
+          },
+          "finished_at": "2026-10-25T13:54:37.329Z"
+        }
+      }
+    },
+    {
+      "id": "T5",
+      "family": "search_then_get",
+      "expected": {
+        "decision_id": "ADR-B0-005",
+        "version": "1",
+        "version_id": "dver-47cd76fdfae32baeea61f8217b71f0ef",
+        "content_digest": "7d2408aa0101228eed70f0226e577e49d2d0e73ec6aca894d2d026ae5b10785e",
+        "lifecycle_status": "active",
+        "context_scope": [
+          "auth",
+          "ui"
+        ],
+        "derived_rule_ids": [
+          "ADR-B0-005:FORBID_LITERAL:33e0b5c00d04cbc00fe36d09c7ed8c6b"
+        ]
+      },
+      "results": {
+        "direct": {
+          "task_id": "T5",
+          "family": "search_then_get",
+          "arm": "direct",
+          "started_at": "2026-10-25T13:54:37.329Z",
+          "ok": true,
+          "actual": {
+            "decision_id": "ADR-B0-005",
+            "version": "1",
+            "version_id": "dver-47cd76fdfae32baeea61f8217b71f0ef",
+            "content_digest": "7d2408aa0101228eed70f0226e577e49d2d0e73ec6aca894d2d026ae5b10785e",
+            "lifecycle_status": "active",
+            "context_scope": [
+              "auth",
+              "ui"
+            ],
+            "derived_rule_ids": [
+              "ADR-B0-005:FORBID_LITERAL:33e0b5c00d04cbc00fe36d09c7ed8c6b"
+            ]
+          },
+          "expected": {
+            "decision_id": "ADR-B0-005",
+            "version": "1",
+            "version_id": "dver-47cd76fdfae32baeea61f8217b71f0ef",
+            "content_digest": "7d2408aa0101228eed70f0226e577e49d2d0e73ec6aca894d2d026ae5b10785e",
+            "lifecycle_status": "active",
+            "context_scope": [
+              "auth",
+              "ui"
+            ],
+            "derived_rule_ids": [
+              "ADR-B0-005:FORBID_LITERAL:33e0b5c00d04cbc00fe36d09c7ed8c6b"
+            ]
+          },
+          "mcp_calls": [
+            {
+              "name": "decision.search",
+              "args": {
+                "query": "marker_adr-b0-005",
+                "canonical_lifecycle_status": "active"
+              },
+              "request_id": 2,
+              "outcome": "fulfilled",
+              "error_code": null,
+              "duration_ms": 11,
+              "result_bytes": 2918
+            },
+            {
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-B0-005"
+              },
+              "request_id": 3,
+              "outcome": "fulfilled",
+              "error_code": null,
+              "duration_ms": 12,
+              "result_bytes": 2862
+            }
+          ],
+          "model_turns": "NOT_MEASURED",
+          "input_tokens": "NOT_MEASURED",
+          "output_tokens": "NOT_MEASURED",
+          "intermediate_context_model_tokens": "NOT_MEASURED",
+          "no_proposal": true,
+          "functional_completion": true,
+          "decision_identity_ok": true,
+          "process_cleanup_ok": true,
+          "duration_ms": 23,
+          "mcp_call_count": 2,
+          "mcp_result_bytes": 5780,
+          "result_bytes": 319,
+          "host_calls": 0,
+          "host_events": [],
+          "cleanup": {
+            "kind": "direct",
+            "phase": "T5-direct",
+            "errors": [],
+            "pid": 69652,
+            "server_exit_observed": true,
+            "server_alive_after": false
+          },
+          "finished_at": "2026-10-25T13:54:39.118Z"
+        },
+        "code": {
+          "task_id": "T5",
+          "family": "search_then_get",
+          "arm": "code",
+          "started_at": "2026-10-25T13:54:39.118Z",
+          "ok": true,
+          "actual": {
+            "decision_id": "ADR-B0-005",
+            "version": "1",
+            "version_id": "dver-47cd76fdfae32baeea61f8217b71f0ef",
+            "content_digest": "7d2408aa0101228eed70f0226e577e49d2d0e73ec6aca894d2d026ae5b10785e",
+            "lifecycle_status": "active",
+            "context_scope": [
+              "auth",
+              "ui"
+            ],
+            "derived_rule_ids": [
+              "ADR-B0-005:FORBID_LITERAL:33e0b5c00d04cbc00fe36d09c7ed8c6b"
+            ]
+          },
+          "expected": {
+            "decision_id": "ADR-B0-005",
+            "version": "1",
+            "version_id": "dver-47cd76fdfae32baeea61f8217b71f0ef",
+            "content_digest": "7d2408aa0101228eed70f0226e577e49d2d0e73ec6aca894d2d026ae5b10785e",
+            "lifecycle_status": "active",
+            "context_scope": [
+              "auth",
+              "ui"
+            ],
+            "derived_rule_ids": [
+              "ADR-B0-005:FORBID_LITERAL:33e0b5c00d04cbc00fe36d09c7ed8c6b"
+            ]
+          },
+          "mcp_calls": [
+            {
+              "name": "decision.search",
+              "args": {
+                "query": "marker_adr-b0-005",
+                "canonical_lifecycle_status": "active"
+              },
+              "request_id": 2,
+              "outcome": "fulfilled",
+              "error_code": null,
+              "duration_ms": 15,
+              "result_bytes": 2918
+            },
+            {
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-B0-005"
+              },
+              "request_id": 3,
+              "outcome": "fulfilled",
+              "error_code": null,
+              "duration_ms": 14,
+              "result_bytes": 2862
+            }
+          ],
+          "model_turns": "NOT_MEASURED",
+          "input_tokens": "NOT_MEASURED",
+          "output_tokens": "NOT_MEASURED",
+          "intermediate_context_model_tokens": "NOT_MEASURED",
+          "no_proposal": true,
+          "functional_completion": true,
+          "decision_identity_ok": true,
+          "process_cleanup_ok": true,
+          "duration_ms": 66,
+          "mcp_call_count": 2,
+          "mcp_result_bytes": 5780,
+          "result_bytes": 319,
+          "host_calls": 2,
+          "host_events": [
+            {
+              "ts": "2026-10-25T13:54:40.976Z",
+              "type": "host_call_started",
+              "callId": 1,
+              "provider": "codemode",
+              "method": "decision_search"
+            },
+            {
+              "ts": "2026-10-25T13:54:40.991Z",
+              "type": "host_call_started",
+              "callId": 2,
+              "provider": "codemode",
+              "method": "decision_get"
+            },
+            {
+              "ts": "2026-10-25T13:54:40.991Z",
+              "type": "host_call_settled",
+              "callId": 1,
+              "provider": "codemode",
+              "method": "decision_search",
+              "outcome": "fulfilled"
+            },
+            {
+              "ts": "2026-10-25T13:54:41.006Z",
+              "type": "host_call_settled",
+              "callId": 2,
+              "provider": "codemode",
+              "method": "decision_get",
+              "outcome": "fulfilled"
+            }
+          ],
+          "cleanup": {
+            "kind": "direct",
+            "phase": "T5-code",
+            "errors": [],
+            "pid": 58076,
+            "server_exit_observed": true,
+            "server_alive_after": false
+          },
+          "finished_at": "2026-10-25T13:54:41.337Z"
+        }
+      }
+    },
+    {
+      "id": "T6",
+      "family": "search_then_trace",
+      "expected": {
+        "canonical_decision_id": "ADR-B0-018",
+        "version": "1",
+        "version_id": "dver-082a078fea409b08ac2c6b080ea8467b",
+        "content_digest": "e0d33d4075485c7c1047504d597f45dbb24328d25e3ea12b23d6762fee4c4451",
+        "derived_rule_ids": [
+          "ADR-B0-018:FORBID_LITERAL:9117b71942559968fda4807f41dae271"
+        ],
+        "declared_test_evidence": []
+      },
+      "results": {
+        "direct": {
+          "task_id": "T6",
+          "family": "search_then_trace",
+          "arm": "direct",
+          "started_at": "2026-10-25T13:54:41.338Z",
+          "ok": true,
+          "actual": {
+            "canonical_decision_id": "ADR-B0-018",
+            "version": "1",
+            "version_id": "dver-082a078fea409b08ac2c6b080ea8467b",
+            "content_digest": "e0d33d4075485c7c1047504d597f45dbb24328d25e3ea12b23d6762fee4c4451",
+            "derived_rule_ids": [
+              "ADR-B0-018:FORBID_LITERAL:9117b71942559968fda4807f41dae271"
+            ],
+            "declared_test_evidence": []
+          },
+          "expected": {
+            "canonical_decision_id": "ADR-B0-018",
+            "version": "1",
+            "version_id": "dver-082a078fea409b08ac2c6b080ea8467b",
+            "content_digest": "e0d33d4075485c7c1047504d597f45dbb24328d25e3ea12b23d6762fee4c4451",
+            "derived_rule_ids": [
+              "ADR-B0-018:FORBID_LITERAL:9117b71942559968fda4807f41dae271"
+            ],
+            "declared_test_evidence": []
+          },
+          "mcp_calls": [
+            {
+              "name": "decision.search",
+              "args": {
+                "query": "marker_adr-b0-018",
+                "canonical_lifecycle_status": "active"
+              },
+              "request_id": 2,
+              "outcome": "fulfilled",
+              "error_code": null,
+              "duration_ms": 11,
+              "result_bytes": 2918
+            },
+            {
+              "name": "decision.trace",
+              "args": {
+                "record_id": "ADR-B0-018"
+              },
+              "request_id": 3,
+              "outcome": "fulfilled",
+              "error_code": null,
+              "duration_ms": 12,
+              "result_bytes": 4230
+            }
+          ],
+          "model_turns": "NOT_MEASURED",
+          "input_tokens": "NOT_MEASURED",
+          "output_tokens": "NOT_MEASURED",
+          "intermediate_context_model_tokens": "NOT_MEASURED",
+          "no_proposal": true,
+          "functional_completion": true,
+          "decision_identity_ok": true,
+          "process_cleanup_ok": true,
+          "duration_ms": 24,
+          "mcp_call_count": 2,
+          "mcp_result_bytes": 7148,
+          "result_bytes": 299,
+          "host_calls": 0,
+          "host_events": [],
+          "cleanup": {
+            "kind": "direct",
+            "phase": "T6-direct",
+            "errors": [],
+            "pid": 30736,
+            "server_exit_observed": true,
+            "server_alive_after": false
+          },
+          "finished_at": "2026-10-25T13:54:43.478Z"
+        },
+        "code": {
+          "task_id": "T6",
+          "family": "search_then_trace",
+          "arm": "code",
+          "started_at": "2026-10-25T13:54:43.478Z",
+          "ok": true,
+          "actual": {
+            "canonical_decision_id": "ADR-B0-018",
+            "version": "1",
+            "version_id": "dver-082a078fea409b08ac2c6b080ea8467b",
+            "content_digest": "e0d33d4075485c7c1047504d597f45dbb24328d25e3ea12b23d6762fee4c4451",
+            "derived_rule_ids": [
+              "ADR-B0-018:FORBID_LITERAL:9117b71942559968fda4807f41dae271"
+            ],
+            "declared_test_evidence": []
+          },
+          "expected": {
+            "canonical_decision_id": "ADR-B0-018",
+            "version": "1",
+            "version_id": "dver-082a078fea409b08ac2c6b080ea8467b",
+            "content_digest": "e0d33d4075485c7c1047504d597f45dbb24328d25e3ea12b23d6762fee4c4451",
+            "derived_rule_ids": [
+              "ADR-B0-018:FORBID_LITERAL:9117b71942559968fda4807f41dae271"
+            ],
+            "declared_test_evidence": []
+          },
+          "mcp_calls": [
+            {
+              "name": "decision.search",
+              "args": {
+                "query": "marker_adr-b0-018",
+                "canonical_lifecycle_status": "active"
+              },
+              "request_id": 2,
+              "outcome": "fulfilled",
+              "error_code": null,
+              "duration_ms": 12,
+              "result_bytes": 2918
+            },
+            {
+              "name": "decision.trace",
+              "args": {
+                "record_id": "ADR-B0-018"
+              },
+              "request_id": 3,
+              "outcome": "fulfilled",
+              "error_code": null,
+              "duration_ms": 11,
+              "result_bytes": 4230
+            }
+          ],
+          "model_turns": "NOT_MEASURED",
+          "input_tokens": "NOT_MEASURED",
+          "output_tokens": "NOT_MEASURED",
+          "intermediate_context_model_tokens": "NOT_MEASURED",
+          "no_proposal": true,
+          "functional_completion": true,
+          "decision_identity_ok": true,
+          "process_cleanup_ok": true,
+          "duration_ms": 46,
+          "mcp_call_count": 2,
+          "mcp_result_bytes": 7148,
+          "result_bytes": 299,
+          "host_calls": 2,
+          "host_events": [
+            {
+              "ts": "2026-10-25T13:54:45.311Z",
+              "type": "host_call_started",
+              "callId": 1,
+              "provider": "codemode",
+              "method": "decision_search"
+            },
+            {
+              "ts": "2026-10-25T13:54:45.323Z",
+              "type": "host_call_started",
+              "callId": 2,
+              "provider": "codemode",
+              "method": "decision_trace"
+            },
+            {
+              "ts": "2026-10-25T13:54:45.323Z",
+              "type": "host_call_settled",
+              "callId": 1,
+              "provider": "codemode",
+              "method": "decision_search",
+              "outcome": "fulfilled"
+            },
+            {
+              "ts": "2026-10-25T13:54:45.334Z",
+              "type": "host_call_settled",
+              "callId": 2,
+              "provider": "codemode",
+              "method": "decision_trace",
+              "outcome": "fulfilled"
+            }
+          ],
+          "cleanup": {
+            "kind": "direct",
+            "phase": "T6-code",
+            "errors": [],
+            "pid": 17296,
+            "server_exit_observed": true,
+            "server_alive_after": false
+          },
+          "finished_at": "2026-10-25T13:54:45.511Z"
+        }
+      }
+    },
+    {
+      "id": "T7",
+      "family": "applicable_then_get_then_trace",
+      "expected": {
+        "selected_id": "ADR-B0-003",
+        "get": {
+          "decision_id": "ADR-B0-003",
+          "version": "1",
+          "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+          "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+          "lifecycle_status": "active",
+          "context_scope": [
+            "routing",
+            "telemetry"
+          ],
+          "derived_rule_ids": [
+            "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+          ]
+        },
+        "trace": {
+          "canonical_decision_id": "ADR-B0-003",
+          "version": "1",
+          "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+          "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+          "derived_rule_ids": [
+            "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+          ],
+          "declared_test_evidence": []
+        }
+      },
+      "results": {
+        "direct": {
+          "task_id": "T7",
+          "family": "applicable_then_get_then_trace",
+          "arm": "direct",
+          "started_at": "2026-10-25T13:54:45.511Z",
+          "ok": true,
+          "actual": {
+            "selected_id": "ADR-B0-003",
+            "get": {
+              "decision_id": "ADR-B0-003",
+              "version": "1",
+              "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+              "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+              "lifecycle_status": "active",
+              "context_scope": [
+                "routing",
+                "telemetry"
+              ],
+              "derived_rule_ids": [
+                "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+              ]
+            },
+            "trace": {
+              "canonical_decision_id": "ADR-B0-003",
+              "version": "1",
+              "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+              "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+              "derived_rule_ids": [
+                "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+              ],
+              "declared_test_evidence": []
+            }
+          },
+          "expected": {
+            "selected_id": "ADR-B0-003",
+            "get": {
+              "decision_id": "ADR-B0-003",
+              "version": "1",
+              "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+              "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+              "lifecycle_status": "active",
+              "context_scope": [
+                "routing",
+                "telemetry"
+              ],
+              "derived_rule_ids": [
+                "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+              ]
+            },
+            "trace": {
+              "canonical_decision_id": "ADR-B0-003",
+              "version": "1",
+              "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+              "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+              "derived_rule_ids": [
+                "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+              ],
+              "declared_test_evidence": []
+            }
+          },
+          "mcp_calls": [
+            {
+              "name": "decision.applicable_to",
+              "args": {
+                "context": [
+                  "routing"
+                ]
+              },
+              "request_id": 2,
+              "outcome": "fulfilled",
+              "error_code": null,
+              "duration_ms": 12,
+              "result_bytes": 2986
+            },
+            {
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-B0-003"
+              },
+              "request_id": 3,
+              "outcome": "fulfilled",
+              "error_code": null,
+              "duration_ms": 10,
+              "result_bytes": 2952
+            },
+            {
+              "name": "decision.trace",
+              "args": {
+                "record_id": "ADR-B0-003"
+              },
+              "request_id": 4,
+              "outcome": "fulfilled",
+              "error_code": null,
+              "duration_ms": 10,
+              "result_bytes": 4320
+            }
+          ],
+          "model_turns": "NOT_MEASURED",
+          "input_tokens": "NOT_MEASURED",
+          "output_tokens": "NOT_MEASURED",
+          "intermediate_context_model_tokens": "NOT_MEASURED",
+          "no_proposal": true,
+          "functional_completion": true,
+          "decision_identity_ok": true,
+          "process_cleanup_ok": true,
+          "duration_ms": 32,
+          "mcp_call_count": 3,
+          "mcp_result_bytes": 10258,
+          "result_bytes": 672,
+          "host_calls": 0,
+          "host_events": [],
+          "cleanup": {
+            "kind": "direct",
+            "phase": "T7-direct",
+            "errors": [],
+            "pid": 4960,
+            "server_exit_observed": true,
+            "server_alive_after": false
+          },
+          "finished_at": "2026-10-25T13:54:47.348Z"
+        },
+        "code": {
+          "task_id": "T7",
+          "family": "applicable_then_get_then_trace",
+          "arm": "code",
+          "started_at": "2026-10-25T13:54:47.349Z",
+          "ok": true,
+          "actual": {
+            "selected_id": "ADR-B0-003",
+            "get": {
+              "decision_id": "ADR-B0-003",
+              "version": "1",
+              "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+              "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+              "lifecycle_status": "active",
+              "context_scope": [
+                "routing",
+                "telemetry"
+              ],
+              "derived_rule_ids": [
+                "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+              ]
+            },
+            "trace": {
+              "canonical_decision_id": "ADR-B0-003",
+              "version": "1",
+              "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+              "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+              "derived_rule_ids": [
+                "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+              ],
+              "declared_test_evidence": []
+            }
+          },
+          "expected": {
+            "selected_id": "ADR-B0-003",
+            "get": {
+              "decision_id": "ADR-B0-003",
+              "version": "1",
+              "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+              "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+              "lifecycle_status": "active",
+              "context_scope": [
+                "routing",
+                "telemetry"
+              ],
+              "derived_rule_ids": [
+                "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+              ]
+            },
+            "trace": {
+              "canonical_decision_id": "ADR-B0-003",
+              "version": "1",
+              "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+              "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+              "derived_rule_ids": [
+                "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+              ],
+              "declared_test_evidence": []
+            }
+          },
+          "mcp_calls": [
+            {
+              "name": "decision.applicable_to",
+              "args": {
+                "context": [
+                  "routing"
+                ]
+              },
+              "request_id": 2,
+              "outcome": "fulfilled",
+              "error_code": null,
+              "duration_ms": 13,
+              "result_bytes": 2986
+            },
+            {
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-B0-003"
+              },
+              "request_id": 3,
+              "outcome": "fulfilled",
+              "error_code": null,
+              "duration_ms": 12,
+              "result_bytes": 2952
+            },
+            {
+              "name": "decision.trace",
+              "args": {
+                "record_id": "ADR-B0-003"
+              },
+              "request_id": 4,
+              "outcome": "fulfilled",
+              "error_code": null,
+              "duration_ms": 12,
+              "result_bytes": 4320
+            }
+          ],
+          "model_turns": "NOT_MEASURED",
+          "input_tokens": "NOT_MEASURED",
+          "output_tokens": "NOT_MEASURED",
+          "intermediate_context_model_tokens": "NOT_MEASURED",
+          "no_proposal": true,
+          "functional_completion": true,
+          "decision_identity_ok": true,
+          "process_cleanup_ok": true,
+          "duration_ms": 63,
+          "mcp_call_count": 3,
+          "mcp_result_bytes": 10258,
+          "result_bytes": 672,
+          "host_calls": 3,
+          "host_events": [
+            {
+              "ts": "2026-10-25T13:54:48.999Z",
+              "type": "host_call_started",
+              "callId": 1,
+              "provider": "codemode",
+              "method": "decision_applicable_to"
+            },
+            {
+              "ts": "2026-10-25T13:54:49.012Z",
+              "type": "host_call_started",
+              "callId": 2,
+              "provider": "codemode",
+              "method": "decision_get"
+            },
+            {
+              "ts": "2026-10-25T13:54:49.012Z",
+              "type": "host_call_settled",
+              "callId": 1,
+              "provider": "codemode",
+              "method": "decision_applicable_to",
+              "outcome": "fulfilled"
+            },
+            {
+              "ts": "2026-10-25T13:54:49.025Z",
+              "type": "host_call_started",
+              "callId": 3,
+              "provider": "codemode",
+              "method": "decision_trace"
+            },
+            {
+              "ts": "2026-10-25T13:54:49.025Z",
+              "type": "host_call_settled",
+              "callId": 2,
+              "provider": "codemode",
+              "method": "decision_get",
+              "outcome": "fulfilled"
+            },
+            {
+              "ts": "2026-10-25T13:54:49.037Z",
+              "type": "host_call_settled",
+              "callId": 3,
+              "provider": "codemode",
+              "method": "decision_trace",
+              "outcome": "fulfilled"
+            }
+          ],
+          "cleanup": {
+            "kind": "direct",
+            "phase": "T7-code",
+            "errors": [],
+            "pid": 54736,
+            "server_exit_observed": true,
+            "server_alive_after": false
+          },
+          "finished_at": "2026-10-25T13:54:49.264Z"
+        }
+      }
+    },
+    {
+      "id": "T8",
+      "family": "filter_and_compose",
+      "expected": {
+        "items": [
+          {
+            "decision_id": "ADR-B0-003",
+            "version": "1",
+            "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+            "derived_rule_ids": [
+              "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+            ]
+          },
+          {
+            "decision_id": "ADR-B0-004",
+            "version": "1",
+            "content_digest": "55873a2190bb0d54d2fc060523d759d7fbfcc0f56142ccd2e13b1ea4e319c5a5",
+            "derived_rule_ids": [
+              "ADR-B0-004:FORBID_LITERAL:1562f5d6c95745c48f3245d09f4f5f32"
+            ]
+          }
+        ]
+      },
+      "results": {
+        "direct": {
+          "task_id": "T8",
+          "family": "filter_and_compose",
+          "arm": "direct",
+          "started_at": "2026-10-25T13:54:49.264Z",
+          "ok": true,
+          "actual": {
+            "items": [
+              {
+                "decision_id": "ADR-B0-003",
+                "version": "1",
+                "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                "derived_rule_ids": [
+                  "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                ]
+              },
+              {
+                "decision_id": "ADR-B0-004",
+                "version": "1",
+                "content_digest": "55873a2190bb0d54d2fc060523d759d7fbfcc0f56142ccd2e13b1ea4e319c5a5",
+                "derived_rule_ids": [
+                  "ADR-B0-004:FORBID_LITERAL:1562f5d6c95745c48f3245d09f4f5f32"
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "items": [
+              {
+                "decision_id": "ADR-B0-003",
+                "version": "1",
+                "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                "derived_rule_ids": [
+                  "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                ]
+              },
+              {
+                "decision_id": "ADR-B0-004",
+                "version": "1",
+                "content_digest": "55873a2190bb0d54d2fc060523d759d7fbfcc0f56142ccd2e13b1ea4e319c5a5",
+                "derived_rule_ids": [
+                  "ADR-B0-004:FORBID_LITERAL:1562f5d6c95745c48f3245d09f4f5f32"
+                ]
+              }
+            ]
+          },
+          "mcp_calls": [
+            {
+              "name": "decision.search",
+              "args": {
+                "query": "routing",
+                "canonical_lifecycle_status": "active"
+              },
+              "request_id": 2,
+              "outcome": "fulfilled",
+              "error_code": null,
+              "duration_ms": 13,
+              "result_bytes": 9092
+            },
+            {
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-B0-003"
+              },
+              "request_id": 3,
+              "outcome": "fulfilled",
+              "error_code": null,
+              "duration_ms": 10,
+              "result_bytes": 2952
+            },
+            {
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-B0-004"
+              },
+              "request_id": 4,
+              "outcome": "fulfilled",
+              "error_code": null,
+              "duration_ms": 11,
+              "result_bytes": 3186
+            }
+          ],
+          "model_turns": "NOT_MEASURED",
+          "input_tokens": "NOT_MEASURED",
+          "output_tokens": "NOT_MEASURED",
+          "intermediate_context_model_tokens": "NOT_MEASURED",
+          "no_proposal": true,
+          "functional_completion": true,
+          "decision_identity_ok": true,
+          "process_cleanup_ok": true,
+          "duration_ms": 35,
+          "mcp_call_count": 3,
+          "mcp_result_bytes": 15230,
+          "result_bytes": 429,
+          "host_calls": 0,
+          "host_events": [],
+          "cleanup": {
+            "kind": "direct",
+            "phase": "T8-direct",
+            "errors": [],
+            "pid": 2744,
+            "server_exit_observed": true,
+            "server_alive_after": false
+          },
+          "finished_at": "2026-10-25T13:54:51.372Z"
+        },
+        "code": {
+          "task_id": "T8",
+          "family": "filter_and_compose",
+          "arm": "code",
+          "started_at": "2026-10-25T13:54:51.372Z",
+          "ok": true,
+          "actual": {
+            "items": [
+              {
+                "decision_id": "ADR-B0-003",
+                "version": "1",
+                "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                "derived_rule_ids": [
+                  "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                ]
+              },
+              {
+                "decision_id": "ADR-B0-004",
+                "version": "1",
+                "content_digest": "55873a2190bb0d54d2fc060523d759d7fbfcc0f56142ccd2e13b1ea4e319c5a5",
+                "derived_rule_ids": [
+                  "ADR-B0-004:FORBID_LITERAL:1562f5d6c95745c48f3245d09f4f5f32"
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "items": [
+              {
+                "decision_id": "ADR-B0-003",
+                "version": "1",
+                "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                "derived_rule_ids": [
+                  "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                ]
+              },
+              {
+                "decision_id": "ADR-B0-004",
+                "version": "1",
+                "content_digest": "55873a2190bb0d54d2fc060523d759d7fbfcc0f56142ccd2e13b1ea4e319c5a5",
+                "derived_rule_ids": [
+                  "ADR-B0-004:FORBID_LITERAL:1562f5d6c95745c48f3245d09f4f5f32"
+                ]
+              }
+            ]
+          },
+          "mcp_calls": [
+            {
+              "name": "decision.search",
+              "args": {
+                "query": "routing",
+                "canonical_lifecycle_status": "active"
+              },
+              "request_id": 2,
+              "outcome": "fulfilled",
+              "error_code": null,
+              "duration_ms": 11,
+              "result_bytes": 9092
+            },
+            {
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-B0-003"
+              },
+              "request_id": 3,
+              "outcome": "fulfilled",
+              "error_code": null,
+              "duration_ms": 9,
+              "result_bytes": 2952
+            },
+            {
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-B0-004"
+              },
+              "request_id": 4,
+              "outcome": "fulfilled",
+              "error_code": null,
+              "duration_ms": 9,
+              "result_bytes": 3186
+            }
+          ],
+          "model_turns": "NOT_MEASURED",
+          "input_tokens": "NOT_MEASURED",
+          "output_tokens": "NOT_MEASURED",
+          "intermediate_context_model_tokens": "NOT_MEASURED",
+          "no_proposal": true,
+          "functional_completion": true,
+          "decision_identity_ok": true,
+          "process_cleanup_ok": true,
+          "duration_ms": 57,
+          "mcp_call_count": 3,
+          "mcp_result_bytes": 15230,
+          "result_bytes": 429,
+          "host_calls": 3,
+          "host_events": [
+            {
+              "ts": "2026-10-25T13:54:52.908Z",
+              "type": "host_call_started",
+              "callId": 1,
+              "provider": "codemode",
+              "method": "decision_search"
+            },
+            {
+              "ts": "2026-10-25T13:54:52.920Z",
+              "type": "host_call_started",
+              "callId": 2,
+              "provider": "codemode",
+              "method": "decision_get"
+            },
+            {
+              "ts": "2026-10-25T13:54:52.920Z",
+              "type": "host_call_settled",
+              "callId": 1,
+              "provider": "codemode",
+              "method": "decision_search",
+              "outcome": "fulfilled"
+            },
+            {
+              "ts": "2026-10-25T13:54:52.929Z",
+              "type": "host_call_started",
+              "callId": 3,
+              "provider": "codemode",
+              "method": "decision_get"
+            },
+            {
+              "ts": "2026-10-25T13:54:52.929Z",
+              "type": "host_call_settled",
+              "callId": 2,
+              "provider": "codemode",
+              "method": "decision_get",
+              "outcome": "fulfilled"
+            },
+            {
+              "ts": "2026-10-25T13:54:52.939Z",
+              "type": "host_call_settled",
+              "callId": 3,
+              "provider": "codemode",
+              "method": "decision_get",
+              "outcome": "fulfilled"
+            }
+          ],
+          "cleanup": {
+            "kind": "direct",
+            "phase": "T8-code",
+            "errors": [],
+            "pid": 25764,
+            "server_exit_observed": true,
+            "server_alive_after": false
+          },
+          "finished_at": "2026-10-25T13:54:53.114Z"
+        }
+      }
+    }
+  ],
+  "cancellation": {
+    "phase": "cancellation",
+    "ok": true,
+    "withheld": true,
+    "outcome": {
+      "result": null,
+      "error": "Code execution failed: execution exceeded 250ms",
+      "stats": {
+        "hostCalls": 1,
+        "resolvedCalls": 0,
+        "failedCalls": 0,
+        "rejectedCalls": 1,
+        "cancelledCalls": 1,
+        "cancelledRejections": 1,
+        "cancelledLateSuccess": 0,
+        "cancelledSettled": 1,
+        "cancelledUnsettled": 0,
+        "lateHostSettlements": 0,
+        "timedOut": true,
+        "interrupted": true,
+        "pendingAtEnd": 0,
+        "deferredDisposed": 1,
+        "drainMs": 0,
+        "hostCancellationGraceMs": 50,
+        "cleanupErrors": [],
+        "durationMs": 254
+      }
+    },
+    "state": {
+      "seq": 1,
+      "name": "decision.get",
+      "args": {
+        "record_id": "ADR-B0-001"
+      },
+      "requestId": 2,
+      "startedAt": "2026-10-25T13:54:54.735Z",
+      "pending": false,
+      "outcome": "rejected",
+      "settledAt": "2026-10-25T13:54:54.988Z",
+      "errorName": "McpError",
+      "errorCode": -32001,
+      "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 250ms",
+      "cancellationSentAt": "2026-10-25T13:54:54.987Z",
+      "cancellationSeen": true,
+      "signalAborted": true
+    },
+    "settled": {
+      "found": true,
+      "state": {
+        "seq": 1,
+        "name": "decision.get",
+        "args": {
+          "record_id": "ADR-B0-001"
+        },
+        "requestId": 2,
+        "startedAt": "2026-10-25T13:54:54.735Z",
+        "pending": false,
+        "outcome": "rejected",
+        "settledAt": "2026-10-25T13:54:54.988Z",
+        "errorName": "McpError",
+        "errorCode": -32001,
+        "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 250ms",
+        "cancellationSentAt": "2026-10-25T13:54:54.987Z",
+        "cancellationSeen": true,
+        "signalAborted": true
+      },
+      "elapsedMs": 0
+    },
+    "cancellation_count": 1,
+    "released": true,
+    "stats": {
+      "hostCalls": 1,
+      "resolvedCalls": 0,
+      "failedCalls": 0,
+      "rejectedCalls": 1,
+      "cancelledCalls": 1,
+      "cancelledRejections": 1,
+      "cancelledLateSuccess": 0,
+      "cancelledSettled": 1,
+      "cancelledUnsettled": 0,
+      "lateHostSettlements": 0,
+      "timedOut": true,
+      "interrupted": true,
+      "pendingAtEnd": 0,
+      "deferredDisposed": 1,
+      "drainMs": 0,
+      "hostCancellationGraceMs": 50,
+      "cleanupErrors": [],
+      "durationMs": 254
+    },
+    "client_errors": [
+      "Received a response for an unknown message ID: {\"jsonrpc\":\"2.0\",\"id\":2,\"result\":{\"content\":[{\"text\":\"{\\n  \\\"record_type\\\": \\\"canonical_decision\\\",\\n  \\\"canonical_decision\\\": {\\n    \\\"decision_id\\\": \\\"ADR-B0-001\\\",\\n    \\\"version\\\": \\\"1\\\",\\n    \\\"version_id\\\": \\\"dver-6321b0b53db41080445166681c6546a9\\\",\\n    \\\"decision_version_id\\\": \\\"dver-6321b0b53db41080445166681c6546a9\\\",\\n    \\\"content_digest\\\": \\\"5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653\\\",\\n    \\\"decision_class\\\": \\\"architecture\\\",\\n    \\\"statement\\\": \\\"Synthetic B0 decision ADR-B0-001 governs cache behavior for the mechanical benchmark marker_adr-b0-001.\\\",\\n    \\\"rationale\\\": \\\"Frozen deterministic B0 corpus entry for scope cache. This is synthetic validation data, not repository project memory.\\\",\\n    \\\"lifecycle_status\\\": \\\"active\\\",\\n    \\\"owner\\\": \\\"\\\",\\n    \\\"decided_at\\\": \\\"2026-02-01T00:00:00Z\\\",\\n    \\\"updated_at\\\": \\\"2026-02-01T00:00:00Z\\\",\\n    \\\"context_scope\\\": [\\n      \\\"cache\\\",\\n      \\\"storage\\\"\\n    ],\\n    \\\"targets\\\": [],\\n    \\\"constraints\\\": [\\n      \\\"no external cache service\\\",\\n      \\\"preserve storage boundary\\\",\\n      \\\"record marker_adr-b0-001\\\"\\n    ],\\n    \\\"anti_patterns\\\": [\\n      \\\"external_cache_client\\\",\\n      \\\"implicit_storage_coupling\\\",\\n      \\\"unbounded_cache_retry\\\"\\n    ],\\n    \\\"source_evidence\\\": [\\n      {\\n        \\\"source_type\\\": \\\"runtime\\\",\\n        \\\"source_locator\\\": \\\"\\\",\\n        \\\"source_revision\\\": \\\"b0m-v1\\\",\\n        \\\"observed_at\\\": \\\"2026-02-01T00:00:00Z\\\"\\n      }\\n    ],\\n    \\\"test_evidence\\\": [\\n      {\\n        \\\"selector\\\": \\\"tests/b0/adr-b0-001.spec\\\",\\n        \\\"sha\\\": \\\"aad3098acc972583962263cc7ff36bb950739edeeb779683050f6fde3d3f3cfc\\\"\\n      }\\n    ],\\n    \\\"relationships\\\": [],\\n    \\\"derived_rule_ids\\\": [\\n      \\\"ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4\\\"\\n    ]\\n  }\\n}\",\"type\":\"text\"}],\"isError\":false,\"structuredContent\":{\"record_type\":\"canonical_decision\",\"canonical_decision\":{\"decision_id\":\"ADR-B0-001\",\"version\":\"1\",\"version_id\":\"dver-6321b0b53db41080445166681c6546a9\",\"decision_version_id\":\"dver-6321b0b53db41080445166681c6546a9\",\"content_digest\":\"5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653\",\"decision_class\":\"architecture\",\"statement\":\"Synthetic B0 decision ADR-B0-001 governs cache behavior for the mechanical benchmark marker_adr-b0-001.\",\"rationale\":\"Frozen deterministic B0 corpus entry for scope cache. This is synthetic validation data, not repository project memory.\",\"lifecycle_status\":\"active\",\"owner\":\"\",\"decided_at\":\"2026-02-01T00:00:00Z\",\"updated_at\":\"2026-02-01T00:00:00Z\",\"context_scope\":[\"cache\",\"storage\"],\"targets\":[],\"constraints\":[\"no external cache service\",\"preserve storage boundary\",\"record marker_adr-b0-001\"],\"anti_patterns\":[\"external_cache_client\",\"implicit_storage_coupling\",\"unbounded_cache_retry\"],\"source_evidence\":[{\"source_type\":\"runtime\",\"source_locator\":\"\",\"source_revision\":\"b0m-v1\",\"observed_at\":\"2026-02-01T00:00:00Z\"}],\"test_evidence\":[{\"selector\":\"tests/b0/adr-b0-001.spec\",\"sha\":\"aad3098acc972583962263cc7ff36bb950739edeeb779683050f6fde3d3f3cfc\"}],\"relationships\":[],\"derived_rule_ids\":[\"ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4\"]}}}}"
+    ],
+    "cleanup": {
+      "kind": "relay",
+      "phase": "cancellation",
+      "errors": [],
+      "relay_pid": 50228,
+      "upstream_pid": 9488,
+      "child_exit_event": {
+        "seq": 13,
+        "ts": "2026-10-25T13:54:55.157Z",
+        "pid": 50228,
+        "type": "child_exit",
+        "code": 0,
+        "signal": null,
+        "upstream_pid": 9488,
+        "observed_by": "top_level"
+      },
+      "child_exit_observed": true,
+      "relay_exit_observed": true,
+      "relay_alive_after": false,
+      "upstream_exit_observed": true,
+      "upstream_alive_after": false
+    },
+    "finished_at": "2026-10-25T13:54:55.232Z"
+  },
+  "unhandled": [],
+  "model_fields": {
+    "model_turns": "NOT_MEASURED",
+    "input_tokens": "NOT_MEASURED",
+    "output_tokens": "NOT_MEASURED",
+    "intermediate_context_model_tokens": "NOT_MEASURED",
+    "note": "B0-M is model-free; these fields are placeholders for B0-A, not observations."
+  },
+  "checks": [
+    {
+      "id": "B0M-T1-DIRECT",
+      "pass": true
+    },
+    {
+      "id": "B0M-T1-CODE",
+      "pass": true
+    },
+    {
+      "id": "B0M-T1-EQUIVALENT",
+      "pass": true
+    },
+    {
+      "id": "B0M-T1-NO-PROPOSAL",
+      "pass": true
+    },
+    {
+      "id": "B0M-T2-DIRECT",
+      "pass": true
+    },
+    {
+      "id": "B0M-T2-CODE",
+      "pass": true
+    },
+    {
+      "id": "B0M-T2-EQUIVALENT",
+      "pass": true
+    },
+    {
+      "id": "B0M-T2-NO-PROPOSAL",
+      "pass": true
+    },
+    {
+      "id": "B0M-T3-DIRECT",
+      "pass": true
+    },
+    {
+      "id": "B0M-T3-CODE",
+      "pass": true
+    },
+    {
+      "id": "B0M-T3-EQUIVALENT",
+      "pass": true
+    },
+    {
+      "id": "B0M-T3-NO-PROPOSAL",
+      "pass": true
+    },
+    {
+      "id": "B0M-T4-DIRECT",
+      "pass": true
+    },
+    {
+      "id": "B0M-T4-CODE",
+      "pass": true
+    },
+    {
+      "id": "B0M-T4-EQUIVALENT",
+      "pass": true
+    },
+    {
+      "id": "B0M-T4-NO-PROPOSAL",
+      "pass": true
+    },
+    {
+      "id": "B0M-T5-DIRECT",
+      "pass": true
+    },
+    {
+      "id": "B0M-T5-CODE",
+      "pass": true
+    },
+    {
+      "id": "B0M-T5-EQUIVALENT",
+      "pass": true
+    },
+    {
+      "id": "B0M-T5-NO-PROPOSAL",
+      "pass": true
+    },
+    {
+      "id": "B0M-T6-DIRECT",
+      "pass": true
+    },
+    {
+      "id": "B0M-T6-CODE",
+      "pass": true
+    },
+    {
+      "id": "B0M-T6-EQUIVALENT",
+      "pass": true
+    },
+    {
+      "id": "B0M-T6-NO-PROPOSAL",
+      "pass": true
+    },
+    {
+      "id": "B0M-T7-DIRECT",
+      "pass": true
+    },
+    {
+      "id": "B0M-T7-CODE",
+      "pass": true
+    },
+    {
+      "id": "B0M-T7-EQUIVALENT",
+      "pass": true
+    },
+    {
+      "id": "B0M-T7-NO-PROPOSAL",
+      "pass": true
+    },
+    {
+      "id": "B0M-T8-DIRECT",
+      "pass": true
+    },
+    {
+      "id": "B0M-T8-CODE",
+      "pass": true
+    },
+    {
+      "id": "B0M-T8-EQUIVALENT",
+      "pass": true
+    },
+    {
+      "id": "B0M-T8-NO-PROPOSAL",
+      "pass": true
+    },
+    {
+      "id": "B0M-MCP-INSTRUMENTATION",
+      "pass": true
+    },
+    {
+      "id": "B0M-MCP-CALL-METRICS",
+      "pass": true
+    },
+    {
+      "id": "B0M-RESULT-SIZES",
+      "pass": true
+    },
+    {
+      "id": "B0M-MODEL-NOT-MEASURED",
+      "pass": true
+    },
+    {
+      "id": "B0M-CANCELLATION",
+      "pass": true
+    },
+    {
+      "id": "B0M-CLEANUP",
+      "pass": true
+    },
+    {
+      "id": "B0M-UNHANDLED",
+      "pass": true
+    }
+  ],
+  "verdict": "PASS",
+  "finished_at": "2026-10-25T13:54:55.232Z"
+}

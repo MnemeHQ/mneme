@@ -1,0 +1,185 @@
+{
+  "collector_sha256": "5a2933347b253743a4cfcace6b71e8fa0a07b1585082d74583f1bd6913c3b77c",
+  "files": [
+    {
+      "path": "R-1-Edit-1/observer.txt",
+      "source_sha256": "fcfa551a4c24f61907a6d6c263d54e25af9b508ad7ea5861b07321e8b2f18d2e",
+      "published_sha256": "0a1103b1a842411ed074bc388ccaffb60436f994faf3118f1c6e13ea7797a35a"
+    },
+    {
+      "path": "R-1-Edit-1/prompt.txt",
+      "source_sha256": "31c82e06229702eb3625f7bcf21df5ff511ba9e623da84aff07cbf6a6be27022",
+      "published_sha256": "8b2e2a9cad029a35787255911672039da052902804daf29ab2eb55cb87877300"
+    },
+    {
+      "path": "R-1-Edit-1/setup.json",
+      "source_sha256": "6115499112ee9540b45968a1f5b784ad75ccde26ca1ed3ae5b562c2c01031030",
+      "published_sha256": "e3b0cd9d475aa3b940e3ec514a0962b7f2742c2acbadf5b8807f5369ce5ab4d3"
+    },
+    {
+      "path": "R-1-Edit-1/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "R-1-Edit-1/events.jsonl",
+      "source_sha256": "eb1755f4e4bb64b1e10db648b600301337c213f4a6244beb4f79027d40d48d75",
+      "published_sha256": "08db4e227c25cbc44f7037b9032021578a6d039f3752bdb9d3b498f718e853e9"
+    },
+    {
+      "path": "R-1-Edit-1/hook-log.jsonl",
+      "source_sha256": "dbfabbd0628ace9205ee18f722c77c75f02f5653665d8d858f63c029554dfbd8",
+      "published_sha256": "3894b9d526525d0b11ca52f8436cc92b7b175bd33401ea0dce30b3c834792ff9"
+    },
+    {
+      "path": "R-1-Edit-1/outcome.json",
+      "source_sha256": "38440240cb2d49e609b784122975b75259cf5a65e0bba7d96d55e2be1412de5e",
+      "published_sha256": "92d5ef1b70b9ccebf763d844c590d9f54383fa1634b00290da9bcacd4bce3cc9"
+    },
+    {
+      "path": "R-1-Edit-1/target.before",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "R-1-Edit-1/target.after",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "R-1-Edit-1/netcap-sni.txt",
+      "source_sha256": "604e0a8aa2a846abe15355e3d97aa08d0862289e9fd79d7f277cadbe8dd3fdb0",
+      "published_sha256": "604e0a8aa2a846abe15355e3d97aa08d0862289e9fd79d7f277cadbe8dd3fdb0"
+    },
+    {
+      "path": "R-1-Edit-2/observer.txt",
+      "source_sha256": "024797343c5f79a4bedce9fe9db24df2084d33ccf38957ea023cd5c6ae0043ee",
+      "published_sha256": "bb80afa77ef6c986227c845153c9a8d4054be0c8efe8e4698c77dbff8f9eed7b"
+    },
+    {
+      "path": "R-1-Edit-2/prompt.txt",
+      "source_sha256": "ff26a49b88e748ba6ca49cf5194c95ff4e776328783ef087328f14251988daee",
+      "published_sha256": "6546f7212beddedc76f834a3891cfaf7248b991cab6a6b7c4535105bd1d77cef"
+    },
+    {
+      "path": "R-1-Edit-2/setup.json",
+      "source_sha256": "0c2de5ff9087d779c5c23a42756992939e9b4a0e238549c7a97c080171c6cfa3",
+      "published_sha256": "2130ede4607f5fabc8e9466678bd1d87f61424bc77af76da08bd20374c213e66"
+    },
+    {
+      "path": "R-1-Edit-2/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "R-1-Edit-2/events.jsonl",
+      "source_sha256": "9eb7f5e78dd68df1a7f6769afddcc640dde231a9864068e29d681960e4bca251",
+      "published_sha256": "0dfe8b935e981ac3cd4dc4c7861355b26ab2174818b6cae591252ada272326d3"
+    },
+    {
+      "path": "R-1-Edit-2/hook-log.jsonl",
+      "source_sha256": "a004bf564ac81525dfde98a6f97911eef56659cba21e29c61665dd70732d087c",
+      "published_sha256": "b16ea689c65011575e025434d175c7ae9a74c98409372273ad4752869cd87bbe"
+    },
+    {
+      "path": "R-1-Edit-2/outcome.json",
+      "source_sha256": "027949942a8f47dbbe2c7a15dcabd731f747a4f9b7b8444efd42b9f352f0cc4b",
+      "published_sha256": "cc3fad2122194e067810208c5a2e4571c3b560ce5c62f8e37cee40168376c6cf"
+    },
+    {
+      "path": "R-1-Edit-2/target.before",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "R-1-Edit-2/target.after",
+      "source_sha256": "ac7a2e1f56dae9d6d909abaefd054fafbd4a332ae0b10f01841c27c6b14571c1",
+      "published_sha256": "ac7a2e1f56dae9d6d909abaefd054fafbd4a332ae0b10f01841c27c6b14571c1"
+    },
+    {
+      "path": "R-1-Edit-2/netcap-sni.txt",
+      "source_sha256": "be1ab1cc083428d0b1926806a9232a94fc3c0b4a714cbaf6fba44e2c34a76dab",
+      "published_sha256": "be1ab1cc083428d0b1926806a9232a94fc3c0b4a714cbaf6fba44e2c34a76dab"
+    },
+    {
+      "path": "R-1-Write-1/observer.txt",
+      "source_sha256": "899456bbb98152283ec6b225374fac94ac93979b92230e153697ac1b649ce349",
+      "published_sha256": "07a72f44ee8ed68d79a22be8b69cdcfaa7e025de6c6a08d15f3d2468d5252dc7"
+    },
+    {
+      "path": "R-1-Write-1/prompt.txt",
+      "source_sha256": "57b0673fa55631fc22144ad1cca0731f2710ac1a31694ca291100fcccd9d40f2",
+      "published_sha256": "71810969941156c173209807b034c77c91c39bc4af0ff0a6411a114b14df573a"
+    },
+    {
+      "path": "R-1-Write-1/setup.json",
+      "source_sha256": "775145036b0e392e601ded5efd63d7a481e8d2fbc303c8ad6a9c2a28c395ceeb",
+      "published_sha256": "f1d22fe0ca2cf99b3de163b16205460c7bcceb538657a7c266cbe21d3b7aeaf0"
+    },
+    {
+      "path": "R-1-Write-1/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "R-1-Write-1/events.jsonl",
+      "source_sha256": "479a590b9587b19426d5fbf84f641ac12f67cf0c8febca27db7c26466c2b16d7",
+      "published_sha256": "df8c1a9400afaa517513898f22ebf6724d0bd3caf75f62c4461fb2f0d9c7c931"
+    },
+    {
+      "path": "R-1-Write-1/hook-log.jsonl",
+      "source_sha256": "17b0dbba081617f97e5769fbe96419440aff10898683102c6ff2c3860fe11621",
+      "published_sha256": "c4e52d803ed75ba4a0a06c55ed5cabadada07f5c129a068682212b279ca3a21d"
+    },
+    {
+      "path": "R-1-Write-1/outcome.json",
+      "source_sha256": "f9fd22259c6112900b0ae2d5fac3cb360f7c12e1ca2dd845d534bd009364089d",
+      "published_sha256": "c904ea22bd3e5cd43a34eccc1fc0c7de18245f4672a20d847e65b030a1f0823a"
+    },
+    {
+      "path": "R-1-Write-1/netcap-sni.txt",
+      "source_sha256": "5d9a701f58a1ef122a83a62e5a78ea36dbc057d18031adead0b50c1349bf971e",
+      "published_sha256": "5d9a701f58a1ef122a83a62e5a78ea36dbc057d18031adead0b50c1349bf971e"
+    },
+    {
+      "path": "R-1-Write-2/observer.txt",
+      "source_sha256": "7160bce3b1d2ade8564f65933dfbfeef9d1e5ed0fc988cdc4e17890138e499ee",
+      "published_sha256": "6a73c1671fa335b7f34a100a84125c080d297d51f790be28d5feae8c44e7130f"
+    },
+    {
+      "path": "R-1-Write-2/prompt.txt",
+      "source_sha256": "40fd747517870b0574d132a6d8f353a41d12fdf5e5001a9b670d431bf202b522",
+      "published_sha256": "35aa199be1451a4583b38b7c4e24a34dab681966609f83b10d441168347feb8c"
+    },
+    {
+      "path": "R-1-Write-2/setup.json",
+      "source_sha256": "888a67338c962aecd4cff0ec2110cd03f523994dc16b858c400890f17c9dcff8",
+      "published_sha256": "32c33cde03b346430f774860cafc15d1fd6c915f772f63072659f83c3f0eb6dc"
+    },
+    {
+      "path": "R-1-Write-2/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "R-1-Write-2/events.jsonl",
+      "source_sha256": "59c13816d2f0fbb4c551f313ad9b2fcf512c86e9bc823450a874c2fd480b23e1",
+      "published_sha256": "1363448681a48187a4408f43b23b1d0c707fc0083de1d47ac67ce44575cc618e"
+    },
+    {
+      "path": "R-1-Write-2/hook-log.jsonl",
+      "source_sha256": "2031cb1681b0b2690e38fc5b869dfc266b00f0ac849b7021edbdbd09f64759aa",
+      "published_sha256": "f4e0c33b5136b7563e16785aaecbb0b0055e3a6251cbb463d8e9560ef72a6305"
+    },
+    {
+      "path": "R-1-Write-2/outcome.json",
+      "source_sha256": "45e93d58823893901ba4dc27cd96ecfe7febaedc177037d04b4aada27701f0f0",
+      "published_sha256": "72f2902826674e06be0b573d7d0bec44882177a0738fcdf54f87164175e27f9d"
+    },
+    {
+      "path": "R-1-Write-2/netcap-sni.txt",
+      "source_sha256": "d0410c3e35df66ac136af920723ca9a5dcc5c51b4d92b8aa2cd4045b1dbb48d8",
+      "published_sha256": "d0410c3e35df66ac136af920723ca9a5dcc5c51b4d92b8aa2cd4045b1dbb48d8"
+    }
+  ]
+}

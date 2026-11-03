@@ -10,6 +10,7 @@
 #
 # Evidence written to $LIVE/<probe>-<tool>-<rep>[-interactive]/out:
 #   observer.txt (E1 before/after hashes, E7 pins), events.jsonl (E2),
+#   transcript.jsonl (headless session transcript, C2b §17.5 delivery),
 #   hook-log.jsonl (E3, E4 wrapper half), target.before / target.after,
 #   outcome.json (classify_c3.py).
 #
@@ -27,7 +28,7 @@ NAME="$PROBE-$TOOL-$REP"; [ "$ARM" = interactive ] && NAME="$NAME-interactive"
 if [ "${C3_SELFTEST:-}" = 1 ]; then
   LIVE_ROOT="$C3_SELFTEST_LIVE"; URL="$C3_SELFTEST_REMOTE"
 else
-  [ -n "${C3_SELFTEST_LIVE:-}${C3_SELFTEST_REMOTE:-}" ] && { echo "ABORT: self-test variables set in a live run"; exit 1; }
+  [ -n "${C3_SELFTEST_LIVE:-}${C3_SELFTEST_REMOTE:-}${C3_SELFTEST_CLAUDE_HOME:-}" ] && { echo "ABORT: self-test variables set in a live run"; exit 1; }
   [ -n "${CLAUDECODE:-}" ] && { echo "ABORT: CLAUDECODE set; run from your own terminal"; exit 1; }
   LIVE_ROOT="$LIVE"; URL="$FIXTURE_URL"
 fi
@@ -129,6 +130,13 @@ if [ "$ARM" = headless ]; then
      --permission-mode acceptEdits --setting-sources "$SOURCES" --model "$PIN_MODEL") \
      < /dev/null > "$OUT/events.jsonl" 2> "$OUT/claude.stderr"
   echo "claude_exit=$?" >> "$OUT/observer.txt"
+  # C2b §17.5: the session transcript is the only model-bound record of a hook's
+  # additionalContext. A missing transcript is missing evidence, not a harness failure.
+  if "$PY" -E -P "$BASE/collect_transcript.py" --headless "$(w "$OUT")" > /dev/null 2> "$OUT/transcript-collect.stderr"; then
+    echo "transcript_collected=yes" >> "$OUT/observer.txt"
+  else
+    echo "transcript_collected=no" >> "$OUT/observer.txt"
+  fi
 else
   START=$(date +%s)
   cat <<EOF

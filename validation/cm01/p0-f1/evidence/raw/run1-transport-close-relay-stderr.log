@@ -1,0 +1,11 @@
+[f1-relay] {"seq":1,"ts":"2026-10-25T00:23:27.999Z","pid":7856,"type":"relay_start","mode":"withhold","delay_ms":0,"withhold_tools":["decision.get"],"upstream_pid":4148,"control_port":53849,"event_log":"C:\\dev\\mneme\\.worktrees\\feat-cm01-p0-f1-cancellation\\validation\\cm01\\p0-f1\\evidence\\raw\\run1-transport-close-relay.jsonl"}
+[f1-relay] {"seq":2,"ts":"2026-10-25T00:23:30.084Z","pid":7856,"type":"upstream_message_forwarded_downstream","requestId":0}
+[f1-relay] {"seq":3,"ts":"2026-10-25T00:23:30.090Z","pid":7856,"type":"upstream_message_forwarded_downstream","requestId":1}
+[f1-relay] {"seq":1,"ts":"2026-10-25T00:23:30.123Z","pid":7856,"type":"tools_call_from_client","requestId":2,"tool":"decision.get"}
+[f1-relay] {"seq":5,"ts":"2026-10-25T00:23:30.124Z","pid":7856,"type":"target_request_seen","requestId":2,"tool":"decision.get","mode":"withhold","delayMs":0}
+[f1-relay] {"seq":6,"ts":"2026-10-25T00:23:30.124Z","pid":7856,"type":"target_request_forwarded","requestId":2}
+[f1-relay] {"seq":7,"ts":"2026-10-25T00:23:30.131Z","pid":7856,"type":"upstream_response_received","requestId":2,"tool":"decision.get","has_result":true,"has_error":false}
+[f1-relay] {"seq":8,"ts":"2026-10-25T00:23:30.132Z","pid":7856,"type":"response_withheld","requestId":2,"tool":"decision.get"}
+[f1-relay] {"seq":9,"ts":"2026-10-25T00:23:30.133Z","pid":7856,"type":"client_stdin_end","held_request_ids":[2]}
+[f1-relay] {"seq":10,"ts":"2026-10-25T00:23:30.134Z","pid":7856,"type":"relay_finishing","reason":"client_stdin_end","held_request_ids":[2],"withheld_discarded":1}
+[f1-relay] {"seq":11,"ts":"2026-10-25T00:23:30.395Z","pid":7856,"type":"child_exit","code":0,"signal":null,"upstream_pid":4148,"observed_by":"top_level"}

@@ -1,0 +1,9 @@
+{
+  "diagnostic": "D-2-Write-1",
+  "control": "D-1-Write-1",
+  "rules": "R3 (#551)",
+  "label": "PAIR_MISMATCH",
+  "problems": [
+    "D-2 Write 1 is EVIDENCE_INCOMPLETE"
+  ]
+}

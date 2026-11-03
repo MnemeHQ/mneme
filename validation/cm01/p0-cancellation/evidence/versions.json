@@ -1,0 +1,45 @@
+{
+  "versions": {
+    "node": "v24.13.1",
+    "npm": "11.8.0",
+    "codemode": "0.5.5",
+    "sdk": "1.32.2",
+    "ajv": "8.17.1",
+    "quickjs": "0.32.0",
+    "zod": "4.6.7",
+    "python": "3.12.10",
+    "mneme": "0.10.0",
+    "mcp": "2.2.0"
+  },
+  "time_pin": {
+    "node": "24.13.1",
+    "npm": "11.8.0",
+    "codemode": "0.5.5",
+    "sdk": "1.32.2",
+    "ajv": "8.17.1",
+    "quickjs": "0.32.0",
+    "zod": "4.6.7",
+    "python": "3.12.10",
+    "mneme": "0.10.0",
+    "mcp": "2.2.0"
+  },
+  "platform": "win32",
+  "arch": "x64",
+  "node_exec_path": "C:\\Program Files\\nodejs\\node.exe",
+  "head": "0d367fc61316e8af50161f6bc48b8dee1711c807",
+  "declared_baseline": "ddeb85eec8f7734edde1c921250592d51afedbee",
+  "s1a1_base": "942de7b121994647e99e9b862b44cda784c0ae84",
+  "s1a1_s0": "9eb4057a290795883076ab05bf11c92038c6ca13",
+  "baseline_drift": {
+    "head_moved_since_declared_baseline": true,
+    "paths_changed_between_baseline_and_head": [
+      "docs/validation/adr-034-m4-heldout-scoring-2026-10-24.md"
+    ],
+    "commits_between_baseline_and_head": [
+      "0d367fc61316e8af50161f6bc48b8dee1711c807 docs(validation): ADR-034 M4 held-out scoring results record (PASS) (#628)"
+    ],
+    "code_under_test_paths_changed": [],
+    "code_under_test_unchanged_since_declared_baseline": true,
+    "note": "The working tree fast-forwarded to an upstream docs-only commit during the session. No path under validation/cm01 or mneme changed between the declared baseline and HEAD."
+  }
+}

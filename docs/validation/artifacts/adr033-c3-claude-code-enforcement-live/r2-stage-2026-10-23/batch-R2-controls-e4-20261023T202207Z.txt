@@ -1,0 +1,36 @@
+== 20261023T202207Z R-2 + controls P-1/P-3/P-4 (Write x2, Edit x2 each) under b0dc1a14, per-probe E4 capture ==
+harness_head=322719631c4d2f8ef87b3bda3199668dac3ad16c
+tshark=TShark (Wireshark) 4.6.9 (v4.6.9-0-g2d548b197c75).
+existing raw evidence archived and verified: <LIVE>\_archive-r2-controls-20261023T202207Z (4 dir(s): P-1-Edit-1, P-1-Edit-2, P-1-Write-1, P-1-Write-2; 184 files; SHA256SUMS sha256 1057e87bfafc310c3da3a120b2a4086edee93953a6459a7a2005cc0fc65377b4)
+[preflight] pins.local.env sha256: 75e4359a3262231070057d6cb6f0b8d63b6b841f5bf974299f88cff4295f04b6
+[preflight] claude: 2.1.303 (Claude Code)
+[preflight] mneme_src HEAD: 322719631c4d2f8ef87b3bda3199668dac3ad16c
+[preflight] mneme/ (incl. working tree) identical to b0dc1a146e37e27ee3d4c32a4e098668ee2c8271
+[preflight] hook module: <MNEME_SRC>\mneme\integrations\claude_code\hook.py
+[preflight] MNEME_* variables in launching shell: 0 (runners unset them per probe)
+[preflight] git: git version 2.47.1.windows.2
+[preflight] python: 3.12.10
+[preflight] os: MINGW64_NT-10.0-26300 <HOST> 3.5.4-395fda67.x86_64 2024-11-25 09:49 UTC x86_64 Msys
+[preflight] live root: <LIVE>
+[preflight] fixture: https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture
+[preflight] model pin (passed as --model, checked in each init event): claude-opus-5-5
+[preflight] OK
+golden={"phase": "AUTHORIZED", "tip": "0530b644d5f695869af6b264cce12b29783bf443", "url": "https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture", "date": "2026-10-23T20:22:18Z"}
+
+P-1-Write-1 headless PASS | expect=proceed | verifier=AUTHORIZED | hook_exit=0 | target_changed=True | tool_result_is_error=False | E4_os=not required
+P-1-Write-2 headless PASS | expect=proceed | verifier=AUTHORIZED | hook_exit=0 | target_changed=True | tool_result_is_error=False | E4_os=not required
+P-1-Edit-1 headless PASS | expect=proceed | verifier=AUTHORIZED | hook_exit=0 | target_changed=True | tool_result_is_error=False | E4_os=not required
+P-1-Edit-2 headless PASS | expect=proceed | verifier=AUTHORIZED | hook_exit=0 | target_changed=True | tool_result_is_error=False | E4_os=not required
+P-3-Write-1 headless PASS | expect=block | verifier=not run | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=not required
+P-3-Write-2 headless PASS | expect=block | verifier=not run | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=not required
+P-3-Edit-1 headless PASS | expect=block | verifier=not run | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=not required
+P-3-Edit-2 headless PASS | expect=block | verifier=not run | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=not required
+P-4-Write-1 headless PASS | expect=proceed | verifier=not run | hook_exit=0 | target_changed=True | tool_result_is_error=False | E4_os=not required
+P-4-Write-2 headless PASS | expect=proceed | verifier=not run | hook_exit=0 | target_changed=True | tool_result_is_error=False | E4_os=not required
+P-4-Edit-1 headless PASS | expect=proceed | verifier=not run | hook_exit=0 | target_changed=True | tool_result_is_error=False | E4_os=not required
+P-4-Edit-2 headless PASS | expect=proceed | verifier=not run | hook_exit=0 | target_changed=True | tool_result_is_error=False | E4_os=not required
+R-2-Write-1 headless PASS | expect=refuse:LOCAL_DECLARATION_TAMPERED | verifier=AUTHORIZED | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=ok
+R-2-Write-2 headless PASS | expect=refuse:LOCAL_DECLARATION_TAMPERED | verifier=AUTHORIZED | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=ok
+R-2-Edit-1 headless PASS | expect=refuse:LOCAL_DECLARATION_TAMPERED | verifier=AUTHORIZED | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=ok
+R-2-Edit-2 headless PASS | expect=refuse:LOCAL_DECLARATION_TAMPERED | verifier=AUTHORIZED | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=ok
+R2_STAGE_DONE: 16/16 PASS (P-1, P-3, P-4, R-2). Stop for review (R-3..R-7 and the interactive arm are not authorized).

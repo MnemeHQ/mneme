@@ -1,0 +1,7 @@
+{"seq":1,"ts":"2026-10-25T00:22:58.812Z","type":"control_connected","phase":"control-relay","connection":{"ok":true,"ts":"2026-10-25T00:22:58.812Z","elapsed_ms":182}}
+{"seq":2,"ts":"2026-10-25T00:23:01.090Z","type":"connected_relay","phase":"control-relay","mode":"passthrough","delay_ms":0,"withhold_tools":[],"relay_pid":22636,"upstream_pid":42596,"tools":6}
+{"seq":3,"ts":"2026-10-25T00:23:01.206Z","type":"executor_cleanup","phase":"control-relay"}
+{"seq":4,"ts":"2026-10-25T00:23:01.598Z","type":"client_closed","phase":"control-relay"}
+{"seq":5,"ts":"2026-10-25T00:23:01.602Z","type":"cleanup_relay","kind":"relay","phase":"control-relay","errors":[],"relay_pid":22636,"upstream_pid":42596,"child_exit_event":{"seq":25,"ts":"2026-10-25T00:23:01.525Z","pid":22636,"type":"child_exit","code":0,"signal":null,"upstream_pid":42596,"observed_by":"top_level"},"child_exit_observed":true,"relay_exit_observed":true,"relay_alive_after":false,"upstream_exit_observed":true,"upstream_alive_after":false}
+{"seq":6,"ts":"2026-10-25T00:23:01.603Z","type":"client_errors","phase":"control-relay","errors":[]}
+{"seq":7,"ts":"2026-10-25T00:23:01.604Z","type":"phase_end","name":"control-relay","ok":true,"error":null}

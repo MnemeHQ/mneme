@@ -1,0 +1,24 @@
+== 20261026T131817Z Q2 interactive arm: R-1 (Write, Edit), P-2 (Write, Edit) under b0dc1a14, per-probe E4 capture ==
+harness_head=f551b127eedc418be1e45dddafb9c45b51e01541
+tshark=TShark (Wireshark) 4.6.9 (v4.6.9-0-g2d548b197c75).
+gate checker: q2-gates-20261026T131817Z.py sha256 236db467402d1f57b8703026f90f9ad430aa4fd5caf98340dfcbf868c542d3fe
+existing raw evidence archived and verified: <LIVE>\_archive-q2-20261026T131817Z (1 dir(s); 1 files; SHA256SUMS sha256 36711454dd0eeec060a1d6cf1179a8391e0deb8c19920f19e86ec16d64c181d8)
+[preflight] pins.local.env sha256: 5a082546d0f4e6d84e78cc015744c234034100c3c4f79bf066e7c9ad963d8b1e
+[preflight] claude: 2.1.303 (Claude Code)
+[preflight] mneme_src HEAD: b0dc1a146e37e27ee3d4c32a4e098668ee2c8271
+[preflight] mneme/ (incl. working tree) identical to b0dc1a146e37e27ee3d4c32a4e098668ee2c8271
+[preflight] hook module: <MNEME_SRC>\mneme\integrations\claude_code\hook.py
+[preflight] MNEME_* variables in launching shell: 0 (runners unset them per probe)
+[preflight] git: git version 2.47.1.windows.2
+[preflight] python: 3.12.10
+[preflight] os: MINGW64_NT-10.0-26300 <HOST> 3.5.4-395fda67.x86_64 2024-11-25 09:49 UTC x86_64 Msys
+[preflight] live root: <LIVE>
+[preflight] fixture: https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture
+[preflight] model pin (passed as --model, checked in each init event): claude-opus-5-5
+[preflight] OK
+golden={"phase": "AUTHORIZED", "tip": "5125231076fb5a8e537a483c84850de99c25ba57", "url": "https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture", "date": "2026-10-26T13:18:27Z"}
+
+fixture gate: tip 5125231076fb5a8e537a483c84850de99c25ba57 events [authorize, revoke, authorize] valid
+R-1-Write-1-interactive interactive FAIL | expect=refuse:MEMORY_MISSING | verifier=AUTHORIZED | hook_exit=2 | target_changed=False | tool_result_is_error=True | Q2_user_delivery=contradicts | recording_sha256=27138779a65a8bc81483d775c68a07f4a30a01d5765149a97dbd331a1565008a | E4_os=ok
+  missing:  | failures: Q2: the operator attestation does not report 'UNEVALUATED: MEMORY_MISSING' | deviations: 
+STOPPED after R-1-Write-1-interactive: FAIL. 1 of 4 session(s) run; no retry (owner rule).

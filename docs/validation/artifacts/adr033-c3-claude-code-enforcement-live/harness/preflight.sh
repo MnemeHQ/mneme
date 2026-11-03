@@ -23,7 +23,7 @@ if [ "${C3_SELFTEST:-}" = 1 ]; then
   say "SELF-TEST MODE (C3_SELFTEST=1): stub claude, local remote; output is NOT live evidence"
 else
   [ -n "${CLAUDECODE:-}" ] && bad "CLAUDECODE is set: this shell is inside a Claude Code session; run from your own terminal"
-  [ -n "${C3_SELFTEST_LIVE:-}" ] && bad "C3_SELFTEST_LIVE is set outside self-test mode"
+  [ -n "${C3_SELFTEST_LIVE:-}${C3_SELFTEST_CLAUDE_HOME:-}" ] && bad "C3_SELFTEST_LIVE or C3_SELFTEST_CLAUDE_HOME is set outside self-test mode"
   v=$(claude --version | tr -d '\r')
   [ "$v" = "$PIN_CLAUDE_VERSION" ] && say "claude: $v" || bad "claude '$v' != '$PIN_CLAUDE_VERSION'"
   case "$(command -v claude)" in "$BASE/selftest/"*) bad "claude resolves to the self-test stub";; esac

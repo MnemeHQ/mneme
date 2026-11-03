@@ -1,0 +1,196 @@
+{
+  "schema": "mneme.cm01.b0m.tasks/v1",
+  "fixture": {
+    "path": "fixture/project_memory.json",
+    "sha256": "a996e2aa5c2d41bf8a75293c8d60adebf9ab89eb59caea926fbccf97297a1dca"
+  },
+  "tasks": [
+    {
+      "id": "T1",
+      "family": "single_get",
+      "description": "Get canonical decision ADR-B0-001 by stable id.",
+      "params": {
+        "record_id": "ADR-B0-001"
+      },
+      "expected": {
+        "decision_id": "ADR-B0-001",
+        "version": "1",
+        "version_id": "dver-6321b0b53db41080445166681c6546a9",
+        "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+        "lifecycle_status": "active",
+        "context_scope": [
+          "cache",
+          "storage"
+        ],
+        "derived_rule_ids": [
+          "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+        ]
+      }
+    },
+    {
+      "id": "T2",
+      "family": "single_search",
+      "description": "Search active canonical decisions for a unique marker.",
+      "params": {
+        "query": "marker_adr-b0-003",
+        "canonical_lifecycle_status": "active"
+      },
+      "expected": {
+        "canonical_ids": [
+          "ADR-B0-003"
+        ],
+        "count": 1
+      }
+    },
+    {
+      "id": "T3",
+      "family": "single_applicable_to",
+      "description": "Return canonical decisions applicable to storage context.",
+      "params": {
+        "context": [
+          "storage"
+        ]
+      },
+      "expected": {
+        "canonical_ids": [
+          "ADR-B0-001",
+          "ADR-B0-002",
+          "ADR-B0-013",
+          "ADR-B0-014"
+        ],
+        "count": 4
+      }
+    },
+    {
+      "id": "T4",
+      "family": "single_trace",
+      "description": "Trace canonical decision ADR-B0-001.",
+      "params": {
+        "record_id": "ADR-B0-001"
+      },
+      "expected": {
+        "canonical_decision_id": "ADR-B0-001",
+        "version": "1",
+        "version_id": "dver-6321b0b53db41080445166681c6546a9",
+        "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+        "derived_rule_ids": [
+          "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+        ],
+        "declared_test_evidence": [
+          {
+            "selector": "tests/b0/adr-b0-001.spec",
+            "sha": "aad3098acc972583962263cc7ff36bb950739edeeb779683050f6fde3d3f3cfc"
+          }
+        ]
+      }
+    },
+    {
+      "id": "T5",
+      "family": "search_then_get",
+      "description": "Search by marker, select the first sorted decision, then get it.",
+      "params": {
+        "query": "marker_adr-b0-005",
+        "canonical_lifecycle_status": "active"
+      },
+      "expected": {
+        "decision_id": "ADR-B0-005",
+        "version": "1",
+        "version_id": "dver-47cd76fdfae32baeea61f8217b71f0ef",
+        "content_digest": "7d2408aa0101228eed70f0226e577e49d2d0e73ec6aca894d2d026ae5b10785e",
+        "lifecycle_status": "active",
+        "context_scope": [
+          "auth",
+          "ui"
+        ],
+        "derived_rule_ids": [
+          "ADR-B0-005:FORBID_LITERAL:33e0b5c00d04cbc00fe36d09c7ed8c6b"
+        ]
+      }
+    },
+    {
+      "id": "T6",
+      "family": "search_then_trace",
+      "description": "Search by marker, select the first sorted decision, then trace it.",
+      "params": {
+        "query": "marker_adr-b0-018",
+        "canonical_lifecycle_status": "active"
+      },
+      "expected": {
+        "canonical_decision_id": "ADR-B0-018",
+        "version": "1",
+        "version_id": "dver-082a078fea409b08ac2c6b080ea8467b",
+        "content_digest": "e0d33d4075485c7c1047504d597f45dbb24328d25e3ea12b23d6762fee4c4451",
+        "derived_rule_ids": [
+          "ADR-B0-018:FORBID_LITERAL:9117b71942559968fda4807f41dae271"
+        ],
+        "declared_test_evidence": []
+      }
+    },
+    {
+      "id": "T7",
+      "family": "applicable_then_get_then_trace",
+      "description": "Scope match, choose first sorted active decision, get and trace it.",
+      "params": {
+        "context": [
+          "routing"
+        ]
+      },
+      "expected": {
+        "selected_id": "ADR-B0-003",
+        "get": {
+          "decision_id": "ADR-B0-003",
+          "version": "1",
+          "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+          "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+          "lifecycle_status": "active",
+          "context_scope": [
+            "routing",
+            "telemetry"
+          ],
+          "derived_rule_ids": [
+            "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+          ]
+        },
+        "trace": {
+          "canonical_decision_id": "ADR-B0-003",
+          "version": "1",
+          "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+          "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+          "derived_rule_ids": [
+            "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+          ],
+          "declared_test_evidence": []
+        }
+      }
+    },
+    {
+      "id": "T8",
+      "family": "filter_and_compose",
+      "description": "Search active routing decisions with rules, return first two identity projections.",
+      "params": {
+        "query": "routing",
+        "canonical_lifecycle_status": "active"
+      },
+      "expected": {
+        "items": [
+          {
+            "decision_id": "ADR-B0-003",
+            "version": "1",
+            "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+            "derived_rule_ids": [
+              "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+            ]
+          },
+          {
+            "decision_id": "ADR-B0-004",
+            "version": "1",
+            "content_digest": "55873a2190bb0d54d2fc060523d759d7fbfcc0f56142ccd2e13b1ea4e319c5a5",
+            "derived_rule_ids": [
+              "ADR-B0-004:FORBID_LITERAL:1562f5d6c95745c48f3245d09f4f5f32"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
