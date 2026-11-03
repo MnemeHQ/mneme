@@ -1,20 +1,25 @@
 # GitHub Actions trusted availability gate (ADR-033 C4)
 
-**Status: Experimental.** The adapter is validated offline
-([Gate 2 record](../validation/adr033-c4-gate2-offline-2026-10-26.md), #680)
-and live in an isolated GitHub lab
-([Gate 3 record](../validation/adr033-c4-gate3-live-2026-10-26.md), #681),
-and C4 is closed as a bounded milestone
-([closure record](../validation/adr033-c4-closure-2026-10-26.md)). It is
-**not** enabled on Mneme Core's CI and is not a production-ready or general
-fail-closed enforcement claim. Core's `mneme-check.yml` stays advisory (an
-implicit, undeclared `open`; ADR-033 §5). Any adoption needs a separate rollout
-decision.
+**Status: required on Mneme Core's `main` as bounded dogfooding.** The adapter
+is validated offline
+([Gate 2 record](../validation/adr033-c4-gate2-offline-2026-10-26.md), #680),
+live in an isolated GitHub lab
+([Gate 3 record](../validation/adr033-c4-gate3-live-2026-10-26.md), #681), and
+C4 is closed ([closure record](../validation/adr033-c4-closure-2026-10-26.md)).
+The CI production rollout R0 made it a required check on Core
+([R0 closure](../validation/ci-r0-s7-closure-2026-11-03.md), #742) and kept it
+there as bounded dogfooding
+([operating-status decision](../validation/ci-r0-operating-status-decision-2026-11-03.md),
+#743). This is **not** a general production-readiness or universal fail-closed
+claim: see [Limitations](#limitations). Core's advisory `mneme-check.yml` still
+runs but is no longer a required check.
 
 Governing documents: [ADR-033](../adr/ADR-033-opt-in-fail-closed-enforcement.md)
 §§1-2 and 5-7; the [C4 Gate 0 charter](../plans/2026-10-26-adr033-c4-ci-availability-charter.md)
 (#676, amendments A1-A5); the [C4 Gate 1 charter](../plans/2026-10-26-adr033-c4-gate1-implementation-charter-proposal.md)
-(#677, review fixes R1-R3); the Layer 1 freeze amendment (#678).
+(#677, review fixes R1-R3); the Layer 1 freeze amendment (#678); the
+[R0 charter](../plans/2026-10-26-ci-r0-production-rollout-readiness-charter.md)
+(#684, R6 #718).
 
 ## What it does
 
@@ -32,9 +37,14 @@ It is CI merge verification, not pre-write interception (ADR-021).
 
 ## Trust model
 
-The adapter runs from the base revision of a `pull_request_target` workflow.
-The PR head is fetched as git objects only and never checked out, imported or
-executed. Decision memory is read from the base commit. A PR cannot set:
+The adapter runs in a `pull_request_target` workflow. GitHub runs that event
+"in the context of the default branch of the base repository": the workflow
+file, its `branches:` filter and `GITHUB_SHA` all come from the **default
+branch's tip**, whatever branch the PR targets. The trusted base is therefore
+always the default branch's tip, and the gate is meaningful only for PRs into
+the default branch. The PR head is fetched as git objects only and never
+checked out, imported or executed. Decision memory is read from the trusted
+base. A PR cannot set:
 
 - the **availability posture**, read from the repository Actions variable
   `MNEME_CI_AVAILABILITY` (administrative trust, ADR-033 §5, P7/P8);
@@ -83,7 +93,7 @@ A missing variable, or any value other than exactly `open` or `closed`, means
 `evaluate` judges one PR and writes the report:
 
 ```bash
-python -I scripts/ci/adr033_c4_gate.py evaluate --repo base --base-sha "$BASE_SHA" --head-sha "$HEAD_SHA" --mode strict --workspace "$RUNNER_TEMP/ws" --empty-dir "$RUNNER_TEMP/empty" --venv-python "$EVALUATOR_PYTHON" --evaluator-commit "$EVALUATOR_COMMIT" --evaluator-wheel-sha256 "$APPROVED_WHEEL_SHA256" --trusted-surface gate/ --report "$RUNNER_TEMP/gate-out/gate-report.json" --summary "$GITHUB_STEP_SUMMARY"
+python -I scripts/ci/adr033_c4_gate.py evaluate --repo base --base-sha "$BASE_SHA" --head-sha "$HEAD_SHA" --mode strict --workspace "$RUNNER_TEMP/ws" --empty-dir "$RUNNER_TEMP/empty" --venv-python "$EVALUATOR_PYTHON" --evaluator-commit "$EVALUATOR_COMMIT" --evaluator-wheel-sha256 "$APPROVED_WHEEL_SHA256" --report "$RUNNER_TEMP/gate-out/gate-report.json" --summary "$GITHUB_STEP_SUMMARY"
 ```
 
 `verify-report` is the decision step. It never takes the adapter's exit code
@@ -97,6 +107,10 @@ and job-summary entry. Anything missing or inconsistent fails the check.
 python -I scripts/ci/adr033_c4_gate.py verify-report --report "$RUNNER_TEMP/gate-out/gate-report.json" --adapter-exit "$GATE_EXIT" --base-sha "$BASE_SHA" --head-sha "$HEAD_SHA" --mode strict --adapter-sha256 "$ADAPTER_SHA256" --evaluator-commit "$EVALUATOR_COMMIT" --evaluator-wheel-sha256 "$APPROVED_WHEEL_SHA256" --summary "$GITHUB_STEP_SUMMARY"
 ```
 
+Add `--trusted-surface <file-or-dir/>` (repeatable) to `evaluate` only if your
+workflow reads other files from the trusted base; the reference workflow reads
+none outside `.github/` and `.mneme/`, so it passes none.
+
 Both steps belong to the one genuine required check. The adapter creates no
 Checks API run and no second check identity.
 
@@ -105,30 +119,125 @@ reviewed Core commit and path (never from the PR or a mutable branch) and verify
 its git blob id and content SHA-256. If that preflight fails, the check fails
 under every posture.
 
-## Reference workflow and required check
+## Installation procedure
 
-The workflow validated in the isolated lab is kept as evidence:
-[`bootstrap-ci1-trusted-gate.yml`](../validation/adr033-c4-gate3-live-2026-10-26/bootstrap-ci1-trusted-gate.yml).
-It is a reference, not an installable product. Using it in a repository needs:
+These steps install the gate in a GitHub repository as Core runs it. They need
+administrator rights on the repository. Do them in order: the check is made
+required only after the workflow is on the default branch.
 
-1. **The workflow on the default branch.** `pull_request_target` always runs the
-   base branch's copy, so the workflow governs PRs only after it is merged. A
-   gate that protects `.github/` refuses its own installation PR; the lab merged
-   it through a recorded administrator operation (Gate 3 record §3).
-2. **The adapter pins** (`ADAPTER_COMMIT`, `ADAPTER_PATH`, `ADAPTER_BLOB`,
-   `ADAPTER_SHA256`) and the evaluator pins (`EVALUATOR_COMMIT`,
-   `APPROVED_WHEEL_SHA256`, a hash-locked runtime lock file and build
-   constraints) set to reviewed values.
-3. **Trusted-surface entries** covering every file the workflow reads
-   (`--trusted-surface`; `.github/`, `.gitattributes` and `.gitmodules` are
-   always included).
-4. **A ruleset or branch protection** that requires the job's check name
-   (`CI1 trusted gate` in the lab) from the GitHub Actions app, with no bypass
-   actors.
-5. **An Actions policy** that allows `pull_request_target` for this workflow,
-   where the organization restricts it.
-6. **The repository variable** `MNEME_CI_AVAILABILITY` set by an administrator
-   to `closed` or `open`. Leaving it unset means `closed`.
+### 1. Prerequisites
+
+- GitHub Actions enabled, with `actions/checkout` and `actions/upload-artifact`
+  allowed at the SHA-pinned versions the workflow uses.
+- The workflow can fetch the public `MnemeHQ/mneme` repository at the pinned
+  commits (adapter and evaluator source).
+- Runners `ubuntu-24.04` (the workflow uses `/usr/bin/python3.12`).
+
+### 2. Decision memory
+
+The default branch must contain `.mneme/project_memory.json`, the file
+`mneme check` reads, with at least one decision carrying a literal-tier typed
+rule (for example `FORBID_LITERAL`). The gate evaluates literal-tier rules only;
+memory without typed rules gives nothing to block.
+
+### 3. Availability posture
+
+Create the repository variable `MNEME_CI_AVAILABILITY` with the value `closed`
+(an unavailable evaluation blocks). An unset or invalid value also means
+`closed`, with a warning in each run.
+
+```bash
+gh api -X POST repos/OWNER/REPO/actions/variables -f name=MNEME_CI_AVAILABILITY -f value=closed
+```
+
+### 4. The workflow
+
+Copy Core's [`.github/workflows/mneme-trusted-gate.yml`](../../.github/workflows/mneme-trusted-gate.yml)
+**verbatim** from `main` (blob `3fb1e0ba17ed0849649130b75447a22af18ac8f4`, last
+changed at `141a29e87bd0530269c194a40fad3ef043961272`). It is self-contained:
+
+- adapter pins `ADAPTER_COMMIT` `c51729f78199203fe12fcbc5c678b89a2c4f7d3e`,
+  `ADAPTER_PATH` `scripts/ci/adr033_c4_gate.py`, `ADAPTER_BLOB`
+  `5feedf60ce1a67b2bb85673354c8b8b367a87d06`, `ADAPTER_SHA256`
+  `afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9`;
+- evaluator pins `EVALUATOR_COMMIT` `0b74d410b45e7b3efcf08d00ce58e7bd7017b757`,
+  `APPROVED_WHEEL_SHA256`
+  `e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51`, with the
+  hash-locked runtime requirements and the build-backend pin inlined;
+- `VIOLATION_MODE: strict`, posture from `vars.MNEME_CI_AVAILABILITY`;
+- trigger `pull_request_target` on `branches: [main]`. If your default branch
+  has another name, change only that filter value.
+
+Do not change pins or steps; a different evaluator or adapter needs its own
+parity evidence. Merge the file with an ordinary PR. Because
+`pull_request_target` runs the default branch's copy, that PR gets no gate run;
+the first runs are on PRs opened or updated after it is merged. The job name,
+`mneme trusted gate`, is the check context.
+
+### 5. Rulesets (after the workflow is on the default branch)
+
+Use two branch rulesets on the default branch, so that a bypass of the gate
+never bypasses the other protections:
+
+- **Gate ruleset:** one rule, `required_status_checks` with context
+  `mneme trusted gate` from the GitHub Actions app (integration id `15368`) and
+  strict up-to-date on. Bypass list: exactly one designated human (`User` actor)
+  in `pull_request` mode, never `always`. That person is the route for changes
+  the gate always refuses (`.mneme/`, `.github/`); with no bypass actor such
+  changes can merge only by disabling the ruleset.
+
+  ```json
+  {"name": "mneme-ci-gate", "target": "branch", "enforcement": "active",
+   "conditions": {"ref_name": {"include": ["~DEFAULT_BRANCH"], "exclude": []}},
+   "bypass_actors": [{"actor_id": HUMAN_USER_ID, "actor_type": "User", "bypass_mode": "pull_request"}],
+   "rules": [{"type": "required_status_checks", "parameters": {
+     "strict_required_status_checks_policy": true, "do_not_enforce_on_create": false,
+     "required_status_checks": [{"context": "mneme trusted gate", "integration_id": 15368}]}}]}
+  ```
+
+- **Protections ruleset, no bypass actors:** pull request required (for
+  example squash only), deletion and non-fast-forward rules, and your other
+  required checks.
+
+Create each with `gh api -X POST repos/OWNER/REPO/rulesets --input FILE.json`.
+
+### 6. Actions policy
+
+Where an organization or repository restricts `pull_request_target`, allow it
+for this workflow. On Core after GitHub's 2026-11-02 change, runs for PRs from
+branches of the same repository started with no approval step and no policy
+change. PRs from forks and first-time contributors have not been observed.
+
+### 7. Verify
+
+Open three throwaway PRs into the default branch and keep them unmerged:
+
+| PR | Expected check | Expected merge |
+|---|---|---|
+| A change containing a literal your memory forbids | failure (VIOLATION) | blocked |
+| A neutral change | success (PASS) | allowed |
+| A symlink (non-regular file) under `closed` | failure (UNEVALUATED) | blocked |
+
+Each run's `gate-report.json` artifact must show the pins above and posture
+`closed`.
+
+### 8. Operating it
+
+- **Protected changes** (`.mneme/`, `.github/`, `.gitattributes`,
+  `.gitmodules`) are always REFUSED. Merge them only through the designated
+  human's bypass, with a record in the PR of the approval, the protected paths,
+  the reason and the gate check-run id. GitHub enforces who may bypass, not the
+  record.
+- **Evaluation unavailable** (runner or evaluator failure): set the posture to
+  `open` and re-run. Only UNEVALUATED then passes, visibly labelled; VIOLATION
+  and REFUSED still block. Set it back to `closed` and re-run afterwards.
+- **Gate defect:** remove the required check from the gate ruleset (or disable
+  it), and restore it through a reviewed change.
+
+The lab workflow from C4 Gate 3,
+[`bootstrap-ci1-trusted-gate.yml`](../validation/adr033-c4-gate3-live-2026-10-26/bootstrap-ci1-trusted-gate.yml),
+is kept as historical evidence only. It reads lab files and is not the
+installable reference.
 
 ## Outputs
 
@@ -158,16 +267,25 @@ exit by itself.
   an inconsistent or tampered report but not a defect shared by both.
 - The per-file report records path, content SHA-256 and head SHA, not the
   file's git blob id.
-- The CI1 limits stay: administrative P7/P8 exposure (an administrator can
-  disable the ruleset, as the lab bootstrap did), no governed decision update
-  route, rule coverage only as wide as the include selectors, partial ADR-029
-  binding, untested merge races. GitHub `pull_request_target` behavior after
-  2026-11-02 is unverified.
+- Administrative exposure (P7/P8) stays: anyone with administrator rights,
+  including an agent holding such a token, can change the rulesets, the
+  posture variable or the workflow, and the bypass actor can merge past the
+  gate. On Core this is an accepted dogfooding residual (R0 ruling R6), not an
+  administrator-resistance claim.
+- Protected-path changes have a procedural route (the recorded human bypass),
+  not a governed decision-update mechanism.
+- Rule coverage is only as wide as the memory's literal-tier rules and include
+  selectors; ADR-029 binding is partial; merge races are untested.
+- `pull_request_target` after GitHub's 2026-11-02 change was observed only for
+  same-repository PRs (Core, 2026-11-02/03); fork and first-time-contributor
+  PRs are unobserved.
+- The gate covers the CI merge boundary only. Agent-host hooks are a separate
+  boundary and are not fail-closed when the host does not invoke them.
 
 ## Release implications
 
 None. The adapter is a standalone, standard-library-only script outside the
 `mneme-hq` wheel, so installing or upgrading `mneme-hq` does not install it, and
-no `mneme-hq` release is needed for it. The Gate 2 and Gate 3 evidence exists;
-adoption by any repository, including Mneme Core, still needs a separate
-rollout decision with its own Layer 1 authorization.
+no `mneme-hq` release is needed for it. Mneme Core adopted it through R0
+(#684-#743). Other repositories install it with the procedure above; Core's
+Layer 1 freeze governs changes to Core only.
