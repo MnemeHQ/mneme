@@ -1,0 +1,5 @@
+S4 case (e), owner-reported from Windows MnemeAgent (pasted into the Mneme Core conversation):
+Authenticated GitHub account: mneme-agent.
+PUT /repos/MnemeHQ/mneme/pulls/733/merge merge_method=squash
+Result: HTTP 405 Method Not Allowed. GitHub reason: Required status check "mneme trusted gate" is failing.
+No merge occurred. Evidence timestamp: 2026-11-03 12:03:44 UTC. GitHub request ID: FD00:110A32:619B29:142E7B3:6AE9CD9A.
