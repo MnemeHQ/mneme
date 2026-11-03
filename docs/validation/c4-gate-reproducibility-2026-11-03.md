@@ -43,10 +43,15 @@ and `updated_at` identical before and after); posture `closed`; base = `main`
 | T3 unavailable (`docs/t3-link`, symlink) under `closed` | #4 | 41660447456 / 126001921424 | **UNEVALUATED**, failure | **405**, required `mneme trusted gate` failing | 4886950408 `fail` (same) |
 
 The merge attempts were run by the owner from the `MnemeAgent` Windows account
-signed in as `mneme-agent` (permission `write`, not a bypass actor); the HTTP
-results were reported in the owner's review and are independently corroborated
-by GitHub's rule-suite records above and by the PR states (#2 and #4 never
-merged and later closed; #3 merged by `mneme-agent`).
+signed in as `mneme-agent` (permission `write`, not a bypass actor; token
+scopes `gist, read:org, repo`, no `workflow`). From the owner-supplied terminal
+output: T1 `405` at 19:01:09Z (request `F9A1:5A97D:7A7E12:1904172:6AEA2F73`),
+T3 `405` at 19:01:11Z (`F9A3:1B5317:7C0AF2:193AA21:6AEA2F75`), each "Required
+status check \"mneme trusted gate\" is failing."; T2 `200` at 19:01:15Z
+(`F9A4:F3DC6:7AEB4F:1902228:6AEA2F78`), merged `5335c722`
+(`merge-attempts-mneme-agent.txt`). GitHub's rule-suite records and the PR
+states (#2 and #4 never merged and later closed; #3 merged by `mneme-agent`)
+corroborate them independently.
 
 Evidence: [`c4-gate-reproducibility-2026-11-03/`](c4-gate-reproducibility-2026-11-03/)
 (three gate reports, three rule suites, the two generated ruleset files, the
