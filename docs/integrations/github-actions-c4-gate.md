@@ -270,16 +270,24 @@ change. PRs from forks and first-time contributors have not been observed.
 
 ### 7. Verify
 
-Open three throwaway PRs into the default branch and keep them unmerged:
+Open three test PRs into the default branch and attempt each merge with an
+account that is **not** the bypass actor (for example a collaborator with
+write access), so the result reflects the rules rather than a bypass:
 
-| PR | Expected check | Expected merge |
-|---|---|---|
-| A change containing a literal your memory forbids | failure (VIOLATION) | blocked |
-| A neutral change | success (PASS) | allowed |
-| A symlink (non-regular file) under `closed` | failure (UNEVALUATED) | blocked |
+| Test | PR | Expected check | Expected merge attempt |
+|---|---|---|---|
+| T1 | a change containing a literal your memory forbids (with the example memory: `install legacy-client` in a `docs/` file) | failure (VIOLATION) | rejected, HTTP **405** |
+| T2 | a neutral change | success (PASS) | **merged**, HTTP **200** |
+| T3 | a symlink (non-regular file) under `closed` | failure (UNEVALUATED) | rejected, HTTP **405** |
 
-Each run's `gate-report.json` artifact must show the pins above and posture
-`closed`.
+```bash
+gh api -X PUT "repos/$REPO/pulls/PR_NUMBER/merge" -f merge_method=squash -i
+```
+
+Close T1 and T3 unmerged afterwards. Each run's `gate-report.json` artifact
+must show the pins above and posture `closed`; GitHub's rule-suite log
+(`gh api "repos/$REPO/rulesets/rule-suites?ref=refs/heads/$DEFAULT_BRANCH"`)
+should show `fail` for T1 and T3 and `pass` for T2.
 
 ### 8. Operating it
 
