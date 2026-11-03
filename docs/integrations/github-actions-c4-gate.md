@@ -140,6 +140,24 @@ The default branch must contain `.mneme/project_memory.json`, the file
 rule (for example `FORBID_LITERAL`). The gate evaluates literal-tier rules only;
 memory without typed rules gives nothing to block.
 
+**Minimal example.** [`c4-gate/project_memory.example.json`](c4-gate/project_memory.example.json)
+is a complete, valid memory with one synthetic decision, `ADR-901`: a
+`FORBID_LITERAL` rule for the text `install legacy-client` in `docs/**`
+(excluding `docs/history/**`), with its decision index (version
+`dver-d3d431ff6d5edba8b555a040a7b85f9b`, rule
+`ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b`). It is the decision
+used in the C4 Gate 3 live lab, reduced to that one decision. With the pinned
+evaluator (`0b74d410`, invoked as the adapter does) a `docs/` file containing
+the text returns `FAIL` (exit 2) and a neutral `docs/` file returns `PASS`
+(exit 0), both with `evaluation_complete: true`.
+
+Copy it unchanged to `.mneme/project_memory.json` to install and verify the
+gate. Do not hand-edit its values: the decision index carries content digests
+and rule identities derived from the decision. To protect your own decisions,
+create the memory with the `mneme-hq` CLI (`mneme init`, then `mneme adr import`
+for ADRs whose constraints declare typed rules), and confirm it with the
+step 7 tests, which run the pinned evaluator.
+
 ### 3. Availability posture
 
 Create the repository variable `MNEME_CI_AVAILABILITY` with the value `closed`
@@ -179,27 +197,69 @@ the first runs are on PRs opened or updated after it is merged. The job name,
 Use two branch rulesets on the default branch, so that a bypass of the gate
 never bypasses the other protections:
 
-- **Gate ruleset:** one rule, `required_status_checks` with context
-  `mneme trusted gate` from the GitHub Actions app (integration id `15368`) and
-  strict up-to-date on. Bypass list: exactly one designated human (`User` actor)
-  in `pull_request` mode, never `always`. That person is the route for changes
-  the gate always refuses (`.mneme/`, `.github/`); with no bypass actor such
-  changes can merge only by disabling the ruleset.
+- **Gate ruleset (`mneme-ci-gate`):** one rule, `required_status_checks` with
+  context `mneme trusted gate` from the GitHub Actions app (integration id
+  `15368`) and strict up-to-date on. Bypass list: exactly one designated human
+  (`User` actor) in `pull_request` mode, never `always`. That person is the
+  route for changes the gate always refuses (`.mneme/`, `.github/`); with no
+  bypass actor such changes can merge only by disabling the ruleset.
+- **Protections ruleset (`main-pr-only`), no bypass actors:** pull request
+  required (squash only, no required approvals), deletion and non-fast-forward
+  rules. Add your other required checks to it as a `required_status_checks`
+  rule if you have any.
 
-  ```json
-  {"name": "mneme-ci-gate", "target": "branch", "enforcement": "active",
-   "conditions": {"ref_name": {"include": ["~DEFAULT_BRANCH"], "exclude": []}},
-   "bypass_actors": [{"actor_id": HUMAN_USER_ID, "actor_type": "User", "bypass_mode": "pull_request"}],
-   "rules": [{"type": "required_status_checks", "parameters": {
-     "strict_required_status_checks_policy": true, "do_not_enforce_on_create": false,
-     "required_status_checks": [{"context": "mneme trusted gate", "integration_id": 15368}]}}]}
-  ```
+These are the shapes Core runs (rulesets 26391853 and 22196895). Set the three
+values at the top, then run the block: it looks up the bypass user's numeric
+id, writes both files as valid JSON and creates the rulesets.
 
-- **Protections ruleset, no bypass actors:** pull request required (for
-  example squash only), deletion and non-fast-forward rules, and your other
-  required checks.
+```bash
+REPO=OWNER/REPO            # the repository to protect
+DEFAULT_BRANCH=main        # its default branch
+BYPASS_LOGIN=github-login  # the one designated human bypass authority
 
-Create each with `gh api -X POST repos/OWNER/REPO/rulesets --input FILE.json`.
+BYPASS_ID="$(gh api "users/$BYPASS_LOGIN" --jq .id)"
+python3 - "$BYPASS_ID" "$DEFAULT_BRANCH" <<'PY'
+import json, sys
+bypass_id, branch = int(sys.argv[1]), sys.argv[2]
+ref = {"ref_name": {"include": [f"refs/heads/{branch}"], "exclude": []}}
+gate = {
+    "name": "mneme-ci-gate", "target": "branch", "enforcement": "active",
+    "conditions": ref,
+    "bypass_actors": [{"actor_id": bypass_id, "actor_type": "User",
+                       "bypass_mode": "pull_request"}],
+    "rules": [{"type": "required_status_checks", "parameters": {
+        "strict_required_status_checks_policy": True,
+        "do_not_enforce_on_create": False,
+        "required_status_checks": [{"context": "mneme trusted gate",
+                                    "integration_id": 15368}]}}],
+}
+protections = {
+    "name": "main-pr-only", "target": "branch", "enforcement": "active",
+    "conditions": ref, "bypass_actors": [],
+    "rules": [
+        {"type": "pull_request", "parameters": {
+            "allowed_merge_methods": ["squash"],
+            "dismiss_stale_reviews_on_push": False,
+            "require_code_owner_review": False,
+            "require_last_push_approval": False,
+            "required_approving_review_count": 0,
+            "required_review_thread_resolution": False}},
+        {"type": "deletion"},
+        {"type": "non_fast_forward"},
+    ],
+}
+for name, body in (("gate-ruleset.json", gate), ("protections-ruleset.json", protections)):
+    with open(name, "w", encoding="utf-8") as f:
+        json.dump(body, f, indent=2)
+        f.write("\n")
+PY
+gh api -X POST "repos/$REPO/rulesets" --input protections-ruleset.json
+gh api -X POST "repos/$REPO/rulesets" --input gate-ruleset.json
+```
+
+Create the protections ruleset first, as above, so the gate's bypass never
+exists without the no-bypass protections. Read both back with
+`gh api repos/$REPO/rulesets` and `gh api repos/$REPO/rules/branches/$DEFAULT_BRANCH`.
 
 ### 6. Actions policy
 
