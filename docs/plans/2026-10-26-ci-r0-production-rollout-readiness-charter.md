@@ -135,14 +135,17 @@ To keep that authority as narrow as GitHub allows:
   relied on.
 - **One designated human authority.** The bypass actor is a named human
   account (the owner), not a team, app or role that grows over time.
-- **No agent-accessible credentials.** No token that agent sessions, CI or
-  automation can use may carry that account's bypass ability. S2 records the
-  credential inventory: which tokens exist for that account, where they are
-  stored, and confirmation that none is configured in agent environments
-  (`gh` auth, `GH_TOKEN`/`GITHUB_TOKEN` exports, MCP servers, repository or
-  organization secrets). If the owner's day-to-day `gh` login is also the
-  agent's login, that is a finding to resolve before S2 completes, by moving
-  agents to a separate non-bypass identity.
+- **Isolated validation identity; bounded dogfooding exception (2026-11-02).**
+  S2 retains the credential inventory and requires that the designated
+  non-admin validation identity cannot access bypass authority. The owner
+  accepts that separate existing internal dogfooding sessions may retain
+  administrator-capable access. This is an expressly accepted P7/P8 residual
+  for Mneme Core dogfooding, **not** a claim of administrator-resistant CI
+  enforcement or agent credential isolation in the ordinary development
+  environment. Isolated test evidence must be attributed to the isolated
+  identity, not generalized to administrator-capable agents.
+  No permanent workstation migration or credential revocation is required
+  as an S2 prerequisite. Keep sensitive inventory details private.
 - `bypass_mode: pull_request` only, never `always`; direct pushes to `main`
   stay blocked (ruleset and the ADR-022 pre-push guard).
 
@@ -220,6 +223,15 @@ behalf):
 - R1, R3-R5: "accept R1 (single repo boundary), R3 (closed), R4 (residuals for
   bounded rollout validation, no ADR-029 upgrade), R5 (drop warn check from
   required when the gate becomes required)."
+
+**R6 (owner, 2026-11-02):** For internal Mneme Core dogfooding only,
+accept administrator-capable agent access as a bounded P7/P8 residual.
+Keep the isolated non-admin S2/S4 validation identity, stage-specific owner
+approvals, dedicated gate ruleset, and recorded bypass procedure. This exception
+does not demonstrate resistance to administrator-controlled agents, does not
+upgrade ADR-029 evidence, and does not change C4 results. Broader production
+security claims require a separate decision and supporting evidence.
+R1-R5 remain unchanged.
 
 These rulings authorize no stage in §7. Production promotion stays DEFERRED.
 

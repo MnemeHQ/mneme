@@ -1687,6 +1687,98 @@ comment.
 The earlier freeze amendments, including ADR-033 C2a, C2b, C2b Amendment 1 and
 C4 and ADR-034 G1/G2-1/D1/D2 with their errata, remain unchanged.
 
+## Amendment — clarify the R0 S5 activation of `mneme-ci-gate` (2026-11-02)
+
+**Status:** clarification of the R0 scope amendment above, authorized on the
+squash merge of the `[layer1-freeze]` PR that adds this section with the
+owner's approval recorded in that PR. **It authorizes the execution of
+nothing.** S5 still needs its own owner authorization, every S4 case as
+expected and a clean S4→S5 configuration equivalence check.
+
+**Section amended:** the R0 scope amendment's eligible-changes table, S5 row.
+
+**Rationale (Amendment Procedure §3(b)).** S2 created the dedicated gate
+ruleset `mneme-ci-gate` (id `26391853`) **disabled**, as the S2 row allows
+("no required check yet, or created disabled"); see the
+[S2 record](../validation/ci-r0-s2-gate-ruleset-2026-11-02.md) (#719,
+`4969cf83`). The S5 row lists adding the required check and strict up-to-date
+in that ruleset but does not name switching its enforcement on, without which
+the S5 change has no effect. This section closes that gap only.
+
+**Clarified S5 row.** The single recorded S5 change set may, in addition to
+the changes already listed, set `mneme-ci-gate` (`26391853`) from
+`enforcement: disabled` to `enforcement: active`. Nothing else is added:
+
+- no other ruleset's enforcement, bypass list or conditions;
+- the bypass list stays exactly one `User` actor in `pull_request` mode;
+- `enforcement: evaluate` and any second bypass actor remain excluded;
+- the §5.4 emergency control "remove the gate from the gate ruleset's required
+  checks (or disable that ruleset)" is unchanged.
+
+All other rows, exclusions and the remainder of the R0 scope amendment are
+unchanged.
+
+## Amendment — authorize the R0 S4 staging trigger filters (2026-11-02)
+
+**Status:** authorized on the squash merge of the `[layer1-freeze]` PR that
+adds this section, with the owner's approval recorded in that PR. It makes one
+narrowly bounded change to production workflow files **eligible**; the change
+itself is a separate reviewed PR, and running S4 still needs every condition
+of the R0 scope amendment's S4 rows. Nothing else is authorized.
+
+**Sections amended:** the R0 scope amendment's eligible-changes table (adds
+one S4 row) and its exclusion "no other workflow".
+
+**Rationale (Amendment Procedure §3(a) and §3(b)).** The S4 attempt of
+2026-11-02 stopped under its own stop rule: the gate did not run on PRs into
+`r0/recovery-staging`. GitHub documents that `pull_request_target` "runs in the
+context of the default branch of the base repository" and that `GITHUB_SHA`
+is the last commit on the default branch. So for any PR the gate workflow,
+its `branches:` filter and its trusted base all come from `main`. The frozen
+adapter builds the PR diff as `merge-base(--base-sha, head)..head` and reads
+decision memory from `--base-sha`; the workflow passes `GITHUB_SHA`. The R0
+scope amendment's S4 rows assumed the staging branch's own workflow and base
+would be used. They are not. Without this change S4 cannot show the charter
+§7 S4 cases with real gate verdicts.
+
+**Eligible change (S4 only).** One PR to `main` that, in exactly these four
+files, changes the pull-request trigger line `branches: [main]` to
+`branches: [main, r0/recovery-staging]` and changes nothing else:
+
+| File | Trigger |
+|---|---|
+| `.github/workflows/mneme-trusted-gate.yml` | `pull_request_target` |
+| `.github/workflows/tests.yml` | `pull_request` (not `push`) |
+| `.github/workflows/encoding-check.yml` | `pull_request` (not `push`) |
+| `.github/workflows/mneme-check.yml` | `pull_request` |
+
+No step, permission, pin, environment value, adapter or evaluator changes.
+The gate keeps its reviewed trust logic (`base == GITHUB_SHA` assertion, memory
+from the trusted base).
+
+**Binding conditions for S4 with this change:**
+
+1. `r0/recovery-staging` is created at **exactly** the `main` commit that
+   contains this change, so the staging tip, `GITHUB_SHA` and the gate's trusted
+   base are one commit: same workflows, same memory, and a PR diff containing
+   only the probe.
+2. No merge to `main` while S4 cases run. Every S4 gate report must show
+   `base_sha` equal to the staging tip; any mismatch stops S4.
+3. The single staging merge (case (a), recorded bypass) runs **last**, because
+   afterwards staging differs from `main`.
+4. Staging rulesets are recreated from the saved specs already compared field by
+   field (`r0-staging-gate`, `r0-staging-main-pr-only`), and removed at teardown
+   with the branch.
+5. The four trigger lines stay through the S4→S5 configuration equivalence check,
+   so the tested and production workflow blobs are identical. Their removal is a
+   recorded cleanup after S5, or at S7 if S5 is not reached.
+
+**Limits.** This shows S4 only for a staging branch identical to `main`. It
+establishes nothing for PRs into other non-default branches, which the gate
+structurally evaluates against `main`'s tip; the production gate targets
+`main` only. Production `main-pr-only`, `mneme-ci-gate` and
+`MNEME_CI_AVAILABILITY=closed` are unchanged.
+
 ---
 
 ## Amendment Procedure
