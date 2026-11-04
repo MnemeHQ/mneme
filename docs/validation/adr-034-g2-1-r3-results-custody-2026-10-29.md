@@ -98,8 +98,8 @@ Owner capture and integrity evidence:
 4. The accepted shared-account residual risk, wheel reproduction provenance limitation, and CRLF/raw-versus-normalized limitations from the pre-scoring record remain operative.
 5. A successful harness process exit and `144/150` are **not** an R3 PASS. The separate structural failure is not collapsed into or erased by the numerical result.
 6. No concealed cases, raw observations, detailed hidden responses, or owner private key appear in this repository record.
-7. Per-gate counts have been **owner-extracted and published only as aggregates**, but independent confirmation is pending. Escrow rationale wording, the verified reviewer termination and scorer restart time also remain **unverified/open**. The available public evidence supports the overall FAIL but does not prove every custody/order requirement was met. The separate independent reviewer reported **BLOCKED** on PR #711, pending owner-authorized private evidence review.
-8. **Additional disclosure (post-scoring, 2026-11-04 or shortly before; exact time not recorded).** During the D4.1 diagnosis (§6), the owner uploaded the **entire** private `r3-concealed-report.json` to an external ChatGPT assistant session, instead of only the intended grouped category output. The assistant reported that the upload matched SHA-256 `d9ab08946cb795a2dff08ffdb36138ca99f8399782bf9b0c3243563c6df4c566`. The report holds case identifiers and per-case gate metadata, but no concealed fixture source, ADR text or raw observations. This is a disclosure outside the owner vault. It does not change any frozen artifact or the R3 outcome, but it further limits any future reuse of the R3 corpus or its case identifiers as held-out material. The file should not be shared further.
+7. Per-gate counts have been **owner-extracted and published only as aggregates**, but independent confirmation is pending. Escrow rationale wording, the verified reviewer termination and scorer restart time also remain **unverified/open**. The available public evidence supports the overall FAIL but does not prove every custody/order requirement was met. An earlier separate independent reviewer reported **BLOCKED** on PR #711, pending owner-authorized private evidence review. A fresh independent review on 2026-11-04 (Claude Code session `402ef02b`, a different session but the same Windows account and model family as the §6 drafter) returned **REQUEST CHANGES**. Its four wording/provenance findings on §6 are addressed in this revision. Its private-evidence items remain open until the owner runs the read-only checks or records them as limitations.
+8. **Additional disclosure (post-scoring, 2026-11-04 or shortly before; exact time not recorded).** During the D4.1 diagnosis (§6), the owner uploaded the **entire** private `r3-concealed-report.json` to an external ChatGPT assistant session, instead of only the intended grouped category output. The assistant reported that the upload matched SHA-256 `d9ab08946cb795a2dff08ffdb36138ca99f8399782bf9b0c3243563c6df4c566`. The report holds case identifiers and per-case gate metadata, but no concealed fixture source, ADR text or raw observations. This is a disclosure outside the owner vault. It does not change any frozen artifact or the R3 outcome, but it **disqualifies** the R3 corpus and its case identifiers as held-out material for any future validation. Besides case identifiers, the report carries per-case class, subclass and visibility, gate applicability and results, and notes that can embed fixture-derived rule IDs (for example `unknown_reason_set_differs:<rule_id>`). Whether the external chat and uploaded file were deleted is **not recorded**. The file should not be shared further.
 
 ## 5. Required independent results review before merge
 
@@ -114,9 +114,9 @@ Owner capture and integrity evidence:
 
 ## 6. Post-scoring diagnostic addendum (D4.1 and D4.2, 2026-11-04)
 
-**Status:** diagnostic only. Nothing below changes the frozen corpus, labels, harness, oracle, report or the **R3 FAIL** outcome, and no rerun is requested. The conclusions use the frozen harness source at `086bbbf7`, the scored implementation source at `1b0957af`, the published aggregates in §2 and one owner-run, metadata-only category read.
+**Status:** diagnostic only. Nothing below changes the frozen corpus, labels, harness, oracle, report or the **R3 FAIL** outcome, and no rerun is requested. The conclusions use the frozen harness source at `086bbbf7`, the scored implementation source at `1b0957af`, the published aggregates in §2 and one category read of the private report, performed by an external assistant (§6.2, §4 item 8).
 
-### 6.1 The six numerical failures are unscored cases (established from code)
+### 6.1 The six numerical failures are unscored cases (from code, given the owner-extracted aggregates)
 
 In the frozen harness, G8 fails only in two ways:
 
@@ -130,11 +130,11 @@ This has two consequences:
 - The identical count of 6 for every gate in §2, including G5 (denominator 40), is this fan-out. It is not 48 independent failures.
 - No completed case recorded a behavioural gate mismatch.
 
-The §2 limitation "this does not prove they are the same six case IDs" is resolved by the code and is superseded here.
+Given the owner-extracted aggregates in §2, the §2 limitation "this does not prove they are the same six case IDs" is resolved by the code. Those aggregates are themselves not yet independently verified.
 
-### 6.2 D4.1: G8 failure categories (owner read, metadata only)
+### 6.2 D4.1: G8 failure categories (external-assistant read, not owner-reproduced)
 
-The owner verified the report hash (`d9ab0894…c4566`) and grouped `cases[].gates.G8.failures` for the failed concealed cases. The harness emits these categories without case content by design.
+**Provenance.** The owner did **not** run the intended grouped, metadata-only read. Instead the owner uploaded the full report to an external ChatGPT assistant (§4 item 8). That assistant reported that the file matched the report hash (`d9ab0894…c4566`) and computed the grouping of `cases[].gates.G8.failures` for the failed concealed cases shown below. Neither the owner nor an independent reviewer has reproduced these counts with an owner-run, read-only command. Until one does, they are assistant-reported. The harness emits these categories without case content by design.
 
 | G8 category | Cases |
 |---|---:|
@@ -148,23 +148,23 @@ Each case carried a single category. The custody consequence of how this read wa
 
 **`label_numeric_rule_id_not_derived` (4): label-side.**
 
-- **What fires it.** The conflict fires when a labelled numeric `rule_id` is absent from the oracle's ADR-derived rule IDs (`oracle.py` `_cross_check`).
-- **Oracle and implementation compute IDs identically.** Both use the ADR-030 §7 formula: oracle `rule_id_of` vs `mneme/rule_identity.py`. Both apply the same ADR-034 §5 canonical value: oracle `_numeric_rule`/`canonical_max` vs `NumericContract.as_object`/`canonicalize_max`.
-- **The compiled memory agreed with the oracle.** For every case with derived expectations, the harness's memory guard (`runner.memory_guard`) compares the rule IDs the scored build compiled against the oracle's. A disagreement would have added `compiled_rule_ids_differ_from_derived` to G8, and no affected case shows it.
-- **Conclusion.** The frozen label names a rule ID that neither the scored implementation nor the oracle derives. The most likely cause is an authoring-generator identity error.
+- **What fires it.** The conflict compares **labels with the oracle only**. It fires when a labelled numeric `rule_id` is absent from the numeric rule IDs the oracle derives from the fixture ADRs (`oracle.py` `_cross_check`). The implementation is not consulted.
+- **The oracle's identity derivation matches the implementation's formula.** Both use the ADR-030 §7 formula: oracle `rule_id_of` vs `mneme/rule_identity.py`. Both apply the same ADR-034 §5 canonical value: oracle `_numeric_rule`/`canonical_max` vs `NumericContract.as_object`/`canonicalize_max`. One minor difference, keyword rejection in `numeric_rule.is_identifier`, would surface as a compile failure, not as this conflict.
+- **The memory guard gives only partial corroboration.** Where a case compiles memory, `runner.memory_guard` compares all compiled rule IDs with all oracle-derived rule IDs. A difference would have added `compiled_rule_ids_differ_from_derived`, and each affected case carried a single category. For a fixture with no memory, though, the guard compares nothing. The guard also covers all rule types, while the conflict concerns numeric IDs only. It therefore does not establish what the implementation derives for these four cases.
+- **Conclusion.** The frozen label names a numeric rule ID that the oracle does not derive from the case's own ADRs. This is a label-contract conflict. The most likely cause is an authoring-generator identity error.
 
 **`expected_cause` (2): label or vocabulary side, most likely.**
 
-- **The cause logic matches.** The oracle's cause derivation is the same as the scored hook's (`mneme/integrations/claude_code/hook.py` at `1b0957af`). Any numeric violation gives `numeric_violation`. Any other violation gives `other_rule`. With no violation, the cause is `no_violation` or `fail_open` according to completeness.
-- **Only the cause conflicted.** A genuine behavioural disagreement would normally also conflict on dependent derived fields such as `evidence.evaluation_complete` or `expected_disposition`, adding a second category. Only the cause conflicted.
+- **The conflict is between the label's own fields.** Like every oracle conflict, it compares the oracle with the labels, not with the implementation. In a routed case, the oracle's `exp.cause` depends only on the derived violations and `evaluation_complete` (`oracle.py` `derive`). Both are checked against the labels (`evidence.violations` and `evidence.evaluation_complete` in `_cross_check`), and neither conflicted, because each case carried a single category. A conflict on the cause alone therefore means the label's `expected_cause`, mapped through `CAUSE_TO_RECORD`, disagrees with the label's own violation and completeness fields. In unrouted or unchecked cases, the cause is compared raw against `legacy_unrouted` or `not_checked`.
+- **The oracle is not a full model of the hook's cause logic.** The scored hook (`mneme/integrations/claude_code/hook.py` at `1b0957af`) can return `fail_open` for an incomplete evaluation whose violation is not M-a actionable (`mixed_violation_actionable`). It also has `availability_refusal` and `not_run` causes. The oracle refuses whenever a violation exists, and models none of those. This does not affect the classification above, but the oracle's cause model should not be described as identical to the implementation's.
 - **The likely mechanism is a vocabulary mismatch.** The label may use a value outside the four-entry AMB-R2-08 map (`contract.CAUSE_TO_RECORD`), for example record vocabulary in place of corpus vocabulary. Alternatively, an unrouted or unchecked case may carry a routed cause.
 - **Not verified.** The exact derived and labelled values sit in the private `r3-observations.json` conflict strings. Reading them is not required for the conclusion below.
 
 ### 6.4 What this does and does not establish
 
-- **Establishes:** 144 concealed cases completed with no behavioural gate mismatch. The six unscored cases arise from label and oracle contract conflicts, and no indication of an implementation defect was found.
+- **Establishes, given the §2 aggregates and the §6.2 categories:** 144 concealed cases completed with no behavioural gate mismatch. The six unscored cases arise from label/oracle contract conflicts.
+- **No implementation defect is demonstrated.** Implementation behaviour on the six cases was observed but never compared with expectations, so neither a defect nor its absence is established for them.
 - **Does not establish:** that the six cases would have passed, or that R3 passed. Unscored cases correctly fail closed. The structural `SC_lexical_families=missing` determination stands independently.
-- **Product change:** none is indicated by D4.1 or D4.2.
 
 ### 6.5 Process corrections for any future blind validation
 
