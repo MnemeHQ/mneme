@@ -80,25 +80,35 @@ amendment.
 
 ### 4.1 Topology
 
-- One new private GitLab.com group, used for nothing else.
-- Project **`gate-config`**: holds only `gate.yml` (Appendix A) on branch
-  `gate-v1`, protected with push and merge "No one" after the commit. The
-  owner is the only member. It is **public**: GitLab documents that a user
-  needs read access to another project's CI file in the `include:project`
-  case, and its own docs suggest a public project for an external CI file.
-  Readers can see the definition, which is already public in Core's
-  workflow; only the owner can change it.
-- Project **`lab`**: the target repository. Seed commit on `main`:
-  `.mneme/project_memory.json` (§3) and `docs/README.md` (compliant text).
-  Members: the owner (Owner) and the contributor (Developer).
+- One new **public** GitLab.com group, used for nothing else. The owner is
+  its only member. It is public because a GitLab project cannot be more
+  visible than its group: a private group holds only private projects, so
+  a public `gate-config` needs a public group.
+- Project **`gate-config`**, **public**: holds only `gate.yml` (Appendix A)
+  on branch `gate-v1`, protected with push and merge "No one" after the
+  commit. No project members beyond the owner's inherited group role. It is
+  public because GitLab documents that a user needs read access to another
+  project's CI file in the `include:project` case, and its own docs suggest
+  a public project for an external CI file. Readers can see the definition,
+  which is already public in Core's workflow; only the owner can change it.
+- Project **`lab`**, **private**: the target repository. Seed commit on
+  `main`: `.mneme/project_memory.json` (§3) and `docs/README.md` (compliant
+  text). Members: the owner (inherited group Owner) and the contributor
+  (direct project member, Developer).
+
+The contributor is **never** a member of the group or of `gate-config`, so
+no group role is inherited by any project. Group membership is the only
+inheritance path, and B3 checks it is unused for the contributor. The
+contributor is never given write access to `gate-config` to make anything
+work; if the design cannot run without it, that is a stop (§7).
 - The contributor's personal namespace, used only for the V5 fork.
 
 ### 4.2 Accounts and identities
 
 - **Owner**: existing GitLab account, group Owner. Performs every
   administrative step (§6) and nothing in a case's contributor path.
-- **Contributor**: a separate account created by the owner, Developer role
-  on `lab` only, no role on `gate-config` or the group. Every case MR and
+- **Contributor**: a separate account created by the owner, direct
+  Developer member of `lab` only; no role on `gate-config` or the group. Every case MR and
   merge attempt is made as the contributor.
 - The agent never handles either account's password or token. Commands run
   under a session the owner authenticated (GitLab MCP, `glab` or a separate
@@ -199,8 +209,17 @@ before the case is judged.
 | ID | Contributor change | Observe | PASS when |
 |---|---|---|---|
 | V5a | fork `lab` into the contributor namespace; in the fork add `.gitlab-ci.yml` with one always-passing job and a violating `docs/v5.md`; open an MR to `lab` | which project ran which pipeline, from which configuration, and which pipeline the MR's merge check uses | no pipeline defined by the fork satisfies `lab`'s merge check |
-| V5b | (only if the owner authorizes it at gate E) the owner runs the V5a MR's pipeline in the parent project as the documented parent-run path | which configuration the parent-run pipeline uses | the parent-run pipeline uses `gate-config` and reports VIOLATION or REFUSED. Reported separately from V5a; an owner action, not a contributor bypass test |
+| V5b | **excluded from gate E.** The owner running the V5a MR's pipeline in the parent project | which configuration the parent-run pipeline uses | not run under this charter (see below) |
 | V6-F | head-pinned merge attempt on the V5a MR by the contributor | host response | merge refused |
+
+**Fork warning.** GitLab documents that a fork MR pipeline normally runs in
+the fork with the fork's own configuration, and that even when a
+parent-project member runs it in the parent project, the configuration
+comes from the fork's branch, with the parent's variables and resources
+and the triggering member's permissions. A parent run would therefore
+execute untrusted configuration with `lab`'s resources. V5b is excluded
+from gate E for that reason; running it needs its own authorization after
+the V5a result, with its own risk assessment.
 
 If V5a or V6-F is FAIL or UNVERIFIED, the results record states that fork
 protection is **not shown** and makes no fork-protection claim. Nothing in
@@ -208,16 +227,20 @@ V5 changes the same-repository verdicts.
 
 ### 5.3 Not tested
 
-Posture `open`; merge races and the documented older-successful-pipeline
-caveat; runner outage or timeout; first-time-contributor approval (no GitLab
+Posture `open`; V5b (parent-project run of a fork pipeline); merge races;
+the documented older-successful-pipeline caveat (GitLab notes that an
+older successful MR pipeline can allow a merge after a newer pipeline
+fails), which no case exercises and which stays an explicit limitation of
+any result; runner outage or timeout; first-time-contributor approval (no GitLab
 equivalent documented); administrator resistance (R6); paid-tier controls
 (pipeline execution policies, external status checks, approval-policy
 bypass). Each stays a recorded limitation.
 
 ## 6. Procedure (at gate E only)
 
-1. **Build.** Create the group and projects, commit the seed and Appendix A,
-   apply §4.3, add the contributor. Snapshot every setting (API GET) before
+1. **Build.** Create the public group, the public `gate-config` and the
+   private `lab`, commit the seed and Appendix A, apply §4.3, add the
+   contributor as a direct Developer member of `lab` only. Snapshot every setting (API GET) before
    and after.
 2. **Build checks (all must pass before any case):**
    - **B1** `ci_config_path` is `gate.yml@<group>/gate-config:gate-v1`;
@@ -225,14 +248,17 @@ bypass). Each stays a recorded limitation.
      byte-identical to Appendix A; `gate-v1` is protected.
    - **B2** the job log shows the §3 image digest; instance runners are
      available to the group.
-   - **B3** contributor role is Developer on `lab` and nothing else.
+   - **B3** visibility and membership: group public, `gate-config` public,
+     `lab` private; the group's only member is the owner; the contributor is
+     a direct Developer member of `lab` and a member of nothing else (group
+     and `gate-config` member lists, including inherited members, recorded).
    - **B4** only `MNEME_CI_AVAILABILITY` is defined as a project or group
      variable; no variable shadows an Appendix A pin.
    - **B5** a throwaway owner MR touching only `docs/` runs the gate end to
      end: wheel and adapter pins verified, report PASS. Then, on the same
      runner image, the CI1 contract corpora replay offline (the Gate 2
      replay commands) with the Gate 2 counts. The B5 MR is closed unmerged.
-3. **Cases** in the order V1, V2, V3, V4a-d, V6-S, V5a, V6-F, V5b. For each:
+3. **Cases** in the order V1, V2, V3, V4a-d, V6-S, V5a, V6-F. For each:
    open the MR as the contributor, wait for the pipeline, fetch evidence,
    attempt the head-pinned merge, record.
 4. **Restore and archive.** Close open MRs, delete the fork, export the
@@ -246,7 +272,7 @@ Stop at once, record the state, and report:
 - any pin in §3 differs, or a case would need an adapter, evaluator, rule,
   fixture or posture change;
 - a build check fails;
-- a case needs an owner or admin action other than V5b;
+- a case needs an owner or admin action;
 - GitLab behaves in a way this charter did not anticipate and the next step
   is not covered here;
 - a paid tier would be needed.
@@ -258,7 +284,7 @@ reviewed amendment.
 
 The owner establishes, outside this charter:
 
-- the GitLab.com group, and any identity verification GitLab requires for
+- a GitLab.com account able to create the public group, and any identity verification GitLab requires for
   Free users to run jobs on GitLab-hosted runners (email, phone or payment
   method, by risk score). Free namespaces get 400 compute minutes a month;
   this charter needs about 15 pipeline runs;
@@ -271,7 +297,7 @@ The owner establishes, outside this charter:
 | Gate | Content | Authorizes |
 |---|---|---|
 | C0 | this charter, reviewed and merged | nothing beyond the protocol |
-| E | owner authorization, after §8 | build, build checks, cases and restore, exactly as §§4-7 (V5b only if named) |
+| E | owner authorization, after §8 | build, build checks, cases V1-V4, V6-S, V5a, V6-F and restore, exactly as §§4-7. Not V5b |
 | R | results record PR with an independent read-only audit (as C4 Gate 4) | closure of this experiment; no support claim |
 
 ## 10. Evidence
@@ -281,8 +307,9 @@ Committed under `docs/validation/ci-portability-gitlab-lab-<date>/` with an
 
 - pins as observed in each job log (adapter blob and SHA-256, wheel SHA-256,
   lock SHA-256, image digest, `gate-config` commit);
-- settings snapshots (before build, after build, after restore) and member
-  lists with roles;
+- settings snapshots (before build, after build, after restore), the
+  group's and both projects' visibility, and member lists with roles,
+  direct and inherited;
 - per case: identity used, MR IID and URLs, source project, pipeline ID,
   project the pipeline ran in and its configuration source, job ID, full
   job log, `gate-report.json`, `summary.md`, `verify-report` output,
@@ -309,7 +336,8 @@ No tokens, passwords or personal data in any committed file.
 
 Lab creation, configuration or execution before gate E; any change to Core
 enforcement, the adapter, the evaluator, ADRs, the Layer 1 freeze, `.mneme/`
-or Core's CI configuration; posture `open`; any additional platform.
+or Core's CI configuration; posture `open`; V5b; granting the contributor
+any access to `gate-config` or the group; any additional platform.
 
 ## Appendix A. Proposed trusted definition (`gate-config/gate.yml`)
 
