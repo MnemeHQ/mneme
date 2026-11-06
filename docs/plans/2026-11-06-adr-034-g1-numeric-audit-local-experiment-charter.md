@@ -213,9 +213,46 @@ The experiment uses one constraint that:
    forms in the current code;
 3. has narrow `include_paths`.
 
-An illustrative candidate is the hook's `_CHECK_TIMEOUT_SECONDS` in
-`mneme/integrations/claude_code/hook.py`. The constraint is chosen and
-recorded at gate A.
+### 4.2 Selected constraint (proposed for gate A)
+
+**Constraint:** the Claude Code hook's check timeout is at most 10 seconds.
+It is documented in
+[`docs/integrations/claude-code.md`](../integrations/claude-code.md) ("The
+hook has a 10 s timeout and fails open on expiry") and implemented as the
+module-level `_CHECK_TIMEOUT_SECONDS = 10` in
+`mneme/integrations/claude_code/hook.py`. The Agent SDK, Antigravity and
+Codex CLI integrations import the same constant.
+
+**Contract** (ADR-034 §2, symbol only):
+
+```text
+- FORBID_NUMERIC_ABOVE:
+    language: python
+    symbol: _CHECK_TIMEOUT_SECONDS
+    max: 10
+    inclusive: true
+    unit: seconds
+    include_paths:
+      - "mneme/integrations/claude_code/hook.py"
+```
+
+Canonical value:
+`{"inclusive":true,"language":"python","max":"10","symbol":"_CHECK_TIMEOUT_SECONDS","unit":"seconds","v":1}`.
+
+**Qualification run (2026-11-06, before gate A).** To confirm the baseline is
+testable, and only that, one `--source-file` run used the §5.3 invocation on
+a byte-identical copy of `hook.py` at `42ffdde5` (git blob `285ef854`,
+SHA-256 `cb381e8c…8c5b`). It ran in a disposable directory outside the
+repository, with `MNEME_MEMORY` unset. Result: exit 0, verdict `PASS`,
+`evaluation_complete` true, rule `APPLIED`, governed path
+`mneme/integrations/claude_code/hook.py`. No synthetic variant was run, and
+the directory was deleted afterwards. This run is a selection check, not
+experiment evidence.
+
+**Known out-of-scope form.** `hook.py` also reads a test-only override,
+`float(os.environ.get("MNEME_HOOK_CHECK_TIMEOUT_TEST", _CHECK_TIMEOUT_SECONDS))`.
+That is not a declared source, and the audit does not see it. It is input for
+§5.5 question 3.
 
 ## 5. Local experiment
 
@@ -306,7 +343,7 @@ set `MNEME_MEMORY`, or require a CLI change.
 
 | Gate | Content | Needs |
 |---|---|---|
-| A | This charter merged, with rulings O1 and O2 and the §4.1 constraint recorded | owner |
+| A | This charter merged, with rulings O1 and O2 and the §4.2 constraint accepted | owner |
 | B | Local experiment run (§5), a results record answering §5.5, and the disposable directory deleted | owner go-ahead after A |
 
 Any persistent advisory workflow, committed audit memory or observation period
