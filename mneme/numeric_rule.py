@@ -693,9 +693,15 @@ def _classify_expression(
 
 def _classify_symbol(
     symbol: str, facts: _ModuleFacts, bound: Fraction,
+    dynamic_lines: list[int] | None = None,
 ) -> _Classified:
-    """The single module-level assignment to ``symbol`` (ADR-034 §3)."""
+    """The single module-level assignment to ``symbol`` (ADR-034 §3, §3b)."""
     bindings = facts.bindings.get(symbol, [])
+    if dynamic_lines:
+        # A construct that can write the module namespace (S1-a to S1-g):
+        # the recognized value, if any, may not be the runtime value.
+        line = min([*dynamic_lines, *(b.line for b in bindings)])
+        return _Classified("UNKNOWN", line, REASON_AMBIGUOUS_BINDING)
     if not bindings:
         return _Classified("UNKNOWN", None, REASON_SOURCE_NOT_FOUND)
     if len(bindings) > 1:
@@ -720,6 +726,121 @@ def _classify_symbol(
     # Unpacking, a bare annotation, an import or a definition: the binding
     # exists but does not carry a recognized value form.
     return _Classified("UNKNOWN", binding.line, REASON_UNRECOGNIZED_FORM)
+
+
+# ── Symbol-source dynamic writes (ADR-034 §3b, owner ruling S1) ──────────────
+
+# S1-a: namespace-mapping and source-executing names, in any context.
+_S1_NAMESPACE_NAMES = frozenset({
+    "globals", "vars", "locals", "exec", "eval", "__builtins__",
+})
+# S1-d: attribute setters by name and as dunder attributes.
+_S1_SETTER_NAMES = frozenset({"setattr", "delattr"})
+_S1_SETTER_ATTRS = frozenset({"__setattr__", "__delattr__"})
+# S1-e: attributes exposing a namespace mapping.
+_S1_NAMESPACE_ATTRS = frozenset({
+    "__dict__", "__globals__", "f_globals", "f_locals",
+})
+_S1_BUILTIN_MODULES = frozenset({"builtins", "__builtin__"})
+# Names a string argument must not carry (S1-g): setters and namespaces.
+_S1_STRING_NAMES = _S1_SETTER_NAMES | _S1_SETTER_ATTRS | _S1_NAMESPACE_ATTRS
+# Names a constant ``getattr`` name must not carry (S1-g).
+_S1_GETATTR_NAMES = _S1_NAMESPACE_NAMES | _S1_STRING_NAMES
+
+
+def _const_str(node: ast.AST | None) -> bool:
+    return isinstance(node, ast.Constant) and isinstance(node.value, str)
+
+
+def _names_any(node: ast.AST | None, names: frozenset[str]) -> bool:
+    """A string constant naming one of ``names`` in any dotted part."""
+    return _const_str(node) and any(
+        part in names for part in node.value.split(".")
+    )
+
+
+def _symbol_dynamic_write_lines(symbol: str, module: ast.Module) -> list[int]:
+    """Lines of S1-a to S1-g constructs (ADR-034 §3b).
+
+    Each construct can write the module namespace under the symbol's name or
+    under a name static analysis cannot rule out. Detection is conservative:
+    a construct need not touch the symbol (accepted false incompletes, §3b).
+    """
+    callees = {
+        id(node.func) for node in ast.walk(module) if isinstance(node, ast.Call)
+    }
+    lines: list[int] = []
+    for node in ast.walk(module):
+        if isinstance(node, ast.Name):
+            if node.id in _S1_NAMESPACE_NAMES:                       # S1-a
+                lines.append(node.lineno)
+            elif (
+                node.id in _S1_SETTER_NAMES | {"getattr"}
+                and id(node) not in callees
+            ):                                                         # S1-d
+                lines.append(node.lineno)
+        elif isinstance(node, ast.ImportFrom):
+            if any(alias.name == "*" for alias in node.names):        # S1-b
+                lines.append(node.lineno)
+            if node.module in _S1_BUILTIN_MODULES:                    # S1-f
+                lines.append(node.lineno)
+        elif isinstance(node, ast.Import):
+            if any(a.name in _S1_BUILTIN_MODULES for a in node.names):  # S1-f
+                lines.append(node.lineno)
+        elif isinstance(node, ast.Attribute):
+            if node.attr == symbol and not isinstance(node.ctx, ast.Load):
+                lines.append(node.lineno)                              # S1-c
+            if node.attr in _S1_NAMESPACE_ATTRS:                       # S1-e
+                lines.append(node.lineno)
+            if node.attr in _S1_SETTER_ATTRS and id(node) not in callees:
+                lines.append(node.lineno)                              # S1-d
+        elif isinstance(node, ast.Call):
+            lines.extend(_symbol_dynamic_call_lines(symbol, node))
+    return lines
+
+
+def _symbol_dynamic_call_lines(symbol: str, node: ast.Call) -> list[int]:
+    func = node.func
+    if isinstance(func, ast.Name):
+        callee = func.id
+    elif isinstance(func, ast.Attribute):
+        callee = func.attr
+    else:
+        callee = None
+    unpacked = any(isinstance(a, ast.Starred) for a in node.args) or any(
+        kw.arg is None for kw in node.keywords
+    )
+    lines: list[int] = []
+    if (isinstance(func, ast.Name) and callee in _S1_SETTER_NAMES) or (
+        isinstance(func, ast.Attribute) and callee in _S1_SETTER_ATTRS
+    ):                                                                 # S1-d
+        # ``setattr(obj, name, v)`` and ``object.__setattr__(obj, name, v)``
+        # take the name second; a bound ``obj.__setattr__(name, v)`` first.
+        unbound = isinstance(func, ast.Name) or (
+            isinstance(func.value, ast.Name)
+            and func.value.id in {"object", "type"}
+        )
+        index = 1 if unbound else 0
+        name = node.args[index] if len(node.args) > index else None
+        if unpacked or not _const_str(name) or name.value == symbol:
+            lines.append(node.lineno)
+    if callee in ("__import__", "import_module"):                       # S1-f
+        first = node.args[0] if node.args else None
+        if not _const_str(first) or first.value in _S1_BUILTIN_MODULES:
+            lines.append(node.lineno)
+    if isinstance(func, ast.Name) and callee == "getattr":             # S1-g
+        name = node.args[1] if len(node.args) > 1 else None
+        if (
+            unpacked or not _const_str(name)
+            or _names_any(name, _S1_GETATTR_NAMES)
+        ):
+            lines.append(node.lineno)
+    if any(
+        _names_any(arg, _S1_STRING_NAMES)
+        for arg in (*node.args, *(kw.value for kw in node.keywords))
+    ):                                                                 # S1-g
+        lines.append(node.lineno)
+    return lines
 
 
 # ── Function-source resolution by Python lexical scoping (ADR-034 §3a) ───────
@@ -1171,7 +1292,10 @@ def evaluate_source(contract: NumericContract, source: bytes) -> MatcherResult:
 
     symbol_result: _Classified | None = None
     if contract.symbol is not None:
-        symbol_result = _classify_symbol(contract.symbol, facts, bound)
+        symbol_result = _classify_symbol(
+            contract.symbol, facts, bound,
+            _symbol_dynamic_write_lines(contract.symbol, module),
+        )
         classified.append((SOURCE_KIND_SYMBOL, symbol_result))
 
     if contract.call_function is not None:
