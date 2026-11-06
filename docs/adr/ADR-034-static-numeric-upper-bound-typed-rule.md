@@ -345,10 +345,10 @@ whatever its recognized value. The list is closed for this slice:
 | S1-a | A name `globals`, `vars`, `locals`, `exec`, `eval` or `__builtins__`, in any context (called, passed or aliased). |
 | S1-b | A star import (`from m import *`). |
 | S1-c | An attribute store, augmented store or delete whose attribute is the symbol, on any object (`obj.SYMBOL = …`, `del obj.SYMBOL`). The object may be this module. |
-| S1-d | A call to `setattr`, `delattr`, or an attribute `__setattr__` / `__delattr__`, unless its name argument is a string constant other than the symbol and the call has no `*` or `**` argument. |
+| S1-d | A call to `setattr`, `delattr`, or an attribute `__setattr__` / `__delattr__`, unless its name argument is a string constant other than the symbol and the call has no `*` or `**` argument. Also any reference to `setattr`, `delattr`, `getattr`, `__setattr__` or `__delattr__` that is not the callee of a call (aliased or passed as a value). |
 | S1-e | An attribute `__dict__`, `__globals__`, `f_globals` or `f_locals`, in any context. |
 | S1-f | An import of `builtins` or `__builtin__`, or a call to `__import__` / `import_module` whose first argument is not a string constant or names `builtins`. |
-| S1-g | A call to `getattr` whose name argument is not a string constant, or is a constant naming an S1-a, S1-d or S1-e name. |
+| S1-g | A call to `getattr` whose name argument is not a string constant, or is a constant naming an S1-a, S1-d or S1-e name. Also any call argument that is a string constant naming, in any dotted part, an S1-d or S1-e name (`attrgetter("__dict__")`, `methodcaller("__setattr__", …)`). |
 
 **Not affected.** These stay as they are:
 - reads of the symbol, including passing it as a value;
@@ -368,8 +368,12 @@ numeric constants in `mneme/`:
   frozen-dataclass `object.__setattr__(self, "…", …)` idiom.
 - **S1 list:** makes 0 of them `UNKNOWN`, and flags each bypass shape tried:
   `globals()`, `vars()`, `exec`, a star import, a `sys.modules[__name__]`
-  attribute write, `setattr` with a constant or computed name, and a
-  `__dict__` write.
+  attribute write, `setattr` with a constant or computed name, an aliased
+  `setattr`, a bound `__setattr__`, a `__dict__` write, `attrgetter("__dict__")`,
+  `methodcaller("__setattr__", …)`, `getattr` with a computed name, and
+  `builtins.exec`.
+- **Data strings stay clean:** S1-a names as plain strings (for example
+  `compile(source, name, "exec")`) are not constructs.
 
 **Stated limits (not claimed).** The whole-file audit evaluates the governed
 file's own source only. These are outside the rule, as before:
@@ -388,8 +392,10 @@ constructs that *can* write the module namespace. It does not prove that a
 listed construct modifies the governed symbol. For example, a `globals()`
 call elsewhere in the module that never touches the symbol still makes the
 source unevaluated. This false-incomplete risk is accepted for a fail-closed
-audit. The 0-of-64 measurement above is evidence for this code base only,
-not a guarantee for other repositories.
+audit. A custom `__setattr__` that forwards a computed name
+(`super().__setattr__(name, value)`) is another example. The 0-of-64
+measurement above is evidence for this code base only, not a guarantee for
+other repositories.
 
 **Consequences.**
 - **Authorized:** one matcher correction in `mneme/numeric_rule.py`
