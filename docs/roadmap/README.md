@@ -1,6 +1,6 @@
 # Mneme — Current Roadmap
 
-> **Current roadmap — October 2026.**
+> **Current roadmap — November 2026.**
 >
 > The original [April 2026 adoption and enhancement roadmap](./2026-04-24-adoption-and-enhancement-roadmap.md) is retained as historical context. It describes the path from an early working implementation to a usable developer tool. Mneme has moved beyond that stage: the core enforcement mechanism and several native agent integrations now ship. This file is the current operational roadmap.
 
@@ -225,6 +225,21 @@ Use `sagarika29/ai-system-architect` as the first producer-workflow compatibilit
 This surface remains distinct from the generic hosted MCP / HTTP control plane listed under Deferred. A local OSS implementation may expose proposal ingestion and retrieval over the Decision Index kernel; cross-repository federation of known decisions is DG2 (public OSS). Organization-wide persistence, source discovery and reconciliation, RBAC/SSO, multi-tenant governance, and hosted control-plane behavior remain outside the core.
 
 See proposed [ADR-027](../adr/ADR-027-decision-mcp-proposal-ingestion-and-authority-boundary.md) and issue #362.
+
+### P1 (discovery) — Embeddable Mneme SDK and shared adapter contract
+
+**Status (2026-11-06): P1 architecture discovery; no SDK implementation, release, hosted API, or new enforcement behavior authorized.** Technical integration interest justifies testing whether a small, local SDK facade is useful before a generic network API. This is a reuse-and-parity exercise under [provider-independent adapter tracker #281](https://github.com/MnemeHQ/mneme/issues/281), not a new decision engine or an implicit delivery date.
+
+**Existing delivery boundary:** Core already exposes protocol-independent decision services, decision-intent assessment, CLI checks and a Claude Agent SDK integration. The Decision MCP has exactly six frozen ADR-027 tools over **local stdio only**; its retrieval/applicability hints are not enforcement verdicts. The legacy `[api]` dependency extra is not a supported HTTP endpoint. No general Mneme SDK or remote enforcement contract should be claimed as shipped.
+
+**Smallest defensible sequence (one approval at a time):**
+
+1. **Contract inventory and architecture review.** Map supported Core retrieval, proposal, authority and pre-mutation evaluation entry points to a proposed embeddable SDK contract. Reconcile with ADR-017/018/020/023/027/029/030/031/033, the Layer 1 freeze and the adapter parity obligations in #281. Define normalized action, target/root, authoritative decision/version binding, verdict/evaluation completeness, evidence and error/timeout shapes; do not define new semantics in the facade.
+2. **Pinned local orchestrator proof.** In a synthetic or permissioned sample repository, use one explicit pre-action seam to exercise a permitted and a prohibited mutation against the same reviewed decision and evaluator as the CLI. Prove actual denial before mutation; separately record missing/stale authority, wrong repository root, unsupported tool, `UNEVALUATED`/fail-open and unavailable-current-bytes cases. Compare normalized verdicts, identities, traces, and p50/p95 cost with the pinned CLI path. Explicitly distinguish intercepted from opt-in self-governed tools; remote/virtual filesystems remain unsupported until separately validated.
+3. **SDK implementation decision (conditional).** If the proof demonstrates parity and lower integration effort, scope a minimal **Python-first**, local, typed SDK facade over the existing services/checker, with contract tests, versioning and examples. Investigate TypeScript or Rust clients only after validating a concrete host/deployment requirement. SDK design may precede an HTTP API; it must not require one.
+4. **Remote transport separately gated.** Network access, authentication, repository/tenant isolation, policy freshness and remote-worker deployment remain Enterprise remote-MCP/API discovery, not an SDK side effect. Follow [Enterprise #21](https://github.com/MnemeHQ/mneme-enterprise/issues/21) for remote orchestrators and [Enterprise #13](https://github.com/MnemeHQ/mneme-enterprise/issues/13) for topology/query hypotheses; those inputs are not completed pilots or confirmed deployment requirements.
+
+**Non-negotiable boundaries:** Keep the canonical Decision Index and the existing `DecisionRetriever`, `ConflictDetector`, effective-decision resolver and deterministic enforcer authoritative in Core. Do not duplicate policy evaluation in clients, elevate proposals or retrieval hints to authority, expand the six-tool MCP inventory, mistake `UNEVALUATED` for `ALLOW`, or claim blanket mutation coverage. Do not displace DG1 convergence, CI assurance or independent benchmark validation. Promote implementation only after the architecture review and pinned proof are reviewed.
 
 ### P1 (parallel) — Code Mode orchestration and software-factory interoperability (CM-01)
 
