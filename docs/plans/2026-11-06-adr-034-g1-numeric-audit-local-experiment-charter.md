@@ -1,10 +1,11 @@
 # ADR-034 G1 numeric audit: local advisory experiment charter
 
-**Status: CHARTER PROPOSAL.** Documentation only. Merging this charter makes
-it the reviewed protocol for one local, isolated experiment with the G1
+**Status: CHARTER ACCEPTED (gate A).** Documentation only. Rulings O1 and O2
+and the §4.2 constraint are accepted (owner ruling below). Merging this charter
+makes it the reviewed protocol for one local, isolated experiment with the G1
 whole-file numeric audit. It authorizes no change to any repository memory,
-rule, workflow, ruleset, hook, CLI or ADR. Each gate in §8 needs the owner's
-separate, explicit authorization.
+rule, workflow, ruleset, hook, CLI or ADR. Gate B (§8) needs the owner's
+separate, explicit go-ahead.
 **Date:** 2026-11-06.
 **Repository:** `MnemeHQ/mneme`; Core baseline `42ffdde5` (#711).
 **Governing decisions:** [ADR-034](../adr/ADR-034-static-numeric-upper-bound-typed-rule.md)
@@ -38,6 +39,14 @@ restriction; observations from an unprotected audit memory must not be
 presented as trustworthy enforcement evidence; "Run one local, isolated
 advisory experiment with an existing numeric constraint and synthetic
 inputs"; "Do not build the permanent advisory workflow yet."
+
+**Gate A ruling (owner, 2026-11-06, on review of head `5d0dd3de`):** "Accept
+O1 in principle and the narrow O2 exception for this local experiment only,
+subject to selecting a qualifying constraint and completing PR review." The
+§4.2 constraint was found appropriate: it is an existing documented
+constraint, the matcher recognizes the module-level constant, and the
+test-only environment override is excluded from the claim. "No CLI, hook,
+canonical memory or required CI changes are needed."
 
 ## 1. Question
 
@@ -95,7 +104,7 @@ gate and the hooks consume the canonical memory (§3.2, §3.3).
 ## 3. Architecture determination
 
 Each item below is a finding against the merged code and ADRs at `42ffdde5`.
-Items marked **ruling** need the owner's decision at gate A (§8).
+Items marked **ruling** were decided by the owner at gate A (§8): both accepted.
 
 ### 3.1 A separate memory file is a supported input (finding)
 
@@ -147,8 +156,8 @@ input**, with all of the following:
   cited as ADR-029 "relevant enforcement observed".
 
 **O1 (owner):** accept a non-authoritative audit memory on these terms without
-an ADR amendment. Recommended: accept. Alternative: require a `proposed` ADR
-carrying the contract first (heavier; adds no isolation).
+an ADR amendment. **Accepted** (owner, 2026-11-06), in principle, with the
+isolation above.
 
 ### 3.5 Activation restriction: an explicit, narrow owner exception (ruling O2)
 
@@ -170,6 +179,9 @@ in §5, on these terms:
 
 A committed audit memory or any persistent workflow would need a new, separate
 ruling. O2 does not cover it.
+
+**Accepted** (owner, 2026-11-06) for this local experiment only, on the terms
+above.
 
 ### 3.6 Determination
 
@@ -213,7 +225,7 @@ The experiment uses one constraint that:
    forms in the current code;
 3. has narrow `include_paths`.
 
-### 4.2 Selected constraint (proposed for gate A)
+### 4.2 Selected constraint (accepted at gate A)
 
 **Constraint:** the Claude Code hook's check timeout is at most 10 seconds.
 It is documented in
@@ -343,7 +355,7 @@ set `MNEME_MEMORY`, or require a CLI change.
 
 | Gate | Content | Needs |
 |---|---|---|
-| A | This charter merged, with rulings O1 and O2 and the §4.2 constraint accepted | owner |
+| A | This charter merged, with rulings O1 and O2 and the §4.2 constraint accepted (accepted 2026-11-06) | owner |
 | B | Local experiment run (§5), a results record answering §5.5, and the disposable directory deleted | owner go-ahead after A |
 
 Any persistent advisory workflow, committed audit memory or observation period
