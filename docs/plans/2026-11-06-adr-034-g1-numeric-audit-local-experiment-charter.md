@@ -1,10 +1,10 @@
-# ADR-034 G1 numeric audit: warn-only dogfood charter
+# ADR-034 G1 numeric audit: local advisory experiment charter
 
 **Status: CHARTER PROPOSAL.** Documentation only. Merging this charter makes
-it the reviewed protocol for deciding whether, and how, Mneme Core may dogfood
-the G1 whole-file numeric audit. It authorizes no memory file, rule, workflow,
-ruleset, hook, CLI or ADR change. Each gate in §9 needs the owner's separate,
-explicit authorization.
+it the reviewed protocol for one local, isolated experiment with the G1
+whole-file numeric audit. It authorizes no change to any repository memory,
+rule, workflow, ruleset, hook, CLI or ADR. Each gate in §8 needs the owner's
+separate, explicit authorization.
 **Date:** 2026-11-06.
 **Repository:** `MnemeHQ/mneme`; Core baseline `42ffdde5` (#711).
 **Governing decisions:** [ADR-034](../adr/ADR-034-static-numeric-upper-bound-typed-rule.md)
@@ -31,13 +31,22 @@ blocking hooks." Decision recorded with it: "G1 dogfood remains a candidate,
 not authorized for activation. G2-1, CI numeric enforcement and R4 remain
 deferred."
 
+**Revision direction (owner, 2026-11-06, on review of revision 1):** accept
+O1 in principle with explicit isolation; O2 needs a narrower ruling, granted
+as an explicit exception rather than a reinterpretation of the M4
+restriction; observations from an unprotected audit memory must not be
+presented as trustworthy enforcement evidence; "Run one local, isolated
+advisory experiment with an existing numeric constraint and synthetic
+inputs"; "Do not build the permanent advisory workflow yet."
+
 ## 1. Question
 
-Is the M4-validated G1 audit (`mneme check --source-file`,
-`FORBID_NUMERIC_ABOVE`, warn mode) operationally useful on Mneme Core's own
-pull requests, when run from a memory that no enforcement surface reads?
+Does the M4-validated G1 audit (`mneme check --source-file`,
+`FORBID_NUMERIC_ABOVE`, warn mode) give useful results on one real Mneme Core
+constraint, when run locally from a memory that no enforcement surface reads,
+and would that justify a persistent advisory workflow?
 
-"Useful" is measured in §7. The charter does not ask whether numeric rules
+"Useful" is defined by the questions in §5.5. The charter does not ask whether numeric rules
 should be enforced, and its outcome cannot support any enforcement claim.
 
 ## 2. Evidence basis
@@ -86,15 +95,15 @@ gate and the hooks consume the canonical memory (§3.2, §3.3).
 ## 3. Architecture determination
 
 Each item below is a finding against the merged code and ADRs at `42ffdde5`.
-Items marked **ruling** need the owner's decision at gate B (§9).
+Items marked **ruling** need the owner's decision at gate A (§8).
 
 ### 3.1 A separate memory file is a supported input (finding)
 
 ADR-020 §5 defines the policy root for "another explicitly supplied memory
 file" as that file's parent directory; `mneme check --memory <path>` accepts
 any path (`mneme/path_selectors.py`, `policy_root`). Inputs must resolve
-inside that root, so a memory meant to govern repository paths must sit at the
-repository root. A file under a subdirectory would make that subdirectory the
+inside that root, so the audit memory must sit at the root of the project it
+governs (for the experiment, the disposable directory of §5.1). A file under a subdirectory would make that subdirectory the
 policy root and every other path `PATH_APPLICABILITY_UNKNOWN`.
 
 ### 3.2 The required trusted gate does not read it (finding)
@@ -105,16 +114,16 @@ not an input to the gate's verdict. The gate's pinned evaluator (`0b74d410`)
 classes numeric payloads as UNEVALUATED under the `closed` posture (C4 closure
 §7), which is why the canonical memory must not carry the rule.
 
-Side effect: because the file is outside `.mneme/` and `.github/`, the gate
-does not protect it. Any pull request can edit the audit memory. This is
-acceptable only because the audit is advisory, and it is recorded as a
-limitation (§8).
+Side effect, relevant only to a future committed audit memory: a file outside
+`.mneme/` and `.github/` is not protected by the gate, so any pull request
+could edit it. This charter commits no audit memory (§3.5).
 
 ### 3.3 The hooks do not read it (finding, with one condition)
 
 The Claude Code hook resolves memory from `MNEME_MEMORY` or by walking up to
 `.mneme/project_memory.json` (`mneme/integrations/claude_code/hook.py`,
-`find_memory`). A root-level audit file is never discovered. **Condition:**
+`find_memory`). An audit memory with any other name or location is never
+discovered. **Condition:**
 `MNEME_MEMORY` must never point at the audit memory, in any workflow, hook
 configuration or documented setup. With that condition, the Layer 1 freeze F2
 consequence (closed-availability edits refused on APPLIED numeric paths) is
@@ -141,42 +150,52 @@ input**, with all of the following:
 an ADR amendment. Recommended: accept. Alternative: require a `proposed` ADR
 carrying the contract first (heavier; adds no isolation).
 
-### 3.5 Is this "activation"? (ruling O2)
+### 3.5 Activation restriction: an explicit, narrow owner exception (ruling O2)
 
-The M4 record and the Layer 1 freeze restrict *activation* of
-`FORBID_NUMERIC_ABOVE`. Their stated concern is enforcement surfaces: the edit
-gate under closed availability (F2) and enforcement claims. Under §3.2 and
-§3.3, no enforcement surface reads the audit memory.
+The M4 record lists "activation of `FORBID_NUMERIC_ABOVE` in any repository's
+memory" as not authorized, and the Layer 1 freeze keeps the F2 restriction in
+force. This charter does **not** reinterpret either restriction. Both stand
+unchanged.
 
-**O2 (owner):** rule that a numeric rule in the non-authoritative audit
-memory, read only by the advisory audit workflow, is **not** activation under
-the M4 record or F2. Recommended: so rule, recorded in the gate C PR, with no
-`[layer1-freeze]` amendment. If the owner rules otherwise, gate C needs a
-`[layer1-freeze]` amendment first.
+**O2 (owner):** grant one explicit exception, limited to the local experiment
+in §5, on these terms:
 
-### 3.6 Workflow changes (finding)
+- the numeric rule exists only in a disposable audit memory outside the
+  repository, created for the experiment and deleted after it;
+- no file in `MnemeHQ/mneme` gains a `FORBID_NUMERIC_ABOVE` rule, and
+  `.mneme/project_memory.json` is untouched;
+- no enforcement surface (required gate, hooks, Agent SDK, LangChain, MCP)
+  reads the audit memory, and `MNEME_MEMORY` is never set to it;
+- the exception ends when the results record (§8, gate B) merges.
 
-A new workflow file lives under `.github/`, which the required gate refuses.
-Gate D therefore needs the R0 §5.2 recorded human bypass, as for #485.
+A committed audit memory or any persistent workflow would need a new, separate
+ruling. O2 does not cover it.
 
-### 3.7 Determination
+### 3.6 Determination
 
 Conditional on O1 and O2, the separation is architecturally valid: the audit
 memory is an explicitly supplied memory under ADR-020 §5, it is outside the
 trusted gate's input and the hooks' discovery, and it holds no authority under
 ADR-030/031. The canonical Decision Index and the trusted-input boundary are
-unchanged. If either ruling is refused, the dogfood stops at gate B.
+unchanged. If either ruling is refused, the experiment does not run.
+
+**Trust limitation.** An audit memory outside `.mneme/` is not protected by
+the trusted gate (§3.2), and a local run has no host-event binding. Experiment
+observations are therefore exploratory. They must never be presented as
+trustworthy enforcement evidence, as an ADR-029 "relevant enforcement
+observed" record, or as validation beyond M4.
 
 ## 4. Recognition scope
 
-The audit claims nothing beyond ADR-034's first slice:
+The experiment claims nothing beyond ADR-034's first slice:
 
 - **Language:** Python `.py` files only, read whole from disk through
   `--source-file`.
 - **Sources:** a module-level bare-name assignment to the declared `symbol`,
   and/or direct bare-name calls `function(...)` at the declared 0-based
   `position` (ADR-034 §2). Every declared source must be positively found
-  (O2 of ADR-034): absence or ambiguity is `MATCHER_UNEVALUATED`, never a pass.
+  (ADR-034 ruling O2): absence or ambiguity is `MATCHER_UNEVALUATED`, never a
+  pass.
 - **Values:** the recognized literal forms of ADR-034 §3 and §5a, compared
   against the exact authored decimal `max`, inclusive only.
 - **Name resolution:** Python lexical scoping per §3a; indirect namespace
@@ -185,39 +204,55 @@ The audit claims nothing beyond ADR-034's first slice:
   derived or computed constants, imported values, exclusive bounds, ranges,
   unit conversion, other languages.
 
-### 4.1 Rule selection criteria (applied at gate C)
+### 4.1 Constraint selection
 
-The rule chosen for the dogfood must:
+The experiment uses one constraint that:
 
-1. restate a real constraint already recorded in Core (§3.4);
-2. be expressible in the §2 contract with its sources in recognized forms in
-   the current code, so that a clean run is `PASS` with evaluation complete;
-3. have narrow `include_paths` covering only the files that hold the
-   declared sources;
-4. be confirmed by a disposable `--source-file` run on the gate C head,
-   with the result recorded in the gate C PR.
+1. restates a real constraint already recorded in Core (§3.4);
+2. is expressible in the ADR-034 §2 contract, with its sources in recognized
+   forms in the current code;
+3. has narrow `include_paths`.
 
 An illustrative candidate is the hook's `_CHECK_TIMEOUT_SECONDS` in
-`mneme/integrations/claude_code/hook.py`. It is not selected by this charter.
+`mneme/integrations/claude_code/hook.py`. The constraint is chosen and
+recorded at gate A.
 
-## 5. Proposed audit workflow (gate D design)
+## 5. Local experiment
 
-- A **new, separate** workflow file. `mneme-check.yml` and
-  `mneme-trusted-gate.yml` are not modified.
-- Trigger `pull_request` on `main`; permissions `contents: read`,
-  `pull-requests: write` (sticky comment only).
-- Selects changed `.py` files matching the audit rule's `include_paths`; for
-  each, runs
-  `python -m mneme.cli check --memory <audit memory> --source-file <file> --query <PR title + path> --mode warn --json`.
-  No other invocation is used. Files outside scope are not checked.
-- Never sets `MNEME_MEMORY`.
-- Every step is non-blocking: exit codes 0 and 2 are both recorded, and the
-  job never fails because of a verdict.
-- **Not** added to `mneme-ci-gate` or any ruleset, and never a required check.
+### 5.1 Setup
 
-### 5.1 Reporting of incomplete evaluations
+- A disposable project directory outside the repository (for example a
+  session scratch directory), holding the audit memory at its root and a
+  `src/` tree.
+- The audit memory carries only the §4.1 constraint, marked experimental and
+  non-authoritative (§3.4).
+- The CLI runs unmodified from a checkout of `main` at a recorded commit.
 
-Each checked file is reported in exactly one row with these classes:
+### 5.2 Inputs
+
+1. **Baseline copy:** a byte-identical copy of the real file holding the
+   constraint's sources, taken from the recorded `main` commit, with its
+   SHA-256 recorded.
+2. **Synthetic variants**, each a small edit of the baseline copy:
+   - within the bound, at the bound, and above the bound;
+   - each source in a recognized form and in an unrecognized form (for
+     example a keyword argument, an alias, a computed value);
+   - a declared source removed;
+   - a shadowed or rebound name (§3a).
+
+Each variant states its expected class (§5.4) before it is run.
+
+### 5.3 Invocation
+
+Exactly one form, for every input:
+
+`python -m mneme.cli check --memory <audit memory> --source-file <file> --query <constraint label> --mode warn --json`
+
+No `--input`, no `--target-path`, no `MNEME_MEMORY`.
+
+### 5.4 Reporting of incomplete evaluations
+
+Each input is reported in exactly one class:
 
 | Class | Condition |
 |---|---|
@@ -228,83 +263,73 @@ Each checked file is reported in exactly one row with these classes:
 | `ERROR` | no parseable `mneme.check/v1` payload, or an operational error |
 
 `INCOMPLETE`, `FAIL_INCOMPLETE` and `ERROR` are counted separately and are
-never folded into `PASS`. The comment shows the numeric trace outcome and
-reason for every non-`PASS` row. The summary heading states that the audit is
-advisory and non-authoritative.
+never folded into `PASS`. Every non-`PASS` row records the numeric trace
+outcome and reason.
+
+### 5.5 Usefulness questions
+
+The results record answers:
+
+1. Does the baseline copy evaluate complete and `PASS`?
+2. Do the within, at and above variants produce the expected classes?
+3. Which realistic forms of the constraint fall outside the recognition scope,
+   and how often does the real code base use them?
+4. Is a persistent advisory workflow worth its cost: a `.github/` change by
+   recorded bypass, an unprotected committed audit memory, and an observation
+   period? Answer yes, no, or not yet, with reasons.
+
+### 5.6 Stop rule
+
+Stop and record the stop if any step would touch a file in the repository,
+set `MNEME_MEMORY`, or require a CLI change.
 
 ## 6. Isolation invariants
 
-These hold throughout. Any breach is a stop rule (§7.2).
-
 1. `.mneme/project_memory.json` carries no `FORBID_NUMERIC_ABOVE` rule.
-2. The trusted gate's adapter, evaluator, ruleset, posture and memory input
+2. No file in the repository changes, except this charter and the results
+   record.
+3. The trusted gate's adapter, evaluator, ruleset, posture and memory input
    are unchanged.
-3. No hook, settings file or workflow sets `MNEME_MEMORY` to the audit memory.
-4. The audit workflow is not a required check.
-5. No CLI, matcher, enforcer, hook or ADR change is made for the dogfood.
+4. No hook, settings file or workflow sets `MNEME_MEMORY` to the audit memory.
+5. No CLI, matcher, enforcer, hook or ADR change is made.
 
-## 7. Observation and usefulness
+## 7. Limitations
 
-### 7.1 Observation window and measures (gate E)
+- Observations are exploratory (§3.6).
+- One constraint in one code base, chosen by the owner; nothing generalizes.
+- `--source-file` reads files from disk; it is not bound to a host event and
+  gives no ADR-029 binding.
+- Synthetic variants are authored with knowledge of the matcher, so they test
+  the recognition scope, not blind detection.
 
-The window is fixed at gate E as a number of in-scope pull requests or a
-period, whichever comes first (recommended: 20 in-scope PRs or 4 weeks).
-Recorded per run: the class counts of §5.1, run time, and the trace reason for
-every non-`PASS`. Recorded per FAIL: whether the owner confirms it as a true
-violation. The question in §1 is answered from:
-
-- the incomplete rate (`INCOMPLETE` + `FAIL_INCOMPLETE` + `ERROR` over all
-  rows);
-- confirmed versus disputed FAILs;
-- whether any finding changed a pull request.
-
-No threshold turns these into an enforcement claim.
-
-### 7.2 Stop rules
-
-Stop the experiment and record the stop if:
-
-- any §6 invariant is breached;
-- the audit workflow affects the required gate's result or any merge;
-- the audit memory is edited outside a reviewed PR that names this charter.
-
-## 8. Limitations
-
-- The audit memory is unprotected by the trusted gate (§3.2); its contents are
-  trusted only as far as PR review.
-- Results come from one rule in one repository, chosen by the owner; they do
-  not generalize.
-- `--source-file` reads the PR head's files from disk; it is not bound to a
-  host event and gives no ADR-029 binding.
-- The workflow runs on `pull_request`; fork PRs and first-time contributors are
-  not considered.
-
-## 9. Gates
+## 8. Gates
 
 | Gate | Content | Needs |
 |---|---|---|
-| A | This charter merged | review |
-| B | Rulings O1 (§3.4) and O2 (§3.5) | owner |
-| C | Rule selection (§4.1) and the audit memory file at the repository root, in a PR that does not touch `.mneme/` | owner authorization after B |
-| D | Audit workflow file (§5), merged by recorded bypass (§3.6) | owner authorization after C |
-| E | Observation window (§7.1) | owner authorization after D |
-| F | Results record with the §7 measures; workflow and audit memory removed or kept by owner decision | owner |
+| A | This charter merged, with rulings O1 and O2 and the §4.1 constraint recorded | owner |
+| B | Local experiment run (§5), a results record answering §5.5, and the disposable directory deleted | owner go-ahead after A |
 
-## 10. Claims
+Any persistent advisory workflow, committed audit memory or observation period
+is outside this charter. If the §5.5 answer is "yes", it needs its own short
+proposal and authorization.
 
-On completion, the most the dogfood can support is: *on Mneme Core pull
-requests during the window, the G1 audit of one restated constraint produced
-these class counts and these owner-confirmed findings.*
+## 9. Claims
+
+On completion, the most the experiment can support is: *for one restated
+constraint, the G1 audit classified the baseline copy and these synthetic
+variants as recorded.*
 
 Not claimed: enforcement, blocking, pre-write protection, CI numeric
-enforcement, ADR-029 relevant enforcement, generalization to other rules or
-repositories, or any change to G2-1, R3 or M4 outcomes.
+enforcement, ADR-029 relevant enforcement, trustworthy enforcement evidence,
+generalization to other rules or repositories, or any change to G2-1, R3 or
+M4 outcomes.
 
-## 11. Not authorized
+## 10. Not authorized
 
 - Any change to `.mneme/project_memory.json`, the trusted gate, rulesets, the
   posture variable, hooks, CLI, matcher or ADRs.
-- The audit memory file, the rule, the workflow, or the observation window
-  (gates C to E).
+- A committed audit memory, an advisory workflow, or an observation period.
+- Reinterpretation of the M4 or Layer 1 freeze activation restrictions beyond
+  the O2 exception.
 - G2-1 blocking activation, CI numeric enforcement, evaluator re-pinning, and
   R4.
