@@ -5,16 +5,17 @@ packaged as an installable plugin. Enforce your project's ADRs and engineering
 constraints automatically — before AI-generated edits reach your repo.
 
 This is the plugin form of the [flat `claude-code` integration](../claude-code/).
-It bundles the enforcement hook, the `mneme` skill, and four namespaced slash
-commands (`/mneme:context`, `/mneme:check`, `/mneme:record`, `/mneme:review`)
-into a single distributable unit.
+It bundles the enforcement hook, the `mneme` skill, four namespaced slash
+commands (`/mneme:context`, `/mneme:check`, `/mneme:record`, `/mneme:review`),
+and the local Decision MCP server into a single distributable unit.
 
 ## What this plugin runs and connects to
 
 The plugin directory contains only configuration and Markdown: `hooks/hooks.json`,
-four slash-command prompts in `commands/`, one skill in `skills/mneme/`, the
-manifest, and this README. It ships no executable code, no MCP server, and no
-HTTP hooks.
+`.mcp.json`, four slash-command prompts in `commands/`, one skill in
+`skills/mneme/`, the manifest, the icon, and this README. It ships no executable
+code and no HTTP hooks. Its one MCP server is local stdio, declared in
+`.mcp.json`.
 
 **Executables it invokes:**
 
@@ -24,6 +25,7 @@ HTTP hooks.
 | `python -m mneme check` | Spawned by `mneme-hook` with the same interpreter, on a temp file holding the proposed change | Per gated tool call and at `Stop` |
 | `git ls-files` | The user's local `git` | `SessionStart` baseline and `Stop` session-delta audit |
 | `mneme check`, `mneme list`, `mneme add`, `mneme test` | Same `mneme-hq` package, run through Claude Code's normal Bash tool | Only when the user runs a `/mneme:*` command or the skill is used |
+| `mneme decision-mcp` | Same `mneme-hq` package with the `mcp` extra ([source](https://github.com/MnemeHQ/mneme/blob/main/mneme/decision_mcp.py)); local stdio MCP server `mneme-decisions` | Started by Claude Code with the session |
 
 **Network and data:**
 
@@ -32,6 +34,11 @@ HTTP hooks.
   a temp file and a per-session baseline under the OS temp directory;
   `/mneme:record` (`mneme add`) appends the new decision to
   `.mneme/project_memory.json`.
+- The MCP server speaks stdio only and has no HTTP transport. It reads the
+  Decision Index in `.mneme/project_memory.json` and writes only
+  non-authoritative proposals to `.mneme/decision_proposals.json`. It cannot
+  accept, activate, or supersede decisions; that stays with
+  `mneme decision accept`.
 - They make no network requests: no telemetry, no analytics, no LLM or API
   calls, and no data leaves the machine.
 - `mneme-hq` also contains code that can use the network: the opt-in
@@ -50,10 +57,18 @@ separate artifacts, and installing one does not install the other.
 **Step 1 — install the runtime:**
 
 ```bash
-pipx install "mneme-hq>=0.5.1"
+pipx install "mneme-hq[mcp]>=0.10.0"
 ```
 
-`>=0.5.1` is a real requirement, not a preference. Earlier releases do not
+The `[mcp]` extra provides the Decision MCP server. Without it, the hooks and
+commands still work and only the `mneme-decisions` MCP server fails to start.
+The server also fails closed, showing "Failed to connect" in `/mcp`, in a project
+with no `.mneme/project_memory.json`. Run `mneme init` there to enable it.
+
+The MCP server needs `>=0.10.0`, the first release where `mneme decision-mcp`
+reads the persisted Decision Index (older memory files may need
+`mneme decision-index migrate`). The hook alone needs `>=0.5.1`, and that is a
+real requirement, not a preference. Earlier releases do not
 support the `--json` verdict the hook relies on; on `0.5.0` and below a
 crashing check could hard-block an edit, and `warn` mode reported nothing at
 all. If the installed runtime is too old, the hook says so explicitly rather
