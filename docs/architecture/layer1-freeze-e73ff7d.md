@@ -1781,6 +1781,79 @@ structurally evaluates against `main`'s tip; the production gate targets
 
 ---
 
+## Amendment — authorize the ADR-034 S1 symbol-source correction (2026-11-06)
+
+> This authorizes **one bounded implementation change**: the symbol-source
+> correction specified by ADR-034 §3b (owner ruling S1), which is already
+> merged. It is delivered as its own reviewed PR. It authorizes no validation
+> claim and no other behavior.
+
+**Change, S1 (ADR-034 §3b).**
+- **Where:** `symbol` source classification in `mneme/numeric_rule.py`.
+- **What:** if the governed file contains any construct in the closed list
+  S1-a to S1-g, the `symbol` source is `UNKNOWN` / `AMBIGUOUS_BINDING`,
+  never clean. Nothing outside that list changes, and the call source keeps
+  §3a and the D2 change unchanged.
+- **Outcome boundary:** S1 may change a strict-mode refusal or warn-mode
+  defer solely because a previously `PASS` or `FAIL` symbol source becomes
+  unevaluated. No result can become `PASS` because of S1. This is an
+  authorized consequence of the matcher change, **not** permission to change
+  the hook's blocking logic, exit-code mapping, availability handling or
+  strict/warn policy.
+- **Pinned regressions:**
+  - the F-G1-1 shape (`globals()['SYMBOL'] = …`);
+  - each S1 construct, including the aliased-setter and namespace-string
+    forms;
+  - each "not affected" idiom in §3b (reads, `getattr` with another constant
+    name, `object.__setattr__(self, "field", …)`, `sys.modules` reads, S1-a
+    names as plain data strings);
+  - the existing call-scope suite, the G1 regression suite and the public M4
+    R1–R18 vectors;
+  - golden rule IDs, and payloads for checks with no numeric rule, which stay
+    byte-identical.
+
+**Sections referenced:** the ADR-034 G1 and G2-1 amendments, the D1/D2
+amendment above (its "Not authorized" list excludes any `symbol`-source
+change; this amendment is the explicit, narrow exception for S1 only), and
+the Amendment Procedure below.
+
+**Rationale (Amendment Procedure §3(b)).** The charter-level decision was
+**already made**:
+- **Finding:** the G1 local experiment results record (#752, squash
+  `0a2632be`) found F-G1-1, a clean `PASS` for a dynamic rebinding of the
+  governed symbol.
+- **The ruling:** the owner ruled S1, merged as ADR-034 §3b, PR [#753](https://github.com/MnemeHQ/mneme/pull/753), squash `ebe9de4b`.
+
+The change is not justified after the fact. It is still to be implemented.
+
+**Recorded consequences.**
+- **M4 and G1.** After S1, the matcher's symbol-source recognition boundary
+  differs from the build M4 validated, only towards unevaluated results.
+  M4's PASS (#628) remains evidence for its pinned build only. The G1 local
+  experiment results (#752) are unchanged. A post-change G1 claim beyond the
+  pinned regressions needs its own validation.
+- **G2-1.** The G2-1 FAIL stays final. R4 remains deferred.
+- **Pinned harnesses.** The pinned `benchmarks/adr034_m4/` and
+  `benchmarks/adr034_g2_1/` harnesses are not modified.
+
+### Not authorized by this amendment
+
+- Any `symbol`-source change beyond S1-a to S1-g, and any call-source change.
+- Any independent change to hook blocking logic, exit-code mapping,
+  strict/warn policy or availability policy (ADR-033). No change to
+  `FORBID_LITERAL`, `DecisionRetriever`, `ConflictDetector`, persistence or
+  rule identity.
+- Any change to the pinned M4 or G2-1 harnesses or evidence, or re-scoring of
+  any sealed or revealed corpus.
+- Any CLI, SDK, CI, ruleset, posture or memory change, and any activation of
+  `FORBID_NUMERIC_ABOVE` in any memory.
+- Any enforcement, "relevant enforcement observed" or production claim, or
+  any G1 or G2-1 validation claim, for the changed build.
+
+All earlier freeze amendments and records remain unchanged.
+
+---
+
 ## Amendment Procedure
 
 This document is frozen at `e73ff7d`. To amend it:
