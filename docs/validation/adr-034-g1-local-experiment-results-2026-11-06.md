@@ -34,8 +34,8 @@ and not validation beyond M4.
   2026-11-06T13:24:25Z, before the first invocation (variant file SHA-256
   `c9c7d982…1e4c`; runner `c0f9326d…04a8`; memory builder `b3cf777a…d034d0`).
   Expectations follow ADR-034 §3, §4 and §5a. The raw results file
-  (SHA-256 `22cbb700…e870`) stays in the session scratch directory; it is
-  not committed.
+  (SHA-256 `22cbb700…e870`) was written beside the disposable directory and
+  was deleted with it (§5); it was never committed.
 
 ## 2. Results
 
@@ -67,7 +67,7 @@ input.
 | V19 | `del _CHECK_TIMEOUT_SECONDS` appended | INCOMPLETE | **INCOMPLETE** | MATCHER_UNEVALUATED | AMBIGUOUS_BINDING | `01c9f9ce` |
 | V20 | syntax error appended | INCOMPLETE | **INCOMPLETE** | MATCHER_UNEVALUATED | PARSE_FAILURE | `58f718a9` |
 
-**Totals:** 21 inputs; 20 observed as expected, 1 mismatch (V18).
+**Totals:** 21 inputs (one baseline and 20 variants); 20 observed as expected, 1 mismatch (V18).
 PASS 8 (7 expected + V18), FAIL 5, FAIL_INCOMPLETE 0, INCOMPLETE 11, ERROR 0.
 No input produced `FAIL_INCOMPLETE` or `ERROR`. Every non-`PASS` row's trace
 carried the matcher status and reason shown.
@@ -168,13 +168,17 @@ The stop rule was not triggered. Checked after the run:
 ## 5. Disposal
 
 The disposable directory (audit memory and all 21 inputs) was deleted at
-2026-11-06T13:25:48Z and confirmed absent. Inputs are reproducible from the
-baseline blob and the variant table above.
+2026-11-06T13:25:48Z and confirmed absent. The raw results file and the
+baseline JSON payload, held in the session scratch directory beside it, were
+deleted by 2026-11-06T13:31:51Z. No raw output is retained: this record, with
+its per-input hashes and the summarized classes, traces and reasons in §2, is
+the retained evidence. Inputs are reproducible from the baseline blob and the
+variant table above.
 
 ## 6. Claims
 
 Supported: *for one restated constraint, the G1 audit at `4e43de45`
-classified the baseline copy and these 21 synthetic inputs as recorded: 20 as
+classified these 21 inputs (one baseline and 20 synthetic variants) as recorded: 20 as
 expected, and one dynamic rebinding (V18) as a clean `PASS` contrary to
 ADR-034 §3.*
 
