@@ -383,6 +383,14 @@ file's own source only. These are outside the rule, as before:
 S1 restores the fail-closed contract for writes the governed file can make
 to itself. It does not make the matcher a general Python analyzer.
 
+**Conservative detection, accepted false incompletes.** S1 detects
+constructs that *can* write the module namespace. It does not prove that a
+listed construct modifies the governed symbol. For example, a `globals()`
+call elsewhere in the module that never touches the symbol still makes the
+source unevaluated. This false-incomplete risk is accepted for a fail-closed
+audit. The 0-of-64 measurement above is evidence for this code base only,
+not a guarantee for other repositories.
+
 **Consequences.**
 - **Authorized:** one matcher correction in `mneme/numeric_rule.py`
   implementing exactly S1-a to S1-g for the `symbol` source. It must carry
