@@ -24,6 +24,7 @@ protection (see "G2 amendment (2026-10-24)" below).
 **Amended:** 2026-10-26: relevant-enforcement attribution with several applied numeric rules (§7b, owner ruling D1, from the G2-1 blind validation FAIL in #666). Per-rule attribution is authoritative, and the event-level value is existential. It authorizes no implementation.
 **Amended:** 2026-10-26: function-source name resolution follows Python lexical scoping (§3a, owner ruling D2, from the G2-1 blind validation FAIL in #666). It authorizes no matcher change.
 **Amended:** 2026-10-27: evidence attribution of non-numeric refusals (§7c, owner rulings D3-1 to D3-4, from the G2-1 R2 FAIL in #692). The evidence record names every violation a trusted, coherent payload reports, with or without a subject. Those identities are attribution only, never relevance. It authorizes no implementation.
+**Amended:** 2026-11-06: dynamic writes to the governed symbol (§3b, owner ruling S1, from finding F-G1-1 in the G1 local experiment results, #752). A closed list of constructs that can write the module namespace makes the `symbol` source `UNKNOWN` / `AMBIGUOUS_BINDING`, never clean. It authorizes one matcher correction implementing §3b and nothing else.
 
 **What acceptance means.** Acceptance establishes what a future implementation
 must satisfy. It does **not** establish that Mneme enforces numeric bounds:
@@ -317,7 +318,92 @@ unchanged.
 **Not decided here: the `symbol` source.** The same question applies to a
 class-body assignment, or a function-local assignment, of the governed
 **symbol**. It is outside D2. The §3 reading ("rebound anywhere in the
-module") stays in force for symbols until a separate ruling.
+module") stays in force for symbols until a separate ruling. Dynamic writes
+to the symbol are decided in §3b.
+
+### 3b. Dynamic writes to the governed symbol (amendment 2026-11-06, owner ruling S1)
+
+**Why.** The G1 local experiment
+([results record](../validation/adr-034-g1-local-experiment-results-2026-11-06.md),
+#752 `0a2632be`, finding F-G1-1) appended
+`globals()['_CHECK_TIMEOUT_SECONDS'] = 60` to a module whose only assignment
+to the governed symbol was `= 10`. At runtime the value is 60. The audit
+returned a clean `PASS` (`RECOGNIZED`, `NO_VIOLATION`). §3 makes a symbol
+"rebound anywhere in the module" `UNKNOWN`, but the shipped matcher
+recognizes only name bindings (`mneme/numeric_rule.py`, `_FactCollector`).
+Writes through a namespace mapping, an attribute of the module object or
+executed source are not seen. This is a fail-open in a fail-closed contract.
+
+**Ruling (normative, `symbol` source only).** The single module-level
+assignment of §3 is the only recognized write to the governed symbol. If the
+governed file contains **any** construct below, the `symbol` source is
+`UNKNOWN` with reason `AMBIGUOUS_BINDING` (reason priority §4 unchanged),
+whatever its recognized value. The list is closed for this slice:
+
+| ID | Construct, anywhere in the governed file |
+|---|---|
+| S1-a | A name `globals`, `vars`, `locals`, `exec`, `eval` or `__builtins__`, in any context (called, passed or aliased). |
+| S1-b | A star import (`from m import *`). |
+| S1-c | An attribute store, augmented store or delete whose attribute is the symbol, on any object (`obj.SYMBOL = …`, `del obj.SYMBOL`). The object may be this module. |
+| S1-d | A call to `setattr`, `delattr`, or an attribute `__setattr__` / `__delattr__`, unless its name argument is a string constant other than the symbol and the call has no `*` or `**` argument. |
+| S1-e | An attribute `__dict__`, `__globals__`, `f_globals` or `f_locals`, in any context. |
+| S1-f | An import of `builtins` or `__builtin__`, or a call to `__import__` / `import_module` whose first argument is not a string constant or names `builtins`. |
+| S1-g | A call to `getattr` whose name argument is not a string constant, or is a constant naming an S1-a, S1-d or S1-e name. |
+
+**Not affected.** These stay as they are:
+- reads of the symbol, including passing it as a value;
+- `getattr` with any other constant name;
+- `object.__setattr__(self, "field", value)` and similar calls with a constant
+  name other than the symbol (the frozen-dataclass idiom);
+- `sys.modules` reads with no S1-c, S1-d or S1-e write.
+
+The call source keeps §3a unchanged.
+
+**Why not reuse the §3a rule 4 resolver for symbols.** §3a also fails closed
+on any load of the declared function (escape) and on every `__setattr__`
+attribute. Neither is a write to the symbol. The governed value is what a
+load reads. Measured on `main` at `0a2632be`, over the 64 module-level
+numeric constants in `mneme/`:
+- **§3a rule 4 set:** would make 12 of them `UNKNOWN`, all from the
+  frozen-dataclass `object.__setattr__(self, "…", …)` idiom.
+- **S1 list:** makes 0 of them `UNKNOWN`, and flags each bypass shape tried:
+  `globals()`, `vars()`, `exec`, a star import, a `sys.modules[__name__]`
+  attribute write, `setattr` with a constant or computed name, and a
+  `__dict__` write.
+
+**Stated limits (not claimed).** The whole-file audit evaluates the governed
+file's own source only. These are outside the rule, as before:
+- writes to the symbol from other files (another module assigning
+  `hook.SYMBOL`, test monkeypatching);
+- module reloading or replacement of `sys.modules` entries elsewhere;
+- native extensions;
+- obfuscation that reaches the constructs above without naming them, beyond
+  S1-f and S1-g.
+
+S1 restores the fail-closed contract for writes the governed file can make
+to itself. It does not make the matcher a general Python analyzer.
+
+**Consequences.**
+- **Authorized:** one matcher correction in `mneme/numeric_rule.py`
+  implementing exactly S1-a to S1-g for the `symbol` source. It must carry
+  regressions for:
+  - the F-G1-1 shape;
+  - each S1 construct;
+  - each "not affected" idiom;
+  - the existing G1 suites and the public M4 R vectors.
+
+  No CLI, hook, SDK, CI or memory change is authorized.
+- **Effect on verdicts:** inputs can only move from `PASS` or `FAIL` to an
+  incomplete evaluation. No input moves to `PASS`. A file with a recognized
+  above-bound symbol value and an S1 construct becomes unevaluated for that
+  source, as V15 already is for a second assignment.
+- **M4 and G1:**
+  - M4's PASS (#628) stays evidence for its pinned build. Its results are
+    preserved and not re-scored.
+  - The G1 local experiment results (#752) are unchanged.
+  - A post-change G1 claim beyond these regressions needs its own
+    validation.
+- **G2-1, R4 and CI numeric enforcement:** remain deferred.
 
 ### 4. Outcome semantics
 
