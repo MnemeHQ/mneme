@@ -134,8 +134,11 @@ and future architecture contracts.
   still resolved at ADR import. DG1P removed ADR `date` as precedence
   authority: a same-scope, same-priority tie is an ambiguity unless explicit
   supersession or priority resolves it, and re-import never deactivates a
-  decision that is already canonical in such a scope. Decision applicability
-  (DG1B1) and waivers (DG1B2) remain evidence- and charter-gated.
+  decision that is already canonical in such a scope. DG1B1 decision
+  applicability is persisted under `mneme.decision-index/v2`, and
+  `mneme check --applicability-preview` (DG1F-C1a) renders a report-only,
+  non-authoritative preview from the resolver. Waivers (DG1B2) remain
+  evidence- and charter-gated. DG1 shipped in `mneme-hq==0.11.0`.
 - [ADR-025](../adr/ADR-025-trusted-test-execution-attestation.md) is also
   **proposed**. Trusted test-execution attestation remains reserved/deferred.
 
@@ -360,14 +363,17 @@ minimum reading set for understanding the current runtime architecture.
 | [ADR-028](../adr/ADR-028-public-decision-intent-assessment.md) | Accepted | Public API semantics for classifying decision intent. |
 | [ADR-029](../adr/ADR-029-enforcement-evidence-binding-semantics.md) | Accepted | How enforcement evidence binds to governed decisions without requiring runtime observation. |
 | [ADR-030](../adr/ADR-030-canonical-decision-persistence-version-identity-and-stable-rule-lineage.md) | Accepted | Persistence, version identity, and stable rule lineage for the canonical index. |
-| [ADR-031](../adr/ADR-031-decision-governance-semantics.md) | Accepted | DG1 semantics (implementation pending): which decisions are effective, what governance changed, and canonical evidence identity. |
+| [ADR-031](../adr/ADR-031-decision-governance-semantics.md) | Accepted | DG1 semantics: which decisions are effective, what governance changed, and canonical evidence identity. Resolver, evidence identity, DG1P and DG1B1 shipped in 0.11.0; runtime consumption (DG1F) beyond the report-only preview and waivers (DG1B2) remain gated. |
+| [ADR-032](../adr/ADR-032-opt-in-product-usage-measurement.md) | Accepted | Opt-in product usage measurement boundary. Not implemented. |
+| [ADR-033](../adr/ADR-033-opt-in-fail-closed-enforcement.md) | Accepted | Opt-in fail-closed handling when enforcement cannot be evaluated (Architecture A, `mneme availability`). Shipped in 0.11.0 for Claude Code direct writes. |
+| [ADR-034](../adr/ADR-034-static-numeric-upper-bound-typed-rule.md) | Accepted | `FORBID_NUMERIC_ABOVE` static numeric upper bound for Python. Whole-file audit shipped in 0.11.0; the new-file `Write` pre-write check ships without an enforcement claim (validation not passed). |
 
 ## Suggested reading paths
 
 **To understand enforcement:** ADR-017 -> ADR-018 -> ADR-019 -> ADR-020 -> ADR-021.
 
 **To understand the Decision Index and MCP:** ADR-023 -> ADR-027 -> ADR-029
--> ADR-030. Then ADR-031 for DG1 governance semantics (implementation pending).
+-> ADR-030. Then ADR-031 for DG1 governance semantics.
 
 **To understand Audit evidence:** ADR-024 -> ADR-026 -> ADR-028 -> ADR-029.
 Read proposed ADR-025 only for the deferred trusted-attestation direction.

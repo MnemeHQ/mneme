@@ -72,8 +72,8 @@ give those legacy directive names new semantics.
 
 `FORBID_LITERAL` does not split prose into keywords. It checks the declared
 value directly and requires identifier/slug boundaries at identifier-like
-edges. For example, `pip install mneme` fails while `pip install mneme-hq`
-passes. The comparison is case-sensitive. Typed rules are enforced regardless
+edges. For example, a rule forbidding `install acme` matches
+`pip install acme` but not `pip install acme-hq`. The comparison is case-sensitive. Typed rules are enforced regardless
 of retrieval score; retrieval still controls context injection only. When ADR
 source provenance is available, a rule is not applied to its own declaring ADR
 or canonical memory file, so policy storage can state the literal it governs.
@@ -137,7 +137,11 @@ integer or dyadic bounds (`2.5`, `0.75`) when that matters.
 **Not covered.** The pre-write edit gate (Claude Code hook, Agent SDK,
 LangChain) sees only introduced text, so it reports this rule as
 unevaluated and never blocks on it; a literal violation in the same edit
-still blocks. In a repository with an authorized closed availability
+still blocks. The one exception is a Claude Code `Write` that creates a new
+`.py` file in an existing directory: the hook checks the complete proposed
+source (`mneme check --proposed-new-file`, ADR-034 G2-1). Independent
+validation of that path has not passed, so no enforcement claim is made for
+it. In a repository with an authorized closed availability
 declaration (ADR-033), every nonempty edit on a path where a numeric rule
 applies is refused as `EVALUATION_INCOMPLETE`, so do not activate numeric
 rules there. The response-text conflict detector reports numeric rules as
