@@ -137,7 +137,11 @@ integer or dyadic bounds (`2.5`, `0.75`) when that matters.
 **Not covered.** The pre-write edit gate (Claude Code hook, Agent SDK,
 LangChain) sees only introduced text, so it reports this rule as
 unevaluated and never blocks on it; a literal violation in the same edit
-still blocks. In a repository with an authorized closed availability
+still blocks. The one exception is a Claude Code `Write` that creates a new
+`.py` file in an existing directory: the hook checks the complete proposed
+source (`mneme check --proposed-new-file`, ADR-034 G2-1). Independent
+validation of that path has not passed, so no enforcement claim is made for
+it. In a repository with an authorized closed availability
 declaration (ADR-033), every nonempty edit on a path where a numeric rule
 applies is refused as `EVALUATION_INCOMPLETE`, so do not activate numeric
 rules there. The response-text conflict detector reports numeric rules as
