@@ -72,8 +72,8 @@ give those legacy directive names new semantics.
 
 `FORBID_LITERAL` does not split prose into keywords. It checks the declared
 value directly and requires identifier/slug boundaries at identifier-like
-edges. For example, `pip install mneme` fails while `pip install mneme-hq`
-passes. The comparison is case-sensitive. Typed rules are enforced regardless
+edges. For example, a rule forbidding `install acme` matches
+`pip install acme` but not `pip install acme-hq`. The comparison is case-sensitive. Typed rules are enforced regardless
 of retrieval score; retrieval still controls context injection only. When ADR
 source provenance is available, a rule is not applied to its own declaring ADR
 or canonical memory file, so policy storage can state the literal it governs.
