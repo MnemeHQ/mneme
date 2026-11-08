@@ -105,3 +105,12 @@ jobs:
           test "$state" = "setup"
           test "$enforcement" = "not_enabled"
           echo "G3 clean-setup smoke passed (state=setup, enforcement=not_enabled)"
+
+      - name: Remind operator to synchronize the website
+        if: success()
+        run: |
+          {
+            echo "## Website follow-up"
+            echo
+            echo "The published package passed smoke. Synchronize MnemeHQ/mnemehq-site to ${VERSION} through a reviewed PR; see the Website synchronized step in docs/releases/RELEASING.md."
+          } >> "$GITHUB_STEP_SUMMARY"
