@@ -96,14 +96,66 @@ Dimensions 1, 2 and configuration are absent. Per ADR-029 §2 this is
 
 | ID | Finding | Kind |
 |---|---|---|
-| E-1 | **Relevant enforcement observed is achievable in v0.11.0 on exactly one path:** the agent-host hook, a `FORBID_NUMERIC_ABOVE` rule, a new-file `Write`, and a pinned host identity. `relevant_enforcement_per_rule` already implements the fail-closed per-rule check for it. Every literal-rule observation on every surface stops at execution observed. | scope fact |
+| E-1 | **Relevant enforcement observed is achievable in v0.11.0 on exactly one path:** the agent-host hook, a `FORBID_NUMERIC_ABOVE` rule, a new-file `Write`, and a pinned host identity. `relevant_enforcement_per_rule` already implements the fail-closed per-rule check for it. The claim rests on per-rule configuration binding and carries a consumer obligation (§5.1). Every literal-rule observation on every surface stops at execution observed. | scope fact, conditional (§5.1) |
 | E-2 | CLI omits control/provenance and subject for literal-only checks. This is by design (G2-1 charter §5.2 rule 3, D3 proposal §1), not a defect, but it caps every literal CLI observation at dimension 1/2. | gap, needs owner ruling to change |
 | E-3 | No surface records a per-rule **allow** for literal rules. An `APPLIED` rule with no violation is an inferred allow, which ADR-029 §2 ("attributable allow/reject result is recorded for that rule") does not accept. | gap, runtime change |
-| E-4 | Configuration identity is carried only by the CI gate (memory blob). CLI and hook cannot detect the ADR-029 §2 "mismatched configuration" case on their own. | gap, runtime change |
+| E-4 | Memory-wide configuration identity is carried only by the CI gate (memory blob). CLI and hook bind configuration per rule only, through content-derived `rule_id` and `decision_version_id` (§5.1). They cannot detect a mismatch in the rest of the loaded memory. | gap, runtime change |
 | E-5 | **The production CI gate does not run v0.11.0.** Its evaluator is pinned to the CI1-approved build of `0b74d410` (2026-10-17). CI evidence on Core is evidence about that build, not about v0.11.0. Any v0.11.0 CI claim needs a re-pin under the CI1/R0 process. | scope fact |
 | E-6 | The CI gate's applicability extract drops `decision_version_id`. It survives in the raw `stdout`, so nothing is lost, but the structured record cannot bind dimension 3 without re-parsing. | minor, adapter-only |
 | E-7 | Section-less memory and the `--adr-dir` view still produce no canonical `decision_version_id`; `EvidenceIdentity.complete` is false and binding fails closed at dimension 3, as ADR-031 §10 requires. Confirmed by code; not re-probed here. | conforming |
 | E-8 | CI1 and C4 already recorded literal CI evidence as "execution observed with near-complete binding" and did not claim relevance ([C4 closure §5](adr033-c4-closure-2026-10-26.md), [CI1 reconciliation row 5](ci1-production-readiness-reconciliation-2026-10-20.md)). This audit agrees and finds nothing in v0.11.0 that changes it. | consistent with prior records |
+
+### 5.1 How E-1 meets the configuration-mismatch invariant
+
+Review question: ADR-029 §2 says mismatched configuration is stale evidence
+and fails closed, but the hook record (E-4) carries no memory digest. How can
+E-1 stand?
+
+**Answer: configuration is bound per rule, by content-derived identity, and
+ADR-034 §7a defines the hook's configuration binding at that granularity.**
+
+1. **`rule_id` binds the rule's own configuration.** ADR-030 §7:
+   `rule_id = <decision_id>:<RULE_TYPE>:<SHA-256(canonical_json([value,
+   applicability]))[:32]>`. A changed bound, unit or path selector produces a
+   different `rule_id`. A claim naming the configured rule cannot match a
+   record of a differently configured rule.
+2. **`decision_version_id` binds the decision content.** ADR-030 §4: `dver-`
+   is derived from `decision_id`, the decision `content_digest`, occurrence
+   source identity and predecessor. Different decision content means a
+   different version identity.
+3. **ADR-034 §7a lists the hook's required bindings as "rule ID, decision
+   version, governed path, applicability, matcher status, and the hook's
+   allow/refuse outcome"**, plus control provenance, host event and the
+   subject digest join. It does not require a memory-wide digest. E-1 is
+   therefore a claim under ADR-034 §7a's reading of ADR-029's §4
+   configuration slot: "which rule configuration was in force" is bound per
+   rule.
+
+**What this does not cover (stated so E-1 is not over-read):**
+
+- **Memory-wide configuration.** The record does not say what else the
+  loaded memory contained, which version was effective, or whether the
+  evaluated version was authoritative at that moment. Which version governs
+  is a decision-governance question (ADR-031), not an evidence one. Evidence
+  records only what was evaluated.
+- **Consumer obligation on version.** `relevant_enforcement_per_rule` keys
+  its result by `rule_id` and checks `decision_version_id` only for being
+  non-empty. Under ADR-030 §7 an unchanged rule keeps its `rule_id` across
+  decision versions. A consumer that looks up only by `rule_id` would accept
+  a record of rule R under version V1 as evidence for R under V2. To keep the
+  ADR-029 §2 "rule version" mismatch fail-closed, a consumer must compare the
+  full `(decision_id, decision_version_id, rule_id)` tuple from the record's
+  `rules` entry against its claim. The function does not do this for the
+  consumer. Behavior is unaffected (same rule semantics); the evidence claim
+  is.
+
+**Disposition.** E-1 stands, conditional on (a) ADR-034 §7a's per-rule
+configuration binding being an accepted reading of ADR-029 §4, and (b) the
+full-tuple comparison above. If the owner reads ADR-029 §4 as requiring
+memory-wide configuration identity, E-1 drops to execution observed and no
+v0.11.0 surface reaches relevant enforcement observed. Either reading is a
+ruling, not something this audit can settle. Enforcing (b) in code would be
+a runtime change and is not authorized here.
 
 ## 6. ADR-029 §6 scenarios at v0.11.0
 
@@ -113,7 +165,7 @@ Dimensions 1, 2 and configuration are absent. Per ADR-029 §2 this is
 | B. Ran, rule `EXCLUDED` | yes, recorded as execution observed | CLI, CI (hook: numeric only) |
 | C. `APPLIED`, attributable allow/reject, provenance | **numeric only, hook only** | E-1 |
 | D. CI control ran, coverage unprovable | yes, at execution observed | CI |
-| E. Mismatched SHA / path / selector / rule version | detectable by the hook's common-binding check (numeric) and by `RuleEvaluation` equality; configuration mismatch detectable in CI only | E-4 |
+| E. Mismatched SHA / path / selector / rule version | subject digest and governed path: the hook's common-binding check (numeric). Selector or rule value: changes `rule_id` (ADR-030 §7). Decision version: only if the consumer compares the full tuple (§5.1). Memory-wide configuration: CI only | E-4, §5.1 |
 
 ## 7. What #579 needs to reconcile before approval
 
