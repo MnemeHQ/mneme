@@ -96,7 +96,7 @@ Dimensions 1, 2 and configuration are absent. Per ADR-029 §2 this is
 
 | ID | Finding | Kind |
 |---|---|---|
-| E-1 | **Relevant enforcement observed is achievable in v0.11.0 on exactly one path:** the agent-host hook, a `FORBID_NUMERIC_ABOVE` rule, a new-file `Write`, and a pinned host identity. `relevant_enforcement_per_rule` already implements the fail-closed per-rule check for it. The claim rests on per-rule configuration binding and carries a consumer obligation (§5.1). Every literal-rule observation on every surface stops at execution observed. | scope fact, conditional (§5.1) |
+| E-1 | **Relevant enforcement observed is achievable in v0.11.0 on exactly one path:** the agent-host hook, a `FORBID_NUMERIC_ABOVE` rule, a new-file `Write`, and a pinned host identity. `relevant_enforcement_per_rule` already implements the fail-closed per-rule check for it. The claim rests on per-rule configuration binding (accepted by owner ruling 2026-11-08) and holds only under a complete `(decision_id, decision_version_id, rule_id)` match (§5.1). Every literal-rule observation on every surface stops at execution observed. | scope fact, conditional (§5.1) |
 | E-2 | CLI omits control/provenance and subject for literal-only checks. This is by design (G2-1 charter §5.2 rule 3, D3 proposal §1), not a defect, but it caps every literal CLI observation at dimension 1/2. | gap, needs owner ruling to change |
 | E-3 | No surface records a per-rule **allow** for literal rules. An `APPLIED` rule with no violation is an inferred allow, which ADR-029 §2 ("attributable allow/reject result is recorded for that rule") does not accept. | gap, runtime change |
 | E-4 | Memory-wide configuration identity is carried only by the CI gate (memory blob). CLI and hook bind configuration per rule only, through content-derived `rule_id` and `decision_version_id` (§5.1). They cannot detect a mismatch in the rest of the loaded memory. | gap, runtime change |
@@ -144,18 +144,39 @@ ADR-034 §7a defines the hook's configuration binding at that granularity.**
   decision versions. A consumer that looks up only by `rule_id` would accept
   a record of rule R under version V1 as evidence for R under V2. To keep the
   ADR-029 §2 "rule version" mismatch fail-closed, a consumer must compare the
-  full `(decision_id, decision_version_id, rule_id)` tuple from the record's
-  `rules` entry against its claim. The function does not do this for the
-  consumer. Behavior is unaffected (same rule semantics); the evidence claim
-  is.
+  full `(decision_id, decision_version_id, rule_id)` identity against its
+  claim. The hook's `rules` entries carry `rule_id` and
+  `decision_version_id` only; there is no separate `decision_id` field. The
+  decision ID is the prefix of the canonical `rule_id`
+  (`<decision_id>:<RULE_TYPE>:<digest>`, ADR-030 §7), so a consumer takes it
+  from there. A missing, malformed or mismatched component fails closed. The
+  function does not do this comparison for the consumer. Behavior is
+  unaffected (same rule semantics); the evidence claim is.
 
-**Disposition.** E-1 stands, conditional on (a) ADR-034 §7a's per-rule
-configuration binding being an accepted reading of ADR-029 §4, and (b) the
-full-tuple comparison above. If the owner reads ADR-029 §4 as requiring
-memory-wide configuration identity, E-1 drops to execution observed and no
-v0.11.0 surface reaches relevant enforcement observed. Either reading is a
-ruling, not something this audit can settle. Enforcing (b) in code would be
-a runtime change and is not authorized here.
+**Owner ruling (2026-11-08): per-rule configuration binding accepted, with
+conditions.** ADR-029 §4 ("which rule configuration was in force"), ADR-030
+§§7-8 (the historical rule binding is decision, decision version and rule)
+and ADR-034 §§7a-7b (relevance per applied numeric rule) already support the
+per-rule reading. A digest of the whole decision memory is not required for
+each relevant-enforcement observation. No new ADR is needed.
+
+Conditions on E-1:
+
+1. **Narrow scope.** E-1 holds only for the specific numeric rule and
+   evaluation the record represents. It does not show that the decision was
+   authoritative, that the correct memory was selected, or that any other
+   rule was enforced.
+2. **Complete identity match.** A standalone relevance boolean never
+   establishes a version-specific claim. An observation under V1 never
+   establishes enforcement under V2, even when both versions contain the
+   same rule. A version-specific claim must match the complete
+   `(decision_id, decision_version_id, rule_id)` identity as described
+   above, and missing or mismatched identity fails closed.
+3. **No runtime change.** Enforcing the full-identity comparison in code
+   (for example inside `relevant_enforcement_per_rule`) needs separate
+   authorization. This ruling authorizes none.
+
+Broader configuration and authority guarantees stay unclaimed.
 
 ## 6. ADR-029 §6 scenarios at v0.11.0
 
