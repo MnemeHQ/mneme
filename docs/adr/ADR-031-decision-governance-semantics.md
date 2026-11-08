@@ -12,6 +12,7 @@ scope: decision_index.governance_semantics
 **Status:** Accepted
 **Date:** 2026-10-07 (accepted 2026-10-08)
 **Amended:** 2026-10-13 — v2 `extensions` namespace key contract (§8a); DG1F applicability-only sequencing exception (§11)
+**Erratum:** 2026-11-08 — `precedence_lost` / precedence-reason scheduling (§2, §3, Consequences); see [Erratum](#erratum-2026-11-08-precedence-reason-scheduling)
 **Deciders:** Theo Valmis
 
 ---
@@ -179,7 +180,8 @@ an explicit ambiguity and never selects a winner.
   does not re-run ADR precedence from sources. It consumes the outcome that
   the explicit import operation persisted. Persisting the precedence
   **reason** (priority, winner, group) is required so the resolver can
-  explain a loss; that data is introduced only under the schema rule in §8.
+  explain a loss; that data is introduced only under the schema rule in §8,
+  as its own declared v2 semantic feature (see the 2026-11-08 erratum).
 - **Cross-writer same-scope precedence is not introduced.** A decision from
   one writer never displaces a decision from another by sharing a scope
   string. Any such semantic needs its own decision.
@@ -195,12 +197,13 @@ not effective is a **resolution cause** carried in the `ResolutionTrace`:
 | `lifecycle_superseded` | an explicit `supersedes` relationship targets it | v1 data |
 | `lifecycle_deprecated` | lifecycle is `deprecated` | v1 data |
 | `lifecycle_inactive` | lifecycle is `inactive`; the reason was not recorded | v1 data |
-| `precedence_lost` | lost exact same-scope precedence, with winner and priority | first v2 slice (§8) |
+| `precedence_lost` | lost exact same-scope precedence, with winner and priority | a future v2 semantic feature (§8; erratum 2026-11-08); not yet implemented |
 | `not_applicable` | decision applicability excludes the context | DG1B1 |
 | `waived` | an authoritative waiver applies to the context | DG1B2 |
 
-Over v1 data the resolver reports `lifecycle_inactive` and never guesses
-whether an inactive record was a proposed ADR or a precedence loser.
+Over v1 data, and over v2 data that does not declare the precedence-reason
+feature, the resolver reports `lifecycle_inactive` and never guesses whether
+an inactive record was a proposed ADR or a precedence loser.
 
 ### 4. Three applicability layers stay separate
 
@@ -587,7 +590,9 @@ Audit tier formulas (ADR-026) or frozen benchmark fixtures.
   by date will report ambiguity after DG1P. Authors must mark one ADR
   superseded or change priority. Mneme's own corpus is unaffected.
 - Over v1 data the resolver cannot explain why an `inactive` decision is
-  inactive. That stays unrecorded until the first v2 slice.
+  inactive. That stays unrecorded until a v2 semantic feature for the
+  precedence reason is introduced (erratum 2026-11-08); DG1B1, the first v2
+  slice, did not introduce it.
 - Schema v2 makes mixed 0.10.x and later binaries on one memory file
   incompatible once a project migrates.
 - `--adr-dir` MCP mode cannot provide decision-version evidence identity.
@@ -611,6 +616,39 @@ Resolved during DG1A review, before acceptance:
 
 After acceptance, the next slice is DG1C only. No applicability or waiver
 work starts before DG1C, DG1E and DG1D land.
+
+---
+
+## Erratum (2026-11-08): precedence-reason scheduling
+
+**Defect.** The accepted text scheduled the persisted precedence reason and
+the `precedence_lost` cause for "the first v2 slice" (§3 table; Negative
+consequences). §8 limits each v2 slice to its own fields, and §11 names DG1B1
+as the first v2 slice. DG1B1 introduced decision applicability only, so the
+scheduling statements contradicted §8 and §11 and the Negative-consequences
+statement became false. No charter, freeze amendment or tracker entry
+deferred it. Found by the
+[DG1 v0.11.0 reconciliation](../validation/dg1-v0110-architecture-reconciliation-2026-11-08.md)
+(G-4) and its independent review.
+
+**Correction (scheduling only).** The precedence reason and `precedence_lost`
+are introduced by a future v2 **semantic feature** declared in
+`semantic_features` under the §8 evolution rule, in its own slice, with its
+own evidence case, charter and, where it changes enforcement or retrieval
+inputs, its own `[layer1-freeze]` amendment. It is not scheduled. The §2, §3
+and Consequences wording is corrected in place to say so.
+
+**Unchanged.**
+
+- The obligation in §2: persisting the reason is still required before the
+  resolver may report a precedence loss.
+- Governance semantics: precedence stays an import-time authority operation;
+  the resolver reports `lifecycle_inactive` with precedence `not_recorded`
+  and never guesses, as v0.11.0 already does over v1 and v2.
+- Schema: no field, feature, loader or writer change. `precedence_lost` does
+  not exist in any released version.
+- DG1G: the §13 fixture floor does not include `precedence_lost`, so closeout
+  does not depend on it.
 
 ---
 
