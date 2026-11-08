@@ -500,7 +500,7 @@ def test_accept_activates_no_protection(tmp_path, capsys, monkeypatch):
     def _fail(*_args, **_kwargs):
         raise AssertionError("protection activation must not be called")
 
-    monkeypatch.setattr(cli, "activate_protection", _fail)
+    monkeypatch.setattr("mneme.protection.activate_protection", _fail)
     monkeypatch.setattr(cli, "generate_protection_report", _fail)
     monkeypatch.setattr(
         cli, "check_prompt", _fail
@@ -642,7 +642,7 @@ def spy_service(monkeypatch):
     _SpyService.last_reject = ""
     _SpyService.accept_result = None
     _SpyService.reject_result = None
-    monkeypatch.setattr(cli, "DecisionAuthorityService", _SpyService)
+    monkeypatch.setattr("mneme.decision_authority.DecisionAuthorityService", _SpyService)
     return _SpyService
 
 

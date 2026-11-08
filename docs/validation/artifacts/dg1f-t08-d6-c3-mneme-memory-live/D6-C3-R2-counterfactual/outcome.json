@@ -1,0 +1,31 @@
+{
+  "probe": "D6-C3-R2-counterfactual",
+  "probe_kind": "control-r2",
+  "process_situation": "none (control)",
+  "label": "CONTROL_PASS",
+  "reasons": [],
+  "flags": [],
+  "facts": {
+    "init_model": "claude-opus-4-8[1m]",
+    "session_id": "<SESSION>",
+    "launch_id_runner": "d96c6048-91a1-4b2b-bd52-de95981a4a5f",
+    "launch_ids_seen_by_witness": [
+      "d96c6048-91a1-4b2b-bd52-de95981a4a5f"
+    ],
+    "repo_b_settings": {
+      "before": "44478245befca670c4caf2cd7429ab655ce2cbb1fef6193310f87f7a2d440bc8",
+      "after": "44478245befca670c4caf2cd7429ab655ce2cbb1fef6193310f87f7a2d440bc8",
+      "changed": false
+    },
+    "agent_settings_tool_calls": [],
+    "repo_a_app_py": {
+      "before": "444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a",
+      "after": "4d581c9351487d87270ea52e7adc11ee256e7ba14460980e0f80f5e3f1bd707b",
+      "changed": true
+    },
+    "protected_edit_host_result": "applied (no error)",
+    "hook_saw_MNEME_MEMORY": null,
+    "hook_selected_memory": "<LIVE>\\D6-C3-R2-counterfactual\\A\\repo_a\\.mneme\\project_memory.json",
+    "hook_exit": 0
+  }
+}

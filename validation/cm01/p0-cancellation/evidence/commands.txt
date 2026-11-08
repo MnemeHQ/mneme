@@ -1,0 +1,72 @@
+CM-01-P0-01 exact commands
+
+Directory:
+  validation/cm01/p0-cancellation
+
+Baseline:
+  ddeb85eec8f7734edde1c921250592d51afedbee
+
+Head at recorded runs:
+  0d367fc61316e8af50161f6bc48b8dee1711c807
+  (upstream docs-only fast-forward; validation/cm01 and mneme unchanged
+   between baseline and head; reused artifacts hash-verified against baseline)
+
+Dependency setup:
+  cd ../s1a-local
+  npm ci --ignore-scripts --no-audit --no-fund
+  cd ../p0-cancellation
+  npm ci --ignore-scripts --no-audit --no-fund
+
+Run:
+  npm run p0
+  # equivalent: node run-cancellation.mjs
+
+Observed (two independent runs, identical classification):
+  run1 verdict: FAIL
+  run2 verdict: FAIL
+  repeatable: true
+  no_mutation.pass: true
+
+Fault timeline (run1, final harness):
+  request id 2 forward:        2026-10-24T13:49:08.133Z
+  upstream response received:  2026-10-24T13:49:08.140Z
+  response withheld:           2026-10-24T13:49:08.141Z
+  executor timeout returned:   2026-10-24T13:49:09.638Z
+  observation window end:      ~2026-10-24T13:49:11.153Z
+  response released:           2026-10-24T13:49:11.154Z
+  client request fulfilled:    2026-10-24T13:49:11.155Z
+  upstream child exit:         2026-10-24T13:49:11.491Z
+
+Fault measurements:
+  executor error:              Code execution failed: execution exceeded 1500ms
+  executor timedOut:           true
+  cancellation notifications:  0 sent / 0 observed by relay
+  client pending at timeout:   true
+  client pending after window: true
+  late response settled:       true
+  relay/upstream cleanup:      exited, no survivors
+
+Versions:
+  Node 24.13.1
+  npm 11.8.0
+  @cloudflare/codemode 0.5.5
+  @modelcontextprotocol/sdk 1.32.2
+  ajv 8.17.1
+  quickjs-emscripten 0.32.0
+  zod 4.6.7
+  Python 3.12.10
+  mneme 0.10.0
+  mcp 2.2.0
+
+Evidence:
+  evidence/run1.json
+  evidence/run2.json
+  evidence/verdict.json
+  evidence/versions.json
+  evidence/raw/run*-harness-events.jsonl
+  evidence/raw/run*-fault-relay.jsonl
+  evidence/raw/run*-control-relay-relay.jsonl
+  evidence/raw/run*-fault-child-events.jsonl
+  evidence/raw/run*-control-relay-child-events.jsonl
+  evidence/raw/run*-*-child-stderr.log
+  evidence/raw/runner-console.log

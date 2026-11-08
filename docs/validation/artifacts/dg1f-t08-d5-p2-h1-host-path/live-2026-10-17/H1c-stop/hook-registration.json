@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"<PYTHON>\" -I \"<HARNESS>\\emitter.py\" stop \"<LIVE>\\H1c-stop\\out\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

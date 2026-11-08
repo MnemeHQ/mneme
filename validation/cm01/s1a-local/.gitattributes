@@ -1,0 +1,3 @@
+# Raw evidence logs and synthetic fixtures preserve bytes/line endings.
+**/evidence/** -whitespace
+**/fixture/** -whitespace

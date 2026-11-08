@@ -64,7 +64,11 @@ tool/backend behind that name is not inspected. This means:
 Everything else — read-only tools (`read_file`, `ls`, `glob`, `grep`),
 custom tools, shell/`execute` surfaces — receives **no opinion and zero
 checker invocations**. The tool map is deliberately closed; extending it is
-the only way a new tool becomes governed.
+the only way a new tool becomes intercepted. A custom tool can instead
+self-govern by asking the gate itself before it mutates; that is opt-in, and
+a custom tool that never calls the gate stays ungoverned. See
+[custom-tools.md](custom-tools.md) for the tested pattern and for
+project-boundary behavior.
 
 Out of scope for this milestone: shell/`execute` governance (ADR-021's
 prevent-catch-verify design does not yet generalize to remote/virtual

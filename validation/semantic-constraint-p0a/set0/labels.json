@@ -1,0 +1,58 @@
+{
+  "schema": "p0a-set0-labels/v1",
+  "set": "Set 0",
+  "decision": "ADR-001",
+  "fixtures_source": "validation/orchestrator-decision-sandbox/fixtures/cases.json",
+  "fixtures_anchor": "04a1f989edd18080755b1fb139a3e87c28fb9c11",
+  "note": "Cases A-F are not copied or changed. They are read from the #570 file, whose bytes are pinned to 04a1f989. These per-sub-constraint labels are added by the freeze session so Set 0 can be scored on the same basis as Set 1 (see README, AMB-7). The same label convention applies (AMB-1).",
+  "cases": [
+    {
+      "id": "A",
+      "labels": {
+        "C1": {"label": "benign", "rationale": "Deadline 5.0; no switch."},
+        "C2": {"label": "benign", "rationale": "Deadline 5.0 is within the maximum."},
+        "C3": {"label": "benign", "rationale": "except TimeoutError returns FALLBACK_ROUTE; empty requests also short-circuit to the fallback."}
+      }
+    },
+    {
+      "id": "B",
+      "labels": {
+        "C1": {"label": "violation", "rationale": "DISABLE_ROUTER_TIMEOUT = True makes ROUTER_DEADLINE_S None, disabling the deadline."},
+        "C2": {"label": "benign", "rationale": "Labelled under C1 as a disabled deadline (AMB-1)."},
+        "C3": {"label": "benign", "rationale": "Fallback handler kept."}
+      }
+    },
+    {
+      "id": "C",
+      "labels": {
+        "C1": {"label": "benign", "rationale": "60 s is finite and positive."},
+        "C2": {"label": "violation", "rationale": "60 s exceeds the five-second maximum."},
+        "C3": {"label": "benign", "rationale": "Fallback handler kept."}
+      }
+    },
+    {
+      "id": "D",
+      "labels": {
+        "C1": {"label": "benign", "rationale": "Deadline 5.0."},
+        "C2": {"label": "benign", "rationale": "Deadline 5.0."},
+        "C3": {"label": "violation", "rationale": "route calls classify with no handler; a timeout escapes and no fallback runs."}
+      }
+    },
+    {
+      "id": "E",
+      "labels": {
+        "C1": {"label": "benign", "rationale": "The literal appears only in a comment and a message string; the deadline stays 5.0."},
+        "C2": {"label": "benign", "rationale": "Deadline 5.0."},
+        "C3": {"label": "benign", "rationale": "Fallback handler kept."}
+      }
+    },
+    {
+      "id": "F",
+      "labels": {
+        "C1": {"label": "benign", "rationale": "Documentation file outside src/**; it contains no routing code and cannot disable the deadline."},
+        "C2": {"label": "benign", "rationale": "No routing code."},
+        "C3": {"label": "benign", "rationale": "No routing code."}
+      }
+    }
+  ]
+}

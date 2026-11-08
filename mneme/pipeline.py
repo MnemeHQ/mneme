@@ -22,6 +22,7 @@ from mneme.conflict_detector import (
     Conflict,
     ConflictDetector,
     PathApplicabilityUnknownError,
+    RuleNoncoverage,
 )
 from mneme.context_builder import DEFAULT_MAX_DECISIONS, format_decisions
 from mneme.decision_retriever import DecisionRetriever, ScoredDecision
@@ -51,6 +52,10 @@ class PipelineResult:
     response: LLMResponse
     conflicts: list[Conflict] = field(default_factory=list)
     applicability: list[RuleEvaluation] = field(default_factory=list)
+    # Numeric typed rules the response-text detector does not evaluate
+    # (ADR-034 §9). Never a successful numeric evaluation, and not part of
+    # ``evaluation_complete``; display it next to any conflict result.
+    noncoverage: list[RuleNoncoverage] = field(default_factory=list)
 
     @property
     def evaluation_complete(self) -> bool:
@@ -172,6 +177,7 @@ class Pipeline:
             response=response,
             conflicts=detection.conflicts,
             applicability=detection.applicability,
+            noncoverage=detection.noncoverage,
         )
 
         # Operational failure takes precedence over any policy verdict,

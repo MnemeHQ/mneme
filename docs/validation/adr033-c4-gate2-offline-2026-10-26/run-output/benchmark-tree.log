@@ -1,0 +1,48 @@
+========================================================================
+  Mneme Benchmark Report
+========================================================================
+
+  PASS   feature_boundary_violation
+         Mneme prevented the violation. Baseline triggered 3 violation(s) (autogen, crewai, src/agents/coordinator.py); enhanced response had none. Retrieved: anti-002.
+         baseline triggered: autogen, crewai, src/agents/coordinator.py, src/agents/worker.py
+         layer1: recall@3=1.00 precision@3=0.33 irrelevant=yes
+
+  PASS   framework_abstraction_violation
+         Mneme prevented the violation. Baseline triggered 2 violation(s) (langchain, langchain-anthropic, src/chains/main.py); enhanced response had none. Retrieved: anti-001.
+         baseline triggered: langchain, langchain-anthropic, src/chains/main.py, src/chains/retrieval_chain.py
+         layer1: recall@3=1.00 precision@3=0.33 irrelevant=yes
+
+  PASS   infra_scope_creep_violation
+         Mneme prevented the violation. Baseline triggered 4 violation(s) (redis, celery, src/agents/worker.py); enhanced response had none. Retrieved: anti-002.
+         baseline triggered: redis, celery, src/agents/worker.py, src/orchestration/coordinator.py
+         layer1: recall@3=1.00 precision@3=0.33 irrelevant=yes
+
+  PASS   openai_provider_violation
+         Mneme prevented the violation. Baseline triggered 2 violation(s) (openai, mneme/providers/openai.py); enhanced response had none. Retrieved: .
+         baseline triggered: openai, mneme/providers/openai.py
+
+  PASS   pydantic_dependency_creep
+         Mneme prevented the violation. Baseline triggered 2 violation(s) (pydantic, mneme/schemas.py); enhanced response had none. Retrieved: .
+         baseline triggered: pydantic, mneme/schemas.py
+
+  PASS   retrieval_complexity_violation
+         Mneme prevented the violation. Baseline triggered 4 violation(s) (sentence-transformers, chromadb, src/embeddings/encoder.py); enhanced response had none. Retrieved: mneme_retrieval_deterministic.
+         baseline triggered: sentence-transformers, chromadb, src/embeddings/encoder.py, src/vector_store/chroma_index.py
+         layer1: recall@3=1.00 precision@3=0.33 irrelevant=yes
+
+  PASS   storage_backend_violation
+         Mneme prevented the violation. Baseline triggered 5 violation(s) (sqlalchemy, alembic, psycopg2-binary); enhanced response had none. Retrieved: mneme_storage_json.
+         baseline triggered: sqlalchemy, alembic, psycopg2-binary, migrations/0001_initial.py
+         layer1: recall@3=1.00 precision@3=0.33 irrelevant=yes
+
+------------------------------------------------------------------------
+  Layer 2 (enforcement): 7/7 violations caught
+  Pass rate: 100%
+
+  Layer 1 (retrieval, n=5): mean recall@3=1.00  mean precision@3=0.33  irrelevant injection rate=100%
+
+  By category:
+    anti_pattern: 2/2 PASS
+    architecture: 2/2 PASS
+    scope: 3/3 PASS
+========================================================================

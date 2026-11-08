@@ -22,6 +22,10 @@ from pathlib import Path
 
 from mneme.decision_index import CanonicalArchitectureIndex
 from mneme.decision_index_persistence import (
+    DECISION_INDEX_SCHEMA_V2,
+    NUMERIC_RULE_TYPE,
+    NUMERIC_UPPER_BOUND_FEATURE,
+    DecisionIndexMigrationRequired,
     legacy_item_to_runtime_decision,
     load_persisted_decision_index,
     runtime_decision_from_memory_record,
@@ -130,6 +134,19 @@ class MemoryStore:
                 runtime_decision_from_memory_record(d, self.path)
                 for d in data.get("decisions", [])
             ]
+            if any(
+                rule.type == NUMERIC_RULE_TYPE
+                for decision in native_decisions
+                for rule in decision.rules
+            ):
+                # ADR-034 §5: the type is usable only from v2 memory that
+                # declares its semantic feature, never from legacy memory.
+                raise DecisionIndexMigrationRequired(
+                    f"{NUMERIC_RULE_TYPE} rules require a "
+                    f"{DECISION_INDEX_SCHEMA_V2} decision_index declaring "
+                    f"{NUMERIC_UPPER_BOUND_FEATURE!r}; migrate with "
+                    "`mneme decision-index migrate`"
+                )
             migrated = [
                 decision
                 for item in items

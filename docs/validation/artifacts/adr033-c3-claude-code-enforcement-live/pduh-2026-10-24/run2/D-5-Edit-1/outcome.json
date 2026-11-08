@@ -1,0 +1,43 @@
+{
+  "probe": "D-5",
+  "tool": "Edit",
+  "rep": "1",
+  "arm": "headless",
+  "selftest": false,
+  "expect": "proceed",
+  "verifier_expect": null,
+  "label": "PASS",
+  "delivery": "not_applicable",
+  "diagnostic": {
+    "expected": "absent",
+    "user_visible": "not_tested",
+    "locations": [],
+    "emitted": "absent",
+    "model_delivered": "absent"
+  },
+  "checks": {
+    "E1": "ok",
+    "E2": "ok",
+    "E3": "ok",
+    "FR2_emitted_absent": "ok",
+    "FR2_absent": "ok"
+  },
+  "failures": [],
+  "missing": [],
+  "deviations": [],
+  "facts": {
+    "target_changed": true,
+    "e2_source": "stream-json",
+    "tool_result_is_error": false,
+    "tool_result_excerpt": "The file <LIVE>\\D-5-Edit-1\\repo\\app.py has been updated successfully.",
+    "tool_use_id": "toolu_01PiXb2YKPeQDSmCjiZzBoET",
+    "hook_records": 0,
+    "host_system": {
+      "subtypes": [],
+      "indicators": {}
+    },
+    "transcript_collected": true,
+    "init_model": "claude-opus-5-5",
+    "host_offers_tool": true
+  }
+}

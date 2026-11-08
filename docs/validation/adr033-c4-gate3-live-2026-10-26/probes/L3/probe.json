@@ -1,0 +1,109 @@
+{
+  "probe": "L3",
+  "planned": {
+    "posture": "open",
+    "change": [
+      "symlink",
+      "docs/c4-l3-link.md"
+    ],
+    "aggregate": "UNEVALUATED",
+    "check_conclusion": "success",
+    "merge_http": 200
+  },
+  "posture_variable": {
+    "value": "open",
+    "updated_at": "2026-10-26T22:09:50Z"
+  },
+  "base_main": "06fb92c9962d6cbae4b388992791d524f3c33d5c",
+  "head_sha": "51585842a7cdd448a495f44f54cf7fe99100c693",
+  "branch": "c4/gate3-l3",
+  "pr": 37,
+  "pr_url": "https://github.com/MnemeHQ/mneme-ci1-lab/pull/37",
+  "check_runs": [
+    {
+      "id": 121879087450,
+      "name": "CI1 trusted gate",
+      "head_sha": "51585842a7cdd448a495f44f54cf7fe99100c693",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/MnemeHQ/mneme-ci1-lab/actions/runs/40410321115/job/121879087450",
+      "started_at": "2026-10-26T22:10:14Z",
+      "completed_at": "2026-10-26T22:10:35Z",
+      "app_id": 15368
+    }
+  ],
+  "workflow_run_id": 40410321115,
+  "workflow_run": {
+    "id": 40410321115,
+    "event": "pull_request_target",
+    "head_sha": "51585842a7cdd448a495f44f54cf7fe99100c693",
+    "status": "completed",
+    "conclusion": "success",
+    "path": ".github/workflows/ci1-trusted-gate.yml",
+    "run_attempt": 1,
+    "html_url": "https://github.com/MnemeHQ/mneme-ci1-lab/actions/runs/40410321115"
+  },
+  "report": {
+    "aggregate": {
+      "classification": "UNEVALUATED",
+      "reason": "docs/c4-l3-link.md: not a regular file (symlink)",
+      "partly_unevaluated": true,
+      "counts": {
+        "UNEVALUATED": 1
+      }
+    },
+    "disposition": "success",
+    "posture": {
+      "effective": "open",
+      "source": "vars.MNEME_CI_AVAILABILITY",
+      "fallback": null
+    },
+    "requested_mode": "strict",
+    "base_sha": "06fb92c9962d6cbae4b388992791d524f3c33d5c",
+    "head_sha": "51585842a7cdd448a495f44f54cf7fe99100c693",
+    "adapter": {
+      "path": "scripts/ci/adr033_c4_gate.py",
+      "sha256": "afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9"
+    },
+    "evaluator": {
+      "commit": "0b74d410b45e7b3efcf08d00ce58e7bd7017b757",
+      "wheel_sha256": "e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51",
+      "python": "/home/runner/work/_temp/evaluator/bin/python"
+    },
+    "memory": null,
+    "files": [
+      {
+        "path": "docs/c4-l3-link.md",
+        "status": "A",
+        "mode": "120000",
+        "classification": "UNEVALUATED",
+        "kind": "mode",
+        "reason": "not a regular file (symlink)"
+      }
+    ],
+    "annotations": [
+      "::warning title=ADR-033 C4 UNEVALUATED::UNEVALUATED, not PASS (availability open): docs/c4-l3-link.md: not a regular file (symlink)"
+    ]
+  },
+  "merge": {
+    "status_line": "HTTP/2.0 200 OK",
+    "request_id": "C8DD:153454:3034CC:9DBD64:6ADFCFFB",
+    "body": "{\"sha\":\"9137c93b66c2b8534f2222f125378b6761f6aae3\",\"merged\":true,\"message\":\"Pull Request successfully merged\"}"
+  },
+  "checks": {
+    "check run on PR head": true,
+    "genuine app": true,
+    "single check run": true,
+    "event pull_request_target": true,
+    "check conclusion": true,
+    "report head/base": true,
+    "report adapter sha256": true,
+    "report posture": true,
+    "report mode strict": true,
+    "report aggregate": true,
+    "merge http": true,
+    "UNEVALUATED warning annotation": true,
+    "UNEVALUATED in summary": true
+  },
+  "outcome": "AS_PLANNED"
+}

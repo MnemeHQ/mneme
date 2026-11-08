@@ -1,0 +1,16 @@
+{
+  "status": "historical, immutable",
+  "description": "Pre-fix evidence for the orchestrator decision sandbox, measured before MnemeHQ/mneme#573 changed relative-path materialization. Kept byte-identical; do not regenerate.",
+  "runtime": {
+    "main_base_commit": "c443de87",
+    "contains_relative_path_fix_cf6bc40b": false
+  },
+  "harness_commit": "405d9c720a57e461776b84421b2198f0e7c8880d",
+  "last_commit_before_reconciliation": "ddddf3527672c729ae8710d12be7241ca1a073b4",
+  "run_record": "clean clone at 405d9c72, pinned venv, Python 3.12.10, Windows 11 (10.0.26300), mneme-hq 0.10.0 from source, strict mode, langchain 1.3.17 / langchain-core 1.6.0 / langgraph 1.2.11; fresh summary byte-identical to committed; 41/41 sandbox tests passed",
+  "files_sha256": {
+    "summary.json": "6a95035528b62875a1dd0e341db03b759486927d637b59603ee99bba202849d1",
+    "summary.csv": "fbe98a73ec01e6d08876e5d316cb226e068c8ce116d9974b4726d2959cee69b2",
+    "RESULTS.md": "0a8d422ae0200b3781eef2fa42663313e51fdbd6d88b83b60ed36bccd1b5498b"
+  }
+}

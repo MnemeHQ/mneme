@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Self-test stub shim. NOT Claude Code. Put this directory first on PATH only
+# together with H1_SELFTEST=1; the runners refuse any other combination.
+H=$(cd "$(dirname "$0")/.." && pwd)
+. "$H/pins.env"
+exec "$PY" -I "$H/selftest/stub_claude.py" "$@"

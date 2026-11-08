@@ -1,0 +1,179 @@
+{
+  "meta": {
+    "name": "ci1-fixture",
+    "description": "CI1.2.2 incomplete-evaluation fixture"
+  },
+  "items": [],
+  "examples": [],
+  "decisions": [
+    {
+      "id": "ADR-921",
+      "decision": "CI1 fixture - forbid the deprecated sync flag everywhere",
+      "rationale": "## Context\n\nSynthetic decision for the CI1.2.2 incomplete-evaluation fixture. It is not a\nMneme product decision and exists only inside this fixture.\n\n## Decision\n\nNo file may pass the deprecated sync flag.\n\n## Constraints\n\n- FORBID_LITERAL: --legacy-sync\n",
+      "scope": [
+        "cli_flags"
+      ],
+      "constraints": [],
+      "anti_patterns": [],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "--legacy-sync"
+        }
+      ],
+      "test_evidence": [],
+      "created_at": "2026-10-17",
+      "updated_at": "2026-10-17",
+      "status": "active",
+      "source": {
+        "type": "adr",
+        "path": "adr/ADR-921-ci1-fixture-global-literal.md",
+        "sha256": "1ac75529467c4ffc3516dd8a388e3a5e93e2f7b0e7c21ebd5804e3734675a773"
+      }
+    },
+    {
+      "id": "ADR-922",
+      "decision": "CI1 fixture - forbid the staging hostname in documentation",
+      "rationale": "## Context\n\nSynthetic decision for the CI1.2.2 incomplete-evaluation fixture. It is not a\nMneme product decision and exists only inside this fixture.\n\n## Decision\n\nDocumentation must not name the internal staging host.\n\n## Constraints\n\n- FORBID_LITERAL:\n    value: staging.internal.example\n    include_paths:\n      - docs/**\n",
+      "scope": [
+        "documentation"
+      ],
+      "constraints": [],
+      "anti_patterns": [],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "staging.internal.example",
+          "include_paths": [
+            "docs/**"
+          ]
+        }
+      ],
+      "test_evidence": [],
+      "created_at": "2026-10-17",
+      "updated_at": "2026-10-17",
+      "status": "active",
+      "source": {
+        "type": "adr",
+        "path": "adr/ADR-922-ci1-fixture-scoped-literal.md",
+        "sha256": "44e0eb5ce238084bcc0ac935d8a58d8c7b66c4a879426acde8fea696950761b8"
+      }
+    }
+  ],
+  "decision_index": {
+    "schema": "mneme.decision-index/v2",
+    "semantic_features": [],
+    "decisions": [
+      {
+        "decision_id": "ADR-921",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-441d7a93b5c2b0c6440fab501cd0eb7c",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": "2026-10-17"
+      },
+      {
+        "decision_id": "ADR-922",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-a31f3d502703fc07ffe709b95c1d74b4",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": "2026-10-17"
+      }
+    ],
+    "versions": [
+      {
+        "version_id": "dver-441d7a93b5c2b0c6440fab501cd0eb7c",
+        "decision_id": "ADR-921",
+        "revision": "1",
+        "content_digest": "a55ae30f31fdcec337a7d3e5694623e09f6169b3b113027ac2a1c5afc4f5a809",
+        "statement": "CI1 fixture - forbid the deprecated sync flag everywhere",
+        "rationale": "## Context\n\nSynthetic decision for the CI1.2.2 incomplete-evaluation fixture. It is not a\nMneme product decision and exists only inside this fixture.\n\n## Decision\n\nNo file may pass the deprecated sync flag.\n\n## Constraints\n\n- FORBID_LITERAL: --legacy-sync\n",
+        "context_scope": [
+          "cli_flags"
+        ],
+        "constraints": [],
+        "anti_patterns": [],
+        "source_evidence": [
+          {
+            "source_type": "adr",
+            "source_locator": "adr/ADR-921-ci1-fixture-global-literal.md",
+            "source_revision": "1ac75529467c4ffc3516dd8a388e3a5e93e2f7b0e7c21ebd5804e3734675a773",
+            "observed_at": "",
+            "verification_status": ""
+          }
+        ],
+        "occurrence_source_identity": [
+          "ADR-921",
+          "1ac75529467c4ffc3516dd8a388e3a5e93e2f7b0e7c21ebd5804e3734675a773",
+          "adr-import"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-10-17"
+      },
+      {
+        "version_id": "dver-a31f3d502703fc07ffe709b95c1d74b4",
+        "decision_id": "ADR-922",
+        "revision": "1",
+        "content_digest": "aeb2fb01e0f7b1a13fd6cac604c792183d1fd1c36d621d8880d045b2cb8764fc",
+        "statement": "CI1 fixture - forbid the staging hostname in documentation",
+        "rationale": "## Context\n\nSynthetic decision for the CI1.2.2 incomplete-evaluation fixture. It is not a\nMneme product decision and exists only inside this fixture.\n\n## Decision\n\nDocumentation must not name the internal staging host.\n\n## Constraints\n\n- FORBID_LITERAL:\n    value: staging.internal.example\n    include_paths:\n      - docs/**\n",
+        "context_scope": [
+          "documentation"
+        ],
+        "constraints": [],
+        "anti_patterns": [],
+        "source_evidence": [
+          {
+            "source_type": "adr",
+            "source_locator": "adr/ADR-922-ci1-fixture-scoped-literal.md",
+            "source_revision": "44e0eb5ce238084bcc0ac935d8a58d8c7b66c4a879426acde8fea696950761b8",
+            "observed_at": "",
+            "verification_status": ""
+          }
+        ],
+        "occurrence_source_identity": [
+          "ADR-922",
+          "44e0eb5ce238084bcc0ac935d8a58d8c7b66c4a879426acde8fea696950761b8",
+          "adr-import"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-10-17"
+      }
+    ],
+    "rules": [
+      {
+        "rule_id": "ADR-921:FORBID_LITERAL:8ea9d1c2fc9247acd0fb4505ddd8d24e",
+        "decision_id": "ADR-921",
+        "decision_version_id": "dver-441d7a93b5c2b0c6440fab501cd0eb7c",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "--legacy-sync"
+        },
+        "applicability": {},
+        "binding_authority": "version"
+      },
+      {
+        "rule_id": "ADR-922:FORBID_LITERAL:21a32494727a473bd487a2580e075557",
+        "decision_id": "ADR-922",
+        "decision_version_id": "dver-a31f3d502703fc07ffe709b95c1d74b4",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "staging.internal.example"
+        },
+        "applicability": {
+          "include_paths": [
+            "docs/**"
+          ]
+        },
+        "binding_authority": "version"
+      }
+    ]
+  }
+}

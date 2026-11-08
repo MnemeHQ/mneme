@@ -1,6 +1,85 @@
 # Changelog
 
-## Unreleased
+## v0.11.0 — 2026-11-07
+
+**Decision governance semantics (ADR-031 DG1), the `FORBID_NUMERIC_ABOVE`
+numeric rule (ADR-034), opt-in fail-closed availability (ADR-033) and
+enforcement-trust fixes.** This release contains behavior changes; see
+`docs/releases/v0.11.0.md` for the full list and upgrade notes.
+
+**Opt-in fail-closed availability (ADR-033 C2a/C2b)**
+
+- **New `mneme availability status | authorize | revoke`.** A repository can
+  opt in to refusing Claude Code direct writes (`Edit`, `Write`,
+  `MultiEdit`) when the check cannot run or cannot be trusted. The opt-in is
+  `.mneme/availability.json`, and it counts only when the live default branch
+  of `origin` holds a reviewed authorization event for it. `authorize` and
+  `revoke` write the declaration and never commit. See
+  `docs/integrations/claude-code.md`.
+- **Without a declaration, hook behavior is byte-identical** and no verifier
+  runs.
+- **Known limitation (Architecture A):** deleting the local declaration can
+  silently disable opt-in fail-closed protection. An unverifiable baseline
+  (for example a DNS failure) still lets the edit proceed; the hook then
+  emits a PreToolUse `additionalContext` notice saying the edit was not
+  covered by fail-closed availability enforcement. That notice is not
+  evidence that a file changed.
+
+**Enforcement-trust fixes**
+
+- **Only coherent `mneme check` verdicts are trusted (#260).** The hook (and
+  the Agent SDK and LangChain consumers) now trust a payload only when its
+  mode, violation shape, aggregate verdict and exit code agree. An
+  incoherent result fails open with a diagnostic naming the contradiction.
+- **Relative tool paths resolve against the event `cwd` for change
+  materialization (#571).** Previously the current-file snapshot was read
+  relative to the host process cwd, which could silently skip a forbidden
+  edit, produce a false PASS, or blame pre-existing violations on an
+  unrelated write. Affects the Claude Code, Agent SDK, LangChain, Kiro,
+  Antigravity and Hermes paths.
+- **`mneme adr import` schema errors** are reported as actionable errors
+  instead of a traceback, with canonical memory unchanged.
+
+**`FORBID_NUMERIC_ABOVE`: numeric rule (ADR-034)**
+
+- **New typed rule.** `FORBID_NUMERIC_ABOVE` declares an inclusive upper
+  bound on a Python module-level symbol and/or a positional argument of
+  direct calls. It is decided by the new
+  `mneme check --source-file <file.py>` complete-source audit, and by
+  `--proposed-new-file` for a Claude Code `Write` of a new `.py` file (G2-1,
+  below). Every other input reports it `MATCHER_UNEVALUATED` /
+  `INCOMPLETE_SOURCE_INPUT`, never PASS. See
+  `docs/integrations/adr-import.md`.
+- **Pre-write check for new-file `Write` (G2-1), no support claim.** A Claude
+  Code `PreToolUse` `Write` to a verified-absent `.py` target in an existing
+  directory is checked as complete proposed source. Edits, existing-file
+  writes and other surfaces are unchanged. Independent validation of this
+  path has not passed, so no enforcement claim is made for it.
+- **Matcher corrections.** `--input` without `--target-path` never returns a
+  clean numeric result (F-1); function-source call sites resolve by lexical
+  scope (D2); dynamic writes to the governed symbol (`globals()[...]`,
+  `setattr`, star imports and similar) make the symbol source
+  `AMBIGUOUS_BINDING` instead of a clean PASS (S1, F-G1-1).
+- **Hook evidence attribution (§7b, §7c).** The validation-only
+  `mneme.hook_evidence/v1` record attributes relevant enforcement per rule
+  and names literal-rule refusals; it is inert unless
+  `MNEME_HOOK_EVIDENCE_LOG` is set.
+- **Persistence.** The type is stored only under `mneme.decision-index/v2`
+  with the `numeric_upper_bound_rule` semantic feature. Older Mneme versions
+  refuse such memory; v1 and section-less memory cannot carry the type.
+- **`mneme.check/v1` additions.** Additive per-rule matcher fields on numeric
+  traces, numeric violation details and a top-level `subject` record.
+  Payloads and exit codes for checks without numeric rules are
+  byte-identical.
+- **Behavior change for mixed results (M-a).** When a check is incomplete
+  only because numeric rules are unevaluated, the Claude Code hook, the Agent
+  SDK and LangChain now keep a trusted violation actionable (deny in strict
+  mode) instead of failing open. Incomplete payloads without numeric records
+  keep their previous behavior.
+- **`ConflictDetector`.** `evaluate()` reports numeric rules in a new
+  `noncoverage` list (and `PipelineResult.noncoverage`) without changing
+  `evaluation_complete`; `detect()` raises `NumericRuleNoncoverageError` for
+  decision sets containing numeric rules.
 
 **Decision governance semantics (ADR-031, DG1)**
 
@@ -106,6 +185,24 @@
     unchanged. See the
     [slice-1 charter](docs/plans/2026-10-15-t08-target-path-memory-resolution-charter.md)
     for the deferred items.
+
+**Other additions**
+
+- **`mneme check --applicability-preview LABEL` (DG1F-C1a).** Opt-in,
+  repeatable, report-only: renders per-decision effective status on stderr
+  marked `NON-AUTHORITATIVE`. Stdout, the JSON verdict and exit codes are
+  unchanged.
+- **Faster `mneme check` startup.** Modules used only by other subcommands
+  are imported lazily, which shortens every hook-triggered check. Behavior
+  is unchanged.
+
+## Install
+
+```bash
+pip install "mneme-hq[mcp]==0.11.0"
+```
+
+---
 
 ## v0.10.0 — 2026-10-07
 

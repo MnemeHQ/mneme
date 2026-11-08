@@ -1,0 +1,37 @@
+{
+  "applicability": [
+    {
+      "decision_id": "ADR-901",
+      "decision_version_id": "dver-d3d431ff6d5edba8b555a040a7b85f9b",
+      "input_path": "docs/guide_violating.md",
+      "outcome": "APPLIED",
+      "path_scoped": true,
+      "reason": "an include selector matched",
+      "rule_id": "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b",
+      "rule_index": 0,
+      "rule_type": "FORBID_LITERAL",
+      "rule_value": "install legacy-client",
+      "selector": "docs/**"
+    }
+  ],
+  "evaluation_complete": true,
+  "freshness": [],
+  "mode": "strict",
+  "schema": "mneme.check/v1",
+  "verdict": "FAIL",
+  "violations": [
+    {
+      "decision_id": "ADR-901",
+      "decision_text": "CI1 fixture - forbid the legacy client installer in documentation",
+      "decision_version_id": "dver-d3d431ff6d5edba8b555a040a7b85f9b",
+      "input_path": "docs/guide_violating.md",
+      "kind": "typed_rule",
+      "rule": "install legacy-client",
+      "rule_id": "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b",
+      "rule_type": "FORBID_LITERAL",
+      "selector": "docs/**",
+      "severity": "FAIL",
+      "trigger": "install legacy-client"
+    }
+  ]
+}

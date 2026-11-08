@@ -1,0 +1,53 @@
+{
+  "fixture": "ci1_contract/memory_errors",
+  "version": "v1",
+  "contract": "mneme.check/v1",
+  "input_text": "Store everything as flat JSON files on disk.\n",
+  "query": "storage",
+  "top": 3,
+  "modes": ["strict", "warn"],
+  "cases": [
+    {
+      "id": "memory_missing",
+      "memory_content": null,
+      "expected_exit": 2,
+      "expected_stderr": "error_line",
+      "expected_classification": "UNEVALUATED"
+    },
+    {
+      "id": "memory_truncated_json",
+      "memory_content": "{\"meta\": {\"name\"",
+      "expected_exit": 1,
+      "expected_stderr": "traceback",
+      "expected_classification": "UNEVALUATED"
+    },
+    {
+      "id": "memory_empty_file",
+      "memory_content": "",
+      "expected_exit": 1,
+      "expected_stderr": "traceback",
+      "expected_classification": "UNEVALUATED"
+    },
+    {
+      "id": "memory_json_array",
+      "memory_content": "[]",
+      "expected_exit": 1,
+      "expected_stderr": "traceback",
+      "expected_classification": "UNEVALUATED"
+    },
+    {
+      "id": "memory_missing_required_keys",
+      "memory_content": "{\"decisions\": []}",
+      "expected_exit": 1,
+      "expected_stderr": "traceback",
+      "expected_classification": "UNEVALUATED"
+    },
+    {
+      "id": "memory_malformed_decision",
+      "memory_content": "{\"meta\": {\"name\": \"x\", \"description\": \"x\"}, \"items\": [], \"examples\": [], \"decisions\": [{\"id\": \"d1\"}]}",
+      "expected_exit": 1,
+      "expected_stderr": "traceback",
+      "expected_classification": "UNEVALUATED"
+    }
+  ]
+}

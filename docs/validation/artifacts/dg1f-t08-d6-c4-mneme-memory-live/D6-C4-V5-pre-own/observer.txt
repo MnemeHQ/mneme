@@ -1,0 +1,64 @@
+probe_name=D6-C4-V5-pre-own
+probe_kind=pre
+process_situation=pre-session, single process
+probe=D6-C4-V5-pre-own A=protected B=permissive variant=V5 topology=own
+channel=C4 uncommitted local settings env (.claude/settings.local.json); controls carry B's empty {} local file
+settings_writer_expected=harness, before launch (uncommitted local file); nobody after launch
+local_at_launch=env
+watched_local=<LIVE>\D6-C4-V5-pre-own\A\repo_a\.claude\settings.local.json
+empty_local_sha256=ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356
+expected_override=<LIVE>\D6-C4-V5-pre-own\B\repo_a\.mneme\project_memory.json
+launch_id=f2aeb53b-3b34-4f4f-88e1-702d94193285
+MNEME_MEMORY(launching shell)=<unset>
+date=2026-10-16T20:05:25Z
+claude=2.1.202 (Claude Code)
+mneme_src=<MNEME_SRC> head=f64d0900cb145b382c22fc9cd67f7588b8ed9fdc mneme_dir_equals_40ab0dd12c3f02b960d66c6fd08ab146ac5d369e=yes
+harness_head=ac698985d807910542f1c016a66be1031d479d25 harness_dirty=no
+python=<PYTHON>
+claude_bin=<CLAUDE_BIN>
+setting_sources=project,local
+session_dir=<LIVE>\D6-C4-V5-pre-own\A\repo_a
+added_dir=none
+repo_a=<LIVE>\D6-C4-V5-pre-own\A\repo_a
+repo_b=<LIVE>\D6-C4-V5-pre-own\B\repo_a
+BEFORE A/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE A/memory             aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+BEFORE A/.claude/settings   b74c25ecdb8faf7f3c9e75f6a004cb7cec23c57221b68314dc7a709af822883d
+BEFORE A/.claude/local      840990d4994acb25efca56bb8225ffb5fd5afa0990918c683dc7403c3fb5f8f7
+BEFORE A/settings-env       no
+BEFORE A/local-tracked      no
+BEFORE A/local-ignored      yes
+BEFORE B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+BEFORE B/.claude/settings   0db44033024e915094506a85596165d4e4909532b6064c84850929157b4507db
+BEFORE B/.claude/local      absent
+BEFORE B/settings-env       no
+BEFORE B/local-tracked      no
+BEFORE B/local-ignored      yes
+BEFORE A/HEAD               a1eb260e38031d5fcd8cc9a37e7d9e531ccb1d62
+BEFORE B/HEAD               1659e385165bd16a8ea3f5044397f8cef05c62c1
+session repo settings commit at launch:
+  a1eb260e38031d5fcd8cc9a37e7d9e531ccb1d62 c4 harness baseline: ignore local settings (+ witness hook and gate file in the session repo)
+claude_exit=0
+AFTER A/app.py             4d581c9351487d87270ea52e7adc11ee256e7ba14460980e0f80f5e3f1bd707b
+AFTER A/memory             aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+AFTER A/.claude/settings   b74c25ecdb8faf7f3c9e75f6a004cb7cec23c57221b68314dc7a709af822883d
+AFTER A/.claude/local      840990d4994acb25efca56bb8225ffb5fd5afa0990918c683dc7403c3fb5f8f7
+AFTER A/settings-env       no
+AFTER A/local-tracked      no
+AFTER A/local-ignored      yes
+AFTER B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+AFTER B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+AFTER B/.claude/settings   0db44033024e915094506a85596165d4e4909532b6064c84850929157b4507db
+AFTER B/.claude/local      absent
+AFTER B/settings-env       no
+AFTER B/local-tracked      no
+AFTER B/local-ignored      yes
+AFTER A/HEAD               a1eb260e38031d5fcd8cc9a37e7d9e531ccb1d62
+AFTER B/HEAD               1659e385165bd16a8ea3f5044397f8cef05c62c1
+A/app.py contains psycopg2: 1
+A git status:
+ M app.py
+B git status:
+init_model=claude-opus-4-8[1m]
+outcome=LOCAL_PRESESSION_PROPAGATED

@@ -1,0 +1,300 @@
+{
+  "collector_sha256": "2f302ed244b89364859c0832f638c40fd299601286e9716d4c024312c2ad7df8",
+  "files": [
+    {
+      "path": "R-1-Edit-1/observer.txt",
+      "source_sha256": "62cd7b539e06dd5409e1dbb2748cfbb1b05be60821e7e541c8f191b0252995be",
+      "published_sha256": "db0e51f420dbf3ac59072ceb9b8a4e42b54b43bf0d104b9b4e247a2f446e3685"
+    },
+    {
+      "path": "R-1-Edit-1/prompt.txt",
+      "source_sha256": "31c82e06229702eb3625f7bcf21df5ff511ba9e623da84aff07cbf6a6be27022",
+      "published_sha256": "8b2e2a9cad029a35787255911672039da052902804daf29ab2eb55cb87877300"
+    },
+    {
+      "path": "R-1-Edit-1/setup.json",
+      "source_sha256": "6115499112ee9540b45968a1f5b784ad75ccde26ca1ed3ae5b562c2c01031030",
+      "published_sha256": "e3b0cd9d475aa3b940e3ec514a0962b7f2742c2acbadf5b8807f5369ce5ab4d3"
+    },
+    {
+      "path": "R-1-Edit-1/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "R-1-Edit-1/events.jsonl",
+      "source_sha256": "78eb68d690332f9849b0982d250cd62c33fbada6cbd0b83e51f2282882f8c3a1",
+      "published_sha256": "668dd25121e7854167dc21fa1dbf8dea99e2cef52f9b00d311b842e4b6698fb0"
+    },
+    {
+      "path": "R-1-Edit-1/hook-log.jsonl",
+      "source_sha256": "d4373ca9140afda3c127856c2dc92fab86694b3e1b813c6cde421827f6d57317",
+      "published_sha256": "fe1ee77105e921e60043a5c979dc8076a77df8f83beab8c9b05e35d109470d7e"
+    },
+    {
+      "path": "R-1-Edit-1/outcome.json",
+      "source_sha256": "d2a3f1f4ac391d1dfd065ca9da41fa95029200dab9efe175f2b8aff277b13f7c",
+      "published_sha256": "e3d37fbb1dda6ad3e8316dc3bc8a6884ed983e8de3bba8c362f806a5676191ea"
+    },
+    {
+      "path": "R-1-Edit-1/target.before",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "R-1-Edit-1/target.after",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "R-1-Edit-1/netcap-sni.txt",
+      "source_sha256": "1be3bbacb3292b5c1ccb0845ff6f572be4889276de1ebf7c631b9bbf74cdb67d",
+      "published_sha256": "1be3bbacb3292b5c1ccb0845ff6f572be4889276de1ebf7c631b9bbf74cdb67d"
+    },
+    {
+      "path": "R-1-Edit-1/transcript.selected.jsonl",
+      "source_sha256": "64a71d8b432a7d10799ad0b242cd3e90e102e50c5193add75d2024daef105ef7",
+      "published_sha256": "f8ff3038ec0b98fd70a54f6371224c918c9e4c4b765a49990e801005eb33e297",
+      "source_size": 186489,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 4,
+        "api-request": 2,
+        "last-prompt": 3,
+        "attachment:deferred_tools_record": 1,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "R-1-Edit-2/observer.txt",
+      "source_sha256": "b428caa083fa4a1d3f315c36b0779aaef16dc47a47801ee333a7e8b1094bee5b",
+      "published_sha256": "a6f2277edcd547b58443dde49f24f8beaeaee59d894dfbfcd812c006bec83c83"
+    },
+    {
+      "path": "R-1-Edit-2/prompt.txt",
+      "source_sha256": "ff26a49b88e748ba6ca49cf5194c95ff4e776328783ef087328f14251988daee",
+      "published_sha256": "6546f7212beddedc76f834a3891cfaf7248b991cab6a6b7c4535105bd1d77cef"
+    },
+    {
+      "path": "R-1-Edit-2/setup.json",
+      "source_sha256": "0c2de5ff9087d779c5c23a42756992939e9b4a0e238549c7a97c080171c6cfa3",
+      "published_sha256": "2130ede4607f5fabc8e9466678bd1d87f61424bc77af76da08bd20374c213e66"
+    },
+    {
+      "path": "R-1-Edit-2/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "R-1-Edit-2/events.jsonl",
+      "source_sha256": "a058f5f5b96fead63001e9960dcea8c76bba94934f1bb245689b990b1922a63b",
+      "published_sha256": "1691f94ff6d7d9b7dce7b2ebaa7ba53b4137e9b41798d4d84d4d842f0f66f3dd"
+    },
+    {
+      "path": "R-1-Edit-2/hook-log.jsonl",
+      "source_sha256": "9dfe66731826053f7768d27fb0b98539476339e40e6c12c4e65915a67ceedfdc",
+      "published_sha256": "0fe9bd303b6272ad31272e8acfe55568665460dcf83000759ba7395a068267c8"
+    },
+    {
+      "path": "R-1-Edit-2/outcome.json",
+      "source_sha256": "5ae75e0073874e3538b8fb87899861a230c06bef135476db91bf81b37c988a2c",
+      "published_sha256": "e9a68c9a1e783d6b75765dc8c06068480edbd9470c126148875ac4491bca72cc"
+    },
+    {
+      "path": "R-1-Edit-2/target.before",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "R-1-Edit-2/target.after",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "R-1-Edit-2/netcap-sni.txt",
+      "source_sha256": "cf15b5cbb1889f344c8351e565432596e96cf1f00e6b6c35ea1fd65e4cf3631c",
+      "published_sha256": "cf15b5cbb1889f344c8351e565432596e96cf1f00e6b6c35ea1fd65e4cf3631c"
+    },
+    {
+      "path": "R-1-Edit-2/transcript.selected.jsonl",
+      "source_sha256": "e39e47caf1b2b90367f329fd01f2f8bd41a750697b4525628b7ada97043f4c01",
+      "published_sha256": "cd82deefbfbffd37cc8cefbeac5a3403d07e88aa94dfb251529050b85f86f69a",
+      "source_size": 186527,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 4,
+        "api-request": 2,
+        "last-prompt": 3,
+        "attachment:deferred_tools_record": 1,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "R-1-Write-1/observer.txt",
+      "source_sha256": "1858939f25af7f76cb11c93a3c8f454e64abecac1b7502f387fd08da0414e740",
+      "published_sha256": "5d553a00069af49b2a36dfadaed0c69ed47c0aa16baed3c2fe5b4d96acfa635b"
+    },
+    {
+      "path": "R-1-Write-1/prompt.txt",
+      "source_sha256": "57b0673fa55631fc22144ad1cca0731f2710ac1a31694ca291100fcccd9d40f2",
+      "published_sha256": "71810969941156c173209807b034c77c91c39bc4af0ff0a6411a114b14df573a"
+    },
+    {
+      "path": "R-1-Write-1/setup.json",
+      "source_sha256": "775145036b0e392e601ded5efd63d7a481e8d2fbc303c8ad6a9c2a28c395ceeb",
+      "published_sha256": "f1d22fe0ca2cf99b3de163b16205460c7bcceb538657a7c266cbe21d3b7aeaf0"
+    },
+    {
+      "path": "R-1-Write-1/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "R-1-Write-1/events.jsonl",
+      "source_sha256": "0621af937d4b71a389725cce36d674d21daa00ceb0b668917e3fa7efc355a1c2",
+      "published_sha256": "cd481c9056d4d88ae13fd085ecd16497440ea05218a7885c7fe311846041caae"
+    },
+    {
+      "path": "R-1-Write-1/hook-log.jsonl",
+      "source_sha256": "41e0acdb56f38716af6f4938cd35c2febcef98ffb2edf299d8c9d5faaec5024a",
+      "published_sha256": "f454db777e1547f2456f01685afcb5f0a514e11240d6697958f625f438f11086"
+    },
+    {
+      "path": "R-1-Write-1/outcome.json",
+      "source_sha256": "4355b7dbd7a7cbd9359df197289f64cd04b682d108d7abbf1487069ab5efdf87",
+      "published_sha256": "1d613554a565e0dc5e8c8af776bab558bcff847efa8c26b404299dfbea0e350d"
+    },
+    {
+      "path": "R-1-Write-1/netcap-sni.txt",
+      "source_sha256": "9a008508367e99ba5f265e6780872c1669c3ea70ac57a2f1dc2c65294a2a57fe",
+      "published_sha256": "9a008508367e99ba5f265e6780872c1669c3ea70ac57a2f1dc2c65294a2a57fe"
+    },
+    {
+      "path": "R-1-Write-1/transcript.selected.jsonl",
+      "source_sha256": "39c323cf0b8c543255390407db334c91279ff3c51d32b1fe7a131ebda6feaad9",
+      "published_sha256": "5907f7735998cd0777989fb12733ca439876a5cbd02d6a2f43f3f6a9b5520991",
+      "source_size": 185664,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 2,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 3,
+        "api-request": 2,
+        "last-prompt": 3,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "R-1-Write-2/observer.txt",
+      "source_sha256": "ffc8647ed7918545deca5e94b162588a5b58dea5ae3041634df0183220ae9bbe",
+      "published_sha256": "a4a80ebb563c9235e6550f911509689c79c3356ce91e1d2675684a4f08420aab"
+    },
+    {
+      "path": "R-1-Write-2/prompt.txt",
+      "source_sha256": "40fd747517870b0574d132a6d8f353a41d12fdf5e5001a9b670d431bf202b522",
+      "published_sha256": "35aa199be1451a4583b38b7c4e24a34dab681966609f83b10d441168347feb8c"
+    },
+    {
+      "path": "R-1-Write-2/setup.json",
+      "source_sha256": "888a67338c962aecd4cff0ec2110cd03f523994dc16b858c400890f17c9dcff8",
+      "published_sha256": "32c33cde03b346430f774860cafc15d1fd6c915f772f63072659f83c3f0eb6dc"
+    },
+    {
+      "path": "R-1-Write-2/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "R-1-Write-2/events.jsonl",
+      "source_sha256": "8ea2c0d91013437887b48b465513e935146713dd9d8f23ff1870c8af82db3945",
+      "published_sha256": "1084c14b09b102a48005deaebefe7ade77ff42092ac06f5835486cd70294d4e5"
+    },
+    {
+      "path": "R-1-Write-2/hook-log.jsonl",
+      "source_sha256": "8a757f5cab5cad91f545a2185fc4c3697a6ace2a94d1600dcf76b05575e3c912",
+      "published_sha256": "e82760eb6e78be106af2dcc91a0b0fc8bcc6abd0c7cf7df55777d2629e993963"
+    },
+    {
+      "path": "R-1-Write-2/outcome.json",
+      "source_sha256": "e8d67deedf3cf9b2ab5d8f0780670fd65f7f66801b0f0a1c8437a0d4704c4669",
+      "published_sha256": "31e87cbd16013ddaeab854519f6558405604c5d92ed86743e5a0d6007f80cbfd"
+    },
+    {
+      "path": "R-1-Write-2/netcap-sni.txt",
+      "source_sha256": "d4aac0b1125a305b794d27006c1e34e88dec29ae03f4a9649d2b1e7b460324d4",
+      "published_sha256": "d4aac0b1125a305b794d27006c1e34e88dec29ae03f4a9649d2b1e7b460324d4"
+    },
+    {
+      "path": "R-1-Write-2/transcript.selected.jsonl",
+      "source_sha256": "fb792ce02a3b881e3bec6b5a7b0797517014c78568ce2149b5c91de3bda954ad",
+      "published_sha256": "e67fdb85970a939ec6899dca3e6b1aec5330019b172bd5803bc954902b16327e",
+      "source_size": 184363,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 3,
+        "api-request": 2,
+        "last-prompt": 3,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "batch-R1-reval-e4-20261023T161726Z.txt",
+      "source_sha256": "50fe408076f3cd75c52100b00e2d17cf135b66373a6907ddfc73cb8cb4d22d84",
+      "published_sha256": "9507cf4eb23164b9e45631ecc090e3be3ef22dbae87953fd12ab21154615f0cb"
+    }
+  ],
+  "selection": {
+    "probes": [
+      "R-1-*"
+    ],
+    "extra": [
+      "batch-R1-reval-e4-20261023T161726Z.txt"
+    ]
+  }
+}

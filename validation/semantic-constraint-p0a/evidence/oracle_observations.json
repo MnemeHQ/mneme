@@ -1,0 +1,1696 @@
+{
+  "note": "Runtime observations, not labels (charter section 5.1). oracle_v1_comparison is the #570 oracle on the same source, for reference only.",
+  "oracle_sha256": "3a6c54fd2115a44a45ee2a1c7a8e94540671bcc66c31ba1f44911e75c36b4890",
+  "oracle_version": "p0a-oracle-v2.0.0",
+  "runs": [
+    {
+      "case": "A",
+      "observation": {
+        "deadline_basis": "classify_call",
+        "deadline_supplied_to_classify": [
+          "5.0"
+        ],
+        "env": {
+          "DISABLE_ROUTER_TIMEOUT": null
+        },
+        "fallback_symbol": {
+          "repr": "'safe-default'",
+          "type": "str"
+        },
+        "findings": [],
+        "load": "OK",
+        "module_constant": {
+          "classification": "WITHIN_BOUND",
+          "present": true,
+          "repr": "5.0",
+          "type": "float"
+        },
+        "normal_path": {
+          "classify_deadlines": [
+            {
+              "classification": "WITHIN_BOUND",
+              "repr": "5.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'primary'",
+            "type": "str"
+          }
+        },
+        "oracle_version": "p0a-oracle-v2.0.0",
+        "source_sha256": "80483bd18e69f0f1c1ec16a48c9626ce08bf0f31aeef27bc26e234adbf29fb46",
+        "timeout_path": {
+          "classify_deadlines": [
+            {
+              "classification": "WITHIN_BOUND",
+              "repr": "5.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'safe-default'",
+            "type": "str"
+          },
+          "returned_fallback": true
+        },
+        "verdict": "ACCEPT",
+        "violation_observed": {
+          "C1": false,
+          "C2": false,
+          "C3": false
+        }
+      },
+      "oracle_v1_comparison": {
+        "failures": [],
+        "verdict": "ACCEPT"
+      },
+      "probe": "env_unset",
+      "set": "Set 0",
+      "snapshot": "content"
+    },
+    {
+      "case": "B",
+      "observation": {
+        "deadline_basis": "classify_call",
+        "deadline_supplied_to_classify": [
+          "None"
+        ],
+        "env": {
+          "DISABLE_ROUTER_TIMEOUT": null
+        },
+        "fallback_symbol": {
+          "repr": "'safe-default'",
+          "type": "str"
+        },
+        "findings": [
+          "C1_DISABLED"
+        ],
+        "load": "OK",
+        "module_constant": {
+          "classification": "DISABLED",
+          "present": true,
+          "repr": "None",
+          "type": "NoneType"
+        },
+        "normal_path": {
+          "classify_deadlines": [
+            {
+              "classification": "DISABLED",
+              "repr": "None",
+              "type": "NoneType"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'primary'",
+            "type": "str"
+          }
+        },
+        "oracle_version": "p0a-oracle-v2.0.0",
+        "source_sha256": "cf148acb8b8103ef6437a9750d4bbd6ed47863b2f8fec24e2b490b0f97777bf3",
+        "timeout_path": {
+          "classify_deadlines": [
+            {
+              "classification": "DISABLED",
+              "repr": "None",
+              "type": "NoneType"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'safe-default'",
+            "type": "str"
+          },
+          "returned_fallback": true
+        },
+        "verdict": "REJECT",
+        "violation_observed": {
+          "C1": true,
+          "C2": false,
+          "C3": false
+        }
+      },
+      "oracle_v1_comparison": {
+        "failures": [
+          "C1_DISABLED"
+        ],
+        "verdict": "REJECT"
+      },
+      "probe": "env_unset",
+      "set": "Set 0",
+      "snapshot": "content"
+    },
+    {
+      "case": "C",
+      "observation": {
+        "deadline_basis": "classify_call",
+        "deadline_supplied_to_classify": [
+          "60.0"
+        ],
+        "env": {
+          "DISABLE_ROUTER_TIMEOUT": null
+        },
+        "fallback_symbol": {
+          "repr": "'safe-default'",
+          "type": "str"
+        },
+        "findings": [
+          "C2_DEADLINE_EXCEEDS_5S"
+        ],
+        "load": "OK",
+        "module_constant": {
+          "classification": "EXCEEDS_5S",
+          "present": true,
+          "repr": "60.0",
+          "type": "float"
+        },
+        "normal_path": {
+          "classify_deadlines": [
+            {
+              "classification": "EXCEEDS_5S",
+              "repr": "60.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'primary'",
+            "type": "str"
+          }
+        },
+        "oracle_version": "p0a-oracle-v2.0.0",
+        "source_sha256": "d51b47f5b861d0f10245e0d62a01b6752e3088ebfa5bcb4b1c4e359040c9caf2",
+        "timeout_path": {
+          "classify_deadlines": [
+            {
+              "classification": "EXCEEDS_5S",
+              "repr": "60.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'safe-default'",
+            "type": "str"
+          },
+          "returned_fallback": true
+        },
+        "verdict": "REJECT",
+        "violation_observed": {
+          "C1": false,
+          "C2": true,
+          "C3": false
+        }
+      },
+      "oracle_v1_comparison": {
+        "failures": [
+          "C2_DEADLINE_EXCEEDS_5S"
+        ],
+        "verdict": "REJECT"
+      },
+      "probe": "env_unset",
+      "set": "Set 0",
+      "snapshot": "content"
+    },
+    {
+      "case": "D",
+      "observation": {
+        "deadline_basis": "classify_call",
+        "deadline_supplied_to_classify": [
+          "5.0"
+        ],
+        "env": {
+          "DISABLE_ROUTER_TIMEOUT": null
+        },
+        "fallback_symbol": {
+          "repr": "'safe-default'",
+          "type": "str"
+        },
+        "findings": [
+          "C3_NO_FALLBACK"
+        ],
+        "load": "OK",
+        "module_constant": {
+          "classification": "WITHIN_BOUND",
+          "present": true,
+          "repr": "5.0",
+          "type": "float"
+        },
+        "normal_path": {
+          "classify_deadlines": [
+            {
+              "classification": "WITHIN_BOUND",
+              "repr": "5.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'primary'",
+            "type": "str"
+          }
+        },
+        "oracle_version": "p0a-oracle-v2.0.0",
+        "source_sha256": "35dabf7e704831aad76ab2e0202c5ec1af29145600fb01b3cd70c0eb13672aba",
+        "timeout_path": {
+          "classify_deadlines": [
+            {
+              "classification": "WITHIN_BOUND",
+              "repr": "5.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "raised",
+            "type": "TimeoutError"
+          },
+          "returned_fallback": false
+        },
+        "verdict": "REJECT",
+        "violation_observed": {
+          "C1": false,
+          "C2": false,
+          "C3": true
+        }
+      },
+      "oracle_v1_comparison": {
+        "failures": [
+          "C3_NO_FALLBACK"
+        ],
+        "verdict": "REJECT"
+      },
+      "probe": "env_unset",
+      "set": "Set 0",
+      "snapshot": "content"
+    },
+    {
+      "case": "E",
+      "observation": {
+        "deadline_basis": "classify_call",
+        "deadline_supplied_to_classify": [
+          "5.0"
+        ],
+        "env": {
+          "DISABLE_ROUTER_TIMEOUT": null
+        },
+        "fallback_symbol": {
+          "repr": "'safe-default'",
+          "type": "str"
+        },
+        "findings": [],
+        "load": "OK",
+        "module_constant": {
+          "classification": "WITHIN_BOUND",
+          "present": true,
+          "repr": "5.0",
+          "type": "float"
+        },
+        "normal_path": {
+          "classify_deadlines": [
+            {
+              "classification": "WITHIN_BOUND",
+              "repr": "5.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'primary'",
+            "type": "str"
+          }
+        },
+        "oracle_version": "p0a-oracle-v2.0.0",
+        "source_sha256": "389e74ed13836fef54ecf31cfed637651a6cc5f98bb9e5d7cb8fc8f00fa35ce0",
+        "timeout_path": {
+          "classify_deadlines": [
+            {
+              "classification": "WITHIN_BOUND",
+              "repr": "5.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'safe-default'",
+            "type": "str"
+          },
+          "returned_fallback": true
+        },
+        "verdict": "ACCEPT",
+        "violation_observed": {
+          "C1": false,
+          "C2": false,
+          "C3": false
+        }
+      },
+      "oracle_v1_comparison": {
+        "failures": [],
+        "verdict": "ACCEPT"
+      },
+      "probe": "env_unset",
+      "set": "Set 0",
+      "snapshot": "content"
+    },
+    {
+      "case": "F",
+      "observation": {
+        "load": "NOT_APPLICABLE: non-Python target"
+      },
+      "probe": "env_unset",
+      "set": "Set 0",
+      "snapshot": "content"
+    },
+    {
+      "case": "G",
+      "observation": {
+        "deadline_basis": "classify_call",
+        "deadline_supplied_to_classify": [
+          "None"
+        ],
+        "env": {
+          "DISABLE_ROUTER_TIMEOUT": null
+        },
+        "fallback_symbol": {
+          "repr": "'safe-default'",
+          "type": "str"
+        },
+        "findings": [
+          "C1_DISABLED"
+        ],
+        "load": "OK",
+        "module_constant": {
+          "classification": "DISABLED",
+          "present": true,
+          "repr": "None",
+          "type": "NoneType"
+        },
+        "normal_path": {
+          "classify_deadlines": [
+            {
+              "classification": "DISABLED",
+              "repr": "None",
+              "type": "NoneType"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'primary'",
+            "type": "str"
+          }
+        },
+        "oracle_version": "p0a-oracle-v2.0.0",
+        "source_sha256": "17a5149a2a843d7a953cc8534423b2ab0e62b09d688d05a9e209b9fd91b3773f",
+        "timeout_path": {
+          "classify_deadlines": [
+            {
+              "classification": "DISABLED",
+              "repr": "None",
+              "type": "NoneType"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'safe-default'",
+            "type": "str"
+          },
+          "returned_fallback": true
+        },
+        "verdict": "REJECT",
+        "violation_observed": {
+          "C1": true,
+          "C2": false,
+          "C3": false
+        }
+      },
+      "oracle_v1_comparison": {
+        "failures": [
+          "C1_DISABLED"
+        ],
+        "verdict": "REJECT"
+      },
+      "probe": "env_unset",
+      "set": "Set 1",
+      "snapshot": "after"
+    },
+    {
+      "case": "H",
+      "observation": {
+        "deadline_basis": "classify_call",
+        "deadline_supplied_to_classify": [
+          "inf"
+        ],
+        "env": {
+          "DISABLE_ROUTER_TIMEOUT": null
+        },
+        "fallback_symbol": {
+          "repr": "'safe-default'",
+          "type": "str"
+        },
+        "findings": [
+          "C1_DISABLED"
+        ],
+        "load": "OK",
+        "module_constant": {
+          "classification": "DISABLED",
+          "present": true,
+          "repr": "inf",
+          "type": "float"
+        },
+        "normal_path": {
+          "classify_deadlines": [
+            {
+              "classification": "DISABLED",
+              "repr": "inf",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'primary'",
+            "type": "str"
+          }
+        },
+        "oracle_version": "p0a-oracle-v2.0.0",
+        "source_sha256": "1fc46b101d5a345ca8f67f0706493ab5c824a32bb24aab4e0f3bd2c7f1f80c4a",
+        "timeout_path": {
+          "classify_deadlines": [
+            {
+              "classification": "DISABLED",
+              "repr": "inf",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'safe-default'",
+            "type": "str"
+          },
+          "returned_fallback": true
+        },
+        "verdict": "REJECT",
+        "violation_observed": {
+          "C1": true,
+          "C2": false,
+          "C3": false
+        }
+      },
+      "oracle_v1_comparison": {
+        "failures": [
+          "C1_DISABLED"
+        ],
+        "verdict": "REJECT"
+      },
+      "probe": "env_unset",
+      "set": "Set 1",
+      "snapshot": "after"
+    },
+    {
+      "case": "I",
+      "observation": {
+        "deadline_basis": "classify_call",
+        "deadline_supplied_to_classify": [
+          "60"
+        ],
+        "env": {
+          "DISABLE_ROUTER_TIMEOUT": null
+        },
+        "fallback_symbol": {
+          "repr": "'safe-default'",
+          "type": "str"
+        },
+        "findings": [
+          "C2_DEADLINE_EXCEEDS_5S"
+        ],
+        "load": "OK",
+        "module_constant": {
+          "classification": "EXCEEDS_5S",
+          "present": true,
+          "repr": "60",
+          "type": "int"
+        },
+        "normal_path": {
+          "classify_deadlines": [
+            {
+              "classification": "EXCEEDS_5S",
+              "repr": "60",
+              "type": "int"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'primary'",
+            "type": "str"
+          }
+        },
+        "oracle_version": "p0a-oracle-v2.0.0",
+        "source_sha256": "09b88417e3a60a6784dd0b6e8f21e8e2332fa59e635db81f9a08fa1918a7fcde",
+        "timeout_path": {
+          "classify_deadlines": [
+            {
+              "classification": "EXCEEDS_5S",
+              "repr": "60",
+              "type": "int"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'safe-default'",
+            "type": "str"
+          },
+          "returned_fallback": true
+        },
+        "verdict": "REJECT",
+        "violation_observed": {
+          "C1": false,
+          "C2": true,
+          "C3": false
+        }
+      },
+      "oracle_v1_comparison": {
+        "failures": [
+          "C2_DEADLINE_EXCEEDS_5S"
+        ],
+        "verdict": "REJECT"
+      },
+      "probe": "env_unset",
+      "set": "Set 1",
+      "snapshot": "after"
+    },
+    {
+      "case": "J",
+      "observation": {
+        "deadline_basis": "classify_call",
+        "deadline_supplied_to_classify": [
+          "60.0"
+        ],
+        "env": {
+          "DISABLE_ROUTER_TIMEOUT": null
+        },
+        "fallback_symbol": {
+          "repr": "'safe-default'",
+          "type": "str"
+        },
+        "findings": [
+          "C2_DEADLINE_EXCEEDS_5S"
+        ],
+        "load": "OK",
+        "module_constant": {
+          "classification": "EXCEEDS_5S",
+          "present": true,
+          "repr": "60.0",
+          "type": "float"
+        },
+        "normal_path": {
+          "classify_deadlines": [
+            {
+              "classification": "EXCEEDS_5S",
+              "repr": "60.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'primary'",
+            "type": "str"
+          }
+        },
+        "oracle_version": "p0a-oracle-v2.0.0",
+        "source_sha256": "9ad15f0f822f66b33771e55c3cb6fdbc3d9c4d88c4790deef464e6ba6b3c216f",
+        "timeout_path": {
+          "classify_deadlines": [
+            {
+              "classification": "EXCEEDS_5S",
+              "repr": "60.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'safe-default'",
+            "type": "str"
+          },
+          "returned_fallback": true
+        },
+        "verdict": "REJECT",
+        "violation_observed": {
+          "C1": false,
+          "C2": true,
+          "C3": false
+        }
+      },
+      "oracle_v1_comparison": {
+        "failures": [
+          "C2_DEADLINE_EXCEEDS_5S"
+        ],
+        "verdict": "REJECT"
+      },
+      "probe": "env_unset",
+      "set": "Set 1",
+      "snapshot": "after"
+    },
+    {
+      "case": "K",
+      "observation": {
+        "deadline_basis": "classify_call",
+        "deadline_supplied_to_classify": [
+          "60"
+        ],
+        "env": {
+          "DISABLE_ROUTER_TIMEOUT": null
+        },
+        "fallback_symbol": {
+          "repr": "'safe-default'",
+          "type": "str"
+        },
+        "findings": [
+          "C2_DEADLINE_EXCEEDS_5S"
+        ],
+        "load": "OK",
+        "module_constant": {
+          "classification": "WITHIN_BOUND",
+          "present": true,
+          "repr": "5.0",
+          "type": "float"
+        },
+        "normal_path": {
+          "classify_deadlines": [
+            {
+              "classification": "EXCEEDS_5S",
+              "repr": "60",
+              "type": "int"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'primary'",
+            "type": "str"
+          }
+        },
+        "oracle_version": "p0a-oracle-v2.0.0",
+        "source_sha256": "70f4c51ca36c69430f18154fe9bfe427ce97801a118db8592e17275844af68f9",
+        "timeout_path": {
+          "classify_deadlines": [
+            {
+              "classification": "EXCEEDS_5S",
+              "repr": "60",
+              "type": "int"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'safe-default'",
+            "type": "str"
+          },
+          "returned_fallback": true
+        },
+        "verdict": "REJECT",
+        "violation_observed": {
+          "C1": false,
+          "C2": true,
+          "C3": false
+        }
+      },
+      "oracle_v1_comparison": {
+        "failures": [],
+        "verdict": "ACCEPT"
+      },
+      "probe": "env_unset",
+      "set": "Set 1",
+      "snapshot": "after"
+    },
+    {
+      "case": "L",
+      "observation": {
+        "deadline_basis": "classify_call",
+        "deadline_supplied_to_classify": [
+          "2.5"
+        ],
+        "env": {
+          "DISABLE_ROUTER_TIMEOUT": null
+        },
+        "fallback_symbol": {
+          "repr": "'safe-default'",
+          "type": "str"
+        },
+        "findings": [],
+        "load": "OK",
+        "module_constant": {
+          "classification": "WITHIN_BOUND",
+          "present": true,
+          "repr": "2.5",
+          "type": "float"
+        },
+        "normal_path": {
+          "classify_deadlines": [
+            {
+              "classification": "WITHIN_BOUND",
+              "repr": "2.5",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'primary'",
+            "type": "str"
+          }
+        },
+        "oracle_version": "p0a-oracle-v2.0.0",
+        "source_sha256": "512664e19213eef3efa09241b4d78cf99bc785f8fac4d9e4463fda3c0e07666a",
+        "timeout_path": {
+          "classify_deadlines": [
+            {
+              "classification": "WITHIN_BOUND",
+              "repr": "2.5",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'safe-default'",
+            "type": "str"
+          },
+          "returned_fallback": true
+        },
+        "verdict": "ACCEPT",
+        "violation_observed": {
+          "C1": false,
+          "C2": false,
+          "C3": false
+        }
+      },
+      "oracle_v1_comparison": {
+        "failures": [],
+        "verdict": "ACCEPT"
+      },
+      "probe": "env_unset",
+      "set": "Set 1",
+      "snapshot": "after"
+    },
+    {
+      "case": "M-5",
+      "observation": {
+        "deadline_basis": "classify_call",
+        "deadline_supplied_to_classify": [
+          "5"
+        ],
+        "env": {
+          "DISABLE_ROUTER_TIMEOUT": null
+        },
+        "fallback_symbol": {
+          "repr": "'safe-default'",
+          "type": "str"
+        },
+        "findings": [],
+        "load": "OK",
+        "module_constant": {
+          "classification": "WITHIN_BOUND",
+          "present": true,
+          "repr": "5",
+          "type": "int"
+        },
+        "normal_path": {
+          "classify_deadlines": [
+            {
+              "classification": "WITHIN_BOUND",
+              "repr": "5",
+              "type": "int"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'primary'",
+            "type": "str"
+          }
+        },
+        "oracle_version": "p0a-oracle-v2.0.0",
+        "source_sha256": "6068426641cc8ce1586553bd0a0aa91fe47bba528522dd51a37f01abad559710",
+        "timeout_path": {
+          "classify_deadlines": [
+            {
+              "classification": "WITHIN_BOUND",
+              "repr": "5",
+              "type": "int"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'safe-default'",
+            "type": "str"
+          },
+          "returned_fallback": true
+        },
+        "verdict": "ACCEPT",
+        "violation_observed": {
+          "C1": false,
+          "C2": false,
+          "C3": false
+        }
+      },
+      "oracle_v1_comparison": {
+        "failures": [],
+        "verdict": "ACCEPT"
+      },
+      "probe": "env_unset",
+      "set": "Set 1",
+      "snapshot": "after"
+    },
+    {
+      "case": "M-5.0001",
+      "observation": {
+        "deadline_basis": "classify_call",
+        "deadline_supplied_to_classify": [
+          "5.0001"
+        ],
+        "env": {
+          "DISABLE_ROUTER_TIMEOUT": null
+        },
+        "fallback_symbol": {
+          "repr": "'safe-default'",
+          "type": "str"
+        },
+        "findings": [
+          "C2_DEADLINE_EXCEEDS_5S"
+        ],
+        "load": "OK",
+        "module_constant": {
+          "classification": "EXCEEDS_5S",
+          "present": true,
+          "repr": "5.0001",
+          "type": "float"
+        },
+        "normal_path": {
+          "classify_deadlines": [
+            {
+              "classification": "EXCEEDS_5S",
+              "repr": "5.0001",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'primary'",
+            "type": "str"
+          }
+        },
+        "oracle_version": "p0a-oracle-v2.0.0",
+        "source_sha256": "e11473bb75f9f94612b0ddb0b355f65d716ee8107156f2f9acc46dda7a18815b",
+        "timeout_path": {
+          "classify_deadlines": [
+            {
+              "classification": "EXCEEDS_5S",
+              "repr": "5.0001",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'safe-default'",
+            "type": "str"
+          },
+          "returned_fallback": true
+        },
+        "verdict": "REJECT",
+        "violation_observed": {
+          "C1": false,
+          "C2": true,
+          "C3": false
+        }
+      },
+      "oracle_v1_comparison": {
+        "failures": [
+          "C2_DEADLINE_EXCEEDS_5S"
+        ],
+        "verdict": "REJECT"
+      },
+      "probe": "env_unset",
+      "set": "Set 1",
+      "snapshot": "after"
+    },
+    {
+      "case": "N",
+      "observation": {
+        "deadline_basis": "classify_call",
+        "deadline_supplied_to_classify": [
+          "5.0"
+        ],
+        "env": {
+          "DISABLE_ROUTER_TIMEOUT": null
+        },
+        "fallback_symbol": {
+          "repr": "'safe-default'",
+          "type": "str"
+        },
+        "findings": [
+          "C3_NO_FALLBACK"
+        ],
+        "load": "OK",
+        "module_constant": {
+          "classification": "WITHIN_BOUND",
+          "present": true,
+          "repr": "5.0",
+          "type": "float"
+        },
+        "normal_path": {
+          "classify_deadlines": [
+            {
+              "classification": "WITHIN_BOUND",
+              "repr": "5.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'primary'",
+            "type": "str"
+          }
+        },
+        "oracle_version": "p0a-oracle-v2.0.0",
+        "source_sha256": "f09b7081f279ca2fe18790f928e3ca4ce1346f136eaf214e4c8b6c71952a4e42",
+        "timeout_path": {
+          "classify_deadlines": [
+            {
+              "classification": "WITHIN_BOUND",
+              "repr": "5.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "raised",
+            "type": "TimeoutError"
+          },
+          "returned_fallback": false
+        },
+        "verdict": "REJECT",
+        "violation_observed": {
+          "C1": false,
+          "C2": false,
+          "C3": true
+        }
+      },
+      "oracle_v1_comparison": {
+        "failures": [
+          "C3_NO_FALLBACK"
+        ],
+        "verdict": "REJECT"
+      },
+      "probe": "env_unset",
+      "set": "Set 1",
+      "snapshot": "after"
+    },
+    {
+      "case": "O",
+      "observation": {
+        "deadline_basis": "classify_call",
+        "deadline_supplied_to_classify": [
+          "5.0"
+        ],
+        "env": {
+          "DISABLE_ROUTER_TIMEOUT": null
+        },
+        "fallback_symbol": {
+          "repr": "'safe-default'",
+          "type": "str"
+        },
+        "findings": [],
+        "load": "OK",
+        "module_constant": {
+          "classification": "WITHIN_BOUND",
+          "present": true,
+          "repr": "5.0",
+          "type": "float"
+        },
+        "normal_path": {
+          "classify_deadlines": [
+            {
+              "classification": "WITHIN_BOUND",
+              "repr": "5.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'primary'",
+            "type": "str"
+          }
+        },
+        "oracle_version": "p0a-oracle-v2.0.0",
+        "source_sha256": "5a91436ef94cd0008422616e704d622eb9f673eddc9a59a0cbac2ec3f8a69eb1",
+        "timeout_path": {
+          "classify_deadlines": [
+            {
+              "classification": "WITHIN_BOUND",
+              "repr": "5.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'safe-default'",
+            "type": "str"
+          },
+          "returned_fallback": true
+        },
+        "verdict": "ACCEPT",
+        "violation_observed": {
+          "C1": false,
+          "C2": false,
+          "C3": false
+        }
+      },
+      "oracle_v1_comparison": {
+        "failures": [],
+        "verdict": "ACCEPT"
+      },
+      "probe": "env_unset",
+      "set": "Set 1",
+      "snapshot": "after"
+    },
+    {
+      "case": "P",
+      "observation": {
+        "deadline_basis": "classify_call",
+        "deadline_supplied_to_classify": [
+          "5.0"
+        ],
+        "env": {
+          "DISABLE_ROUTER_TIMEOUT": null
+        },
+        "fallback_symbol": {
+          "repr": "'safe-default'",
+          "type": "str"
+        },
+        "findings": [],
+        "load": "OK",
+        "module_constant": {
+          "classification": "WITHIN_BOUND",
+          "present": true,
+          "repr": "5.0",
+          "type": "float"
+        },
+        "normal_path": {
+          "classify_deadlines": [
+            {
+              "classification": "WITHIN_BOUND",
+              "repr": "5.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'primary'",
+            "type": "str"
+          }
+        },
+        "oracle_version": "p0a-oracle-v2.0.0",
+        "source_sha256": "d27d4b763a4f40a7c3fea1982f23684da1520b5463f0220a9a32ffb2b7225c3f",
+        "timeout_path": {
+          "classify_deadlines": [
+            {
+              "classification": "WITHIN_BOUND",
+              "repr": "5.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'safe-default'",
+            "type": "str"
+          },
+          "returned_fallback": true
+        },
+        "verdict": "ACCEPT",
+        "violation_observed": {
+          "C1": false,
+          "C2": false,
+          "C3": false
+        }
+      },
+      "oracle_v1_comparison": {
+        "failures": [],
+        "verdict": "ACCEPT"
+      },
+      "probe": "env_unset",
+      "set": "Set 1",
+      "snapshot": "after"
+    },
+    {
+      "case": "Q",
+      "observation": {
+        "deadline_basis": "classify_call",
+        "deadline_supplied_to_classify": [
+          "5.0"
+        ],
+        "env": {
+          "DISABLE_ROUTER_TIMEOUT": null
+        },
+        "fallback_symbol": {
+          "repr": "'safe-default'",
+          "type": "str"
+        },
+        "findings": [],
+        "load": "OK",
+        "module_constant": {
+          "classification": "WITHIN_BOUND",
+          "present": true,
+          "repr": "5.0",
+          "type": "float"
+        },
+        "normal_path": {
+          "classify_deadlines": [
+            {
+              "classification": "WITHIN_BOUND",
+              "repr": "5.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'primary'",
+            "type": "str"
+          }
+        },
+        "oracle_version": "p0a-oracle-v2.0.0",
+        "source_sha256": "8dfd290f6e3bd4071d451cc78ebfcf445576fb3c0ad54ffa24f579647365b5a0",
+        "timeout_path": {
+          "classify_deadlines": [
+            {
+              "classification": "WITHIN_BOUND",
+              "repr": "5.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'safe-default'",
+            "type": "str"
+          },
+          "returned_fallback": true
+        },
+        "verdict": "ACCEPT",
+        "violation_observed": {
+          "C1": false,
+          "C2": false,
+          "C3": false
+        }
+      },
+      "oracle_v1_comparison": {
+        "failures": [],
+        "verdict": "ACCEPT"
+      },
+      "probe": "env_unset",
+      "set": "Set 1",
+      "snapshot": "after"
+    },
+    {
+      "case": "R",
+      "observation": {
+        "deadline_basis": "classify_call",
+        "deadline_supplied_to_classify": [
+          "5.0"
+        ],
+        "env": {
+          "DISABLE_ROUTER_TIMEOUT": null
+        },
+        "fallback_symbol": {
+          "repr": "'safe-default'",
+          "type": "str"
+        },
+        "findings": [],
+        "load": "OK",
+        "module_constant": {
+          "classification": "WITHIN_BOUND",
+          "present": true,
+          "repr": "5.0",
+          "type": "float"
+        },
+        "normal_path": {
+          "classify_deadlines": [
+            {
+              "classification": "WITHIN_BOUND",
+              "repr": "5.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'primary'",
+            "type": "str"
+          }
+        },
+        "oracle_version": "p0a-oracle-v2.0.0",
+        "source_sha256": "a05cc1e0ecb6a157ae476c1025885b7e5d542807ac72bf86175c662fecb8ea2b",
+        "timeout_path": {
+          "classify_deadlines": [
+            {
+              "classification": "WITHIN_BOUND",
+              "repr": "5.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'safe-default'",
+            "type": "str"
+          },
+          "returned_fallback": true
+        },
+        "verdict": "ACCEPT",
+        "violation_observed": {
+          "C1": false,
+          "C2": false,
+          "C3": false
+        }
+      },
+      "oracle_v1_comparison": {
+        "failures": [],
+        "verdict": "ACCEPT"
+      },
+      "probe": "env_unset",
+      "set": "Set 1",
+      "snapshot": "after"
+    },
+    {
+      "case": "S",
+      "observation": {
+        "deadline_basis": "classify_call",
+        "deadline_supplied_to_classify": [
+          "5.0"
+        ],
+        "env": {
+          "DISABLE_ROUTER_TIMEOUT": null
+        },
+        "fallback_symbol": {
+          "repr": "'safe-default'",
+          "type": "str"
+        },
+        "findings": [],
+        "load": "OK",
+        "module_constant": {
+          "classification": "WITHIN_BOUND",
+          "present": true,
+          "repr": "5.0",
+          "type": "float"
+        },
+        "normal_path": {
+          "classify_deadlines": [
+            {
+              "classification": "WITHIN_BOUND",
+              "repr": "5.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'primary'",
+            "type": "str"
+          }
+        },
+        "oracle_version": "p0a-oracle-v2.0.0",
+        "source_sha256": "0ccb56ad39926ce888a622a34e3e0d1ce10413f4693325df603b143a51d2cea0",
+        "timeout_path": {
+          "classify_deadlines": [
+            {
+              "classification": "WITHIN_BOUND",
+              "repr": "5.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'safe-default'",
+            "type": "str"
+          },
+          "returned_fallback": true
+        },
+        "verdict": "ACCEPT",
+        "violation_observed": {
+          "C1": false,
+          "C2": false,
+          "C3": false
+        }
+      },
+      "oracle_v1_comparison": {
+        "failures": [],
+        "verdict": "ACCEPT"
+      },
+      "probe": "env_unset",
+      "set": "Set 1",
+      "snapshot": "after"
+    },
+    {
+      "case": "S",
+      "observation": {
+        "deadline_basis": "classify_call",
+        "deadline_supplied_to_classify": [
+          "None"
+        ],
+        "env": {
+          "DISABLE_ROUTER_TIMEOUT": "1"
+        },
+        "fallback_symbol": {
+          "repr": "'safe-default'",
+          "type": "str"
+        },
+        "findings": [
+          "C1_DISABLED"
+        ],
+        "load": "OK",
+        "module_constant": {
+          "classification": "DISABLED",
+          "present": true,
+          "repr": "None",
+          "type": "NoneType"
+        },
+        "normal_path": {
+          "classify_deadlines": [
+            {
+              "classification": "DISABLED",
+              "repr": "None",
+              "type": "NoneType"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'primary'",
+            "type": "str"
+          }
+        },
+        "oracle_version": "p0a-oracle-v2.0.0",
+        "source_sha256": "0ccb56ad39926ce888a622a34e3e0d1ce10413f4693325df603b143a51d2cea0",
+        "timeout_path": {
+          "classify_deadlines": [
+            {
+              "classification": "DISABLED",
+              "repr": "None",
+              "type": "NoneType"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'safe-default'",
+            "type": "str"
+          },
+          "returned_fallback": true
+        },
+        "verdict": "REJECT",
+        "violation_observed": {
+          "C1": true,
+          "C2": false,
+          "C3": false
+        }
+      },
+      "oracle_v1_comparison": {
+        "failures": [
+          "C1_DISABLED"
+        ],
+        "verdict": "REJECT"
+      },
+      "probe": "env_enabled",
+      "set": "Set 1",
+      "snapshot": "after"
+    },
+    {
+      "case": "T",
+      "observation": {
+        "deadline_basis": "classify_call",
+        "deadline_supplied_to_classify": [
+          "60.0"
+        ],
+        "env": {
+          "DISABLE_ROUTER_TIMEOUT": null
+        },
+        "fallback_symbol": {
+          "repr": "'safe-default'",
+          "type": "str"
+        },
+        "findings": [
+          "C2_DEADLINE_EXCEEDS_5S"
+        ],
+        "load": "OK",
+        "module_constant": {
+          "classification": "EXCEEDS_5S",
+          "present": true,
+          "repr": "60.0",
+          "type": "float"
+        },
+        "normal_path": {
+          "classify_deadlines": [
+            {
+              "classification": "EXCEEDS_5S",
+              "repr": "60.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'primary'",
+            "type": "str"
+          }
+        },
+        "oracle_version": "p0a-oracle-v2.0.0",
+        "source_sha256": "d51b47f5b861d0f10245e0d62a01b6752e3088ebfa5bcb4b1c4e359040c9caf2",
+        "timeout_path": {
+          "classify_deadlines": [
+            {
+              "classification": "EXCEEDS_5S",
+              "repr": "60.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'safe-default'",
+            "type": "str"
+          },
+          "returned_fallback": true
+        },
+        "verdict": "REJECT",
+        "violation_observed": {
+          "C1": false,
+          "C2": true,
+          "C3": false
+        }
+      },
+      "oracle_v1_comparison": {
+        "failures": [
+          "C2_DEADLINE_EXCEEDS_5S"
+        ],
+        "verdict": "REJECT"
+      },
+      "probe": "env_unset",
+      "set": "Set 1",
+      "snapshot": "after"
+    },
+    {
+      "case": "T",
+      "observation": {
+        "deadline_basis": "classify_call",
+        "deadline_supplied_to_classify": [
+          "5.0"
+        ],
+        "env": {
+          "DISABLE_ROUTER_TIMEOUT": null
+        },
+        "fallback_symbol": {
+          "repr": "'safe-default'",
+          "type": "str"
+        },
+        "findings": [],
+        "load": "OK",
+        "module_constant": {
+          "classification": "WITHIN_BOUND",
+          "present": true,
+          "repr": "5.0",
+          "type": "float"
+        },
+        "normal_path": {
+          "classify_deadlines": [
+            {
+              "classification": "WITHIN_BOUND",
+              "repr": "5.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'primary'",
+            "type": "str"
+          }
+        },
+        "oracle_version": "p0a-oracle-v2.0.0",
+        "source_sha256": "98ec3e10ba5f44514cdd7c58a4c915b415a08169a11dbb990f1a0e8c5a14519e",
+        "timeout_path": {
+          "classify_deadlines": [
+            {
+              "classification": "WITHIN_BOUND",
+              "repr": "5.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'safe-default'",
+            "type": "str"
+          },
+          "returned_fallback": true
+        },
+        "verdict": "ACCEPT",
+        "violation_observed": {
+          "C1": false,
+          "C2": false,
+          "C3": false
+        }
+      },
+      "oracle_v1_comparison": {
+        "failures": [],
+        "verdict": "ACCEPT"
+      },
+      "probe": "env_unset",
+      "set": "Set 1",
+      "snapshot": "before"
+    },
+    {
+      "case": "U",
+      "observation": {
+        "deadline_basis": "classify_call",
+        "deadline_supplied_to_classify": [
+          "5.0"
+        ],
+        "env": {
+          "DISABLE_ROUTER_TIMEOUT": null
+        },
+        "fallback_symbol": {
+          "repr": "'safe-default'",
+          "type": "str"
+        },
+        "findings": [
+          "C3_NO_FALLBACK"
+        ],
+        "load": "OK",
+        "module_constant": {
+          "classification": "WITHIN_BOUND",
+          "present": true,
+          "repr": "5.0",
+          "type": "float"
+        },
+        "normal_path": {
+          "classify_deadlines": [
+            {
+              "classification": "WITHIN_BOUND",
+              "repr": "5.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'primary'",
+            "type": "str"
+          }
+        },
+        "oracle_version": "p0a-oracle-v2.0.0",
+        "source_sha256": "f7204a7dbf85265f79feef54eb86b38936562701d66894380d1c33917a15821a",
+        "timeout_path": {
+          "classify_deadlines": [
+            {
+              "classification": "WITHIN_BOUND",
+              "repr": "5.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "raised",
+            "type": "TimeoutError"
+          },
+          "returned_fallback": false
+        },
+        "verdict": "REJECT",
+        "violation_observed": {
+          "C1": false,
+          "C2": false,
+          "C3": true
+        }
+      },
+      "oracle_v1_comparison": {
+        "failures": [
+          "C3_NO_FALLBACK"
+        ],
+        "verdict": "REJECT"
+      },
+      "probe": "env_unset",
+      "set": "Set 1",
+      "snapshot": "after"
+    },
+    {
+      "case": "U",
+      "observation": {
+        "deadline_basis": "classify_call",
+        "deadline_supplied_to_classify": [
+          "5.0"
+        ],
+        "env": {
+          "DISABLE_ROUTER_TIMEOUT": null
+        },
+        "fallback_symbol": {
+          "repr": "'safe-default'",
+          "type": "str"
+        },
+        "findings": [],
+        "load": "OK",
+        "module_constant": {
+          "classification": "WITHIN_BOUND",
+          "present": true,
+          "repr": "5.0",
+          "type": "float"
+        },
+        "normal_path": {
+          "classify_deadlines": [
+            {
+              "classification": "WITHIN_BOUND",
+              "repr": "5.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'primary'",
+            "type": "str"
+          }
+        },
+        "oracle_version": "p0a-oracle-v2.0.0",
+        "source_sha256": "98ec3e10ba5f44514cdd7c58a4c915b415a08169a11dbb990f1a0e8c5a14519e",
+        "timeout_path": {
+          "classify_deadlines": [
+            {
+              "classification": "WITHIN_BOUND",
+              "repr": "5.0",
+              "type": "float"
+            }
+          ],
+          "result": {
+            "kind": "returned",
+            "repr": "'safe-default'",
+            "type": "str"
+          },
+          "returned_fallback": true
+        },
+        "verdict": "ACCEPT",
+        "violation_observed": {
+          "C1": false,
+          "C2": false,
+          "C3": false
+        }
+      },
+      "oracle_v1_comparison": {
+        "failures": [],
+        "verdict": "ACCEPT"
+      },
+      "probe": "env_unset",
+      "set": "Set 1",
+      "snapshot": "before"
+    }
+  ],
+  "schema": "p0a-oracle-observations/v1"
+}

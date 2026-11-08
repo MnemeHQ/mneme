@@ -1,0 +1,15 @@
+{"type": "system", "subtype": "init", "model": "claude-opus-4-8[1m]", "claude_code_version": "2.1.202", "permissionMode": "acceptEdits", "cwd": "<LIVE>\\H1c-stop\\ws", "session_id": "<SESSION>"}
+{"type": "system", "subtype": "thinking_tokens", "estimated_tokens": 50, "estimated_tokens_delta": 50, "session_id": "<SESSION>"}
+{"type": "system", "subtype": "thinking_tokens", "estimated_tokens": 115, "estimated_tokens_delta": 65, "session_id": "<SESSION>"}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "thinking", "omitted": true}]}}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": "OK\n\nNO-PROBE-TOKEN"}]}}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "thinking", "omitted": true}]}}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": "MNEME-PROBE-f2711cb65071909f"}]}}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": "MNEME-PROBE-f2711cb65071909f"}]}}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": "MNEME-PROBE-f2711cb65071909f"}]}}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": "MNEME-PROBE-f2711cb65071909f"}]}}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": "MNEME-PROBE-f2711cb65071909f"}]}}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": "MNEME-PROBE-f2711cb65071909f"}]}}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": "MNEME-PROBE-f2711cb65071909f"}]}}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": "MNEME-PROBE-f2711cb65071909f"}]}}
+{"type": "result", "subtype": "success", "is_error": false, "api_error_status": null, "duration_ms": 16643, "duration_api_ms": 14808, "ttft_ms": 2752, "ttft_stream_ms": 1479, "time_to_request_ms": 375, "num_turns": 1, "result": "MNEME-PROBE-f2711cb65071909f", "stop_reason": "end_turn", "session_id": "<SESSION>", "total_cost_usd": 0.16762000000000002, "permission_denials": [], "terminal_reason": "completed", "fast_mode_state": "off"}

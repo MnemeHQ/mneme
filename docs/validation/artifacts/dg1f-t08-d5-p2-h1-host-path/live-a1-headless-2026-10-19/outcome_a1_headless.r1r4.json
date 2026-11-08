@@ -1,0 +1,88 @@
+{
+  "path_id": "H1c-sm",
+  "path_type": "command_lifecycle_event",
+  "event": "Stop",
+  "developer_also": "not_observed",
+  "harness": "headless (-p, stream-json)",
+  "rules": "as-run table + R1-R4 (#551, #561)",
+  "emitter_invocations": 1,
+  "control_hook_invocations": 1,
+  "nonce_locations": [
+    {
+      "source": "transcript",
+      "line": 9,
+      "entry_type": "attachment",
+      "entry_subtype": null,
+      "json_path": "attachment.stdout",
+      "category": "host_output"
+    },
+    {
+      "source": "transcript",
+      "line": 10,
+      "entry_type": "attachment",
+      "entry_subtype": null,
+      "json_path": "attachment.content",
+      "category": "host_output"
+    }
+  ],
+  "transcript_collected": true,
+  "echoed": false,
+  "turns": 1,
+  "turns_control": 1,
+  "permissions": {
+    "emitter": {
+      "unmatched_denials": []
+    },
+    "control": {
+      "unmatched_denials": []
+    },
+    "comparison": {
+      "equivalent_requests": [],
+      "mismatched_decisions": [],
+      "non_equivalent_attempts": {
+        "emitter": [],
+        "control": []
+      }
+    }
+  },
+  "host_events": {
+    "emitter_subtypes": [],
+    "control_subtypes": [],
+    "indicators": {
+      "emitter": {},
+      "control": {},
+      "mismatched": []
+    }
+  },
+  "controls": {
+    "path_type_emitter": {
+      "init_present": true,
+      "result_success": true,
+      "hook_invocations": 1,
+      "no_stop_reentry": true,
+      "holds": true
+    },
+    "path_type_control_arm": {
+      "init_present": true,
+      "result_success": true,
+      "hook_invocations": 1,
+      "no_stop_reentry": true,
+      "holds": true
+    },
+    "common": {
+      "permission_decisions_equal_for_equivalent_requests": true,
+      "host_indicators_equal": true,
+      "result_not_error": true,
+      "stop_invocations_equal": true
+    }
+  },
+  "side_effect_observed": false,
+  "label": "NOT_DELIVERED",
+  "passes_path": false,
+  "reasons": [],
+  "a1": {
+    "run": "headless",
+    "rules": "A1 (#555) on as-run table + R1-R4 (#551, #561)",
+    "host_interference": []
+  }
+}

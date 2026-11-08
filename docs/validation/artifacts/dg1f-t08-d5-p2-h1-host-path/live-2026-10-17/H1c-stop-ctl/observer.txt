@@ -1,0 +1,14 @@
+arm=H1c-stop-ctl
+claude_version=2.1.202 (Claude Code)
+claude_bin=<CLAUDE_BIN>
+harness_head=06d83f8229720a213d0e1f97cf6ebe406facd098
+sources=project
+tools=Read
+notes_before=b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060
+bash_out_before=absent
+settings_sha=bee4586f2d014d76523d3267ce8695dcc43fd04f7fc59832551d681145a637be
+date=2026-10-17T17:52:50Z
+claude_exit=0
+notes_after=b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060
+bash_out_after=absent
+transcript_collected=yes

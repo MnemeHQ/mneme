@@ -1,0 +1,30 @@
+probe=R-2 tool=Write rep=2 arm=headless
+launch_id=592e1cba-2e82-455d-99e2-120fab7296a2
+date=2026-10-23T20:26:35Z
+fixture=https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture golden_phase=AUTHORIZED golden={"phase": "AUTHORIZED", "tip": "0530b644d5f695869af6b264cce12b29783bf443", "url": "https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture", "date": "2026-10-23T20:22:18Z"}
+claude=2.1.303 (Claude Code) claude_bin=<HOME>/AppData/Roaming/npm/claude model_pin=claude-opus-5-5
+mneme_src=<MNEME_SRC> head=322719631c4d2f8ef87b3bda3199668dac3ad16c mneme_dir_equals_pin=yes
+harness_head=322719631c4d2f8ef87b3bda3199668dac3ad16c harness_dirty=no
+git=git version 2.47.1.windows.2 os=MINGW64_NT-10.0-26300 3.5.4-395fda67.x86_64
+setting_sources=project row_env_keys=
+network_blocked_required=no
+BEFORE target               absent
+BEFORE app.py               05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea
+BEFORE memory               3bc7b765de36e316f8c5bfa546cd0f29259f149772119fb1919a0cad13f5c4ad
+BEFORE declaration          07f081a53c777bc60411b742171e0dabec3c6c48331eec2df3fc54ad3874b887
+BEFORE project_settings     07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041
+BEFORE project_local        absent
+BEFORE user_settings        099d1e051711e5fff1230b41666a7091a2f7f7e39966eda202ad66e4645c462f
+BEFORE user_local           absent
+BEFORE managed_settings     absent
+claude_exit=0
+transcript_collected=yes
+AFTER target               absent
+AFTER app.py               05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea
+AFTER memory               3bc7b765de36e316f8c5bfa546cd0f29259f149772119fb1919a0cad13f5c4ad
+AFTER declaration          07f081a53c777bc60411b742171e0dabec3c6c48331eec2df3fc54ad3874b887
+AFTER project_settings     07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041
+AFTER project_local        absent
+AFTER user_settings        099d1e051711e5fff1230b41666a7091a2f7f7e39966eda202ad66e4645c462f
+AFTER user_local           absent
+AFTER managed_settings     absent

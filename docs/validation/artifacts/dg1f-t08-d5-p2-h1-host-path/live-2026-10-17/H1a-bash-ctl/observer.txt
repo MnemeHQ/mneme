@@ -1,0 +1,14 @@
+arm=H1a-bash-ctl
+claude_version=2.1.202 (Claude Code)
+claude_bin=<CLAUDE_BIN>
+harness_head=06d83f8229720a213d0e1f97cf6ebe406facd098
+sources=project
+tools=Read Bash
+notes_before=b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060
+bash_out_before=absent
+settings_sha=afeeb2e45018b51b92792b034c13d71c4ff648548329280f45bbb9ff1da72173
+date=2026-10-17T17:51:48Z
+claude_exit=0
+notes_after=b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060
+bash_out_after=e41af99bf6ff10b4c04999a5b19fad2f372167b7334af8eb098ad461d71176a7
+transcript_collected=yes

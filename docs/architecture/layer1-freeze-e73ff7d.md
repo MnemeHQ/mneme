@@ -674,6 +674,1186 @@ The existing DG1B1, DG1F-C1a and #260 freeze amendments remain unchanged.
 
 ---
 
+## Amendment — authorize ADR-033 C2a PreToolUse availability routing (2026-10-20)
+
+> This is an authorization for **routing, classification and diagnostics at one
+> boundary**. It does not authorize any availability refusal, verifier,
+> enrollment or revocation, fail-closed enforcement, or any change to other
+> boundaries.
+
+**Change:** at the Claude Code direct-write boundary (`Edit|Write|MultiEdit`,
+`handle_event` in `mneme/integrations/claude_code/hook.py`), detect a local
+`.mneme/availability.json` declaration before the memory early return. Without
+a declaration, behavior is byte-identical to `main`. With one, run today's
+check path unchanged and emit a diagnostic that names
+`AUTHORIZATION_UNVERIFIABLE(VERIFIER_CONFIG_MISSING)`, the evaluation state,
+and any SS-3 mismatch or partial-evaluation violations.
+
+**Sections referenced:** the Freeze Anchor **Status** clause ("No behavioral
+change to retrieval or enforcement without an explicit charter amendment") and
+the Amendment Procedure below.
+
+**Rationale (Amendment Procedure §3(b)).** A distinct behavioral charter was
+**already merged** before this amendment:
+[Reliable Enforcement C2a PreToolUse availability routing charter](../plans/2026-10-20-reliable-enforcement-c2a-availability-routing-charter.md),
+PR [#574](https://github.com/MnemeHQ/mneme/pull/574), squash `c49d7008`, under
+accepted [ADR-033](../adr/ADR-033-opt-in-fail-closed-enforcement.md) (PR
+[#483](https://github.com/MnemeHQ/mneme/pull/483), squash `78459d1a`). Charter
+§9 requires this amendment before implementation. No behavior change is
+retroactively justified.
+
+**Governing authority:** accepted ADR-033, ADR-021 (fail-open transport
+policy), ADR-017, ADR-020, ADR-029, ADR-030, ADR-031; the merged C1 (#260)
+verdict-consistency and T-08 slice-1 charters; the merged C2a charter.
+
+### Authorized change — C2a only (charter §3)
+
+- **Declaration detection** (charter §3.1): before the memory early return in
+  `handle_event`, walk up from the T-08 slice-1 start directory to the first
+  ancestor containing `.mneme/`, and look for `.mneme/availability.json`
+  there, whether or not memory exists. `MNEME_MEMORY` is not consulted for
+  this.
+- **Declaration format v1** (charter §3.2): the three required keys only;
+  unknown keys preserved and ignored; any other content is "present but
+  invalid".
+- **Verifier interface** (charter §3.3) whose only implementation returns
+  `AUTHORIZATION_UNVERIFIABLE(VERIFIER_CONFIG_MISSING)`, with no network
+  access and no git configuration read. Other outcomes are reachable only
+  through a test seam.
+- **Evaluation-state classifier** (charter §3.4) built on `assess_verdict`,
+  internal only.
+- **Historical payloads and mixed partial results** (charter §§3.5, 3.6):
+  diagnostics on the declaration path only.
+- **Diagnostics** (charter §3.7) on the existing stderr channel, claimed as
+  emitted, not delivered.
+- **The charter §4 regression matrix**, including byte-identical default-open
+  parity (P1) and no network activity (P2).
+
+No other code path is authorized. **No C2a code path may produce an
+availability refusal.**
+
+### Explicitly preserved (unchanged)
+
+This restates merged charter §5.
+
+1. **No declaration → today's behavior,** byte-identical output, the same exit
+   codes, and zero network activity.
+2. **Default fail-open (ADR-021)** for every untrusted, incomplete,
+   missing-memory or error outcome. A trusted complete strict `FAIL` still
+   blocks exactly as today.
+3. **The `mneme check` CLI,** its output, exit codes, the `mneme.check/v1`
+   payload, and the malformed-memory crash path (CI1.4 §7 condition 4).
+4. **`find_memory`,** `MNEME_MEMORY` precedence and T-08 slice-1 selection.
+5. **strict/warn semantics** and the #260 coherence rules in `assess_verdict`.
+6. **Bash, SessionStart and Stop** behavior.
+7. **Canonical decision authority** (ADR-030 §1). The declaration holds no
+   decisions or rules.
+8. **Frozen benchmark fixtures and methodology; `.mneme/project_memory.json`.**
+
+### Not authorized by this amendment
+
+- Any availability refusal; any verifier that contacts a remote or reads git
+  configuration; any enrollment, issuance or revocation command; the C2b
+  declaration fields. These belong to a C2b charter and its own amendment.
+- Live host validation (ADR-033 gate C3) and CI implementation (gate C4).
+- Any change to other boundaries or integrations, CI workflows, rulesets or
+  Actions policy.
+- Any claim that a diagnostic is delivered or that a repository is protected
+  by C2a. The Architecture A limitation stands: **deleting the local
+  declaration can silently disable opt-in fail-closed protection.**
+
+The existing DG1B1, DG1F-C1a, #260 and T-08 slice-1 freeze amendments remain
+unchanged.
+
+---
+
+## Amendment — authorize ADR-033 C2b verified availability authorization (2026-10-21)
+
+> This authorizes **one verifier, one declaration extension, three authority
+> commands and one refusal route at one boundary**. It does not authorize
+> Architecture B, any cache, credential use, forge API, CI change, or any
+> change to other boundaries.
+
+**Change:** at the Claude Code direct-write boundary (`Edit|Write|MultiEdit`,
+`handle_event` in `mneme/integrations/claude_code/hook.py`), replace the C2a
+verifier stub with a live verifier of the remote default-branch tip, per
+charter §§3-5. Refuse a supported direct write with an operational
+UNEVALUATED diagnostic only when authorization is verified as `AUTHORIZED`
+and a charter §5.3 R3-R6 condition holds. Add
+`mneme availability status|authorize|revoke` per charter §6. Without a local
+declaration, behavior is byte-identical to `main`.
+
+**Sections referenced:** the Freeze Anchor **Status** clause ("No behavioral
+change to retrieval or enforcement without an explicit charter amendment") and
+the Amendment Procedure below.
+
+**Rationale (Amendment Procedure §3(b)).** A distinct behavioral charter was
+**already merged** before this amendment:
+[Reliable Enforcement C2b verified availability authorization charter](../plans/2026-10-21-reliable-enforcement-c2b-availability-authorization-charter.md),
+PR [#587](https://github.com/MnemeHQ/mneme/pull/587), squash `90dc7cab`,
+accepted with every §16 decision pinned. It sits under accepted
+[ADR-033](../adr/ADR-033-opt-in-fail-closed-enforcement.md) (PR
+[#483](https://github.com/MnemeHQ/mneme/pull/483), squash `78459d1a`) and
+follows C2a (PR [#576](https://github.com/MnemeHQ/mneme/pull/576), squash
+`72b6d04a`). Charter §14 requires this amendment before implementation. No
+behavior change is retroactively justified.
+
+**Governing authority:** accepted ADR-033 (Architecture A), ADR-021, ADR-022,
+ADR-029, ADR-030; the merged C1 (#260) verdict-consistency, T-08 slice-1, C2a
+and C2b charters.
+
+### Authorized change — C2b only (charter §§3-9)
+
+- **Verifier** (charter §3): runs only when a local declaration is present.
+  `origin` URL from the repository's own config file; HTTPS only; Git run in
+  a temporary bare repository with a constructed environment (no system or
+  global config, proxies, `insteadOf`, credential helpers or remote-tracking
+  refs); revision is the live remote `HEAD` symref tip, fetched by object id;
+  one 15-second budget; reasons from ADR-033 §4.3's closed set; no persistent
+  cache.
+- **Declaration extension** (charter §4): additive `repository` and
+  `authority.events` fields on `mneme.availability/v1`; hash-chained,
+  append-only events ordered by position, never by timestamps; activation
+  evidence bound by `activated_at` and the protected decision set; review
+  fields recorded as attested, never presented as verified.
+- **State resolution** (charter §5): `AUTHORIZED` and `REVOKED` from the tip's
+  event list; first-parent history walked only when the tip has no
+  declaration, for `VERIFIED_ABSENT` or RR-7 `EVIDENCE_INVALID`; local
+  relation `MATCH|BEHIND|DIVERGES|INVALID`; routing R0-R8.
+- **Authority operations** (charter §6): `mneme availability status` is
+  read-only. `authorize` and `revoke` require their respective live
+  authorization preconditions and interactive TTY confirmation. Only the
+  mutating commands write `.mneme/availability.json`. None commits, pushes,
+  merges or modifies canonical memory.
+- **Hook integration** (charter §7): the default verifier replaced; one
+  `local_relation` input added to `routing_refuses`; the verifier seam stays
+  test-only; the in-process benchmark transport documented as unsupported
+  under `AUTHORIZED`.
+- **Diagnostics** (charter §8): operational UNEVALUATED refusals that never
+  carry `architectural decision violated` or submitted content, claimed as
+  emitted, not delivered.
+- **The charter §9 regression matrix** (V1-V18, H1-H15, A1-A5) and the
+  charter §12 acceptance evidence, including the latency measurement.
+
+No other code path is authorized. **The only new refusals are charter §5.3
+R3-R6 under a verified `AUTHORIZED` baseline.**
+
+### Explicitly preserved (unchanged)
+
+This restates merged charter §10.
+
+1. **No declaration → today's behavior,** byte-identical output, the same exit
+   codes, and zero verifier calls.
+2. **`REVOKED`, `VERIFIED_ABSENT` and `AUTHORIZATION_UNVERIFIABLE` never
+   refuse on availability.** A trusted complete strict `FAIL` still blocks
+   exactly as today under every authorization state.
+3. **The `mneme check` CLI,** its output, exit codes, the `mneme.check/v1`
+   payload, and the malformed-memory crash path (CI1.4 §7 condition 4).
+4. **`find_memory`,** `MNEME_MEMORY` precedence, T-08 slice-1 selection, and
+   C2a declaration discovery and policy-root rule.
+5. **strict/warn semantics,** `assess_verdict`, `DecisionRetriever`,
+   `ConflictDetector` and ADR-020 applicability.
+6. **Bash, SessionStart and Stop** behavior (ADR-021).
+7. **Canonical decision authority** (ADR-030 §1), `setup → active` and
+   `mneme protect activate`. The declaration holds no decisions or rules.
+8. **Frozen benchmark fixtures and methodology; `.mneme/project_memory.json`.**
+
+### Not authorized by this amendment
+
+- Architecture B: any host enrollment record, high-water mark or other trusted
+  state outside the repository; any persistent cache.
+- Any verification trigger other than the local declaration.
+- Credential helpers, tokens, SSH or any non-HTTPS verifier transport; forge
+  API calls.
+- Refusals outside `PreToolUse` `Edit|Write|MultiEdit`; Bash class-A handling.
+- Live host validation (ADR-033 gate C3) and CI implementation (gate C4).
+- Any change to other boundaries or integrations, CI workflows, rulesets or
+  Actions policy.
+- Any claim beyond charter §13. C2b's evidence is hook-level only, and the
+  Architecture A limitation stands: **deleting the local declaration can
+  silently disable opt-in fail-closed protection.**
+
+The existing DG1B1, DG1F-C1a, #260, T-08 slice-1 and C2a freeze amendments
+remain unchanged.
+
+## Amendment — authorize ADR-034 G1 whole-file numeric audit (2026-10-22)
+
+> This authorizes **one new typed rule, `FORBID_NUMERIC_ABOVE`, evaluated only
+> as a whole-file Python audit (G1)**, together with the schema, CLI and
+> result-consumer extensions it needs and explicit `ConflictDetector`
+> noncoverage diagnostics. It does not authorize pre-write numeric
+> enforcement, CI, agent orchestration, or any availability-policy change.
+
+**Change:** implement `FORBID_NUMERIC_ABOVE` exactly as specified by the
+accepted behavioral charter:
+
+- authoring, canonical persistence and identity under schema v2 with the
+  `numeric_upper_bound_rule` semantic feature (§4);
+- the deterministic matcher (§5);
+- per-rule matcher status, evidence binding, and an additive
+  `mneme.check/v1` payload (§6);
+- the `mneme check --source-file` complete-source audit transport, under the
+  single ADR-020 policy root (§3);
+- consumer-trust adaptation in the Claude Code hook, the Agent SDK and
+  LangChain, so that trusted violations stay actionable alongside matcher
+  incompleteness (§6);
+- `ConflictDetectionResult.noncoverage`, which does not change
+  `evaluation_complete` (§7).
+
+Checks that involve no numeric rule must produce byte-identical
+`mneme.check/v1` payloads and exit codes.
+
+**Sections referenced:** the Freeze Anchor **Status** clause ("No behavioral
+change to retrieval or enforcement without an explicit charter amendment") and
+the Amendment Procedure below.
+
+**Rationale (Amendment Procedure §3(b)).** Two charter-level decisions were
+**already made** before this amendment:
+
+- [ADR-034](../adr/ADR-034-static-numeric-upper-bound-typed-rule.md), accepted
+  as a design contract with its evaluation criteria frozen (PR
+  [#594](https://github.com/MnemeHQ/mneme/pull/594), squash `2298c946`). Its
+  held-out corpus v1 is frozen (PR
+  [#600](https://github.com/MnemeHQ/mneme/pull/600), squash `e2998742`).
+- The distinct
+  [ADR-034 G1 behavioral charter](../plans/2026-10-22-adr-034-g1-behavioral-charter.md),
+  accepted by the owner after two architecture reviews and merged (PR
+  [#602](https://github.com/MnemeHQ/mneme/pull/602), squash `83af67ba`).
+
+Charter §1 and §9 require this amendment before implementation. No behavior
+change is retroactively justified.
+
+**Pinned regressions:** charter §8.C items 1–9. They cover:
+
+- old-reader and downgrade refusal;
+- golden rule IDs;
+- the R1–R18 numeric vectors;
+- byte-identical no-numeric payloads;
+- the hook, Agent SDK and LangChain mixed-result matrix, including the
+  closed-availability refusal;
+- `ConflictDetector` noncoverage with `evaluation_complete` unchanged.
+
+Held-out scoring (§8.D) runs only after the implementation commit is frozen,
+under a separate owner authorization.
+
+**Recorded operating consequence (charter §6, F2).** At the edit gate, any
+applicable numeric rule yields `MATCHER_UNEVALUATED` /
+`INCOMPLETE_SOURCE_INPUT`, so a repository with an authorized closed
+availability declaration (ADR-033/C2b) refuses every nonempty edit on an
+APPLIED numeric path as `EVALUATION_INCOMPLETE`. **`FORBID_NUMERIC_ABOVE` must
+not be activated on such paths until a separate G2 authorization.**
+
+### Not authorized by this amendment
+
+- Pre-write numeric denial or any G2 edit-gate numeric evaluation.
+- CI integration or workflow changes.
+- Any ADR-033 availability-policy change, or any exception added for numeric
+  rules.
+- Agent orchestration, MCP enforcement, or new numeric forms (keyword
+  matching, exclusive bounds, unit conversion, constant propagation) or other
+  languages.
+- Changes to `DecisionRetriever` ranking, `ConflictDetector` response-text
+  matching, governance authority, or memory import of ADR-034.
+- Any enforcement or production claim before independent held-out scoring
+  passes.
+- Implementation by any session or person with access to the held-out corpus,
+  its answer key, or the corpus-author or orchestrating session transcripts.
+
+The existing DG1B1, DG1F-C1a, #260, T-08 slice-1, C2a and C2b freeze
+amendments remain unchanged.
+
+---
+
+## Amendment — authorize ADR-033 C2b Amendment 1: UNVERIFIABLE diagnostic delivery (2026-10-22)
+
+> This authorizes **one additional stdout output at one boundary**. It does
+> not authorize any refusal, permission or exit-code change, any other
+> availability state, `systemMessage`, or any warn-mode change beyond the
+> charter's 17.3 append.
+
+**Change:** at the Claude Code direct-write boundary (`handle_event`, the
+`emit_availability` path in `mneme/integrations/claude_code/`), when a local
+declaration is present, authorization is `AUTHORIZATION_UNVERIFIABLE` and the
+hook exits 0, write exactly one stdout object
+`{"hookSpecificOutput": {"hookEventName": "PreToolUse", "additionalContext": <17.2 text>}}`.
+In the warn-mode `defer` case, append the 17.2 text to the existing
+`permissionDecisionReason` instead, still as one object. Exit codes, stderr
+and permission behavior are unchanged. Without a declaration, behavior is
+byte-identical to `main`.
+
+**Sections referenced:** the Freeze Anchor **Status** clause ("No behavioral
+change to retrieval or enforcement without an explicit charter amendment") and
+the Amendment Procedure below.
+
+**Rationale (Amendment Procedure §3(b)).** A distinct charter amendment was
+**already merged** before this amendment:
+[C2b charter section 17](../plans/2026-10-21-reliable-enforcement-c2b-availability-authorization-charter.md),
+PR [#605](https://github.com/MnemeHQ/mneme/pull/605), squash `faec11cb`. It
+follows the C3 Batch R evidence record
+([#601](https://github.com/MnemeHQ/mneme/pull/601), squash `be88c133`;
+R-1 Edit-2, finding F-R2) and the F-R2 assessment
+([#604](https://github.com/MnemeHQ/mneme/pull/604), squash `f774dbde`), whose
+Option 1 the owner accepted on 2026-10-22, under accepted
+[ADR-033](../adr/ADR-033-opt-in-fail-closed-enforcement.md). Charter §17.8
+requires this amendment before implementation. No behavior change is
+retroactively justified.
+
+**Governing authority:** accepted ADR-033 §4.3 ("a visible proceed") and §7
+(no submitted content in diagnostics); the merged C2a and C2b charters,
+including C2b section 17.
+
+### Authorized change — C2b Amendment 1 only (charter §§17.2-17.4)
+
+- **Trigger** (17.2): a local declaration is present, the verification result
+  is `AUTHORIZATION_UNVERIFIABLE` (any reason), and the hook exits 0 on that
+  invocation.
+- **Output** (17.2): exactly one stdout JSON object with
+  `hookSpecificOutput.hookEventName = "PreToolUse"` and `additionalContext`
+  set to the fixed, factual, ASCII-only 17.2 text (reason code; one extra
+  sentence on an SS-3 mismatch). No `permissionDecision`, no
+  `permissionDecisionReason`, no `systemMessage`. The text never contains
+  submitted content, decision text, rule values, triggers or paths, and never
+  states or implies the edit was checked, verified, compliant or safe.
+- **Warn-mode `defer` case** (17.3): one object only. The existing warn-mode
+  object is kept as it is, with the 17.2 text appended to
+  `permissionDecisionReason` on a new line, and no `additionalContext`.
+  Delivery to the model is not claimed for this case.
+- **The charter §17.4 regression matrix** (A1-A10), including byte-identical
+  no-declaration parity (C2a P1/P2) and unchanged refusals.
+
+No other code path is authorized.
+
+### Explicitly preserved (unchanged)
+
+This restates merged charter §17.6.
+
+1. **No declaration → today's behavior,** byte-identical output, the same exit
+   codes, and zero verifier calls.
+2. **ADR-033 Architecture A, including F-R1:** an unverifiable baseline still
+   produces no availability refusal. There is no cache, no retry, no grace
+   window and no Architecture B.
+3. **All refusals and exit codes** (C2b §5.3), **every existing stderr line,**
+   and **permission behavior.** No permission decision is added, removed or
+   altered.
+4. **`AUTHORIZED`, `REVOKED` and `VERIFIED_ABSENT`** outputs.
+5. **Warn-mode output,** except the 17.3 append.
+6. **`mneme check`,** the verifier, the declaration schema, and the
+   `mneme availability` commands.
+7. **Bash, SessionStart and Stop** behavior (ADR-021).
+8. **Frozen benchmark fixtures and methodology; `.mneme/project_memory.json`.**
+
+### Not authorized by this amendment
+
+- Any `systemMessage` (user-facing) output.
+- `additionalContext` for any state other than `AUTHORIZATION_UNVERIFIABLE`.
+- Any warn-mode change beyond the 17.3 append, including the separate finding
+  F-W1 (`defer` semantics).
+- Any claim that F-R2 is closed before the charter §17.5 live proof on Claude
+  Code 2.1.303. That proof, and its harness change, are authorized
+  separately.
+- Any C3 run, R-1 re-run or C4 work. The #601 record is never rewritten.
+
+The existing DG1B1, DG1F-C1a, #260, T-08 slice-1, C2a, C2b and ADR-034 G1
+freeze amendments remain unchanged.
+
+---
+
+## Amendment — record the ADR-034 G1 F-1 conformance correction (#613) (2026-10-22)
+
+> This is a **record**, not a new authorization. It states that #613 brought
+> shipped behavior into line with the ADR-034 G1 amendment above, after this
+> document's description of that amendment's charter became inaccurate. It
+> authorizes no further behavior.
+
+**What happened.** The ADR-034 G1 amendment authorizes implementing
+`FORBID_NUMERIC_ABOVE` "exactly as specified by the accepted behavioral
+charter", citing that charter at squash `83af67ba`. That charter's §3 item 4
+conditioned the non-source result on "an APPLIED numeric rule". It therefore
+let `mneme check --input <file>` without `--target-path` return a clean PASS
+when the input file's own path was EXCLUDED, which contradicts accepted
+ADR-034 §6 ("never a clean result"). Held-out scoring found this as F-1
+([results record](../validation/adr-034-g1-heldout-scoring-2026-10-22.md),
+#612, squash `f25f0e84`).
+
+PR [#613](https://github.com/MnemeHQ/mneme/pull/613) (squash `b0dc1a14`),
+owner-approved, corrected it:
+
+- in `mneme/enforcer.py` and `mneme/cli.py`, for `--input` without
+  `--target-path`, every numeric rule yields `MATCHER_UNEVALUATED` /
+  `INCOMPLETE_SOURCE_INPUT`, whatever the input path's applicability;
+- in the shared trust validator (`mneme/integrations/claude_code/hook.py`,
+  also used by the Agent SDK and LangChain), that record is accepted on an
+  EXCLUDED or UNKNOWN trace only in that case, and contradictory payloads stay
+  untrusted;
+- a dated erratum to the charter's §3 item 4 records the correction.
+
+**Sections referenced:** the ADR-034 G1 amendment above, the Freeze Anchor
+**Status** clause, and the Amendment Procedure below.
+
+**Rationale (Amendment Procedure §3(a) and §3(b)).**
+
+- **(a)** The G1 amendment's description of the authorized behavior relied on
+  charter text that was defective against ADR-034 §6, the governing contract.
+  This record corrects that description.
+- **(b)** The charter correction was already made, in the §3 item 4 erratum
+  merged with #613.
+
+**On Amendment Procedure §4.** #613 merged before this record. This entry
+does not justify a new behavioral change after the fact. The corrected
+behavior is the behavior ADR-034 §6 already required, and the G1 amendment
+already authorized implementing ADR-034. Whether that reading satisfies §4 is
+the owner's decision when merging this record.
+
+**Verification (from #613, not re-run here):** public regression tests only.
+The F-1 behavior has **no** blind held-out evidence. G1 stays FAIL, and sealed
+v1 is not re-scored. Independent validation of the corrected implementation
+is planned separately as ADR-034 M4.
+
+### Explicitly preserved (unchanged by #613)
+
+1. `--input` **with** `--target-path`: APPLIED is non-source, and EXCLUDED
+   stays EXCLUDED with no matcher record.
+2. `--source-file` behavior.
+3. `FORBID_LITERAL` behavior and identities.
+4. Payloads and exit codes of checks involving no numeric rule, which stay
+   byte-identical.
+5. Gate surfaces (hook, Agent SDK, LangChain): they always pass
+   `--target-path`, so their behavior is unchanged.
+
+### Recorded consequence
+
+With numeric rules in memory, `mneme check --input` without `--target-path`
+exits 2 for every input file, including a decision's own policy source. This
+repository's memory contains no numeric rule today.
+
+### Not authorized by this record
+
+- Any behavior beyond #613 as merged.
+- G2 pre-write numeric evaluation, CI integration, any ADR-033
+  availability-policy change, or new numeric forms.
+- Any blind-validation, enforcement or production claim for the corrected
+  implementation.
+- Re-scoring or reuse of sealed v1.
+
+The existing DG1B1, DG1F-C1a, #260, T-08 slice-1, C2a, C2b, ADR-034 G1 and
+C2b Amendment 1 freeze amendments remain unchanged.
+
+---
+
+## Amendment — authorize ADR-034 G2-1 pre-write numeric check for new-file Write (2026-10-24)
+
+> This authorizes **one bounded G2 slice**: a pre-write
+> `FORBID_NUMERIC_ABOVE` check for a Claude Code `Write` that creates a new
+> `.py` file whose target path the checker has verified absent. It covers
+> the new check input, hook routing, consumer-trust rules and evidence the
+> slice needs. It does not authorize existing-file delta attribution, CI,
+> other mutation surfaces, any availability-policy change, or any
+> enforcement claim before independent validation passes.
+
+**Change:** implement exactly what the accepted
+[ADR-034 G2-1 behavioral charter](../plans/2026-10-24-adr-034-g2-1-behavioral-charter.md)
+specifies:
+
+- **The new check input (§3).** `mneme check --proposed-new-file <carrier>
+  --target-path <P>`, a third member of the required input group.
+  - The checker establishes ADR-034 §6a preconditions 1–4 itself: verified
+    absence, no link components, inside the policy root, `.py`.
+  - If any of those fail, the result is the legacy `--input` result,
+    byte-identical.
+  - An invalid UTF-8 carrier (precondition 5) is an operational error.
+  - The input has its own target-binding guard.
+  - The subject is relabelled `proposed_new_source` only when a numeric rule
+    is `APPLIED`. Otherwise the result is byte-identical to `--input` on the
+    same carrier.
+- **Claude Code `PreToolUse` routing for `Write` only (§4).**
+  - A dedicated `lstat` absence probe, a `.py` target, and content that
+    encodes strictly as UTF-8 are all required.
+  - One checker call per event.
+  - The routed carrier holds exactly `content.encode("utf-8")`, written in
+    binary mode. This is the authorized, routed-only correction of today's
+    text-mode line-ending handling (ADR-034 §7a). No hook-level historical
+    parity is claimed for routed events whose content contains CR.
+  - Routed diagnostic wording comes through a keyword-only caller option
+    whose default keeps today's text.
+  - Every unrouted event is unchanged.
+- **Consumer trust (§5).**
+  - A keyword-only `expected_input` parameter on the shared `assess_verdict`.
+    Its default keeps every existing caller's coherent results unchanged:
+    the Agent SDK/LangChain, `antigravity`, `codex_cli`, `hermes`, `kiro`,
+    and the hook's own unrouted, Stop, Bash and rename calls.
+  - Subject-kind / matcher-reason coherence rules.
+  - Digest and path joins for routed events.
+- **Evidence (§6).**
+  - A host-event binding record per routed event, with a **mandatory** pinned
+    host identity (version and SHA-256 of the executable).
+  - If G2C-O2 adopts it, a validation-only `MNEME_HOOK_EVIDENCE_LOG` seam
+    that is inert when unset.
+
+**Byte-identical guarantees.** Whenever no `FORBID_NUMERIC_ABOVE` rule is
+`APPLIED`, `mneme.check/v1` payloads and exit codes stay byte-identical. That
+includes checks with no numeric rule, as the ADR-034 G1 amendment above
+already requires. The same holds for every unrouted hook event and for every
+other integration's coherent results.
+
+**Sections referenced:** the Freeze Anchor **Status** clause ("No behavioral
+change to retrieval or enforcement without an explicit charter amendment"),
+the ADR-034 G1 amendment above (including its recorded F2 operating
+consequence), and the Amendment Procedure below.
+
+**Rationale (Amendment Procedure §3(b)).** Every charter-level decision was
+**already made** before this amendment:
+
+- **The G2 design proposal,** reviewed twice and merged (PR
+  [#630](https://github.com/MnemeHQ/mneme/pull/630), squash `97143065`).
+- **The ADR-034 amendment.** §6a and §7a, with owner rulings G2-O1 to G2-O6,
+  accepted and folded into
+  [ADR-034](../adr/ADR-034-static-numeric-upper-bound-typed-rule.md),
+  including the reconciliation of precondition 5 and the routed carrier (PR
+  [#631](https://github.com/MnemeHQ/mneme/pull/631), squash `f0c16773`).
+- **The G2-1 behavioral charter,** accepted by the owner after two
+  architecture reviews, with rulings G2C-O1 to G2C-O6 (PR
+  [#634](https://github.com/MnemeHQ/mneme/pull/634), squash `673b8ee0`).
+
+Charter §1 and §9 require this amendment before implementation. No behavior
+change is retroactively justified.
+
+**Pinned regressions:** charter §8.C items 1–10. They cover:
+
+- legacy-parity goldens;
+- the preconditions, including permission errors and invalid UTF-8;
+- the binding guard;
+- numeric outcomes on `proposed_new_source`;
+- hook routing, including the race and H1 cases;
+- the expected-input and coherence trust rules, across every
+  `assess_verdict` consumer;
+- the hook outcome matrix under availability `open` and AUTHORIZED `closed`;
+- evidence, including the mandatory host identity;
+- untouched surfaces;
+- the byte contract (LF, CRLF, lone CR, byte-order mark, non-ASCII, empty).
+
+**Separate authorizations.** These each still need their own owner
+authorization:
+
+- the pinned live host characterization (§8.B);
+- the independent validation corpus, harness and scoring (§8.D), which run
+  only after the implementation commit is frozen.
+
+Implementation and corpus authoring are done by separate sessions. Neither
+gets the other's private evaluation material.
+
+**Recorded operating consequences.**
+
+- **The F2 restriction stays in force.** Under an AUTHORIZED closed
+  availability declaration, a new in-scope file that lacks a declared source
+  is still refused as `EVALUATION_INCOMPLETE`, and any edit to an existing
+  file on an APPLIED numeric path is refused as before. G2-1 narrows F2 only
+  for verified-new files that contain every declared source.
+  `FORBID_NUMERIC_ABOVE` must still not be activated on closed-availability
+  paths.
+- **The unrouted defect is not fixed here.** On Windows, the unrouted path's
+  text-mode carrier doubles CRLF line breaks. This is a pre-existing finding,
+  recorded for a separate reviewed fix.
+
+### Not authorized by this amendment
+
+- Existing-file `Write`, `Edit`, `MultiEdit`, deletion or rename numeric
+  evaluation, or any existing-file delta attribution.
+- Bash (including class-A heredoc new-file writes) or Stop/session-delta
+  numeric evaluation.
+- Agent SDK, LangChain, `antigravity`, `codex_cli`, `hermes`, `kiro` or MCP
+  pre-write coverage. Those integrations change only through the
+  default-preserving validator parameter and the default-preserving
+  diagnostic option.
+- CI integration or workflow changes.
+- Any ADR-033 availability-policy change, or any exception added for numeric
+  rules.
+- A fix to the unrouted carrier's CRLF handling.
+- Changes to the M4 matcher semantics, `DecisionRetriever` ranking,
+  `ConflictDetector`, `FORBID_LITERAL` semantics, persistence or rule
+  identity. No new numeric forms or other languages.
+- `MNEME_HOOK_EVIDENCE_LOG` as a supported user option or as a production
+  evidence store.
+- Activating `FORBID_NUMERIC_ABOVE` in this repository's memory, or
+  importing ADR-034 into it.
+- Any enforcement, "relevant enforcement observed" or production claim
+  before §8.D passes.
+- Implementation by any session or person with access to the G2 validation
+  corpus, its answer key, or the corpus author's transcripts.
+
+The existing DG1B1, DG1F-C1a, #260, T-08 slice-1, C2a, C2b, ADR-034 G1 and
+C2b Amendment 1 freeze amendments, and the G1 F-1 record, remain unchanged.
+
+---
+
+## Amendment — record G2-1 charter §5.1 erratum: explicit `source_file` expected input (2026-10-24)
+
+> This is a **record of a narrow owner ruling (G2C-R1)**. It adds one
+> validator value and one test adapter within the G2-1 authorization above,
+> and corrects that amendment's description of default callers. It
+> authorizes nothing else.
+
+**What happened.** The G2-1 amendment above says the shared
+`assess_verdict` default "keeps every existing caller's coherent results
+unchanged" and lists those callers. The list, and charter §5.1's premise that
+no current consumer sends `--source-file`, both left out an existing caller:
+the ADR-034 M4 scoring child, `benchmarks/adr034_m4/m4_child.py` (`trust`
+command). It applies the default validator to G1 `--source-file` payloads
+(`complete_source_file`). The G2-1 implementation PR
+([#637](https://github.com/MnemeHQ/mneme/pull/637), draft) found this as
+3 failures in `tests/test_adr034_m4_harness.py`.
+
+**Ruling (charter §5.1 erratum, option (c)).**
+
+- **New value, explicit only.** `assess_verdict` gains
+  `expected_input="source_file"`, which accepts only `complete_source_file`,
+  and only when the caller requests it explicitly. The caller decides from
+  its own invocation, never from the payload.
+- **Defaults unchanged.** The default `"input"` stays strict: no subject, or
+  `unverified_input`. Routed writes keep `"proposed_new_file"`.
+- **M4 untouched.** The M4 instrument (`benchmarks/adr034_m4/`, its corpus,
+  criteria, pins and results) is not changed. M4's PASS (#628) stands for
+  the build it pinned.
+- **Current-build regression.** A separately identified post-M4
+  compatibility adapter under `tests/` covers current builds. It is never M4
+  blind scoring or G2 validation evidence.
+- **Historical tests kept.** The existing M4 end-to-end tests that call the
+  trust validator through the unmodified child are marked as historical
+  pinned-build validation, with a reason that cites the erratum. They are
+  not deleted and not edited to pass.
+
+**Sections referenced:** the ADR-034 G2-1 amendment above, the Freeze Anchor
+**Status** clause, and the Amendment Procedure below.
+
+**Rationale (Amendment Procedure §3(a) and §3(b)).**
+
+- **(a)** The G2-1 amendment's list of default callers, and the charter
+  premise it relied on, are defective against the repository as merged.
+  This record corrects that description.
+- **(b)** The owner ruling was already made and is recorded as a dated
+  erratum in charter §5.1, merged with this record.
+
+No implemented behavior is justified after the fact. #637 is a draft, and the
+ruling is recorded before the implementation changes.
+
+**Consequence for the default caller.** On post-G2 builds, the unmodified M4
+child's default call treats `complete_source_file` payloads as untrusted. This
+is accepted. M4 is closed, its instrument is pinned, and current-build
+coverage moves to the compatibility adapter.
+
+### Not authorized by this record
+
+- Any change to `benchmarks/adr034_m4/`, the M4 corpus, criteria, pins or
+  results, or any re-scoring of M4.
+- Adding `complete_source_file` to the default `expected_input`, or letting a
+  payload select its own trusted input kind.
+- Counting the compatibility adapter as blind validation or G2 evidence.
+- Anything else beyond the G2-1 amendment above.
+
+The existing DG1B1, DG1F-C1a, #260, T-08 slice-1, C2a, C2b, ADR-034 G1,
+C2b Amendment 1 and ADR-034 G2-1 freeze amendments, and the G1 F-1 record,
+remain unchanged.
+
+---
+
+## Amendment — authorize the ADR-034 D1 evidence-validator and D2 matcher changes (2026-10-26)
+
+> This authorizes **two bounded implementation changes**, each specified by
+> an ADR-034 amendment that is already merged: D1, per-rule attribution of
+> relevant enforcement (§7b), and D2, function-source resolution by Python
+> lexical scoping (§3a). Each change is delivered as its own reviewed PR. It
+> authorizes no validation claim, no symbol-source change and no other
+> behavior.
+
+**Change 1, D1 (ADR-034 §7b).**
+- **Where:** `relevant_enforcement_observed()` and the evidence record in
+  `mneme/integrations/claude_code/hook.py`.
+- **What:**
+  - per-rule relevance is authoritative, and the event-level value is
+    existential: at least one applied numeric rule is relevantly enforced;
+  - record-wide `evaluation_complete` is kept as a separate fact;
+  - the common host, event, subject, digest, target and provenance bindings
+    stay in place;
+  - a rule never inherits another rule's relevance.
+- **Unchanged:** the hook's blocking decisions, exit codes,
+  availability handling, the strict/warn dispositions and the
+  `mneme.check/v1` payloads.
+- **Pinned regressions:** every row of the §7b table, plus the existing G2-1
+  evidence and tamper tests.
+
+**Change 2, D2 (ADR-034 §3a).**
+- **Where:** function (`call`) source resolution in
+  `mneme/numeric_rule.py`.
+- **What:**
+  - each direct bare-name call site is resolved by Python lexical scoping;
+  - a binding no call site resolves to has no effect;
+  - a call site that resolves to another binding is `UNKNOWN` /
+    `AMBIGUOUS_BINDING`;
+  - module-level rebinding, `global`, escape and undecidable or dynamic
+    resolution stay `AMBIGUOUS_BINDING` and are never clean;
+  - class-body execution order, and any binding static analysis cannot
+    establish, **fail closed**.
+- **Outcome boundary:** D2 may change a strict-mode refusal or warn-mode
+  defer solely because corrected function-source resolution changes a
+  previously unevaluated result into a recognized numeric violation. This is
+  an authorized consequence of the matcher change, **not** permission to
+  change the hook's blocking logic, exit-code mapping, availability handling
+  or strict/warn policy. D1 remains evidence-only.
+- **Pinned regressions:**
+  - scope-resolution cases: class body versus method, parameter, nested
+    function, enclosing scope, comprehension, `global`/`nonlocal`, dynamic
+    constructs, and the D2 shapes;
+  - the public M4 R1–R18 vectors and the G1 regression suite;
+  - golden rule IDs, and payloads for checks with no numeric rule, which
+    stay byte-identical.
+
+**Sections referenced:** the Freeze Anchor **Status** clause, the ADR-034 G1
+and G2-1 amendments above, and the Amendment Procedure below.
+- The G1 amendment and the G2-1 amendment both state that M4 matcher
+  semantics are not authorized for change.
+- Change 2 is an explicit, narrow exception to that, for the function source
+  only.
+
+**Rationale (Amendment Procedure §3(b)).** Every charter-level decision was
+**already made**:
+- **Validation result:** the G2-1 blind validation results record (#666,
+  squash `cec27ea9`, verdict FAIL) diagnosed D1 and D2.
+- **The rulings:** the owner ruled on both, and they were merged as ADR-034
+  amendments:
+  - §7b, PR [#668](https://github.com/MnemeHQ/mneme/pull/668), squash
+    `78d1d684`;
+  - §3a, PR [#669](https://github.com/MnemeHQ/mneme/pull/669), squash
+    `4175722e`.
+
+Neither change is justified after the fact. Both are still to be
+implemented.
+
+**Recorded consequences.**
+- **M4 and G1.** After Change 2, the matcher's recognition boundary differs
+  from the build M4 validated. That includes the effect of interpretation
+  AMB-07: a same-named parameter makes only the call sites in its own
+  function `UNKNOWN`. M4's PASS (#628) remains evidence for its pinned build
+  only. A post-change G1 audit claim is **not** covered by M4, and any new
+  blind G1 claim needs its own validation.
+- **G2-1.** The G2-1 FAIL stays final. A later PASS needs a new
+  pre-registration that adopts §3a and §7b, plus a newly authored,
+  independently held-out corpus.
+- **Pinned harnesses.** The pinned `benchmarks/adr034_m4/` and
+  `benchmarks/adr034_g2_1/` harnesses are not modified.
+
+### Not authorized by this amendment
+
+- Any change to the `symbol` source's resolution. Under §3a that stays
+  undecided.
+- Any independent change to hook blocking logic, exit-code mapping,
+  strict/warn policy or availability policy (ADR-033), beyond the hook
+  outcomes necessarily resulting from D2's scoped matcher recognition.
+  No change to `FORBID_LITERAL`, `DecisionRetriever`, `ConflictDetector`,
+  persistence or rule identity.
+- Any change to the pinned M4 or G2-1 harnesses or evidence, or re-scoring
+  of any sealed or revealed corpus.
+- Implementation by any session or person with access to the G2-1 held-out
+  corpus content, its answer key, or the scorer's diagnosis evidence beyond
+  the merged results record.
+- Any enforcement, "relevant enforcement observed" or production claim, or
+  any G1 or G2-1 validation claim, for the changed builds.
+
+The existing DG1B1, DG1F-C1a, #260, T-08 slice-1, C2a, C2b, ADR-034 G1,
+C2b Amendment 1 and ADR-034 G2-1 freeze amendments, the G1 F-1 record and
+the G2-1 §5.1 erratum record remain unchanged.
+
+---
+
+## Amendment — authorize ADR-033 C4 bounded CI adapter implementation (2026-10-26)
+
+**Status:** authorized on the squash merge of PR
+[#678](https://github.com/MnemeHQ/mneme/pull/678), with the owner's approval
+recorded in that PR. It authorizes **one standard-library CI availability
+adapter and its Core regressions**, and nothing else. It is not authorization
+to unarchive CI1, change GitHub policy, run a live merge-gate experiment,
+modify Core production CI, or claim C4 closure.
+
+**Sections referenced:** the Freeze Anchor **Status** clause ("No behavioral
+change to retrieval or enforcement without an explicit charter amendment"),
+the separate [Amendment Procedure](#amendment-procedure), and the earlier
+ADR-033 C2a/C2b availability amendments, whose Claude Code PreToolUse surface
+remains unchanged.
+
+**Rationale (Amendment Procedure §3(b)).** The relevant behavioral charter is
+**already accepted and merged**, before this freeze amendment:
+
+- [Accepted ADR-033](../adr/ADR-033-opt-in-fail-closed-enforcement.md),
+  §§1-2 and 5-7: independent violation `strict|warn` and availability
+  `open|closed` policies, a coherent `mneme.check/v1` observation, CI
+  required-check authority and operational UNEVALUATED reporting.
+- [C4 Gate 0 scope charter](../plans/2026-10-26-adr033-c4-ci-availability-charter.md),
+  PR [#676](https://github.com/MnemeHQ/mneme/pull/676),
+  squash `9a0c1ae18bc37797249ab776ad6ea2c87005417f`; the five
+  owner-approved amendments A1-A5 are pinned.
+- [C4 Gate 1 implementation charter](../plans/2026-10-26-adr033-c4-gate1-implementation-charter-proposal.md),
+  PR [#677](https://github.com/MnemeHQ/mneme/pull/677),
+  squash `89a54d1a093a1d8eb43524dbee7f273170ac7087`;
+  owner approval [record](https://github.com/MnemeHQ/mneme/pull/677#issuecomment-6423873813)
+  and R1-R3 are included. Gate 1 requires this separate freeze amendment
+  before implementation.
+
+No implemented behavior is justified retrospectively by this amendment.
+It authorizes only the prospective, reviewed Core implementation change.
+
+### Authorized change — C4 Gate 1 only
+
+**Location.** One reviewed, Python standard-library-only CI adapter
+`scripts/ci/adr033_c4_gate.py` based on the CI1 lab
+`gate/ci1_gate.py` at lab revision `3cd402fe`, outside the `mneme-hq` wheel;
+`tests/test_adr033_c4_ci_gate.py`; and optional
+`tests/fixtures/adr033_c4_ci/v1/` fixture additions. Necessary documentation
+under `docs/validation/` and `docs/integrations/` is permitted only as
+described in the accepted charter. Historical CI1 fixtures and the canonical
+benchmark are not changed.
+
+**Evaluator unchanged (Gate 0 A5).** Use the already approved CI1 P2 evaluator
+from Core commit `0b74d410b45e7b3efcf08d00ce58e7bd7017b757` and
+wheel SHA-256
+`e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51`.
+A new evaluator build, package change or public CLI schema requires a
+separate owner ruling and new parity evidence, not this amendment.
+
+**Deterministic CI adapter behavior, and nothing broader:**
+
+1. Reuse CI1's trust boundary: trusted-base decision memory, PR head
+   fetched as data only, no PR code execution, fixed query, and the
+   existing coherent `mneme.check/v1`/`assess_verdict` contract
+   (ADR-033 §2, Gate 1 §2-3).
+2. A1: normalize and classify paths before file type; refuse unnormalizable
+   paths and any change to `.mneme/` or the trusted gate surface regardless
+   of file type. Only other non-regular/unmaterializable paths can become
+   operational UNEVALUATED.
+3. A2 plus R1: aggregate REFUSED > strict VIOLATION > UNEVALUATED > WARN >
+   PASS. Under `strict`, a trusted complete WARN or FAIL is a blocking
+   strict violation even when another file is UNEVALUATED. Report every
+   subordinate partial result. SKIP-only means unprotected deletion and is
+   never a verified PASS. `EXCLUDED` on a complete evaluation may be trusted
+   PASS but is not ADR-029 relevant enforcement.
+4. A3 plus R2: `open|closed` availability comes from the administrator-
+   controlled repository Actions variable `MNEME_CI_AVAILABILITY` read
+   in the trusted base-workflow context; missing/invalid values mean
+   `closed` with a visible warning. `strict|warn` violation mode is a
+   separate literal trusted-workflow invocation constant, **not** a second
+   Actions variable. Validate both reported inputs against their trusted
+   sources. A PR never controls either.
+5. A4: complete `warn` results require checker exit 0 for PASS/WARN/FAIL;
+   complete `strict` results follow exits 0/1/2. Incomplete or incoherent
+   observations are untrusted/UNEVALUATED and never become a trusted PASS.
+   Preserve strict/warn rule semantics and `assess_verdict` parity.
+6. Under `closed`, operational UNEVALUATED is non-success. Under explicit
+   `open`, it may produce the required-check success **only while visibly
+   labelled UNEVALUATED**, with a reason, `::warning::` annotation and job
+   summary, never PASS. Trusted strict violations and policy refusals
+   are non-success under either availability posture. Missing/untrusted
+   bootstrap, adapter hash, or gate report always makes the required
+   check non-success: no adapter may silently turn host failure into success.
+7. Adapter identity is review-pinned to an exact Core commit, Git blob and
+   content SHA-256. Future lab execution must verify these before loading
+   the script and must validate report/head/base/mode/posture/evaluator
+   coherence in a trusted decision step. This amendment authorizes
+   the **Core implementation and offline unit fixtures only**, not any
+   lab workflow modification or live execution.
+
+**Pinned regression contract:** Gate 0's O1-O12, including O2w, O8s, O9s,
+O9p, O9n and O10x, strict and warn O11 mixtures, O12 invalid/missing posture,
+and Gate 1 §5's hash/preflight/report failure controls; CI1.2, CI1 C1,
+CI1 V11 Option A, and frozen canonical benchmark parity. The implementation
+PR runs the unit tests and the frozen canonical benchmark at its final head
+and reports the results in the PR (as #591 did for C2b); Gate 2 is the
+separately authorized, recorded offline parity campaign against the pinned
+implementation. Fixtures remain
+versioned and append-only; any failure remains a failure. Evidence must bind
+the exact adapter and evaluator pins. Writing unit tests under the
+implementation PR is allowed; the separately approved Gate 2 offline
+validation campaign is **not** authorized here.
+
+### Explicitly preserved and not authorized
+
+- **No edits** to `mneme/`, `.mneme/`, `.github/workflows/`, Core rulesets
+  or Actions settings, trusted memory, ADR-030 persistence, public CLI schema
+  or `mneme.check/v1` producer.
+- **No semantic change** to `DecisionRetriever`, `ConflictDetector`,
+  typed-rule matching/applicability, existing hook policy, retrieval ranking,
+  rule identities, canonical benchmark or sealed CI1 fixtures.
+- **No lab changes:** the archived `MnemeHQ/mneme-ci1-lab` remains archived;
+  its GitHub workflow, check identity, ruleset, repo variables, Actions
+  policy, test PRs and merge attempts require separately authorized Gate 3.
+- **No production promotion.** Core's existing `mneme-check.yml` remains
+  advisory; CI1 production readiness is still deferred. No release or
+  installation rollout is authorized.
+- **No retrospective reinterpretation.** All C3 R-1 Edit-2 FAIL, F-R2/F-R3-1,
+  verifier-unavailable proceed, enrollment-removal, host-timeout H-2 proceed,
+  MultiEdit N/A, earlier-runtime P-6, operator-attestation limits and all
+  CI1 P7/P8, governed-update, evidence and host race limits remain recorded.
+  The six dimensions of ADR-029 must bind to the same evaluation before any
+  "relevant enforcement observed" claim.
+- **No Gate 2, 3 or 4 approval** is conferred by this amendment.
+  Implementation itself remains a separate reviewed PR under ADR-022.
+
+The earlier freeze amendments (including C2a, C2b and C2b Amendment 1,
+ADR-034 G1/G2-1/D1/D2 and their errata) remain unchanged.
+
+## Amendment — authorize the CI production rollout R0 scope, stage-gated (2026-10-26)
+
+**Status:** authorized on the squash merge of the `[layer1-freeze]` PR that
+adds this section, with the owner's approval recorded in that PR. It defines
+the **only Core CI, ruleset and repository-setting changes** that the R0
+rollout may make, and makes them eligible under this freeze. **It authorizes
+the execution of none of them.** Each of R0 stages S2-S7 still needs its own
+explicit owner authorization, and every change below still goes through its
+stage's review. This amendment does not activate enforcement, install a
+workflow, configure a bypass actor, change a required check or set a variable.
+
+**Sections referenced:** the Freeze Anchor **Status** clause ("No behavioral
+change to retrieval or enforcement without an explicit charter amendment"),
+the separate [Amendment Procedure](#amendment-procedure), and the earlier
+ADR-033 C4 amendment, which excluded Core production CI, rulesets and Actions
+settings. That exclusion stays in force for anything not listed here. CI1.4 §7
+condition 9 ("a separate rollout charter and `[layer1-freeze]` amendment
+before any change to `MnemeHQ/mneme` workflows or rulesets") is satisfied in
+scope only; the other eight conditions keep the classification in the R0
+charter §4.
+
+**Rationale (Amendment Procedure §3(b)).** The governing charter is **already
+accepted and merged**, before this amendment:
+
+- [R0 readiness charter](../plans/2026-10-26-ci-r0-production-rollout-readiness-charter.md),
+  PR [#684](https://github.com/MnemeHQ/mneme/pull/684), squash
+  `e6c80c07f0972a36786fec8d3988809f053ffbce`, with owner rulings R1-R5 in
+  §6 and the squash body: R1 single-repository boundary; R2 Option A as
+  design direction only, not its implementation, activation or any bypass
+  operation; R3 starting posture `closed`; R4 conditions 1, 4 and 5 accepted
+  as residuals for bounded rollout validation, with no ADR-029 upgrade; R5
+  the warn check stops being required when the gate becomes required.
+- [Accepted ADR-033](../adr/ADR-033-opt-in-fail-closed-enforcement.md) and the
+  [C4 closure record](../validation/adr033-c4-closure-2026-10-26.md)
+  (PR [#682](https://github.com/MnemeHQ/mneme/pull/682), `085244dc`).
+
+No change is justified retrospectively. The R0 charter and all C4 evidence
+are unchanged by this amendment.
+
+### Eligible changes — R0 charter §§5 and 7 only
+
+Each row is eligible **only** when its stage has separate owner
+authorization, and only in the order the charter's §7 fixes (S5 additionally
+requires every S4 case as expected and a clean S4→S5 configuration
+equivalence check).
+
+| Stage | Eligible change on `MnemeHQ/mneme` | Bound |
+|---|---|---|
+| S2 | create **one** dedicated gate ruleset targeting `main` | its bypass list has exactly one actor: the designated human account, `bypass_mode: pull_request`; no required check yet, or created disabled; `main-pr-only` keeps no bypass actors. Preceded by the recorded credential inventory (charter §5.1) |
+| S3 | add **one** new workflow under `.github/workflows/` derived from the reviewed lab workflow [`bootstrap-ci1-trusted-gate.yml`](../validation/adr033-c4-gate3-live-2026-10-26/bootstrap-ci1-trusted-gate.yml), by a normal reviewed PR | `pull_request_target`; adapter pinned to `c51729f7`, blob `5feedf60`, SHA-256 `afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9`; evaluator commit `0b74d410b45e7b3efcf08d00ce58e7bd7017b757`, wheel SHA-256 `e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51`; violation mode a workflow constant; actions SHA-pinned; repository-specific edits limited to names, protected-surface paths and check identity. **Not** a required check |
+| S3 | create repository variable `MNEME_CI_AVAILABILITY=closed` | only `open` / `closed` |
+| S3 | an Actions event policy permitting `pull_request_target` for that workflow | **only if** S3 shows GitHub's post-2026-11-02 behavior requires it; recorded with before/after state |
+| S4 | create staging branch `r0/recovery-staging` from `main` after S3, a copy of the gate ruleset targeting it (same bypass actor, gate required, strict up-to-date), and test PRs into it, including test-only `.mneme/` changes | never merged to `main`; `.mneme/project_memory.json` on `main` untouched; posture flips and required-check removal/restore only as the charter §7 S4 cases (a)-(e) |
+| S4 | create a **temporary staging-only equivalent** of the applicable `main-pr-only` protections (its required checks with the same contexts and app ids, PR rule, squash-only, deletion and non-fast-forward rules, no bypass actors) as a separate ruleset targeting `r0/recovery-staging` | solely to validate ruleset layering and bypass isolation (charter §7 S4 case (b)): a bypass of the staging gate ruleset must leave these checks enforced. The production `main-pr-only` ruleset is **not changed**. The staging ruleset is snapshotted and compared field by field with production `main-pr-only` before the S4 cases run (equivalence shown, not assumed), and any difference is recorded |
+| S4 | remove the staging gate ruleset, the staging `main-pr-only` equivalent and the staging branch | after the S4 record, with snapshots showing removal |
+| S4→S5 | read-only configuration snapshots and diff | no change |
+| S5 | in the `main` gate ruleset: add the gate check as required and turn on strict up-to-date; in `main-pr-only`: remove `mneme check --mode warn` from the required checks (R5); posture `closed` | one recorded change set with before/after snapshots |
+| S6 | ordinary compliant PRs; bypass merges of refused PRs | each bypass carries the charter §5.2 record |
+| any stage after S3 | the two emergency controls of charter §5.4: posture to `open`; removal of the gate from the gate ruleset's required checks | designated authority only; recorded on #540 the same day; restore only through a reviewed PR |
+
+`mneme-check.yml` itself is not modified; it keeps running as an advisory
+comment.
+
+### Explicitly preserved and not authorized
+
+- **No stage execution.** S2-S7 each need a separate owner authorization.
+  This amendment approves no bypass operation, including the first one.
+- **No pin change.** No adapter or evaluator other than the pins above; a
+  newer evaluator needs new parity evidence, an owner ruling and, first, the
+  fix for ADR-034 numeric/`subject` payloads being classed UNEVALUATED
+  (C4 closure §7).
+- **No edits** to `mneme/`, `scripts/ci/adr033_c4_gate.py`, the public CLI
+  schema, the `mneme.check/v1` producer, rule semantics, retrieval, the
+  canonical benchmark, or `.mneme/project_memory.json` on `main` (decision
+  updates stay `[memory]` tasks, merged through the §5.2 bypass once the gate
+  is required).
+- **No other repository, branch or setting:** no other workflow, ruleset,
+  variable, secret, Actions permission or organization setting; no change to
+  the production `main-pr-only` ruleset beyond the S5 removal (the S4
+  staging equivalent is a separate, temporary ruleset); no `bypass_mode: always`; no second
+  bypass actor.
+- **No lab work.** `MnemeHQ/mneme-ci1-lab` stays archived.
+- **No reinterpretation.** C4 verdicts, CI1 P7/P8, governed-update, evidence
+  and host-race limits, and every C3 limitation stay as recorded. No ADR-029
+  "relevant enforcement observed" claim.
+- **No production promotion decision.** Promotion stays DEFERRED until S7.
+
+The earlier freeze amendments, including ADR-033 C2a, C2b, C2b Amendment 1 and
+C4 and ADR-034 G1/G2-1/D1/D2 with their errata, remain unchanged.
+
+## Amendment — clarify the R0 S5 activation of `mneme-ci-gate` (2026-11-02)
+
+**Status:** clarification of the R0 scope amendment above, authorized on the
+squash merge of the `[layer1-freeze]` PR that adds this section with the
+owner's approval recorded in that PR. **It authorizes the execution of
+nothing.** S5 still needs its own owner authorization, every S4 case as
+expected and a clean S4→S5 configuration equivalence check.
+
+**Section amended:** the R0 scope amendment's eligible-changes table, S5 row.
+
+**Rationale (Amendment Procedure §3(b)).** S2 created the dedicated gate
+ruleset `mneme-ci-gate` (id `26391853`) **disabled**, as the S2 row allows
+("no required check yet, or created disabled"); see the
+[S2 record](../validation/ci-r0-s2-gate-ruleset-2026-11-02.md) (#719,
+`4969cf83`). The S5 row lists adding the required check and strict up-to-date
+in that ruleset but does not name switching its enforcement on, without which
+the S5 change has no effect. This section closes that gap only.
+
+**Clarified S5 row.** The single recorded S5 change set may, in addition to
+the changes already listed, set `mneme-ci-gate` (`26391853`) from
+`enforcement: disabled` to `enforcement: active`. Nothing else is added:
+
+- no other ruleset's enforcement, bypass list or conditions;
+- the bypass list stays exactly one `User` actor in `pull_request` mode;
+- `enforcement: evaluate` and any second bypass actor remain excluded;
+- the §5.4 emergency control "remove the gate from the gate ruleset's required
+  checks (or disable that ruleset)" is unchanged.
+
+All other rows, exclusions and the remainder of the R0 scope amendment are
+unchanged.
+
+## Amendment — authorize the R0 S4 staging trigger filters (2026-11-02)
+
+**Status:** authorized on the squash merge of the `[layer1-freeze]` PR that
+adds this section, with the owner's approval recorded in that PR. It makes one
+narrowly bounded change to production workflow files **eligible**; the change
+itself is a separate reviewed PR, and running S4 still needs every condition
+of the R0 scope amendment's S4 rows. Nothing else is authorized.
+
+**Sections amended:** the R0 scope amendment's eligible-changes table (adds
+one S4 row) and its exclusion "no other workflow".
+
+**Rationale (Amendment Procedure §3(a) and §3(b)).** The S4 attempt of
+2026-11-02 stopped under its own stop rule: the gate did not run on PRs into
+`r0/recovery-staging`. GitHub documents that `pull_request_target` "runs in the
+context of the default branch of the base repository" and that `GITHUB_SHA`
+is the last commit on the default branch. So for any PR the gate workflow,
+its `branches:` filter and its trusted base all come from `main`. The frozen
+adapter builds the PR diff as `merge-base(--base-sha, head)..head` and reads
+decision memory from `--base-sha`; the workflow passes `GITHUB_SHA`. The R0
+scope amendment's S4 rows assumed the staging branch's own workflow and base
+would be used. They are not. Without this change S4 cannot show the charter
+§7 S4 cases with real gate verdicts.
+
+**Eligible change (S4 only).** One PR to `main` that, in exactly these four
+files, changes the pull-request trigger line `branches: [main]` to
+`branches: [main, r0/recovery-staging]` and changes nothing else:
+
+| File | Trigger |
+|---|---|
+| `.github/workflows/mneme-trusted-gate.yml` | `pull_request_target` |
+| `.github/workflows/tests.yml` | `pull_request` (not `push`) |
+| `.github/workflows/encoding-check.yml` | `pull_request` (not `push`) |
+| `.github/workflows/mneme-check.yml` | `pull_request` |
+
+No step, permission, pin, environment value, adapter or evaluator changes.
+The gate keeps its reviewed trust logic (`base == GITHUB_SHA` assertion, memory
+from the trusted base).
+
+**Binding conditions for S4 with this change:**
+
+1. `r0/recovery-staging` is created at **exactly** the `main` commit that
+   contains this change, so the staging tip, `GITHUB_SHA` and the gate's trusted
+   base are one commit: same workflows, same memory, and a PR diff containing
+   only the probe.
+2. No merge to `main` while S4 cases run. Every S4 gate report must show
+   `base_sha` equal to the staging tip; any mismatch stops S4.
+3. The single staging merge (case (a), recorded bypass) runs **last**, because
+   afterwards staging differs from `main`.
+4. Staging rulesets are recreated from the saved specs already compared field by
+   field (`r0-staging-gate`, `r0-staging-main-pr-only`), and removed at teardown
+   with the branch.
+5. The four trigger lines stay through the S4→S5 configuration equivalence check,
+   so the tested and production workflow blobs are identical. Their removal is a
+   recorded cleanup after S5, or at S7 if S5 is not reached.
+
+**Limits.** This shows S4 only for a staging branch identical to `main`. It
+establishes nothing for PRs into other non-default branches, which the gate
+structurally evaluates against `main`'s tip; the production gate targets
+`main` only. Production `main-pr-only`, `mneme-ci-gate` and
+`MNEME_CI_AVAILABILITY=closed` are unchanged.
+
+---
+
+## Amendment — authorize the ADR-034 S1 symbol-source correction (2026-11-06)
+
+> This authorizes **one bounded implementation change**: the symbol-source
+> correction specified by ADR-034 §3b (owner ruling S1), which is already
+> merged. It is delivered as its own reviewed PR. It authorizes no validation
+> claim and no other behavior.
+
+**Change, S1 (ADR-034 §3b).**
+- **Where:** `symbol` source classification in `mneme/numeric_rule.py`.
+- **What:** if the governed file contains any construct in the closed list
+  S1-a to S1-g, the `symbol` source is `UNKNOWN` / `AMBIGUOUS_BINDING`,
+  never clean. Nothing outside that list changes, and the call source keeps
+  §3a and the D2 change unchanged.
+- **Outcome boundary:** S1 may change a strict-mode refusal or warn-mode
+  defer solely because a previously `PASS` or `FAIL` symbol source becomes
+  unevaluated. No result can become `PASS` because of S1. This is an
+  authorized consequence of the matcher change, **not** permission to change
+  the hook's blocking logic, exit-code mapping, availability handling or
+  strict/warn policy.
+- **Pinned regressions:**
+  - the F-G1-1 shape (`globals()['SYMBOL'] = …`);
+  - each S1 construct, including the aliased-setter and namespace-string
+    forms;
+  - each "not affected" idiom in §3b (reads, `getattr` with another constant
+    name, `object.__setattr__(self, "field", …)`, `sys.modules` reads, S1-a
+    names as plain data strings);
+  - the existing call-scope suite, the G1 regression suite and the public M4
+    R1–R18 vectors;
+  - golden rule IDs, and payloads for checks with no numeric rule, which stay
+    byte-identical.
+
+**Sections referenced:** the ADR-034 G1 and G2-1 amendments, the D1/D2
+amendment above (its "Not authorized" list excludes any `symbol`-source
+change; this amendment is the explicit, narrow exception for S1 only), and
+the Amendment Procedure below.
+
+**Rationale (Amendment Procedure §3(b)).** The charter-level decision was
+**already made**:
+- **Finding:** the G1 local experiment results record (#752, squash
+  `0a2632be`) found F-G1-1, a clean `PASS` for a dynamic rebinding of the
+  governed symbol.
+- **The ruling:** the owner ruled S1, merged as ADR-034 §3b, PR [#753](https://github.com/MnemeHQ/mneme/pull/753), squash `ebe9de4b`.
+
+The change is not justified after the fact. It is still to be implemented.
+
+**Recorded consequences.**
+- **M4 and G1.** After S1, the matcher's symbol-source recognition boundary
+  differs from the build M4 validated, only towards unevaluated results.
+  M4's PASS (#628) remains evidence for its pinned build only. The G1 local
+  experiment results (#752) are unchanged. A post-change G1 claim beyond the
+  pinned regressions needs its own validation.
+- **G2-1.** The G2-1 FAIL stays final. R4 remains deferred.
+- **Pinned harnesses.** The pinned `benchmarks/adr034_m4/` and
+  `benchmarks/adr034_g2_1/` harnesses are not modified.
+
+### Not authorized by this amendment
+
+- Any `symbol`-source change beyond S1-a to S1-g, and any call-source change.
+- Any independent change to hook blocking logic, exit-code mapping,
+  strict/warn policy or availability policy (ADR-033). No change to
+  `FORBID_LITERAL`, `DecisionRetriever`, `ConflictDetector`, persistence or
+  rule identity.
+- Any change to the pinned M4 or G2-1 harnesses or evidence, or re-scoring of
+  any sealed or revealed corpus.
+- Any CLI, SDK, CI, ruleset, posture or memory change, and any activation of
+  `FORBID_NUMERIC_ABOVE` in any memory.
+- Any enforcement, "relevant enforcement observed" or production claim, or
+  any G1 or G2-1 validation claim, for the changed build.
+
+All earlier freeze amendments and records remain unchanged.
+
+---
+
 ## Amendment Procedure
 
 This document is frozen at `e73ff7d`. To amend it:

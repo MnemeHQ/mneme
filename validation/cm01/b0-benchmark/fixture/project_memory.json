@@ -1,0 +1,2034 @@
+{
+  "meta": {
+    "name": "cm01-b0m-synthetic",
+    "description": "Frozen deterministic synthetic corpus for CM-01-B0-M. Not repository project memory."
+  },
+  "items": [],
+  "examples": [],
+  "decisions": [
+    {
+      "id": "ADR-B0-001",
+      "decision": "Synthetic B0 decision ADR-B0-001 governs cache behavior for the mechanical benchmark marker_adr-b0-001.",
+      "rationale": "Frozen deterministic B0 corpus entry for scope cache. This is synthetic validation data, not repository project memory.",
+      "scope": [
+        "cache",
+        "storage"
+      ],
+      "constraints": [
+        "no external cache service",
+        "preserve storage boundary",
+        "record marker_adr-b0-001"
+      ],
+      "anti_patterns": [
+        "external_cache_client",
+        "implicit_storage_coupling",
+        "unbounded_cache_retry"
+      ],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "forbid_adr-b0-001_literal"
+        }
+      ],
+      "test_evidence": [
+        {
+          "selector": "tests/b0/adr-b0-001.spec",
+          "sha": "aad3098acc972583962263cc7ff36bb950739edeeb779683050f6fde3d3f3cfc"
+        }
+      ],
+      "created_at": "2026-02-01T00:00:00Z",
+      "updated_at": "2026-02-01T00:00:00Z",
+      "status": "active"
+    },
+    {
+      "id": "ADR-B0-002",
+      "decision": "Synthetic B0 decision ADR-B0-002 governs storage behavior for the mechanical benchmark marker_adr-b0-002.",
+      "rationale": "Frozen deterministic B0 corpus entry for scope storage. This is synthetic validation data, not repository project memory.",
+      "scope": [
+        "storage",
+        "telemetry"
+      ],
+      "constraints": [
+        "no external storage service",
+        "preserve telemetry boundary",
+        "record marker_adr-b0-002"
+      ],
+      "anti_patterns": [
+        "external_storage_client",
+        "implicit_telemetry_coupling",
+        "unbounded_storage_retry"
+      ],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "forbid_adr-b0-002_literal"
+        }
+      ],
+      "test_evidence": [],
+      "created_at": "2026-02-01T00:00:00Z",
+      "updated_at": "2026-02-01T00:00:00Z",
+      "status": "active"
+    },
+    {
+      "id": "ADR-B0-003",
+      "decision": "Synthetic B0 decision ADR-B0-003 governs telemetry behavior for the mechanical benchmark marker_adr-b0-003.",
+      "rationale": "Frozen deterministic B0 corpus entry for scope telemetry. This is synthetic validation data, not repository project memory.",
+      "scope": [
+        "routing",
+        "telemetry"
+      ],
+      "constraints": [
+        "no external telemetry service",
+        "preserve routing boundary",
+        "record marker_adr-b0-003"
+      ],
+      "anti_patterns": [
+        "external_telemetry_client",
+        "implicit_routing_coupling",
+        "unbounded_telemetry_retry"
+      ],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "forbid_adr-b0-003_literal"
+        }
+      ],
+      "test_evidence": [],
+      "created_at": "2026-02-01T00:00:00Z",
+      "updated_at": "2026-02-01T00:00:00Z",
+      "status": "active"
+    },
+    {
+      "id": "ADR-B0-004",
+      "decision": "Synthetic B0 decision ADR-B0-004 governs routing behavior for the mechanical benchmark marker_adr-b0-004.",
+      "rationale": "Frozen deterministic B0 corpus entry for scope routing. This is synthetic validation data, not repository project memory.",
+      "scope": [
+        "auth",
+        "routing"
+      ],
+      "constraints": [
+        "no external routing service",
+        "preserve auth boundary",
+        "record marker_adr-b0-004"
+      ],
+      "anti_patterns": [
+        "external_routing_client",
+        "implicit_auth_coupling",
+        "unbounded_routing_retry"
+      ],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "forbid_adr-b0-004_literal"
+        }
+      ],
+      "test_evidence": [
+        {
+          "selector": "tests/b0/adr-b0-004.spec",
+          "sha": "f285cf99d6ea14501b75e8e75891feaba8ab424a602a7d5a515bc4df4dd3b033"
+        }
+      ],
+      "created_at": "2026-02-01T00:00:00Z",
+      "updated_at": "2026-02-01T00:00:00Z",
+      "status": "active"
+    },
+    {
+      "id": "ADR-B0-005",
+      "decision": "Synthetic B0 decision ADR-B0-005 governs auth behavior for the mechanical benchmark marker_adr-b0-005.",
+      "rationale": "Frozen deterministic B0 corpus entry for scope auth. This is synthetic validation data, not repository project memory.",
+      "scope": [
+        "auth",
+        "ui"
+      ],
+      "constraints": [
+        "no external auth service",
+        "preserve ui boundary",
+        "record marker_adr-b0-005"
+      ],
+      "anti_patterns": [
+        "external_auth_client",
+        "implicit_ui_coupling",
+        "unbounded_auth_retry"
+      ],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "forbid_adr-b0-005_literal"
+        }
+      ],
+      "test_evidence": [],
+      "created_at": "2026-02-01T00:00:00Z",
+      "updated_at": "2026-02-01T00:00:00Z",
+      "status": "active"
+    },
+    {
+      "id": "ADR-B0-006",
+      "decision": "Synthetic B0 decision ADR-B0-006 governs ui behavior for the mechanical benchmark marker_adr-b0-006.",
+      "rationale": "Frozen deterministic B0 corpus entry for scope ui. This is synthetic validation data, not repository project memory.",
+      "scope": [
+        "ui",
+        "worker"
+      ],
+      "constraints": [
+        "no external ui service",
+        "preserve worker boundary",
+        "record marker_adr-b0-006"
+      ],
+      "anti_patterns": [
+        "external_ui_client",
+        "implicit_worker_coupling",
+        "unbounded_ui_retry"
+      ],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "forbid_adr-b0-006_literal"
+        }
+      ],
+      "test_evidence": [],
+      "created_at": "2026-02-01T00:00:00Z",
+      "updated_at": "2026-02-01T00:00:00Z",
+      "status": "active"
+    },
+    {
+      "id": "ADR-B0-007",
+      "decision": "Synthetic B0 decision ADR-B0-007 governs worker behavior for the mechanical benchmark marker_adr-b0-007.",
+      "rationale": "Frozen deterministic B0 corpus entry for scope worker. This is synthetic validation data, not repository project memory.",
+      "scope": [
+        "queue",
+        "worker"
+      ],
+      "constraints": [
+        "no external worker service",
+        "preserve queue boundary",
+        "record marker_adr-b0-007"
+      ],
+      "anti_patterns": [
+        "external_worker_client",
+        "implicit_queue_coupling",
+        "unbounded_worker_retry"
+      ],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "forbid_adr-b0-007_literal"
+        }
+      ],
+      "test_evidence": [
+        {
+          "selector": "tests/b0/adr-b0-007.spec",
+          "sha": "0d32697e3d8963058f3f0bf4cb835b5f5c67b5cbf8c5e7a62a5b3b5984364580"
+        }
+      ],
+      "created_at": "2026-02-01T00:00:00Z",
+      "updated_at": "2026-02-01T00:00:00Z",
+      "status": "active"
+    },
+    {
+      "id": "ADR-B0-008",
+      "decision": "Synthetic B0 decision ADR-B0-008 governs queue behavior for the mechanical benchmark marker_adr-b0-008.",
+      "rationale": "Frozen deterministic B0 corpus entry for scope queue. This is synthetic validation data, not repository project memory.",
+      "scope": [
+        "queue",
+        "search"
+      ],
+      "constraints": [
+        "no external queue service",
+        "preserve search boundary",
+        "record marker_adr-b0-008"
+      ],
+      "anti_patterns": [
+        "external_queue_client",
+        "implicit_search_coupling",
+        "unbounded_queue_retry"
+      ],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "forbid_adr-b0-008_literal"
+        }
+      ],
+      "test_evidence": [],
+      "created_at": "2026-02-01T00:00:00Z",
+      "updated_at": "2026-02-01T00:00:00Z",
+      "status": "active"
+    },
+    {
+      "id": "ADR-B0-009",
+      "decision": "Synthetic B0 decision ADR-B0-009 governs search behavior for the mechanical benchmark marker_adr-b0-009.",
+      "rationale": "Frozen deterministic B0 corpus entry for scope search. This is synthetic validation data, not repository project memory.",
+      "scope": [
+        "policy",
+        "search"
+      ],
+      "constraints": [
+        "no external search service",
+        "preserve policy boundary",
+        "record marker_adr-b0-009"
+      ],
+      "anti_patterns": [
+        "external_search_client",
+        "implicit_policy_coupling",
+        "unbounded_search_retry"
+      ],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "forbid_adr-b0-009_literal"
+        }
+      ],
+      "test_evidence": [],
+      "created_at": "2026-02-01T00:00:00Z",
+      "updated_at": "2026-02-01T00:00:00Z",
+      "status": "active"
+    },
+    {
+      "id": "ADR-B0-010",
+      "decision": "Synthetic B0 decision ADR-B0-010 governs policy behavior for the mechanical benchmark marker_adr-b0-010.",
+      "rationale": "Frozen deterministic B0 corpus entry for scope policy. This is synthetic validation data, not repository project memory.",
+      "scope": [
+        "policy",
+        "scheduler"
+      ],
+      "constraints": [
+        "no external policy service",
+        "preserve scheduler boundary",
+        "record marker_adr-b0-010"
+      ],
+      "anti_patterns": [
+        "external_policy_client",
+        "implicit_scheduler_coupling",
+        "unbounded_policy_retry"
+      ],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "forbid_adr-b0-010_literal"
+        }
+      ],
+      "test_evidence": [
+        {
+          "selector": "tests/b0/adr-b0-010.spec",
+          "sha": "b5ee6324e9503de264932f89dab0979b4fb4a5ab13a1af35d30dde87ebe0ef34"
+        }
+      ],
+      "created_at": "2026-02-01T00:00:00Z",
+      "updated_at": "2026-02-01T00:00:00Z",
+      "status": "active"
+    },
+    {
+      "id": "ADR-B0-011",
+      "decision": "Synthetic B0 decision ADR-B0-011 governs scheduler behavior for the mechanical benchmark marker_adr-b0-011.",
+      "rationale": "Frozen deterministic B0 corpus entry for scope scheduler. This is synthetic validation data, not repository project memory.",
+      "scope": [
+        "archive",
+        "scheduler"
+      ],
+      "constraints": [
+        "no external scheduler service",
+        "preserve archive boundary",
+        "record marker_adr-b0-011"
+      ],
+      "anti_patterns": [
+        "external_scheduler_client",
+        "implicit_archive_coupling",
+        "unbounded_scheduler_retry"
+      ],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "forbid_adr-b0-011_literal"
+        }
+      ],
+      "test_evidence": [],
+      "created_at": "2026-02-01T00:00:00Z",
+      "updated_at": "2026-02-01T00:00:00Z",
+      "status": "active"
+    },
+    {
+      "id": "ADR-B0-012",
+      "decision": "Synthetic B0 decision ADR-B0-012 governs archive behavior for the mechanical benchmark marker_adr-b0-012.",
+      "rationale": "Frozen deterministic B0 corpus entry for scope archive. This is synthetic validation data, not repository project memory.",
+      "scope": [
+        "archive",
+        "cache"
+      ],
+      "constraints": [
+        "no external archive service",
+        "preserve cache boundary",
+        "record marker_adr-b0-012"
+      ],
+      "anti_patterns": [
+        "external_archive_client",
+        "implicit_cache_coupling",
+        "unbounded_archive_retry"
+      ],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "forbid_adr-b0-012_literal"
+        }
+      ],
+      "test_evidence": [],
+      "created_at": "2026-02-01T00:00:00Z",
+      "updated_at": "2026-02-01T00:00:00Z",
+      "status": "active"
+    },
+    {
+      "id": "ADR-B0-016",
+      "decision": "Synthetic B0 decision ADR-B0-016 governs routing behavior for the mechanical benchmark marker_adr-b0-016.",
+      "rationale": "Frozen deterministic B0 corpus entry for scope routing. This is synthetic validation data, not repository project memory.",
+      "scope": [
+        "auth",
+        "routing"
+      ],
+      "constraints": [
+        "no external routing service",
+        "preserve auth boundary",
+        "record marker_adr-b0-016"
+      ],
+      "anti_patterns": [
+        "external_routing_client",
+        "implicit_auth_coupling",
+        "unbounded_routing_retry"
+      ],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "forbid_adr-b0-016_literal"
+        }
+      ],
+      "test_evidence": [
+        {
+          "selector": "tests/b0/adr-b0-016.spec",
+          "sha": "9d62d090b920db84300f67dc6171b7594ecb443b12a03a9322955b3d7cfdf101"
+        }
+      ],
+      "created_at": "2026-02-01T00:00:00Z",
+      "updated_at": "2026-02-01T00:00:00Z",
+      "status": "active"
+    },
+    {
+      "id": "ADR-B0-017",
+      "decision": "Synthetic B0 decision ADR-B0-017 governs auth behavior for the mechanical benchmark marker_adr-b0-017.",
+      "rationale": "Frozen deterministic B0 corpus entry for scope auth. This is synthetic validation data, not repository project memory.",
+      "scope": [
+        "auth",
+        "ui"
+      ],
+      "constraints": [
+        "no external auth service",
+        "preserve ui boundary",
+        "record marker_adr-b0-017"
+      ],
+      "anti_patterns": [
+        "external_auth_client",
+        "implicit_ui_coupling",
+        "unbounded_auth_retry"
+      ],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "forbid_adr-b0-017_literal"
+        }
+      ],
+      "test_evidence": [],
+      "created_at": "2026-02-01T00:00:00Z",
+      "updated_at": "2026-02-01T00:00:00Z",
+      "status": "active"
+    },
+    {
+      "id": "ADR-B0-018",
+      "decision": "Synthetic B0 decision ADR-B0-018 governs ui behavior for the mechanical benchmark marker_adr-b0-018.",
+      "rationale": "Frozen deterministic B0 corpus entry for scope ui. This is synthetic validation data, not repository project memory.",
+      "scope": [
+        "ui",
+        "worker"
+      ],
+      "constraints": [
+        "no external ui service",
+        "preserve worker boundary",
+        "record marker_adr-b0-018"
+      ],
+      "anti_patterns": [
+        "external_ui_client",
+        "implicit_worker_coupling",
+        "unbounded_ui_retry"
+      ],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "forbid_adr-b0-018_literal"
+        }
+      ],
+      "test_evidence": [],
+      "created_at": "2026-02-01T00:00:00Z",
+      "updated_at": "2026-02-01T00:00:00Z",
+      "status": "active"
+    },
+    {
+      "id": "ADR-B0-019",
+      "decision": "Synthetic B0 decision ADR-B0-019 governs worker behavior for the mechanical benchmark marker_adr-b0-019.",
+      "rationale": "Frozen deterministic B0 corpus entry for scope worker. This is synthetic validation data, not repository project memory.",
+      "scope": [
+        "queue",
+        "worker"
+      ],
+      "constraints": [
+        "no external worker service",
+        "preserve queue boundary",
+        "record marker_adr-b0-019"
+      ],
+      "anti_patterns": [
+        "external_worker_client",
+        "implicit_queue_coupling",
+        "unbounded_worker_retry"
+      ],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "forbid_adr-b0-019_literal"
+        }
+      ],
+      "test_evidence": [
+        {
+          "selector": "tests/b0/adr-b0-019.spec",
+          "sha": "7efc3690915d4c3df2eaad2e16b665941c4f5c18296cfcb47daa4eb5c0babb12"
+        }
+      ],
+      "created_at": "2026-02-01T00:00:00Z",
+      "updated_at": "2026-02-01T00:00:00Z",
+      "status": "active"
+    },
+    {
+      "id": "ADR-B0-020",
+      "decision": "Synthetic B0 decision ADR-B0-020 governs queue behavior for the mechanical benchmark marker_adr-b0-020.",
+      "rationale": "Frozen deterministic B0 corpus entry for scope queue. This is synthetic validation data, not repository project memory.",
+      "scope": [
+        "queue",
+        "search"
+      ],
+      "constraints": [
+        "no external queue service",
+        "preserve search boundary",
+        "record marker_adr-b0-020"
+      ],
+      "anti_patterns": [
+        "external_queue_client",
+        "implicit_search_coupling",
+        "unbounded_queue_retry"
+      ],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "forbid_adr-b0-020_literal"
+        }
+      ],
+      "test_evidence": [],
+      "created_at": "2026-02-01T00:00:00Z",
+      "updated_at": "2026-02-01T00:00:00Z",
+      "status": "active"
+    },
+    {
+      "id": "ADR-B0-021",
+      "decision": "Synthetic B0 decision ADR-B0-021 governs search behavior for the mechanical benchmark marker_adr-b0-021.",
+      "rationale": "Frozen deterministic B0 corpus entry for scope search. This is synthetic validation data, not repository project memory.",
+      "scope": [
+        "policy",
+        "search"
+      ],
+      "constraints": [
+        "no external search service",
+        "preserve policy boundary",
+        "record marker_adr-b0-021"
+      ],
+      "anti_patterns": [
+        "external_search_client",
+        "implicit_policy_coupling",
+        "unbounded_search_retry"
+      ],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "forbid_adr-b0-021_literal"
+        }
+      ],
+      "test_evidence": [],
+      "created_at": "2026-02-01T00:00:00Z",
+      "updated_at": "2026-02-01T00:00:00Z",
+      "status": "active"
+    },
+    {
+      "id": "ADR-B0-023",
+      "decision": "Synthetic B0 decision ADR-B0-023 governs scheduler behavior for the mechanical benchmark marker_adr-b0-023.",
+      "rationale": "Frozen deterministic B0 corpus entry for scope scheduler. This is synthetic validation data, not repository project memory.",
+      "scope": [
+        "archive",
+        "scheduler"
+      ],
+      "constraints": [
+        "no external scheduler service",
+        "preserve archive boundary",
+        "record marker_adr-b0-023"
+      ],
+      "anti_patterns": [
+        "external_scheduler_client",
+        "implicit_archive_coupling",
+        "unbounded_scheduler_retry"
+      ],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "forbid_adr-b0-023_literal"
+        }
+      ],
+      "test_evidence": [],
+      "created_at": "2026-02-01T00:00:00Z",
+      "updated_at": "2026-02-01T00:00:00Z",
+      "status": "active"
+    },
+    {
+      "id": "ADR-B0-024",
+      "decision": "Synthetic B0 decision ADR-B0-024 governs archive behavior for the mechanical benchmark marker_adr-b0-024.",
+      "rationale": "Frozen deterministic B0 corpus entry for scope archive. This is synthetic validation data, not repository project memory.",
+      "scope": [
+        "archive",
+        "cache"
+      ],
+      "constraints": [
+        "no external archive service",
+        "preserve cache boundary",
+        "record marker_adr-b0-024"
+      ],
+      "anti_patterns": [
+        "external_archive_client",
+        "implicit_cache_coupling",
+        "unbounded_archive_retry"
+      ],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "forbid_adr-b0-024_literal"
+        }
+      ],
+      "test_evidence": [],
+      "created_at": "2026-02-01T00:00:00Z",
+      "updated_at": "2026-02-01T00:00:00Z",
+      "status": "active"
+    }
+  ],
+  "decision_index": {
+    "schema": "mneme.decision-index/v2",
+    "semantic_features": [],
+    "decisions": [
+      {
+        "decision_id": "ADR-B0-001",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-6321b0b53db41080445166681c6546a9",
+        "test_evidence": [
+          {
+            "selector": "tests/b0/adr-b0-001.spec",
+            "sha": "aad3098acc972583962263cc7ff36bb950739edeeb779683050f6fde3d3f3cfc"
+          }
+        ],
+        "relationships": [],
+        "updated_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "decision_id": "ADR-B0-002",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-4985f8bb2f7e08e41d85e1402cffc453",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "decision_id": "ADR-B0-003",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "decision_id": "ADR-B0-004",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-6e1942c7ae817a6080cf26b540431edf",
+        "test_evidence": [
+          {
+            "selector": "tests/b0/adr-b0-004.spec",
+            "sha": "f285cf99d6ea14501b75e8e75891feaba8ab424a602a7d5a515bc4df4dd3b033"
+          }
+        ],
+        "relationships": [],
+        "updated_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "decision_id": "ADR-B0-005",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-47cd76fdfae32baeea61f8217b71f0ef",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "decision_id": "ADR-B0-006",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-2e8a9149777c861e5bad1783c0941ff4",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "decision_id": "ADR-B0-007",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-41b40c1ae9c56d43a672bab3f2a32243",
+        "test_evidence": [
+          {
+            "selector": "tests/b0/adr-b0-007.spec",
+            "sha": "0d32697e3d8963058f3f0bf4cb835b5f5c67b5cbf8c5e7a62a5b3b5984364580"
+          }
+        ],
+        "relationships": [],
+        "updated_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "decision_id": "ADR-B0-008",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-79735a3b68b7599315e1e49d79f668d4",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "decision_id": "ADR-B0-009",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-30d6a236d96d9d2504bd5904ddc26674",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "decision_id": "ADR-B0-010",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-5a681404ff48fbf77c6574478eeae7bd",
+        "test_evidence": [
+          {
+            "selector": "tests/b0/adr-b0-010.spec",
+            "sha": "b5ee6324e9503de264932f89dab0979b4fb4a5ab13a1af35d30dde87ebe0ef34"
+          }
+        ],
+        "relationships": [],
+        "updated_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "decision_id": "ADR-B0-011",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-860b0dc50437739e27b14f88c152a51f",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "decision_id": "ADR-B0-012",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-aa197f8332f585f09e2dc62485e5b38a",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "decision_id": "ADR-B0-013",
+        "decision_class": "architecture",
+        "lifecycle_status": "deprecated",
+        "active_version_id": "dver-6508d255daae9e0c4afaaacc6554aae0",
+        "test_evidence": [
+          {
+            "selector": "tests/b0/adr-b0-013.spec",
+            "sha": "9b9d232416ed5c44a2f1ed4ca1e8c036af2ab4df93a4143a6ddce3a5762e6a1f"
+          }
+        ],
+        "relationships": [],
+        "updated_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "decision_id": "ADR-B0-014",
+        "decision_class": "architecture",
+        "lifecycle_status": "superseded",
+        "active_version_id": "dver-6e9c9b16a3545e039d44ddc3b4c52107",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "decision_id": "ADR-B0-015",
+        "decision_class": "architecture",
+        "lifecycle_status": "inactive",
+        "active_version_id": "dver-88a5e5e8c24b1531472c16e4690054f6",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "decision_id": "ADR-B0-016",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-d068604b897161208ae187e90da57bfa",
+        "test_evidence": [
+          {
+            "selector": "tests/b0/adr-b0-016.spec",
+            "sha": "9d62d090b920db84300f67dc6171b7594ecb443b12a03a9322955b3d7cfdf101"
+          }
+        ],
+        "relationships": [],
+        "updated_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "decision_id": "ADR-B0-017",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-4ed519d2f8361331bda400f046f4a1cd",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "decision_id": "ADR-B0-018",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-082a078fea409b08ac2c6b080ea8467b",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "decision_id": "ADR-B0-019",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-c68c7cec41f1291ae5419327c495c788",
+        "test_evidence": [
+          {
+            "selector": "tests/b0/adr-b0-019.spec",
+            "sha": "7efc3690915d4c3df2eaad2e16b665941c4f5c18296cfcb47daa4eb5c0babb12"
+          }
+        ],
+        "relationships": [],
+        "updated_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "decision_id": "ADR-B0-020",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-1ce9eb76ec681e76df4640af1cc31893",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "decision_id": "ADR-B0-021",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-9af32b55067377b39e267a14b301abc0",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "decision_id": "ADR-B0-022",
+        "decision_class": "architecture",
+        "lifecycle_status": "deprecated",
+        "active_version_id": "dver-4d60e357af5e65580ea307ae07c8ef17",
+        "test_evidence": [
+          {
+            "selector": "tests/b0/adr-b0-022.spec",
+            "sha": "b5cb75fd2f061da5fe1eabaa85ac54f10b6150470d89008de00927b67debba38"
+          }
+        ],
+        "relationships": [],
+        "updated_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "decision_id": "ADR-B0-023",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-45dc1bb40b87c790858eb52624eea56c",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "decision_id": "ADR-B0-024",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-04000abd0db34f78c67595fa0a9c53a3",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": "2026-02-01T00:00:00Z"
+      }
+    ],
+    "versions": [
+      {
+        "version_id": "dver-6321b0b53db41080445166681c6546a9",
+        "decision_id": "ADR-B0-001",
+        "revision": "1",
+        "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+        "statement": "Synthetic B0 decision ADR-B0-001 governs cache behavior for the mechanical benchmark marker_adr-b0-001.",
+        "rationale": "Frozen deterministic B0 corpus entry for scope cache. This is synthetic validation data, not repository project memory.",
+        "context_scope": [
+          "cache",
+          "storage"
+        ],
+        "constraints": [
+          "no external cache service",
+          "preserve storage boundary",
+          "record marker_adr-b0-001"
+        ],
+        "anti_patterns": [
+          "external_cache_client",
+          "implicit_storage_coupling",
+          "unbounded_cache_retry"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "b0m-v1",
+            "observed_at": "2026-02-01T00:00:00Z",
+            "verification_status": "synthetic"
+          }
+        ],
+        "occurrence_source_identity": [
+          "b0-corpus",
+          "ADR-B0-001"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "version_id": "dver-4985f8bb2f7e08e41d85e1402cffc453",
+        "decision_id": "ADR-B0-002",
+        "revision": "1",
+        "content_digest": "a122f7d2057e698ab9c2fb4ab5101bda9639621b078a92adbfdc799736f520c4",
+        "statement": "Synthetic B0 decision ADR-B0-002 governs storage behavior for the mechanical benchmark marker_adr-b0-002.",
+        "rationale": "Frozen deterministic B0 corpus entry for scope storage. This is synthetic validation data, not repository project memory.",
+        "context_scope": [
+          "storage",
+          "telemetry"
+        ],
+        "constraints": [
+          "no external storage service",
+          "preserve telemetry boundary",
+          "record marker_adr-b0-002"
+        ],
+        "anti_patterns": [
+          "external_storage_client",
+          "implicit_telemetry_coupling",
+          "unbounded_storage_retry"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "b0m-v1",
+            "observed_at": "2026-02-01T00:00:00Z",
+            "verification_status": "synthetic"
+          }
+        ],
+        "occurrence_source_identity": [
+          "b0-corpus",
+          "ADR-B0-002"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+        "decision_id": "ADR-B0-003",
+        "revision": "1",
+        "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+        "statement": "Synthetic B0 decision ADR-B0-003 governs telemetry behavior for the mechanical benchmark marker_adr-b0-003.",
+        "rationale": "Frozen deterministic B0 corpus entry for scope telemetry. This is synthetic validation data, not repository project memory.",
+        "context_scope": [
+          "routing",
+          "telemetry"
+        ],
+        "constraints": [
+          "no external telemetry service",
+          "preserve routing boundary",
+          "record marker_adr-b0-003"
+        ],
+        "anti_patterns": [
+          "external_telemetry_client",
+          "implicit_routing_coupling",
+          "unbounded_telemetry_retry"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "b0m-v1",
+            "observed_at": "2026-02-01T00:00:00Z",
+            "verification_status": "synthetic"
+          }
+        ],
+        "occurrence_source_identity": [
+          "b0-corpus",
+          "ADR-B0-003"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "version_id": "dver-6e1942c7ae817a6080cf26b540431edf",
+        "decision_id": "ADR-B0-004",
+        "revision": "1",
+        "content_digest": "55873a2190bb0d54d2fc060523d759d7fbfcc0f56142ccd2e13b1ea4e319c5a5",
+        "statement": "Synthetic B0 decision ADR-B0-004 governs routing behavior for the mechanical benchmark marker_adr-b0-004.",
+        "rationale": "Frozen deterministic B0 corpus entry for scope routing. This is synthetic validation data, not repository project memory.",
+        "context_scope": [
+          "auth",
+          "routing"
+        ],
+        "constraints": [
+          "no external routing service",
+          "preserve auth boundary",
+          "record marker_adr-b0-004"
+        ],
+        "anti_patterns": [
+          "external_routing_client",
+          "implicit_auth_coupling",
+          "unbounded_routing_retry"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "b0m-v1",
+            "observed_at": "2026-02-01T00:00:00Z",
+            "verification_status": "synthetic"
+          }
+        ],
+        "occurrence_source_identity": [
+          "b0-corpus",
+          "ADR-B0-004"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "version_id": "dver-47cd76fdfae32baeea61f8217b71f0ef",
+        "decision_id": "ADR-B0-005",
+        "revision": "1",
+        "content_digest": "7d2408aa0101228eed70f0226e577e49d2d0e73ec6aca894d2d026ae5b10785e",
+        "statement": "Synthetic B0 decision ADR-B0-005 governs auth behavior for the mechanical benchmark marker_adr-b0-005.",
+        "rationale": "Frozen deterministic B0 corpus entry for scope auth. This is synthetic validation data, not repository project memory.",
+        "context_scope": [
+          "auth",
+          "ui"
+        ],
+        "constraints": [
+          "no external auth service",
+          "preserve ui boundary",
+          "record marker_adr-b0-005"
+        ],
+        "anti_patterns": [
+          "external_auth_client",
+          "implicit_ui_coupling",
+          "unbounded_auth_retry"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "b0m-v1",
+            "observed_at": "2026-02-01T00:00:00Z",
+            "verification_status": "synthetic"
+          }
+        ],
+        "occurrence_source_identity": [
+          "b0-corpus",
+          "ADR-B0-005"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "version_id": "dver-2e8a9149777c861e5bad1783c0941ff4",
+        "decision_id": "ADR-B0-006",
+        "revision": "1",
+        "content_digest": "636c67eeb2ac5d92f2b7be58d4b91ec009f266d5f89b43ab11be1eead7b9183d",
+        "statement": "Synthetic B0 decision ADR-B0-006 governs ui behavior for the mechanical benchmark marker_adr-b0-006.",
+        "rationale": "Frozen deterministic B0 corpus entry for scope ui. This is synthetic validation data, not repository project memory.",
+        "context_scope": [
+          "ui",
+          "worker"
+        ],
+        "constraints": [
+          "no external ui service",
+          "preserve worker boundary",
+          "record marker_adr-b0-006"
+        ],
+        "anti_patterns": [
+          "external_ui_client",
+          "implicit_worker_coupling",
+          "unbounded_ui_retry"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "b0m-v1",
+            "observed_at": "2026-02-01T00:00:00Z",
+            "verification_status": "synthetic"
+          }
+        ],
+        "occurrence_source_identity": [
+          "b0-corpus",
+          "ADR-B0-006"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "version_id": "dver-41b40c1ae9c56d43a672bab3f2a32243",
+        "decision_id": "ADR-B0-007",
+        "revision": "1",
+        "content_digest": "2a849f4fb97d93f78c9c9f26dd828ce2901b4cedbcf5ffaea160d12f57243ee2",
+        "statement": "Synthetic B0 decision ADR-B0-007 governs worker behavior for the mechanical benchmark marker_adr-b0-007.",
+        "rationale": "Frozen deterministic B0 corpus entry for scope worker. This is synthetic validation data, not repository project memory.",
+        "context_scope": [
+          "queue",
+          "worker"
+        ],
+        "constraints": [
+          "no external worker service",
+          "preserve queue boundary",
+          "record marker_adr-b0-007"
+        ],
+        "anti_patterns": [
+          "external_worker_client",
+          "implicit_queue_coupling",
+          "unbounded_worker_retry"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "b0m-v1",
+            "observed_at": "2026-02-01T00:00:00Z",
+            "verification_status": "synthetic"
+          }
+        ],
+        "occurrence_source_identity": [
+          "b0-corpus",
+          "ADR-B0-007"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "version_id": "dver-79735a3b68b7599315e1e49d79f668d4",
+        "decision_id": "ADR-B0-008",
+        "revision": "1",
+        "content_digest": "e12858bcbcbb092099b0f670473ff76824e1f5b6ff5a8cdb34ced77ac409285a",
+        "statement": "Synthetic B0 decision ADR-B0-008 governs queue behavior for the mechanical benchmark marker_adr-b0-008.",
+        "rationale": "Frozen deterministic B0 corpus entry for scope queue. This is synthetic validation data, not repository project memory.",
+        "context_scope": [
+          "queue",
+          "search"
+        ],
+        "constraints": [
+          "no external queue service",
+          "preserve search boundary",
+          "record marker_adr-b0-008"
+        ],
+        "anti_patterns": [
+          "external_queue_client",
+          "implicit_search_coupling",
+          "unbounded_queue_retry"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "b0m-v1",
+            "observed_at": "2026-02-01T00:00:00Z",
+            "verification_status": "synthetic"
+          }
+        ],
+        "occurrence_source_identity": [
+          "b0-corpus",
+          "ADR-B0-008"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "version_id": "dver-30d6a236d96d9d2504bd5904ddc26674",
+        "decision_id": "ADR-B0-009",
+        "revision": "1",
+        "content_digest": "53be31e978996c5ab7159e5586b731707a35f116a1675e3a22b828b9e9c90eac",
+        "statement": "Synthetic B0 decision ADR-B0-009 governs search behavior for the mechanical benchmark marker_adr-b0-009.",
+        "rationale": "Frozen deterministic B0 corpus entry for scope search. This is synthetic validation data, not repository project memory.",
+        "context_scope": [
+          "policy",
+          "search"
+        ],
+        "constraints": [
+          "no external search service",
+          "preserve policy boundary",
+          "record marker_adr-b0-009"
+        ],
+        "anti_patterns": [
+          "external_search_client",
+          "implicit_policy_coupling",
+          "unbounded_search_retry"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "b0m-v1",
+            "observed_at": "2026-02-01T00:00:00Z",
+            "verification_status": "synthetic"
+          }
+        ],
+        "occurrence_source_identity": [
+          "b0-corpus",
+          "ADR-B0-009"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "version_id": "dver-5a681404ff48fbf77c6574478eeae7bd",
+        "decision_id": "ADR-B0-010",
+        "revision": "1",
+        "content_digest": "376f4bbf88db02c117afa9809cecd300fc7635b5e80992fce2dede38ac4463d0",
+        "statement": "Synthetic B0 decision ADR-B0-010 governs policy behavior for the mechanical benchmark marker_adr-b0-010.",
+        "rationale": "Frozen deterministic B0 corpus entry for scope policy. This is synthetic validation data, not repository project memory.",
+        "context_scope": [
+          "policy",
+          "scheduler"
+        ],
+        "constraints": [
+          "no external policy service",
+          "preserve scheduler boundary",
+          "record marker_adr-b0-010"
+        ],
+        "anti_patterns": [
+          "external_policy_client",
+          "implicit_scheduler_coupling",
+          "unbounded_policy_retry"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "b0m-v1",
+            "observed_at": "2026-02-01T00:00:00Z",
+            "verification_status": "synthetic"
+          }
+        ],
+        "occurrence_source_identity": [
+          "b0-corpus",
+          "ADR-B0-010"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "version_id": "dver-860b0dc50437739e27b14f88c152a51f",
+        "decision_id": "ADR-B0-011",
+        "revision": "1",
+        "content_digest": "31ad60082a04fefd8894699ac1a9e0f14a5b50b1fa820165a489e6711402a6f2",
+        "statement": "Synthetic B0 decision ADR-B0-011 governs scheduler behavior for the mechanical benchmark marker_adr-b0-011.",
+        "rationale": "Frozen deterministic B0 corpus entry for scope scheduler. This is synthetic validation data, not repository project memory.",
+        "context_scope": [
+          "archive",
+          "scheduler"
+        ],
+        "constraints": [
+          "no external scheduler service",
+          "preserve archive boundary",
+          "record marker_adr-b0-011"
+        ],
+        "anti_patterns": [
+          "external_scheduler_client",
+          "implicit_archive_coupling",
+          "unbounded_scheduler_retry"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "b0m-v1",
+            "observed_at": "2026-02-01T00:00:00Z",
+            "verification_status": "synthetic"
+          }
+        ],
+        "occurrence_source_identity": [
+          "b0-corpus",
+          "ADR-B0-011"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "version_id": "dver-aa197f8332f585f09e2dc62485e5b38a",
+        "decision_id": "ADR-B0-012",
+        "revision": "1",
+        "content_digest": "52f5b596e03705fe1d5ec3c7dfd6ecd039df26e6981a3c9439542ada89d7d8b2",
+        "statement": "Synthetic B0 decision ADR-B0-012 governs archive behavior for the mechanical benchmark marker_adr-b0-012.",
+        "rationale": "Frozen deterministic B0 corpus entry for scope archive. This is synthetic validation data, not repository project memory.",
+        "context_scope": [
+          "archive",
+          "cache"
+        ],
+        "constraints": [
+          "no external archive service",
+          "preserve cache boundary",
+          "record marker_adr-b0-012"
+        ],
+        "anti_patterns": [
+          "external_archive_client",
+          "implicit_cache_coupling",
+          "unbounded_archive_retry"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "b0m-v1",
+            "observed_at": "2026-02-01T00:00:00Z",
+            "verification_status": "synthetic"
+          }
+        ],
+        "occurrence_source_identity": [
+          "b0-corpus",
+          "ADR-B0-012"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "version_id": "dver-6508d255daae9e0c4afaaacc6554aae0",
+        "decision_id": "ADR-B0-013",
+        "revision": "1",
+        "content_digest": "20df1bc2b7b4d5f6f64c1497fbe92d6aba8d178cf470ab21835663aeb34e82f5",
+        "statement": "Synthetic B0 decision ADR-B0-013 governs cache behavior for the mechanical benchmark marker_adr-b0-013.",
+        "rationale": "Frozen deterministic B0 corpus entry for scope cache. This is synthetic validation data, not repository project memory.",
+        "context_scope": [
+          "cache",
+          "storage"
+        ],
+        "constraints": [
+          "no external cache service",
+          "preserve storage boundary",
+          "record marker_adr-b0-013"
+        ],
+        "anti_patterns": [
+          "external_cache_client",
+          "implicit_storage_coupling",
+          "unbounded_cache_retry"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "b0m-v1",
+            "observed_at": "2026-02-01T00:00:00Z",
+            "verification_status": "synthetic"
+          }
+        ],
+        "occurrence_source_identity": [
+          "b0-corpus",
+          "ADR-B0-013"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "version_id": "dver-6e9c9b16a3545e039d44ddc3b4c52107",
+        "decision_id": "ADR-B0-014",
+        "revision": "1",
+        "content_digest": "80844ffa3c236397b0166289645d1492819ea3d144790c638071b9a539dfe8d9",
+        "statement": "Synthetic B0 decision ADR-B0-014 governs storage behavior for the mechanical benchmark marker_adr-b0-014.",
+        "rationale": "Frozen deterministic B0 corpus entry for scope storage. This is synthetic validation data, not repository project memory.",
+        "context_scope": [
+          "storage",
+          "telemetry"
+        ],
+        "constraints": [
+          "no external storage service",
+          "preserve telemetry boundary",
+          "record marker_adr-b0-014"
+        ],
+        "anti_patterns": [
+          "external_storage_client",
+          "implicit_telemetry_coupling",
+          "unbounded_storage_retry"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "b0m-v1",
+            "observed_at": "2026-02-01T00:00:00Z",
+            "verification_status": "synthetic"
+          }
+        ],
+        "occurrence_source_identity": [
+          "b0-corpus",
+          "ADR-B0-014"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "version_id": "dver-88a5e5e8c24b1531472c16e4690054f6",
+        "decision_id": "ADR-B0-015",
+        "revision": "1",
+        "content_digest": "d8d7a733dc8843ea408ac59615860c678fedbdd30c2d7e01d7aa05b99ae8fe70",
+        "statement": "Synthetic B0 decision ADR-B0-015 governs telemetry behavior for the mechanical benchmark marker_adr-b0-015.",
+        "rationale": "Frozen deterministic B0 corpus entry for scope telemetry. This is synthetic validation data, not repository project memory.",
+        "context_scope": [
+          "routing",
+          "telemetry"
+        ],
+        "constraints": [
+          "no external telemetry service",
+          "preserve routing boundary",
+          "record marker_adr-b0-015"
+        ],
+        "anti_patterns": [
+          "external_telemetry_client",
+          "implicit_routing_coupling",
+          "unbounded_telemetry_retry"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "b0m-v1",
+            "observed_at": "2026-02-01T00:00:00Z",
+            "verification_status": "synthetic"
+          }
+        ],
+        "occurrence_source_identity": [
+          "b0-corpus",
+          "ADR-B0-015"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "version_id": "dver-d068604b897161208ae187e90da57bfa",
+        "decision_id": "ADR-B0-016",
+        "revision": "1",
+        "content_digest": "ddbf328055c12440e41defb75c11a4b45d81d8b5da09b6fdab51d7a6426ede16",
+        "statement": "Synthetic B0 decision ADR-B0-016 governs routing behavior for the mechanical benchmark marker_adr-b0-016.",
+        "rationale": "Frozen deterministic B0 corpus entry for scope routing. This is synthetic validation data, not repository project memory.",
+        "context_scope": [
+          "auth",
+          "routing"
+        ],
+        "constraints": [
+          "no external routing service",
+          "preserve auth boundary",
+          "record marker_adr-b0-016"
+        ],
+        "anti_patterns": [
+          "external_routing_client",
+          "implicit_auth_coupling",
+          "unbounded_routing_retry"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "b0m-v1",
+            "observed_at": "2026-02-01T00:00:00Z",
+            "verification_status": "synthetic"
+          }
+        ],
+        "occurrence_source_identity": [
+          "b0-corpus",
+          "ADR-B0-016"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "version_id": "dver-4ed519d2f8361331bda400f046f4a1cd",
+        "decision_id": "ADR-B0-017",
+        "revision": "1",
+        "content_digest": "2b6b5b23a1af0eb1359ac1b61ee58c89ae43fd52b0beae33b6a0a7658da7304e",
+        "statement": "Synthetic B0 decision ADR-B0-017 governs auth behavior for the mechanical benchmark marker_adr-b0-017.",
+        "rationale": "Frozen deterministic B0 corpus entry for scope auth. This is synthetic validation data, not repository project memory.",
+        "context_scope": [
+          "auth",
+          "ui"
+        ],
+        "constraints": [
+          "no external auth service",
+          "preserve ui boundary",
+          "record marker_adr-b0-017"
+        ],
+        "anti_patterns": [
+          "external_auth_client",
+          "implicit_ui_coupling",
+          "unbounded_auth_retry"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "b0m-v1",
+            "observed_at": "2026-02-01T00:00:00Z",
+            "verification_status": "synthetic"
+          }
+        ],
+        "occurrence_source_identity": [
+          "b0-corpus",
+          "ADR-B0-017"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "version_id": "dver-082a078fea409b08ac2c6b080ea8467b",
+        "decision_id": "ADR-B0-018",
+        "revision": "1",
+        "content_digest": "e0d33d4075485c7c1047504d597f45dbb24328d25e3ea12b23d6762fee4c4451",
+        "statement": "Synthetic B0 decision ADR-B0-018 governs ui behavior for the mechanical benchmark marker_adr-b0-018.",
+        "rationale": "Frozen deterministic B0 corpus entry for scope ui. This is synthetic validation data, not repository project memory.",
+        "context_scope": [
+          "ui",
+          "worker"
+        ],
+        "constraints": [
+          "no external ui service",
+          "preserve worker boundary",
+          "record marker_adr-b0-018"
+        ],
+        "anti_patterns": [
+          "external_ui_client",
+          "implicit_worker_coupling",
+          "unbounded_ui_retry"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "b0m-v1",
+            "observed_at": "2026-02-01T00:00:00Z",
+            "verification_status": "synthetic"
+          }
+        ],
+        "occurrence_source_identity": [
+          "b0-corpus",
+          "ADR-B0-018"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "version_id": "dver-c68c7cec41f1291ae5419327c495c788",
+        "decision_id": "ADR-B0-019",
+        "revision": "1",
+        "content_digest": "2522a3eb1d2494d61bebd90f516eb3bb02d4dba686f5d18ede472d90752666c2",
+        "statement": "Synthetic B0 decision ADR-B0-019 governs worker behavior for the mechanical benchmark marker_adr-b0-019.",
+        "rationale": "Frozen deterministic B0 corpus entry for scope worker. This is synthetic validation data, not repository project memory.",
+        "context_scope": [
+          "queue",
+          "worker"
+        ],
+        "constraints": [
+          "no external worker service",
+          "preserve queue boundary",
+          "record marker_adr-b0-019"
+        ],
+        "anti_patterns": [
+          "external_worker_client",
+          "implicit_queue_coupling",
+          "unbounded_worker_retry"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "b0m-v1",
+            "observed_at": "2026-02-01T00:00:00Z",
+            "verification_status": "synthetic"
+          }
+        ],
+        "occurrence_source_identity": [
+          "b0-corpus",
+          "ADR-B0-019"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "version_id": "dver-1ce9eb76ec681e76df4640af1cc31893",
+        "decision_id": "ADR-B0-020",
+        "revision": "1",
+        "content_digest": "d0d67d125e62807ce4f3b79705b225481d812f95f416fd54be2746145c33fbf0",
+        "statement": "Synthetic B0 decision ADR-B0-020 governs queue behavior for the mechanical benchmark marker_adr-b0-020.",
+        "rationale": "Frozen deterministic B0 corpus entry for scope queue. This is synthetic validation data, not repository project memory.",
+        "context_scope": [
+          "queue",
+          "search"
+        ],
+        "constraints": [
+          "no external queue service",
+          "preserve search boundary",
+          "record marker_adr-b0-020"
+        ],
+        "anti_patterns": [
+          "external_queue_client",
+          "implicit_search_coupling",
+          "unbounded_queue_retry"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "b0m-v1",
+            "observed_at": "2026-02-01T00:00:00Z",
+            "verification_status": "synthetic"
+          }
+        ],
+        "occurrence_source_identity": [
+          "b0-corpus",
+          "ADR-B0-020"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "version_id": "dver-9af32b55067377b39e267a14b301abc0",
+        "decision_id": "ADR-B0-021",
+        "revision": "1",
+        "content_digest": "dcfc0ead21cbb882cb9ca591544ebe68267587eed9c779b8f6dfe21a060d58fc",
+        "statement": "Synthetic B0 decision ADR-B0-021 governs search behavior for the mechanical benchmark marker_adr-b0-021.",
+        "rationale": "Frozen deterministic B0 corpus entry for scope search. This is synthetic validation data, not repository project memory.",
+        "context_scope": [
+          "policy",
+          "search"
+        ],
+        "constraints": [
+          "no external search service",
+          "preserve policy boundary",
+          "record marker_adr-b0-021"
+        ],
+        "anti_patterns": [
+          "external_search_client",
+          "implicit_policy_coupling",
+          "unbounded_search_retry"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "b0m-v1",
+            "observed_at": "2026-02-01T00:00:00Z",
+            "verification_status": "synthetic"
+          }
+        ],
+        "occurrence_source_identity": [
+          "b0-corpus",
+          "ADR-B0-021"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "version_id": "dver-4d60e357af5e65580ea307ae07c8ef17",
+        "decision_id": "ADR-B0-022",
+        "revision": "1",
+        "content_digest": "372ffb3e67e948b44f12ec349adbd83604044dc603ca0ee14b59f56ed08bf8e4",
+        "statement": "Synthetic B0 decision ADR-B0-022 governs policy behavior for the mechanical benchmark marker_adr-b0-022.",
+        "rationale": "Frozen deterministic B0 corpus entry for scope policy. This is synthetic validation data, not repository project memory.",
+        "context_scope": [
+          "policy",
+          "scheduler"
+        ],
+        "constraints": [
+          "no external policy service",
+          "preserve scheduler boundary",
+          "record marker_adr-b0-022"
+        ],
+        "anti_patterns": [
+          "external_policy_client",
+          "implicit_scheduler_coupling",
+          "unbounded_policy_retry"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "b0m-v1",
+            "observed_at": "2026-02-01T00:00:00Z",
+            "verification_status": "synthetic"
+          }
+        ],
+        "occurrence_source_identity": [
+          "b0-corpus",
+          "ADR-B0-022"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "version_id": "dver-45dc1bb40b87c790858eb52624eea56c",
+        "decision_id": "ADR-B0-023",
+        "revision": "1",
+        "content_digest": "f89790ae9dce9016fd3527dce3bbf62f2bfd31daf3bfc4cae8475ff52ef2edf4",
+        "statement": "Synthetic B0 decision ADR-B0-023 governs scheduler behavior for the mechanical benchmark marker_adr-b0-023.",
+        "rationale": "Frozen deterministic B0 corpus entry for scope scheduler. This is synthetic validation data, not repository project memory.",
+        "context_scope": [
+          "archive",
+          "scheduler"
+        ],
+        "constraints": [
+          "no external scheduler service",
+          "preserve archive boundary",
+          "record marker_adr-b0-023"
+        ],
+        "anti_patterns": [
+          "external_scheduler_client",
+          "implicit_archive_coupling",
+          "unbounded_scheduler_retry"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "b0m-v1",
+            "observed_at": "2026-02-01T00:00:00Z",
+            "verification_status": "synthetic"
+          }
+        ],
+        "occurrence_source_identity": [
+          "b0-corpus",
+          "ADR-B0-023"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-02-01T00:00:00Z"
+      },
+      {
+        "version_id": "dver-04000abd0db34f78c67595fa0a9c53a3",
+        "decision_id": "ADR-B0-024",
+        "revision": "1",
+        "content_digest": "4b387d71674e03b06dd72ca2a2c0db1494a0100a016da6608727b52ff5876ed0",
+        "statement": "Synthetic B0 decision ADR-B0-024 governs archive behavior for the mechanical benchmark marker_adr-b0-024.",
+        "rationale": "Frozen deterministic B0 corpus entry for scope archive. This is synthetic validation data, not repository project memory.",
+        "context_scope": [
+          "archive",
+          "cache"
+        ],
+        "constraints": [
+          "no external archive service",
+          "preserve cache boundary",
+          "record marker_adr-b0-024"
+        ],
+        "anti_patterns": [
+          "external_archive_client",
+          "implicit_cache_coupling",
+          "unbounded_archive_retry"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "b0m-v1",
+            "observed_at": "2026-02-01T00:00:00Z",
+            "verification_status": "synthetic"
+          }
+        ],
+        "occurrence_source_identity": [
+          "b0-corpus",
+          "ADR-B0-024"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-02-01T00:00:00Z"
+      }
+    ],
+    "rules": [
+      {
+        "rule_id": "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4",
+        "decision_id": "ADR-B0-001",
+        "decision_version_id": "dver-6321b0b53db41080445166681c6546a9",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "forbid_adr-b0-001_literal"
+        },
+        "applicability": {},
+        "binding_authority": "legacy_unknown"
+      },
+      {
+        "rule_id": "ADR-B0-002:FORBID_LITERAL:0358ff77a149da2284dcc278dc3fb9e5",
+        "decision_id": "ADR-B0-002",
+        "decision_version_id": "dver-4985f8bb2f7e08e41d85e1402cffc453",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "forbid_adr-b0-002_literal"
+        },
+        "applicability": {},
+        "binding_authority": "legacy_unknown"
+      },
+      {
+        "rule_id": "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3",
+        "decision_id": "ADR-B0-003",
+        "decision_version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "forbid_adr-b0-003_literal"
+        },
+        "applicability": {},
+        "binding_authority": "legacy_unknown"
+      },
+      {
+        "rule_id": "ADR-B0-004:FORBID_LITERAL:1562f5d6c95745c48f3245d09f4f5f32",
+        "decision_id": "ADR-B0-004",
+        "decision_version_id": "dver-6e1942c7ae817a6080cf26b540431edf",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "forbid_adr-b0-004_literal"
+        },
+        "applicability": {},
+        "binding_authority": "legacy_unknown"
+      },
+      {
+        "rule_id": "ADR-B0-005:FORBID_LITERAL:33e0b5c00d04cbc00fe36d09c7ed8c6b",
+        "decision_id": "ADR-B0-005",
+        "decision_version_id": "dver-47cd76fdfae32baeea61f8217b71f0ef",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "forbid_adr-b0-005_literal"
+        },
+        "applicability": {},
+        "binding_authority": "legacy_unknown"
+      },
+      {
+        "rule_id": "ADR-B0-006:FORBID_LITERAL:e633d47dce0c71d1545e407b418e89fb",
+        "decision_id": "ADR-B0-006",
+        "decision_version_id": "dver-2e8a9149777c861e5bad1783c0941ff4",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "forbid_adr-b0-006_literal"
+        },
+        "applicability": {},
+        "binding_authority": "legacy_unknown"
+      },
+      {
+        "rule_id": "ADR-B0-007:FORBID_LITERAL:7beaf86b08ae06200b31495d6ba2bd3f",
+        "decision_id": "ADR-B0-007",
+        "decision_version_id": "dver-41b40c1ae9c56d43a672bab3f2a32243",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "forbid_adr-b0-007_literal"
+        },
+        "applicability": {},
+        "binding_authority": "legacy_unknown"
+      },
+      {
+        "rule_id": "ADR-B0-008:FORBID_LITERAL:3622858bdbc06391b310e45b1d37a930",
+        "decision_id": "ADR-B0-008",
+        "decision_version_id": "dver-79735a3b68b7599315e1e49d79f668d4",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "forbid_adr-b0-008_literal"
+        },
+        "applicability": {},
+        "binding_authority": "legacy_unknown"
+      },
+      {
+        "rule_id": "ADR-B0-009:FORBID_LITERAL:1b36389cb93dc05ea036d2d89eab7802",
+        "decision_id": "ADR-B0-009",
+        "decision_version_id": "dver-30d6a236d96d9d2504bd5904ddc26674",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "forbid_adr-b0-009_literal"
+        },
+        "applicability": {},
+        "binding_authority": "legacy_unknown"
+      },
+      {
+        "rule_id": "ADR-B0-010:FORBID_LITERAL:93a1846003bcc7d4c15da3853df64af8",
+        "decision_id": "ADR-B0-010",
+        "decision_version_id": "dver-5a681404ff48fbf77c6574478eeae7bd",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "forbid_adr-b0-010_literal"
+        },
+        "applicability": {},
+        "binding_authority": "legacy_unknown"
+      },
+      {
+        "rule_id": "ADR-B0-011:FORBID_LITERAL:6cd44bd5fe77057fca593ec72d872e8c",
+        "decision_id": "ADR-B0-011",
+        "decision_version_id": "dver-860b0dc50437739e27b14f88c152a51f",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "forbid_adr-b0-011_literal"
+        },
+        "applicability": {},
+        "binding_authority": "legacy_unknown"
+      },
+      {
+        "rule_id": "ADR-B0-012:FORBID_LITERAL:a58479832608f3cc6f5943aa1c9d43da",
+        "decision_id": "ADR-B0-012",
+        "decision_version_id": "dver-aa197f8332f585f09e2dc62485e5b38a",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "forbid_adr-b0-012_literal"
+        },
+        "applicability": {},
+        "binding_authority": "legacy_unknown"
+      },
+      {
+        "rule_id": "ADR-B0-016:FORBID_LITERAL:de912a8159a4ccc15cca40f5b948836e",
+        "decision_id": "ADR-B0-016",
+        "decision_version_id": "dver-d068604b897161208ae187e90da57bfa",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "forbid_adr-b0-016_literal"
+        },
+        "applicability": {},
+        "binding_authority": "legacy_unknown"
+      },
+      {
+        "rule_id": "ADR-B0-017:FORBID_LITERAL:7e78637b83af55d04a1cd77e7210aef3",
+        "decision_id": "ADR-B0-017",
+        "decision_version_id": "dver-4ed519d2f8361331bda400f046f4a1cd",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "forbid_adr-b0-017_literal"
+        },
+        "applicability": {},
+        "binding_authority": "legacy_unknown"
+      },
+      {
+        "rule_id": "ADR-B0-018:FORBID_LITERAL:9117b71942559968fda4807f41dae271",
+        "decision_id": "ADR-B0-018",
+        "decision_version_id": "dver-082a078fea409b08ac2c6b080ea8467b",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "forbid_adr-b0-018_literal"
+        },
+        "applicability": {},
+        "binding_authority": "legacy_unknown"
+      },
+      {
+        "rule_id": "ADR-B0-019:FORBID_LITERAL:2b00c8cc0216ae00b6bc9102aee7b97d",
+        "decision_id": "ADR-B0-019",
+        "decision_version_id": "dver-c68c7cec41f1291ae5419327c495c788",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "forbid_adr-b0-019_literal"
+        },
+        "applicability": {},
+        "binding_authority": "legacy_unknown"
+      },
+      {
+        "rule_id": "ADR-B0-020:FORBID_LITERAL:07d434c37abdea9179283d8dad6ebb20",
+        "decision_id": "ADR-B0-020",
+        "decision_version_id": "dver-1ce9eb76ec681e76df4640af1cc31893",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "forbid_adr-b0-020_literal"
+        },
+        "applicability": {},
+        "binding_authority": "legacy_unknown"
+      },
+      {
+        "rule_id": "ADR-B0-021:FORBID_LITERAL:9848b84a6bfbaec659980e04919ee98f",
+        "decision_id": "ADR-B0-021",
+        "decision_version_id": "dver-9af32b55067377b39e267a14b301abc0",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "forbid_adr-b0-021_literal"
+        },
+        "applicability": {},
+        "binding_authority": "legacy_unknown"
+      },
+      {
+        "rule_id": "ADR-B0-023:FORBID_LITERAL:8c83f2d1f78b9c927ea4069129696107",
+        "decision_id": "ADR-B0-023",
+        "decision_version_id": "dver-45dc1bb40b87c790858eb52624eea56c",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "forbid_adr-b0-023_literal"
+        },
+        "applicability": {},
+        "binding_authority": "legacy_unknown"
+      },
+      {
+        "rule_id": "ADR-B0-024:FORBID_LITERAL:1dba57ab040ba0cd3e1a4bb6bd556b53",
+        "decision_id": "ADR-B0-024",
+        "decision_version_id": "dver-04000abd0db34f78c67595fa0a9c53a3",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "forbid_adr-b0-024_literal"
+        },
+        "applicability": {},
+        "binding_authority": "legacy_unknown"
+      }
+    ]
+  }
+}

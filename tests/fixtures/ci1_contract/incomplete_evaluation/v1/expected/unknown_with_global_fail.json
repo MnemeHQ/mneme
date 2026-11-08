@@ -1,0 +1,50 @@
+{
+  "applicability": [
+    {
+      "decision_id": "ADR-921",
+      "decision_version_id": "dver-441d7a93b5c2b0c6440fab501cd0eb7c",
+      "input_path": null,
+      "outcome": "APPLIED",
+      "path_scoped": false,
+      "reason": "the rule has global applicability",
+      "rule_id": "ADR-921:FORBID_LITERAL:8ea9d1c2fc9247acd0fb4505ddd8d24e",
+      "rule_index": 0,
+      "rule_type": "FORBID_LITERAL",
+      "rule_value": "--legacy-sync",
+      "selector": null
+    },
+    {
+      "decision_id": "ADR-922",
+      "decision_version_id": "dver-a31f3d502703fc07ffe709b95c1d74b4",
+      "input_path": null,
+      "outcome": "UNKNOWN",
+      "path_scoped": true,
+      "reason": "input path '../README.md' is outside or cannot be resolved against policy root",
+      "rule_id": "ADR-922:FORBID_LITERAL:21a32494727a473bd487a2580e075557",
+      "rule_index": 0,
+      "rule_type": "FORBID_LITERAL",
+      "rule_value": "staging.internal.example",
+      "selector": null
+    }
+  ],
+  "evaluation_complete": false,
+  "freshness": [],
+  "mode": "strict",
+  "schema": "mneme.check/v1",
+  "verdict": "FAIL",
+  "violations": [
+    {
+      "decision_id": "ADR-921",
+      "decision_text": "CI1 fixture - forbid the deprecated sync flag everywhere",
+      "decision_version_id": "dver-441d7a93b5c2b0c6440fab501cd0eb7c",
+      "input_path": null,
+      "kind": "typed_rule",
+      "rule": "--legacy-sync",
+      "rule_id": "ADR-921:FORBID_LITERAL:8ea9d1c2fc9247acd0fb4505ddd8d24e",
+      "rule_type": "FORBID_LITERAL",
+      "selector": null,
+      "severity": "FAIL",
+      "trigger": "--legacy-sync"
+    }
+  ]
+}

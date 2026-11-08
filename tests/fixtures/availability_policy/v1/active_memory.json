@@ -1,0 +1,107 @@
+{
+  "meta": {
+    "name": "d1e2b",
+    "description": "canonical protect"
+  },
+  "items": [],
+  "examples": [],
+  "decisions": [
+    {
+      "id": "d_ready",
+      "decision": "No postgres in the service layer",
+      "rationale": "",
+      "scope": [
+        "storage"
+      ],
+      "constraints": [],
+      "anti_patterns": [
+        "postgres"
+      ],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "postgres"
+        }
+      ],
+      "test_evidence": [],
+      "created_at": "2026-01-01T00:00:00Z",
+      "updated_at": "2026-01-01T00:00:00Z",
+      "status": "active"
+    }
+  ],
+  "activation": {
+    "schema": "mneme.setup/v1",
+    "state": "active",
+    "mneme_version": "0.6.0",
+    "setup_started_at": "2026-01-01T00:00:00Z",
+    "setup_completed_at": "2026-01-01T00:00:00Z",
+    "activated_at": "2026-10-21T09:00:00Z",
+    "audit_ref": "",
+    "baseline": null,
+    "integrations_detected": [],
+    "integrations_configured": [],
+    "enforcement": "not_enabled"
+  },
+  "decision_index": {
+    "schema": "mneme.decision-index/v2",
+    "semantic_features": [],
+    "decisions": [
+      {
+        "decision_id": "d_ready",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-2ec6b096959bf935fedaeb525ffba041",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": "2026-01-01T00:00:00Z"
+      }
+    ],
+    "versions": [
+      {
+        "version_id": "dver-2ec6b096959bf935fedaeb525ffba041",
+        "decision_id": "d_ready",
+        "revision": "1",
+        "content_digest": "eb27103074504925e93204023a0a073f4989da819ad694ce8c6cef5b607f472e",
+        "statement": "No postgres in the service layer",
+        "rationale": "",
+        "context_scope": [
+          "storage"
+        ],
+        "constraints": [],
+        "anti_patterns": [
+          "postgres"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "",
+            "observed_at": "",
+            "verification_status": ""
+          }
+        ],
+        "occurrence_source_identity": [
+          "legacy-decisions",
+          "d_ready"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-01-01T00:00:00Z"
+      }
+    ],
+    "rules": [
+      {
+        "rule_id": "d_ready:FORBID_LITERAL:b5c29244a70b37d91485b4653a880b68",
+        "decision_id": "d_ready",
+        "decision_version_id": "dver-2ec6b096959bf935fedaeb525ffba041",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "postgres"
+        },
+        "applicability": {},
+        "binding_authority": "protection"
+      }
+    ]
+  }
+}

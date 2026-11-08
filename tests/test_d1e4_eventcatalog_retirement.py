@@ -123,7 +123,7 @@ def test_canonical_apply_refuses_before_compilation(tmp_path, capsys, monkeypatc
     def _must_not_compile(*args, **kwargs):
         raise AssertionError("EventCatalog was compiled for a retired apply")
 
-    monkeypatch.setattr(cli, "ec_compile_for_import", _must_not_compile)
+    monkeypatch.setattr("mneme.integrations.eventcatalog.compile_for_import", _must_not_compile)
 
     assert _run(memory, "--apply") == 2
     assert CANONICAL_APPLY_RETIRED in capsys.readouterr().err

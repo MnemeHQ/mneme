@@ -30,6 +30,7 @@ at what level, with what evidence. The website's
 | Validated compatibility | Paperclip (CLI + ACP) | [paperclip.md](paperclip.md), [PR #315](https://github.com/MnemeHQ/mneme/pull/315) |
 | Rules export | Cursor | [adr-import.md](adr-import.md) (corpus workflows); generator: `mneme cursor generate` |
 | CLI-based CI gates | GitHub Actions, GitLab CI | `mneme check` reference patterns |
+| Experimental | GitHub Actions trusted availability gate (ADR-033 C4) | [github-actions-c4-gate.md](github-actions-c4-gate.md); validated offline ([#680](https://github.com/MnemeHQ/mneme/pull/680)) and in an isolated lab ([#681](https://github.com/MnemeHQ/mneme/pull/681)); not enabled on Core |
 | Experimental | OpenCode | plugin-hooks approach under evaluation; compaction experiment returned a NULL verdict |
 | Experimental | Hermes Agent | P1.5 POC passed (context injection + pre-tool blocking); no blocking Stop-equivalent, see [hermes.md](hermes.md) |
 | Planned | Deep Agents filesystem tools (`write_file`/`edit_file`) | roadmap-only until a pinned Deep Agents validation passes; the [LangChain agents on LangGraph](langchain-langgraph.md) adapter governs local-filesystem-semantic tools by name contract |
@@ -49,6 +50,12 @@ at what level, with what evidence. The website's
   remote backends ARE intercepted but carry unsupported/unvalidated backend
   semantics (local-path assumptions may not describe the mutation target).
   See [langchain-langgraph.md](langchain-langgraph.md).
+- **Custom tools and project boundaries** (LangChain and Agent SDK): a custom
+  tool can self-govern by calling the existing gate before it mutates. This
+  is an opt-in reference pattern, not interception; an unwired custom tool
+  stays ungoverned. Writes outside `project_dir` fail open visibly whenever
+  the memory has any path-scoped rule, and are evaluated only when all rules
+  are unscoped; confinement is the orchestrator's policy. See [custom-tools.md](custom-tools.md).
 - **Antigravity**: tested against Antigravity IDE 2.8.1; three file-mutation
   tools covered; deny-only response policy. See [antigravity.md](antigravity.md).
 - **Kiro CLI 3.0 / v3**: validated live on CLI 2.19.2 `--v3` (v3 engine / CLI 3.0).

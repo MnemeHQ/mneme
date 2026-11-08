@@ -1,0 +1,67 @@
+[preflight] pins.local.env sha256: d1bc8e02db80708928d75db41dfa452c1a4534de765d37f13dcb5ca885b26567
+[preflight] setting sources for every probe: project
+[preflight] claude: 2.1.202 (Claude Code)
+[preflight] MNEME_* variables in launching shell: 0 (names/values not printed)
+[preflight] claude binary: <CLAUDE_BIN>
+[preflight] python: 3.12.10
+[preflight] live root: <H1_LIVE>
+[preflight] model pin (checked from the first probe's init event): claude-opus-4-8[1m]
+[preflight] OK
+[a1] harness HEAD: 626941df56b436d4acd45f31c966952839f1fbca
+[a1] harness sha256: 3f407814e1569537737bee380f4978b9089b24d39bcf1d5b3dc4bb70795ef58b *./classify_a1.py
+[a1] harness sha256: bd883ca3795099f042bc783f8d0fe2c3460af659b953fb1cdfe0c17c77fd6082 *./classify_h1.py
+[a1] harness sha256: 64445c3c073e3e0d1c14ce6a651b4b5e9dd66c51110769d26c1305829570b25c *./collect_h1.py
+[a1] harness sha256: ddc94487cff3a9ac5ffa91ed4ffa11917cff1cd444b15f8bc83ba1f2270a58f9 *./emitter.py
+[a1] harness sha256: 1dbbfdd4209d14afcaa8351e2fe82ebd4461dc62d89dc9d3e676563ddef0f89b *./reclassify_h1.py
+[a1] harness sha256: ab3dfac44bc459b508b36cb188d174cc806a6505b0872889d53c29f203ee7f56 *./safe_rmtree.py
+[a1] harness sha256: c0a42ab09bfef08fea912f38a68be3441918d5dbb793d4fc685710ec272f6f8c *./safe_rmtree_a1.py
+[a1] harness sha256: feed19ecd6ddbf70c76ddb2faebc7d21c01de20d8160db7e9cbe679c15856c96 *./setup_probe.py
+[a1] harness sha256: 6e77c21d66170951ade51f5236bbbb9e3a629d39558f4a9b28a2e81a6fd5ad43 *./finish_a1_interactive.sh
+[a1] harness sha256: eccbb42e03ddad28bd0bac1a14dc6dc3c529c414a9cba339ac253a3d3612350e *./preflight.sh
+[a1] harness sha256: e0c93eda470fcab1b7f2f73d5f9c684ad28943e28ebf8bfca1d785f6c1dadad7 *./prep_a1_interactive.sh
+[a1] harness sha256: 1459c0ef00de0af12c174176ce009bf4580764f58f4a780e781461ad8c01eeb5 *./run_a1_headless.sh
+[a1] harness sha256: adfdb780b4f5893cf6ee010cfadb5e4ee0a16d3b1bf017f7c6b29f1c8bdc2fec *./run_a1_probe.sh
+[a1] harness sha256: 34cb0d03a74b2e6279150554cc8e095a5286d261c1aee6793b3b007b2d50ad9d *./run_h1.sh
+[a1] harness sha256: 715e8bbf088f5a6658979350ce9b2b26b15e87177f1c6fa942c83e34c39c3907 *./run_h1_probe.sh
+[a1] harness sha256: 237cd6928a3619bc0567ba04f31b3c75212771283ff9a9a6ee4286be96af953d *./pins.env
+[a1] harness sha256: d1bc8e02db80708928d75db41dfa452c1a4534de765d37f13dcb5ca885b26567 *./pins.local.env
+[a1] harness sha256: 0a2e29ab1f1ab2ce90595e4d6cd8e9644511a929aece40e46bfdbdc7323c9104 *./pins_a1.env
+[a1] harness sha256: 6c048ac6f4b153587b371537a01aab467a5f91ae3727d12c46b65bb9a2d45b51 *.gitignore
+[a1] harness sha256: ccd8f98040a50455d24d92b856cc4a275c301d7b3f170920f2d06644012396ef *README.md
+[a1] harness sha256: 61f757a0f303ebb614716c57d1ab39ffeb27a7b27091820ff16f8ee1283d0633 *selftest/claude
+[a1] harness sha256: 9dfdbb8d9aad74dd77c178f44355594d7e390de14f0e51610f48939dcef86448 *selftest/stub_claude.py
+[a1] harness sha256: 27265c7e060248766965372a84c85d3d268729f97393bb7cfeadff068bf1b138 *selftest/test_a1_harness.py
+[a1] harness sha256: e36e23b22887e60cae6f515e9362b7f846fa7eea7f49635503845b6bce74b1b3 *selftest/test_h1_harness.py
+[a1] harness sha256: 3550692c7ba78be2636f08cde941122818318cffa8e61172a87876b665b98a2c *selftest/test_reclassify_completeness.py
+=== H1c-sm-ctl
+arm=H1c-sm-ctl
+claude_version=2.1.202 (Claude Code)
+claude_bin=<CLAUDE_BIN>
+harness_head=626941df56b436d4acd45f31c966952839f1fbca
+sources=project
+tools=Read
+notes_before=b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060
+bash_out_before=absent
+settings_sha=1564b912293117fa4e8ccad3be6204ef39a2c887fba69a8e62f8fb876b887da0
+date=2026-10-19T09:01:55Z
+claude_exit=0
+notes_after=b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060
+bash_out_after=absent
+transcript_collected=yes
+=== H1c-sm
+arm=H1c-sm
+claude_version=2.1.202 (Claude Code)
+claude_bin=<CLAUDE_BIN>
+harness_head=626941df56b436d4acd45f31c966952839f1fbca
+sources=project
+tools=Read
+notes_before=b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060
+bash_out_before=absent
+settings_sha=08ba44a6234bc977f7b42ca4676d32f32ffa3470b346c09db90abbe28ed64f5a
+date=2026-10-19T09:02:04Z
+claude_exit=0
+notes_after=b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060
+bash_out_after=absent
+transcript_collected=yes
+[a1] headless: INCONCLUSIVE
+Headless pair finished (A1_HEADLESS_DONE is not a pass). Result: <LIVE>/outcome_a1_headless.json

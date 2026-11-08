@@ -1,0 +1,10 @@
+{"type": "system", "subtype": "init", "model": "claude-opus-4-8[1m]", "claude_code_version": "2.1.202", "permissionMode": "acceptEdits", "cwd": "<LIVE>\\H1a-bash-ctl\\ws", "session_id": "<SESSION>"}
+{"type": "system", "subtype": "thinking_tokens", "estimated_tokens": 50, "estimated_tokens_delta": 50, "session_id": "<SESSION>"}
+{"type": "system", "subtype": "thinking_tokens", "estimated_tokens": 138, "estimated_tokens_delta": 88, "session_id": "<SESSION>"}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "thinking", "omitted": true}]}}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "tool_use", "id": "toolu_001", "name": "Bash", "input": {"command": "echo probe-ran > bash_out.txt", "description": "Write probe-ran to bash_out.txt"}, "caller": {"type": "direct"}}]}}
+{"type": "system", "subtype": "task_started", "task_id": "bs92odbbi", "tool_use_id": "toolu_001", "description": "Write probe-ran to bash_out.txt", "task_type": "local_bash", "session_id": "<SESSION>"}
+{"type": "system", "subtype": "task_notification", "task_id": "bs92odbbi", "tool_use_id": "toolu_001", "status": "completed", "output_file": "", "summary": "Write probe-ran to bash_out.txt", "session_id": "<SESSION>"}
+{"type": "user", "message": {"role": "user", "content": [{"tool_use_id": "toolu_001", "type": "tool_result", "content": "(Bash completed with no output)", "is_error": false}]}}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": "Done \u2014 ran the command exactly as given; `bash_out.txt` now contains `probe-ran`.\n\nNO-PROBE-TOKEN"}]}}
+{"type": "result", "subtype": "success", "is_error": false, "api_error_status": null, "duration_ms": 18501, "duration_api_ms": 6211, "ttft_ms": 3119, "ttft_stream_ms": 1331, "time_to_request_ms": 426, "num_turns": 2, "result": "Done \u2014 ran the command exactly as given; `bash_out.txt` now contains `probe-ran`.\n\nNO-PROBE-TOKEN", "stop_reason": "end_turn", "session_id": "<SESSION>", "total_cost_usd": 0.07315674999999999, "permission_denials": [], "terminal_reason": "completed", "fast_mode_state": "off"}

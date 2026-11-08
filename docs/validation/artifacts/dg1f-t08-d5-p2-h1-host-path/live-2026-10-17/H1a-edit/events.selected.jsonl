@@ -1,0 +1,13 @@
+{"type": "system", "subtype": "init", "model": "claude-opus-4-8[1m]", "claude_code_version": "2.1.202", "permissionMode": "acceptEdits", "cwd": "<LIVE>\\H1a-edit\\ws", "session_id": "<SESSION>"}
+{"type": "system", "subtype": "thinking_tokens", "estimated_tokens": 50, "estimated_tokens_delta": 50, "session_id": "<SESSION>"}
+{"type": "system", "subtype": "thinking_tokens", "estimated_tokens": 124, "estimated_tokens_delta": 74, "session_id": "<SESSION>"}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "thinking", "omitted": true}]}}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "tool_use", "id": "toolu_001", "name": "Read", "input": {"file_path": "<LIVE>\\H1a-edit\\ws\\notes.txt"}, "caller": {"type": "direct"}}]}}
+{"type": "user", "message": {"role": "user", "content": [{"tool_use_id": "toolu_001", "type": "tool_result", "content": "1\talpha\n2\t"}]}}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "tool_use", "id": "toolu_002", "name": "Edit", "input": {"replace_all": false, "file_path": "<LIVE>\\H1a-edit\\ws\\notes.txt", "old_string": "alpha", "new_string": "beta"}, "caller": {"type": "direct"}}]}}
+{"type": "user", "message": {"role": "user", "content": [{"tool_use_id": "toolu_002", "type": "tool_result", "content": "The file <LIVE>\\H1a-edit\\ws\\notes.txt has been updated successfully. (file state is current in your context \u2014 no need to Read it back)"}]}}
+{"type": "system", "subtype": "thinking_tokens", "estimated_tokens": 50, "estimated_tokens_delta": 50, "session_id": "<SESSION>"}
+{"type": "system", "subtype": "thinking_tokens", "estimated_tokens": 114, "estimated_tokens_delta": 64, "session_id": "<SESSION>"}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "thinking", "omitted": true}]}}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": "Done \u2014 replaced \"alpha\" with \"beta\" in notes.txt.\n\nMNEME-PROBE-05b9124f02604071"}]}}
+{"type": "result", "subtype": "success", "is_error": false, "api_error_status": null, "duration_ms": 8303, "duration_api_ms": 8959, "ttft_ms": 3163, "ttft_stream_ms": 1680, "time_to_request_ms": 374, "num_turns": 3, "result": "Done \u2014 replaced \"alpha\" with \"beta\" in notes.txt.\n\nMNEME-PROBE-05b9124f02604071", "stop_reason": "end_turn", "session_id": "<SESSION>", "total_cost_usd": 0.09066175, "permission_denials": [], "terminal_reason": "completed", "fast_mode_state": "off"}

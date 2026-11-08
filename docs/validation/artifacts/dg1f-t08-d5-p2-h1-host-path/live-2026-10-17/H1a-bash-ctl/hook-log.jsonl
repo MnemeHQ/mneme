@@ -1,0 +1,1 @@
+{"ts": "2026-10-17T17:51:53.971294+00:00", "mode": "noop", "envelope": {"hook_event_name": "PreToolUse", "tool_name": "Bash", "session_id": "<SESSION>", "transcript_path": "<HOME>\\.claude\\projects\\C--dev-d5p2-h1-live-H1a-bash-ctl-ws\\<UUID>.jsonl", "cwd": "<LIVE>\\H1a-bash-ctl\\ws"}, "emitted": ""}

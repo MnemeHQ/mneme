@@ -1,0 +1,23 @@
+{
+  "applicability": [
+    {
+      "decision_id": "ADR-901",
+      "decision_version_id": "dver-d3d431ff6d5edba8b555a040a7b85f9b",
+      "input_path": null,
+      "outcome": "UNKNOWN",
+      "path_scoped": true,
+      "reason": "input path '../README.md' is outside or cannot be resolved against policy root",
+      "rule_id": "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b",
+      "rule_index": 0,
+      "rule_type": "FORBID_LITERAL",
+      "rule_value": "install legacy-client",
+      "selector": null
+    }
+  ],
+  "evaluation_complete": false,
+  "freshness": [],
+  "mode": "strict",
+  "schema": "mneme.check/v1",
+  "verdict": "PASS",
+  "violations": []
+}

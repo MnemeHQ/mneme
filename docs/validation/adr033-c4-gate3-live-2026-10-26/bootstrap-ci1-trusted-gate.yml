@@ -1,0 +1,214 @@
+name: CI1 trusted merge gate
+
+# ADR-033 C4 Gate 3 bootstrap (MnemeHQ/mneme: C4 Gate 0 charter #676, Gate 1
+# charter #677 sections 2 and 4, freeze amendment #678, adapter #679, Gate 2
+# record #680). Replaces the CI1 gate script with the C4 availability adapter;
+# the CI1 trust boundary is unchanged.
+#
+# Trust boundary:
+# - pull_request_target runs the BASE branch's workflow with a read-only token.
+#   The PR head is fetched into the object store and read only as git blobs; it
+#   is never checked out, installed, imported or executed.
+# - Decision memory comes from the base commit, never from the PR.
+# - The evaluator is the CI1 P2-approved build: rebuilt from MnemeHQ/mneme
+#   0b74d410 and installed only if its sha256 is the approved value. Runtime
+#   dependencies are hash-locked.
+# - The adapter is fetched from MnemeHQ/mneme at the exact reviewed commit and
+#   runs only if its git blob id, file mode and sha256 match the pins below.
+#   Never from the PR, its title, its environment or a branch.
+# - The availability posture comes from the administrator-controlled repository
+#   variable MNEME_CI_AVAILABILITY (missing or invalid means closed). The
+#   violation mode is the literal constant below. A PR controls neither.
+# - "Gate decision" runs the adapter's verify-report, which re-reads the posture,
+#   recomputes the result from the report and checks every pin. The adapter's
+#   own exit code is never enough.
+# The job name below is the required-check context in ruleset 25313704.
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci1-trusted-gate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  EVALUATOR_COMMIT: 0b74d410b45e7b3efcf08d00ce58e7bd7017b757
+  APPROVED_WHEEL_SHA256: e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51
+  ADAPTER_REPOSITORY: MnemeHQ/mneme
+  ADAPTER_COMMIT: c51729f78199203fe12fcbc5c678b89a2c4f7d3e
+  ADAPTER_PATH: scripts/ci/adr033_c4_gate.py
+  ADAPTER_BLOB: 5feedf60ce1a67b2bb85673354c8b8b367a87d06
+  ADAPTER_SHA256: afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9
+  # R2: the violation mode is a literal constant of this trusted workflow.
+  VIOLATION_MODE: strict
+  # A3: administrative posture; the adapter treats anything but open/closed as closed.
+  MNEME_CI_AVAILABILITY: ${{ vars.MNEME_CI_AVAILABILITY }}
+  # From the event, not from anything the PR controls.
+  PR_NUMBER: ${{ github.event.pull_request.number }}
+  HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+  # Interpreter for the adapter (not the evaluator, which is the pinned venv).
+  GATE_PYTHON: /usr/bin/python3.12
+
+jobs:
+  gate:
+    name: CI1 trusted gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - name: Check out the BASE commit (trusted workflow and memory)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: base
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Fetch the PR head as objects only (never checked out)
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd base
+          base_sha="$(git rev-parse HEAD)"
+          [ "$base_sha" = "$GITHUB_SHA" ] || { echo "::error::base checkout $base_sha != GITHUB_SHA $GITHUB_SHA"; exit 1; }
+          git fetch --no-tags --quiet origin "+refs/pull/${PR_NUMBER}/head:refs/ci1/pr-head"
+          fetched="$(git rev-parse refs/ci1/pr-head)"
+          if [ "$fetched" != "$HEAD_SHA" ]; then
+            # A newer push raced this run; that push triggers its own run.
+            echo "::error::PR head moved ($fetched != event $HEAD_SHA); this run is not evaluated"
+            exit 1
+          fi
+          echo "BASE_SHA=$base_sha" >> "$GITHUB_ENV"
+          echo "base $base_sha, head $HEAD_SHA"
+
+      - name: Check out the evaluator source at the pinned commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: MnemeHQ/mneme
+          ref: ${{ env.EVALUATOR_COMMIT }}
+          path: evaluator-src
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Rebuild the evaluator wheel and require the approved sha256
+        shell: bash
+        run: |
+          set -euo pipefail
+          unset PYTHONPATH
+          umask 0002
+          [ "$(git -C evaluator-src rev-parse HEAD)" = "$EVALUATOR_COMMIT" ] || { echo "::error::evaluator source is not the pinned commit"; exit 1; }
+          b="$RUNNER_TEMP/build"
+          mkdir -p "$b"
+          git -C evaluator-src archive --format=tar HEAD > "$b/src.tar"
+          /usr/bin/python3.12 -I -c "import sys, tarfile; tarfile.open(sys.argv[1]).extractall(sys.argv[2], filter='data')" "$b/src.tar" "$b/src"
+          /usr/bin/python3.12 -I -m venv "$b/venv"
+          export SOURCE_DATE_EPOCH="$(git -C evaluator-src log -1 --format=%ct)"
+          PIP_CONSTRAINT="$GITHUB_WORKSPACE/base/p2/build-constraints.txt" \
+            "$b/venv/bin/python" -I -m pip wheel -q --no-deps --disable-pip-version-check \
+            --wheel-dir "$b/built" "$b/src"
+          shopt -s nullglob
+          wheels=("$b"/built/*.whl)
+          [ "${#wheels[@]}" -eq 1 ] || { echo "::error::expected exactly one built wheel, found ${#wheels[@]}"; exit 1; }
+          sha="$(sha256sum "${wheels[0]}" | cut -d' ' -f1)"
+          [ "$sha" = "$APPROVED_WHEEL_SHA256" ] || { echo "::error::evaluator wheel $sha != approved $APPROVED_WHEEL_SHA256"; exit 1; }
+          echo "EVALUATOR_WHEEL=${wheels[0]}" >> "$GITHUB_ENV"
+          echo "evaluator wheel $sha (approved)"
+
+      - name: Install the pinned evaluator (hash-locked, no resolution)
+        shell: bash
+        run: |
+          set -euo pipefail
+          unset PYTHONPATH
+          e="$RUNNER_TEMP/evaluator"
+          /usr/bin/python3.12 -I -m venv "$e"
+          req="$RUNNER_TEMP/evaluator-requirements.txt"
+          cp base/gate/evaluator-requirements.txt "$req"
+          echo "$EVALUATOR_WHEEL --hash=sha256:$APPROVED_WHEEL_SHA256" >> "$req"
+          "$e/bin/python" -I -m pip install -q --disable-pip-version-check \
+            --require-hashes --only-binary=:all: --no-deps -r "$req"
+          "$e/bin/python" -I -c "import importlib.metadata as m, mneme, sys; p = mneme.__file__; assert p.startswith(sys.prefix), p; print(m.version('mneme-hq'), p)"
+          echo "EVALUATOR_PYTHON=$e/bin/python" >> "$GITHUB_ENV"
+
+      - name: Check out the adapter at the reviewed commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ env.ADAPTER_REPOSITORY }}
+          ref: ${{ env.ADAPTER_COMMIT }}
+          path: adapter-src
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Verify the adapter pins before running it
+        shell: bash
+        run: |
+          # Any mismatch fails the required check under every posture.
+          set -euo pipefail
+          [ "$(git -C adapter-src rev-parse HEAD)" = "$ADAPTER_COMMIT" ] || { echo "::error::adapter source is not the pinned commit"; exit 1; }
+          entry="$(git -C adapter-src ls-tree HEAD -- "$ADAPTER_PATH")"
+          mode="${entry%% *}"; blob="$(echo "$entry" | cut -d' ' -f3 | cut -f1)"
+          [ "$mode" = "100644" ] || { echo "::error::adapter is not a regular file (mode $mode)"; exit 1; }
+          [ "$blob" = "$ADAPTER_BLOB" ] || { echo "::error::adapter blob $blob != pinned $ADAPTER_BLOB"; exit 1; }
+          a="$RUNNER_TEMP/adapter"
+          mkdir -p "$a"
+          git -C adapter-src cat-file blob "$ADAPTER_BLOB" > "$a/adr033_c4_gate.py"
+          sha="$(sha256sum "$a/adr033_c4_gate.py" | cut -d' ' -f1)"
+          [ "$sha" = "$ADAPTER_SHA256" ] || { echo "::error::adapter sha256 $sha != pinned $ADAPTER_SHA256"; exit 1; }
+          echo "ADAPTER_FILE=$a/adr033_c4_gate.py" >> "$GITHUB_ENV"
+          echo "adapter $ADAPTER_COMMIT:$ADAPTER_PATH blob $blob sha256 $sha (pinned)"
+
+      - name: Evaluate the PR in the trusted workspace
+        id: gate
+        shell: bash
+        run: |
+          # GitHub runs `shell: bash` as `bash -eo pipefail`, so a non-zero
+          # adapter exit is captured in a condition. This step only records;
+          # "Gate decision" enforces.
+          set -uo pipefail
+          out="$RUNNER_TEMP/gate-out"
+          mkdir -p "$out"
+          if "$GATE_PYTHON" -I "$ADAPTER_FILE" evaluate \
+            --repo base --base-sha "$BASE_SHA" --head-sha "$HEAD_SHA" --mode "$VIOLATION_MODE" \
+            --workspace "$RUNNER_TEMP/ws" --empty-dir "$RUNNER_TEMP/empty" \
+            --venv-python "$EVALUATOR_PYTHON" --evaluator-commit "$EVALUATOR_COMMIT" \
+            --evaluator-wheel-sha256 "$APPROVED_WHEEL_SHA256" \
+            --trusted-surface gate/ --trusted-surface p2/ --trusted-surface policy/ \
+            --report "$out/gate-report.json" --summary "$out/summary.md"; then
+            code=0
+          else
+            code=$?
+          fi
+          echo "exit=$code" >> "$GITHUB_OUTPUT"
+          echo "adapter exit code: $code"
+          if [ -f "$out/summary.md" ]; then
+            cat "$out/summary.md" >> "$GITHUB_STEP_SUMMARY"
+          else
+            printf '## ADR-033 C4 trusted gate\n\n- **No summary was produced** (adapter exit %s). The decision step blocks.\n' "$code" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          exit 0
+
+      - name: Preserve the gate evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ci1-gate-pr${{ github.event.pull_request.number }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/gate-out/
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Gate decision
+        shell: bash
+        env:
+          GATE_EXIT: ${{ steps.gate.outputs.exit }}
+        run: |
+          set -uo pipefail
+          out="$RUNNER_TEMP/gate-out"
+          "$GATE_PYTHON" -I "$ADAPTER_FILE" verify-report \
+            --report "$out/gate-report.json" --adapter-exit "${GATE_EXIT:-none}" \
+            --base-sha "$BASE_SHA" --head-sha "$HEAD_SHA" --mode "$VIOLATION_MODE" \
+            --adapter-sha256 "$ADAPTER_SHA256" --evaluator-commit "$EVALUATOR_COMMIT" \
+            --evaluator-wheel-sha256 "$APPROVED_WHEEL_SHA256" --summary "$out/summary.md"

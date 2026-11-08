@@ -1,0 +1,38 @@
+{
+  "platform": "Windows-11-10.0.26300-SP0",
+  "python": "3.12.10",
+  "git": "git version 2.47.1.windows.2",
+  "url": "https://github.com/MnemeHQ/mneme",
+  "cells": {
+    "https_tip": {
+      "n": 20,
+      "median_ms": 2381.9,
+      "p95_ms": 2503.1,
+      "min_ms": 2261.6
+    },
+    "https_absent": {
+      "n": 5,
+      "median_ms": 2987.8,
+      "p95_ms": 3036.0,
+      "min_ms": 2897.0
+    },
+    "hook_no_declaration": {
+      "n": 20,
+      "median_ms": 411.6,
+      "p95_ms": 474.4,
+      "min_ms": 378.4
+    },
+    "hook_h2_authorized_pass": {
+      "n": 20,
+      "median_ms": 1069.2,
+      "p95_ms": 1215.2,
+      "min_ms": 867.3
+    },
+    "hook_h1_authorized_missing_memory": {
+      "n": 20,
+      "median_ms": 535.8,
+      "p95_ms": 716.9,
+      "min_ms": 485.4
+    }
+  }
+}

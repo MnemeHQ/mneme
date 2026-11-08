@@ -12,6 +12,13 @@ from mneme.integrations.claude_code.hook import main
 
 FIXTURE = Path(__file__).parent / "fixtures" / "project_memory.json"
 
+
+@pytest.fixture(autouse=True, params=["subprocess", "inprocess"])
+def transport(request, monkeypatch):
+    """Every e2e case must hold under both check transports (issue #60)."""
+    monkeypatch.setenv("MNEME_HOOK_CHECK_TRANSPORT", request.param)
+    return request.param
+
 # Seed content that will be replaced in Edit envelopes.
 SEED_OLD = "# placeholder import line"
 

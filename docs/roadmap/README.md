@@ -38,6 +38,22 @@ Extend the existing benchmark discipline toward externally legible comparisons o
 
 Prefer frozen fixtures, deterministic scoring, clear treatment/control boundaries, and explicit separation of functional completion from architectural compliance.
 
+### P0 — Four-layer decision-conformance validation
+
+Validate the **existing** governance model end to end: **Guidance → Pre-mutation enforcement → CI checks → Evidence**. This is a cross-cutting acceptance test for the current benchmark, DG1, integration and CI assurance work, **not** a fifth layer, a new policy engine, or DG2 scope.
+
+The Decision Index supplies the common decision authority and applicability semantics to each layer. A process or ADR-acknowledgment marker may be useful workflow evidence, but must not count as proof that code conforms to an architectural decision.
+
+**Minimum reproducible test**
+
+- Freeze one sample repository, one human-reviewed decision and one verified typed rule. Test both a compliant change and an ADR-acknowledged change that still violates the actual constraint.
+- Demonstrate the supported pre-mutation boundary really prevents a forbidden mutation; where a host lacks a blocking seam, explicitly report detection-only or **unevaluated** rather than claiming protection.
+- Independently check the resulting change through CI. Record whether the CI result uses the same applicable decision and rule revision, and distinguish warn from blocking mode.
+- Include a valid scoped exception, an invalid/expired exception, benign-change controls, missing/stale decision binding and unavailable current-byte cases.
+- Produce decision-linked evidence: effective decision and source/version, target scope, rule lineage, enforcement surface, evaluated input/revision, verdict, reasons and limitations. Measure architectural compliance **and** functional completion, false blocks and setup friction.
+
+**Exit evidence:** a repeatable trace showing permitted work succeeds, a documented-but-noncompliant change is caught at each *supported* control point, and a complete record of unevaluated or unsupported surfaces. Reuse the production governance trace (#282), DG1 tracker (#497) and separate CI1 enforcement-assurance tracker (#540). Do not claim universal mutation coverage or directly compare an external product without a reproduced baseline.
+
 ### P0 — Decision Index authority completion (D1)
 
 D0 is shipped: Mneme has a canonical, source-independent Decision Index boundary with Layer 1 runtime projection parity.
@@ -102,6 +118,8 @@ The publication boundary is: **OSS owns decision execution; enterprise owns deci
 - hosted multi-tenant governance, approval/admin workflows, fleet propagation; and
 - organization-wide analytics/control-plane behavior.
 
+**Shared resolution contract:** as DG1 runtime convergence is accepted, CLI, hook, CI, MCP retrieval/explanation and evidence should consume one versioned authority/applicability result rather than independently interpreting documents or policy. Track exact decision/rule revision, repository binding and supported override semantics. Distinguish `ALLOW`, `DENY`, `UNEVALUATED` (or the existing contract's equivalent explicit outcomes); never turn missing context, unavailable policy, or a retrieval hint into a positive enforcement verdict. Changes to behavior remain gated by the accepted ADR and Layer 1 freeze amendment process.
+
 ### P1.5 — DG2: deterministic decision federation (public OSS)
 
 Once DG1 semantics are stable, extend the same governance resolver across more than one known decision source or repository. Learn from existing federation designs, but federate **Mneme decision authority**, not merely files or Markdown corpora.
@@ -145,6 +163,8 @@ structured architecture review
 **Constraint:** the Skill is an interface over Mneme retrieval and deterministic enforcement. It must not become a second policy engine or substitute model judgment for `mneme check` verdicts.
 
 Initial work should reuse the shipped `/mneme:context`, `/mneme:check`, `/mneme:record`, and `/mneme:review` surfaces before adding new runtime behavior.
+
+**First protected change onboarding:** package one short, maintained example that starts with a reviewed decision, activates an existing verified typed rule, then shows an allowed and a prohibited change with their actual enforcement/evidence output. Optimize for a first useful architectural protection outcome, not install completion or a new multipurpose coding harness. Label curated/example decisions separately from automatically discovered decision candidates; verify the workflow under a pinned supported integration and show any unsupported host mutation path.
 
 ### P1 — Source-independent decision ingestion contract
 
@@ -198,13 +218,35 @@ Enforcement / evidence
 
 Proposal state is separate from canonical decision lifecycle. P0 supports `proposed -> accepted` or `proposed -> rejected`, but acceptance is a Mneme-owned authority action and is not exposed as a generic producer mutation.
 
-Proposal ingestion must be idempotent by stable producer/source/version identity. Semantic similarity may flag likely duplicates for review but must not auto-merge canonical decisions.
+Proposal ingestion must be idempotent by stable producer/source/version identity. Preserve decision context available **at creation time** (known rationale, rejected alternatives, reversibility/exit cost, intended scope and provenance), alongside evidence reconstructed later. Both are non-authoritative until the explicit human-reviewed Mneme authority transition. Capture is not autonomous promotion or a second authoritative store. Semantic similarity may flag likely duplicates for review but must not auto-merge canonical decisions.
 
 Use `sagarika29/ai-system-architect` as the first producer-workflow compatibility test after the generic contract exists. Do not add Sagarika-specific logic to the Decision Index/MCP core.
 
 This surface remains distinct from the generic hosted MCP / HTTP control plane listed under Deferred. A local OSS implementation may expose proposal ingestion and retrieval over the Decision Index kernel; cross-repository federation of known decisions is DG2 (public OSS). Organization-wide persistence, source discovery and reconciliation, RBAC/SSO, multi-tenant governance, and hosted control-plane behavior remain outside the core.
 
 See proposed [ADR-027](../adr/ADR-027-decision-mcp-proposal-ingestion-and-authority-boundary.md) and issue #362.
+
+### P1 (parallel) — Code Mode orchestration and software-factory interoperability (CM-01)
+
+Maintain **Code Mode as a parallel, optional Decision MCP consumer integration** for orchestration efficiency, programmable decision-context composition, and software-factory interoperability. This workstream supports—not gates or replaces—the Decision Index, `DecisionRetriever`, `ConflictDetector`, deterministic enforcement, or independent architecture benchmarks. See [CM-01 tracker #640](https://github.com/MnemeHQ/mneme/issues/640).
+
+**Recorded status (2026-10-25):**
+
+- **S1-A1:** merged local OSS compatibility experiment using a sandboxed QuickJS executor and the four read-only Decision MCP methods. M7 demonstrated data-dependent `search → get → trace` composition within one Code Mode execution with output parity; model-turn, token and end-to-end efficiency gains are **not yet measured**.
+- **P0-01:** genuine MCP cancellation defect reproduced; original **FAIL** preserved with independently verified evidence, merged in [PR #633](https://github.com/MnemeHQ/mneme/pull/633) (`adf50933`).
+- **P0-01-F1:** isolated per-call cancellation correction **PASS** (20/20 checks in each of two local runs); independent evidence verification **VERIFIED** (32 static and 5 reproduction checks, zero discrepancies). F1 evidence is merged in [PR #642](https://github.com/MnemeHQ/mneme/pull/642) at `f8591102` and remains independently **VERIFIED**. Its 50 ms cleanup grace is a tested-environment result, not a cross-platform guarantee. The original P0 FAIL remains unchanged. **S1-A2 stays blocked** until separately authorized.
+- **CM-01-B0-M:** model-free mechanical benchmark **PASS** (39/39 checks in each original run), merged in [PR #650](https://github.com/MnemeHQ/mneme/pull/650) at `34d75bec`. The original evidence manifest `94dd0ee381fba2e9775634e0fc8f005dfeb59c9b874fd022227c6fcb92ed17ac` is preserved and supplemental raw-transport verification is **VERIFIED** (98/98). B0-M is mechanical only: model turns, tokens, model-visible context and efficiency remain **not measured**. **B0-A is not authorized.**
+
+**Sequential gates (authorize one at a time):**
+
+1. **Complete.** F1 verified evidence was recorded in [PR #642](https://github.com/MnemeHQ/mneme/pull/642) at `f8591102`, preserving frozen S1-A1/P0 files, hashes and the original failure.
+2. Benchmark direct MCP versus Code Mode on pinned, representative read-only decision workflows. Measure **model turns, tokens/context transferred, wall-clock latency, MCP requests, correctness/decision identity, error recovery, and cleanup**; retain a no-benefit outcome if overhead outweighs gains.
+   - **Mechanical foundation complete:** B0-M is merged in [PR #650](https://github.com/MnemeHQ/mneme/pull/650) at `34d75bec`; original verdict PASS (39/39 in each run), supplemental verification VERIFIED (98/98), original evidence manifest preserved. B0-M used 24 deterministic synthetic decisions and does not establish B0-A dataset adequacy or sample size.
+   - **Next authorization:** B0-A remains unauthorized. Before model API calls, finalize its primary metric, sample size, model selection, approved endpoint/budget and evidence plan. B0-M does not demonstrate model-mediated benefit.
+3. Evaluate one portable agent-orchestrator/software-factory reference integration only after the benchmark shows a defensible benefit. Validate reliable cancellation, method allowlisting, argument checks, parity, and host isolation. No support or production-readiness claim from local compatibility alone.
+4. Reassess MCP capability gaps as DG1/DG2 and decision-linked evidence mature (for example effective-decision explanations, protection/evidence reads, version history, or read-only conflict findings). **Prefer composition of existing tools** first; any new MCP method requires an independent, versioned ADR-027 authority/capability review and protocol validation.
+
+**Architectural constraints:** ADR-023 keeps the Decision Index canonical; ADR-027 freezes the **current six-tool** MCP capability inventory (four reads and two non-authoritative proposal methods). Code Mode cannot accept/activate/supersede decisions, grant waivers, create trusted evidence, or become a second resolver/enforcer. Existing CLI, hook, CI and direct MCP flows remain authoritative and usable without Code Mode. No implication of server-side execution termination, hosted Workers compatibility, mutation enforcement, or universal sandbox/process isolation.
 
 ### P1 — Reference review consumer validation
 
@@ -215,6 +257,12 @@ The experiment should test whether the consumer can retrieve applicable Mneme de
 This is a compatibility/reference integration, not a dependency. Mneme must continue to operate independently through its existing agent, CLI, hook, and CI surfaces.
 
 Do not add CodeRabbit-specific logic to the Decision Index or enforcement core.
+
+### P1 — Explainable enforcement and observable coverage
+
+Improve the existing Audit, enforcement evidence and readiness reporting without duplicating the Core evaluator. A blocked change should identify the actual violated decision/rule and offer a compliant path or an authorized, scoped waiver route—not an untracked bypass. Expose coverage and **negative space**: applicable decisions evaluated and not evaluated, failed and passed checks, supported pre-mutation versus CI-only detection, benign false blocks, waiver validity, stale policy and unsupported operations. Process-marker compliance and retrieval success are distinct from semantic conformance.
+
+Use version-pinned decisions and rule/evaluator contracts across supported surfaces. Maintain a tested compatibility matrix, explicit timeout/failure behavior and rollback guidance; do not silently alter active enforcement via tool updates. This work refines the existing four layers (especially Enforcement, CI and Evidence) and builds on CI1 (#540), rather than adding a new layer.
 
 ### P1 — Migration-aware Architecture Audit
 

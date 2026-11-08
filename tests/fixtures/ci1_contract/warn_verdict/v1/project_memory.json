@@ -1,0 +1,20 @@
+{
+  "meta": {
+    "name": "ci1-fixture",
+    "description": "CI1.2.2 WARN verdict fixture"
+  },
+  "items": [],
+  "examples": [],
+  "decisions": [
+    {
+      "id": "storage_json",
+      "decision": "Use JSON storage only",
+      "rationale": "local-first",
+      "scope": ["storage"],
+      "constraints": ["no postgres"],
+      "anti_patterns": ["introduce ORM"],
+      "created_at": "2026-10-17T00:00:00Z",
+      "updated_at": "2026-10-17T00:00:00Z"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "applicability": [],
+  "evaluation_complete": true,
+  "freshness": [],
+  "mode": "warn",
+  "schema": "mneme.check/v1",
+  "verdict": "WARN",
+  "violations": [
+    {
+      "decision_id": "storage_json",
+      "decision_text": "Use JSON storage only",
+      "decision_version_id": null,
+      "input_path": null,
+      "kind": "constraint",
+      "rule": "no postgres",
+      "rule_id": null,
+      "rule_type": null,
+      "selector": null,
+      "severity": "WARN",
+      "trigger": "postgres"
+    }
+  ]
+}

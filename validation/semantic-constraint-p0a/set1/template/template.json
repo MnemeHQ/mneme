@@ -1,0 +1,34 @@
+{
+  "schema": "p0a-router-template/v1",
+  "template_id": "p0a-simple-router-v1",
+  "description": "Frozen simple router template and declared symbols for P0-A Set 1 (charter section 4.1). Derived from the #570 A-F router shape.",
+  "base_file": "set1/template/router_base.py",
+  "target_path": "src/router.py",
+  "language": "python",
+  "symbols": {
+    "route_function": "route",
+    "route_parameters": ["request", "classify"],
+    "classifier_parameter": "classify",
+    "deadline_constant": "ROUTER_DEADLINE_S",
+    "fallback_symbol": "FALLBACK_ROUTE",
+    "forbidden_literal": "DISABLE_ROUTER_TIMEOUT"
+  },
+  "classify_call": {
+    "form": "classify(request, <deadline>)",
+    "deadline_argument": "second positional argument, in seconds"
+  },
+  "timeout_handler": {
+    "declared_exception_types": ["TimeoutError", "OSError", "Exception", "BaseException"],
+    "basis": "TimeoutError and its builtin superclasses (TimeoutError.__mro__ minus object).",
+    "not_declared": [
+      "bare except:",
+      "tuple exception types",
+      "exception types bound to other names"
+    ]
+  },
+  "deadline_bounds": {
+    "unit": "seconds",
+    "maximum_inclusive": 5.0,
+    "disabled_forms": "None, zero, negative, infinite, NaN or non-numeric (bool counts as non-numeric), as in the #570 oracle"
+  }
+}

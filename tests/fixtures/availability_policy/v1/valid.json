@@ -1,0 +1,5 @@
+{
+  "schema": "mneme.availability/v1",
+  "availability": "closed",
+  "memory_path": ".mneme/project_memory.json"
+}

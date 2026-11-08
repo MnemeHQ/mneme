@@ -1,0 +1,25 @@
+{
+  "tag": "04-reenabled",
+  "archived": false,
+  "main": "c16dec6822672da75413c501767e9e2110a91982",
+  "ruleset_enforcement": "active",
+  "ruleset_updated_at": "2026-10-26T17:05:35.994-05:00",
+  "bypass_actors": [],
+  "required_checks": [
+    {
+      "context": "CI1 trusted gate",
+      "integration_id": 15368
+    }
+  ],
+  "policy_enforcement": "active",
+  "policy_updated_at": "2026-10-17T14:39:01.705-05:00",
+  "variables": {
+    "MNEME_CI_AVAILABILITY": "closed"
+  },
+  "repo_sha256": "5c4934f85c42781b",
+  "ruleset_sha256": "fb239be15d0a0593",
+  "policy_sha256": "44dc1848e312ce99",
+  "variables_sha256": "4ed30cd806a82832",
+  "actions-permissions_sha256": "0bffee97e4ad5267",
+  "main_sha256": "a00bbddc87ff4fb9"
+}

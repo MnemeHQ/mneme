@@ -1,0 +1,35 @@
+CM-01 S1-A1 E0 exact commands
+
+Worktree:
+  C:\dev\mneme\.worktrees\feat-cm01-s1a1-e0-local-executor
+
+Directory:
+  validation/cm01/s1a-local
+
+Commands:
+  npm install --ignore-scripts --no-audit --no-fund
+  npm run m4-guard
+  npm run probe:native
+  npm run e0
+  Copy-Item evidence\e0.json evidence\e0-run1.json -Force
+  npm run e0
+  Copy-Item evidence\e0.json evidence\e0-run2.json -Force
+
+Observed:
+  npm install: 10 packages added
+  m4-guard: pass=true, violations=[]
+  probe:native: pass=true, native_bridge_supported=true, asyncify_selected=false
+  e0 run 1: pass=true, failed=[]
+  e0 run 2: pass=true, failed=[]
+  run comparison: equal=true (excluding started_at/finished_at)
+
+Inputs:
+  Current-main base: 942de7b121994647e99e9b862b44cda784c0ae84
+  S0 source: 9eb4057a290795883076ab05bf11c92038c6ca13
+
+Evidence:
+  evidence/e0.json
+  evidence/e0-run1.json
+  evidence/e0-run2.json
+  evidence/repeatability.json
+  evidence/raw/e0.log

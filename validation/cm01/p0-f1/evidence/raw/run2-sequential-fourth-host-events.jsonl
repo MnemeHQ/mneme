@@ -1,0 +1,9 @@
+{"ts":"2026-10-25T00:24:02.405Z","type":"host_call_started","callId":1,"provider":"codemode","method":"decision_get"}
+{"ts":"2026-10-25T00:24:02.415Z","type":"host_call_started","callId":2,"provider":"codemode","method":"decision_search"}
+{"ts":"2026-10-25T00:24:02.415Z","type":"host_call_settled","callId":1,"provider":"codemode","method":"decision_get","outcome":"fulfilled"}
+{"ts":"2026-10-25T00:24:02.423Z","type":"host_call_started","callId":3,"provider":"codemode","method":"decision_applicable_to"}
+{"ts":"2026-10-25T00:24:02.423Z","type":"host_call_settled","callId":2,"provider":"codemode","method":"decision_search","outcome":"fulfilled"}
+{"ts":"2026-10-25T00:24:02.432Z","type":"host_call_started","callId":4,"provider":"codemode","method":"decision_trace"}
+{"ts":"2026-10-25T00:24:02.433Z","type":"host_call_settled","callId":3,"provider":"codemode","method":"decision_applicable_to","outcome":"fulfilled"}
+{"ts":"2026-10-25T00:24:02.922Z","type":"host_call_aborted","callId":4,"provider":"codemode","method":"decision_trace","abortedAt":1792887842921,"reason":"Error: Code Mode execution exceeded 500ms"}
+{"ts":"2026-10-25T00:24:02.923Z","type":"host_call_settled_after_abort","callId":4,"provider":"codemode","method":"decision_trace","outcome":"rejected","errorName":"HostCancelledError","errorMessage":"MCP decision.trace cancelled: MCP error -32001: Error: Code Mode execution exceeded 500ms","afterAbortMs":2}

@@ -1,0 +1,62 @@
+[
+  {
+    "id": "A",
+    "sub_constraint": "C1,C2,C3",
+    "target_path": "src/router.py",
+    "content": "\"\"\"Synthetic routing validator (orchestrator decision sandbox).\"\"\"\n\nROUTER_DEADLINE_S = 5.0\nFALLBACK_ROUTE = \"safe-default\"\n\n\ndef route(request, classify):\n    \"\"\"Return the classified route, or FALLBACK_ROUTE when the deadline is hit.\"\"\"\n    if not request:\n        return FALLBACK_ROUTE\n    try:\n        return classify(request, ROUTER_DEADLINE_S)\n    except TimeoutError:\n        return FALLBACK_ROUTE\n",
+    "oracle": "ACCEPT",
+    "predicted_cli": "ALLOWED",
+    "classification": "TRUE_NEGATIVE",
+    "description": "Compliant change: 5 s deadline, fallback kept, empty requests short-circuit to the fallback."
+  },
+  {
+    "id": "B",
+    "sub_constraint": "C1",
+    "target_path": "src/router.py",
+    "content": "\"\"\"Synthetic routing validator (orchestrator decision sandbox).\"\"\"\n\nDISABLE_ROUTER_TIMEOUT = True\nROUTER_DEADLINE_S = None if DISABLE_ROUTER_TIMEOUT else 5.0\nFALLBACK_ROUTE = \"safe-default\"\n\n\ndef route(request, classify):\n    \"\"\"Return the classified route, or FALLBACK_ROUTE when the deadline is hit.\"\"\"\n    try:\n        return classify(request, ROUTER_DEADLINE_S)\n    except TimeoutError:\n        return FALLBACK_ROUTE\n",
+    "oracle": "REJECT",
+    "predicted_cli": "BLOCKED",
+    "classification": "TRUE_POSITIVE",
+    "description": "Exact violation: the forbidden identifier is used as code to disable the deadline."
+  },
+  {
+    "id": "C",
+    "sub_constraint": "C2",
+    "target_path": "src/router.py",
+    "content": "\"\"\"Synthetic routing validator (orchestrator decision sandbox).\"\"\"\n\nROUTER_DEADLINE_S = 60.0\nFALLBACK_ROUTE = \"safe-default\"\n\n\ndef route(request, classify):\n    \"\"\"Return the classified route, or FALLBACK_ROUTE when the deadline is hit.\"\"\"\n    try:\n        return classify(request, ROUTER_DEADLINE_S)\n    except TimeoutError:\n        return FALLBACK_ROUTE\n",
+    "oracle": "REJECT",
+    "predicted_cli": "ALLOWED",
+    "classification": "COVERAGE_GAP",
+    "description": "Semantic bypass: deadline raised to 60 s without the forbidden identifier."
+  },
+  {
+    "id": "D",
+    "sub_constraint": "C3",
+    "target_path": "src/router.py",
+    "content": "\"\"\"Synthetic routing validator (orchestrator decision sandbox).\"\"\"\n\nROUTER_DEADLINE_S = 5.0\nFALLBACK_ROUTE = \"safe-default\"\n\n\ndef route(request, classify):\n    \"\"\"Return the classified route.\"\"\"\n    return classify(request, ROUTER_DEADLINE_S)\n",
+    "oracle": "REJECT",
+    "predicted_cli": "ALLOWED",
+    "classification": "MODELLING_GAP",
+    "description": "Fallback bypass: 5 s deadline kept, safe fallback removed, no forbidden identifier."
+  },
+  {
+    "id": "E",
+    "sub_constraint": "C1",
+    "target_path": "src/router.py",
+    "content": "\"\"\"Synthetic routing validator (orchestrator decision sandbox).\"\"\"\n\n# Do not reintroduce DISABLE_ROUTER_TIMEOUT: ADR-001 forbids disabling the deadline.\nROUTER_DEADLINE_S = 5.0\nFALLBACK_ROUTE = \"safe-default\"\nUNSUPPORTED_FLAG_MESSAGE = \"DISABLE_ROUTER_TIMEOUT is not supported\"\n\n\ndef route(request, classify):\n    \"\"\"Return the classified route, or FALLBACK_ROUTE when the deadline is hit.\"\"\"\n    try:\n        return classify(request, ROUTER_DEADLINE_S)\n    except TimeoutError:\n        return FALLBACK_ROUTE\n",
+    "oracle": "ACCEPT",
+    "predicted_cli": "BLOCKED",
+    "classification": "FALSE_BLOCK",
+    "description": "False-block control: compliant code; the identifier appears only in a comment and a message string."
+  },
+  {
+    "id": "F",
+    "sub_constraint": "C1",
+    "target_path": "docs/notes.md",
+    "content": "# Router notes\n\nThe routing validator is described in ADR-001.\n\nThe old DISABLE_ROUTER_TIMEOUT switch was removed. The deadline is fixed at\nfive seconds.\n",
+    "oracle": "ACCEPT",
+    "predicted_cli": "ALLOWED",
+    "classification": "SCOPE_EXCLUDED",
+    "description": "Path-scope control: the identifier appears only in an out-of-scope docs file."
+  }
+]

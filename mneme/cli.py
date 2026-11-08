@@ -49,6 +49,7 @@ import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from mneme.adr_diagnostics import collect_adr_diagnostics
 from mneme.adr_freshness import FreshnessIssue
@@ -59,20 +60,9 @@ from mneme.adr_import import (
     detect_continuity_effects,
     format_preview,
 )
-from mneme.integrations.eventcatalog import (
-    apply_import as ec_apply_import,
-    compile_for_import as ec_compile_for_import,
-    detect_collisions as ec_detect_collisions,
-    format_preview as ec_format_preview,
-    refuse_canonical_apply as ec_refuse_canonical_apply,
-)
-from mneme.benchmark import BenchmarkRunner, ScenarioVerdict
-from mneme.benchmark_report import format_json, format_markdown, format_terminal
+from mneme.adr_schema import ADRParseError, ADRValidationError
 from mneme.context_builder import DEFAULT_MAX_DECISIONS, format_decisions
-from mneme.cursor_generator import generate_mdc
-from mneme.decision_add import AddDecisionError, add_canonical_decision
 from mneme.decision_governance import GovernanceContext, resolve_effective
-from mneme.decision_authority import DecisionAuthorityError, DecisionAuthorityService
 from mneme.decision_index_persistence import (
     DecisionIndexMigrationRefused,
     DecisionIndexMigrationRequired,
@@ -84,29 +74,24 @@ from mneme.decision_index_persistence import (
     plan_memory_migration,
     refuse_legacy_decisions_write,
 )
-from mneme.decision_proposal_store import JsonFileDecisionProposalStore
 from mneme.decision_retriever import DecisionRetriever
 from mneme.enforcer import (
+    INPUT_KIND_COMPLETE_SOURCE,
+    INPUT_KIND_PROPOSED_NEW,
     EnforcementResult,
     Severity,
+    SourceSubject,
     check_prompt,
     generate_protection_report,
 )
 from mneme.memory_store import MemoryStore
-from mneme.protection import (
-    ENFORCEMENT_BEHAVIOR,
-    ProtectionError,
-    activate_protection,
-    activation_precheck,
-    find_candidates,
-    find_decision,
-    load_decisions,
-    protection_status,
-    validate_proposal,
-)
-from mneme.readiness import READINESS_LABELS, READINESS_ORDER
-from mneme.setup import SetupError, SetupOutcome, run_setup
-from mneme.setup_state import STATE_ACTIVE, scaffold_project_memory
+
+if TYPE_CHECKING:
+    # Annotation-only. Subcommand-only modules are imported inside their
+    # command functions so `mneme check` (run by mneme-hook on every write)
+    # does not pay for them; see tests/test_cli_import_budget.py.
+    from mneme.decision_proposal_store import JsonFileDecisionProposalStore
+    from mneme.setup import SetupOutcome
 
 
 def _utc_now() -> str:
@@ -139,6 +124,7 @@ def _scaffold_memory() -> dict:
     enforce). meta.name and meta.description are the only fields the loader
     requires; created_by is recorded for provenance.
     """
+    from mneme.setup_state import scaffold_project_memory
     return scaffold_project_memory(created_by="mneme init")
 
 
@@ -167,6 +153,7 @@ def _cmd_init(args: argparse.Namespace) -> int:
 
 def _print_setup_summary(outcome: SetupOutcome) -> None:
     """Render the human-readable setup summary (ASCII, existing CLI style)."""
+    from mneme.readiness import READINESS_LABELS, READINESS_ORDER
     print("Mneme setup")
     print()
     print("Repository")
@@ -231,6 +218,8 @@ def _print_setup_summary(outcome: SetupOutcome) -> None:
 
 
 def _cmd_setup(args: argparse.Namespace) -> int:
+    from mneme.setup import SetupError, run_setup
+    from mneme.setup_state import STATE_ACTIVE
     audit_ref = args.audit_ref if args.audit_ref is not None else ""
     if args.audit_ref is not None and not audit_ref.strip():
         return _error_exit("audit reference must not be empty")
@@ -286,6 +275,7 @@ def _cmd_list(args: argparse.Namespace) -> int:
 # ── Subcommand: add_decision ─────────────────────────────────────────────────
 
 def _cmd_add(args: argparse.Namespace) -> int:
+    from mneme.decision_add import AddDecisionError, add_canonical_decision
     path = Path(args.memory)
     if not path.exists():
         return _error_exit(f"memory file {path} does not exist")
@@ -393,50 +383,114 @@ def _check_payload(
     uncaught exception -- so the verdict is stated explicitly here, behind a
     versioned ``schema`` key. Anything a consumer cannot parse should be
     treated as "no verdict" and failed open.
+
+    ADR-034 additions are strictly additive and appear only when a numeric
+    rule or a ``--source-file`` audit is involved: the per-rule matcher
+    record on each applied ``FORBID_NUMERIC_ABOVE`` trace, the numeric
+    violation details, and a top-level ``subject`` record. Payloads with no
+    numeric rule stay byte-identical.
     """
-    return {
+    payload: dict = {
         "schema": CHECK_JSON_SCHEMA,
         "verdict": result.verdict.value,
         "mode": mode,
         "evaluation_complete": result.evaluation_complete,
         "applicability": [
-            {
-                "decision_id": item.decision_id,
-                "rule_type": item.rule_type,
-                "rule_value": item.rule_value,
-                "rule_index": item.rule_index,
-                "path_scoped": item.path_scoped,
-                "input_path": item.input_path,
-                "outcome": item.outcome.value,
-                "selector": item.selector,
-                "reason": item.reason,
-                "rule_id": item.rule_id,
-                "decision_version_id": item.decision_version_id,
-            }
-            for item in result.applicability
+            _applicability_record(item) for item in result.applicability
         ],
-        "violations": [
-            {
-                "decision_id": v.decision_id,
-                "decision_text": v.decision_text,
-                "severity": v.severity.value,
-                "rule": v.rule,
-                "trigger": v.trigger,
-                "kind": v.kind,
-                "rule_type": v.rule_type,
-                "input_path": v.input_path,
-                "selector": v.selector,
-                "rule_id": v.rule_id,
-                "decision_version_id": v.decision_version_id,
-            }
-            for v in result.violations
-        ],
+        "violations": [_violation_record(v) for v in result.violations],
         "freshness": [
             {"code": i.code, "adr_id": i.adr_id, "message": i.message,
              "path": str(i.path) if i.path else None}
             for i in freshness
         ],
     }
+    subject = result.subject
+    if subject is not None and (
+        subject.input_kind == INPUT_KIND_COMPLETE_SOURCE
+        or result.has_numeric_rules
+    ):
+        payload["subject"] = _subject_record(subject)
+    return payload
+
+
+def _applicability_record(item) -> dict:
+    record = {
+        "decision_id": item.decision_id,
+        "rule_type": item.rule_type,
+        "rule_value": item.rule_value,
+        "rule_index": item.rule_index,
+        "path_scoped": item.path_scoped,
+        "input_path": item.input_path,
+        "outcome": item.outcome.value,
+        "selector": item.selector,
+        "reason": item.reason,
+        "rule_id": item.rule_id,
+        "decision_version_id": item.decision_version_id,
+    }
+    if item.matcher_status is not None:
+        record.update({
+            "matcher_status": item.matcher_status,
+            "matcher_outcome": item.matcher_outcome,
+            "primary_reason": item.primary_reason,
+            "unknown_sources": [u.as_dict() for u in item.unknown_sources],
+            "subject_sha256": item.subject_sha256,
+        })
+    return record
+
+
+def _violation_record(v) -> dict:
+    record = {
+        "decision_id": v.decision_id,
+        "decision_text": v.decision_text,
+        "severity": v.severity.value,
+        "rule": v.rule,
+        "trigger": v.trigger,
+        "kind": v.kind,
+        "rule_type": v.rule_type,
+        "input_path": v.input_path,
+        "selector": v.selector,
+        "rule_id": v.rule_id,
+        "decision_version_id": v.decision_version_id,
+    }
+    if v.details is not None:
+        record["numeric"] = v.details
+    return record
+
+
+def _subject_record(subject: SourceSubject) -> dict:
+    from mneme import __version__
+    from mneme.numeric_rule import runtime_label
+
+    if subject.input_kind == INPUT_KIND_PROPOSED_NEW:
+        # ADR-034 §7a / G2-1 charter §3.5: additive keys, this kind only.
+        return {
+            "input_kind": subject.input_kind,
+            "subject_sha256": subject.sha256,
+            "source_path": None,
+            "target_path": subject.target_path,
+            "memory_path": subject.memory_path,
+            "governed_path": subject.governed_path,
+            "absence_verified": True,
+            "surface": "mneme check",
+            "surface_version": __version__,
+            "runtime": runtime_label(),
+        }
+    record = {
+        "input_kind": subject.input_kind,
+        "subject_sha256": subject.sha256,
+        "source_path": subject.source_path,
+        "memory_path": subject.memory_path,
+        "governed_path": subject.governed_path,
+        "surface": "mneme check",
+        "surface_version": __version__,
+        "runtime": runtime_label(),
+    }
+    if subject.input_kind != INPUT_KIND_COMPLETE_SOURCE:
+        # F-1: consumers verify that an unverified input without a target
+        # path carries a non-source matcher record on every numeric rule.
+        record["target_path_declared"] = subject.target_path_declared
+    return record
 
 
 def _collect_adr_diagnostics(
@@ -484,27 +538,253 @@ def _print_applicability_preview(store: MemoryStore, labels: list[str]) -> None:
     print("\n".join(lines), file=sys.stderr, flush=True)
 
 
+class _SourceFileError(ValueError):
+    """A ``--source-file`` request cannot be safely read or bound."""
+
+
+def _read_source_file(source_file: str, memory: str) -> tuple[str, SourceSubject]:
+    """Resolve, validate and snapshot one complete source file (charter §3).
+
+    The only root is the ADR-020 policy root of the memory actually loaded.
+    The file is read once; its exact bytes are hashed and are the snapshot
+    the matcher evaluates. Nothing is imported or executed.
+    """
+    import hashlib
+    import os
+    import stat
+
+    from mneme.path_selectors import normalize_input_path, policy_root
+
+    requested = Path(source_file)
+    if requested.is_symlink():
+        raise _SourceFileError(f"source file {source_file} is a symlink")
+    try:
+        resolved = requested.resolve(strict=True)
+    except (OSError, RuntimeError) as exc:
+        raise _SourceFileError(
+            f"source file {source_file} does not exist or cannot be resolved"
+        ) from exc
+    lexical = Path(os.path.abspath(requested))
+    if os.path.normcase(str(lexical)) != os.path.normcase(str(resolved)):
+        raise _SourceFileError(
+            f"source file {source_file} resolves through a link"
+        )
+    try:
+        mode = resolved.stat().st_mode
+    except OSError as exc:
+        raise _SourceFileError(f"source file {source_file} cannot be read") from exc
+    if not stat.S_ISREG(mode):
+        raise _SourceFileError(f"source file {source_file} is not a regular file")
+    if resolved.suffix != ".py":
+        raise _SourceFileError(
+            f"source file {source_file} is not a Python (.py) source file"
+        )
+    root = policy_root(memory)
+    try:
+        resolved.relative_to(root)
+    except ValueError as exc:
+        raise _SourceFileError(
+            f"source file {source_file} is outside the policy root {root}"
+        ) from exc
+    try:
+        governed = normalize_input_path(resolved, memory)
+    except ValueError as exc:
+        raise _SourceFileError(str(exc)) from exc
+    try:
+        data = resolved.read_bytes()
+    except OSError as exc:
+        raise _SourceFileError(f"source file {source_file} cannot be read") from exc
+    try:
+        text = data.decode("utf-8", errors="strict")
+    except UnicodeDecodeError as exc:
+        raise _SourceFileError(
+            f"source file {source_file} is not valid UTF-8"
+        ) from exc
+    return text, SourceSubject(
+        input_kind=INPUT_KIND_COMPLETE_SOURCE,
+        sha256=hashlib.sha256(data).hexdigest(),
+        source=data,
+        source_path=str(resolved),
+        memory_path=str(Path(memory).resolve()),
+        governed_path=governed,
+    )
+
+
+def _proposed_new_target(target_path: str, memory: str) -> tuple[str, str] | None:
+    """Establish ADR-034 §6a preconditions 1-4 for ``--proposed-new-file``.
+
+    Returns ``(resolved_target, governed_path)``, or ``None`` when any
+    precondition fails; the caller then evaluates exactly as ``--input``
+    would (G2-1 charter §3.3). Only the checker's own probe counts: whatever
+    the caller observed about the target is never trusted (G2-O3).
+    """
+    import os
+    import stat
+
+    from mneme.path_selectors import normalize_input_path, policy_root
+
+    # Lexical form keeps ``..`` components, so they can never pass the
+    # link-component comparison below.
+    lexical = Path(target_path).absolute()
+    # 1. Verified absence: only "not found" is absence.
+    try:
+        os.lstat(lexical)
+    except FileNotFoundError:
+        pass
+    except (OSError, ValueError):
+        return None
+    else:
+        return None
+    # 2. The parent directory resolves strictly, through no link.
+    try:
+        parent = lexical.parent.resolve(strict=True)
+        parent_mode = os.stat(parent).st_mode
+    except (OSError, RuntimeError, ValueError):
+        return None
+    if not stat.S_ISDIR(parent_mode) or (
+        os.path.normcase(str(lexical.parent)) != os.path.normcase(str(parent))
+    ):
+        return None
+    resolved = parent / lexical.name
+    # 3. Inside the policy root of the memory actually loaded.
+    try:
+        resolved.relative_to(policy_root(memory))
+        governed = normalize_input_path(resolved, memory)
+    except ValueError:
+        return None
+    # 4. Python file kind, from the target path alone.
+    if resolved.suffix != ".py":
+        return None
+    return str(resolved), governed
+
+
+def _legacy_text(data: bytes) -> str:
+    """Decode exactly as ``Path.read_text(encoding="utf-8")`` would."""
+    import io
+
+    return io.TextIOWrapper(io.BytesIO(data), encoding="utf-8").read()
+
+
 def _cmd_check(args: argparse.Namespace) -> int:
-    input_path = Path(args.input)
-    if not input_path.exists():
-        return _error_exit(f"input file {input_path} does not exist")
+    source_file = getattr(args, "source_file", None)
+    proposed_file = getattr(args, "proposed_new_file", None)
+    if source_file is not None and args.target_path is not None:
+        return _error_exit("--source-file cannot be combined with --target-path")
+    if proposed_file is not None and args.target_path is None:
+        return _error_exit("--proposed-new-file requires --target-path")
     memory_path = Path(args.memory)
+    if source_file is None:
+        input_path = Path(args.input if proposed_file is None else proposed_file)
+        if not input_path.exists():
+            return _error_exit(f"input file {input_path} does not exist")
     if not memory_path.exists():
         return _error_exit(f"memory file {memory_path} does not exist")
-    input_text = input_path.read_text(encoding="utf-8")
+
+    subject: SourceSubject | None = None
+    proposed: SourceSubject | None = None
+    if source_file is not None:
+        try:
+            input_text, subject = _read_source_file(source_file, args.memory)
+        except _SourceFileError as exc:
+            return _error_exit(str(exc))
+        target_path = subject.source_path
+    elif proposed_file is not None:
+        # G2-1 charter §3.5: one byte read; both decodings derive from it.
+        import hashlib
+
+        try:
+            data = input_path.read_bytes()
+        except OSError:
+            return _error_exit(f"input file {input_path} cannot be read")
+        try:
+            proposed_text = data.decode("utf-8", errors="strict")
+        except UnicodeDecodeError:
+            # Precondition 5 (G2C-O6): never a legacy fallback or PASS.
+            return _error_exit(f"input file {input_path} is not valid UTF-8")
+        input_text = _legacy_text(data)
+        target_path = args.target_path
+        established = _proposed_new_target(args.target_path, args.memory)
+        if established is not None:
+            resolved_target, governed = established
+            proposed = SourceSubject(
+                input_kind=INPUT_KIND_PROPOSED_NEW,
+                sha256=hashlib.sha256(data).hexdigest(),
+                source=data,
+                memory_path=str(Path(args.memory).resolve()),
+                governed_path=governed,
+                target_path=resolved_target,
+            )
+    else:
+        input_text = input_path.read_text(encoding="utf-8")
+        target_path = args.target_path or args.input
 
     store = MemoryStore(args.memory)
     store.load()
     retriever = DecisionRetriever(store.decisions())
     scored = retriever.retrieve(args.query)
 
-    target_path = args.target_path or args.input
-    result = check_prompt(
-        input_text,
-        scored,
-        top=args.top,
-        input_path=target_path,
-    )
+    result: EnforcementResult | None = None
+    if proposed is not None:
+        result = check_prompt(
+            proposed_text,
+            scored,
+            top=args.top,
+            input_path=proposed.target_path,
+            subject=proposed,
+        )
+        # ADR-034 §6a target binding, owned by this input kind.
+        mismatched = [
+            item for item in result.applicability
+            if item.input_path is not None
+            and item.input_path != proposed.governed_path
+        ]
+        if mismatched:
+            return _error_exit(
+                "proposed new file applicability path does not match the "
+                f"governed path {proposed.governed_path!r}"
+            )
+        if not any(
+            item.rule_type == "FORBID_NUMERIC_ABOVE"
+            and item.outcome.value == "APPLIED"
+            for item in result.applicability
+        ):
+            # No numeric rule applied: exactly the legacy --input result.
+            result = None
+
+    if result is None:
+        if subject is None and any(
+            rule.type == "FORBID_NUMERIC_ABOVE"
+            for decision in store.decisions()
+            for rule in decision.rules
+        ):
+            # Bind what was actually checked. Never complete source: the
+            # numeric rule stays MATCHER_UNEVALUATED / INCOMPLETE_SOURCE_INPUT.
+            subject = SourceSubject.unverified(
+                input_text.encode("utf-8"),
+                target_path_declared=args.target_path is not None,
+            )
+
+        result = check_prompt(
+            input_text,
+            scored,
+            top=args.top,
+            input_path=target_path,
+            subject=subject,
+        )
+
+    if source_file is not None:
+        # The selector evaluator must have used exactly the governed path
+        # that was hashed; any mismatch is operational, never a verdict.
+        mismatched = [
+            item for item in result.applicability
+            if item.input_path is not None
+            and item.input_path != subject.governed_path
+        ]
+        if mismatched:
+            return _error_exit(
+                "source file applicability path does not match the governed "
+                f"path {subject.governed_path!r}"
+            )
 
     # DG1F-C1a: informational stderr-only side channel; never feed this
     # resolution to DecisionRetriever, check_prompt, stdout or JSON.
@@ -536,23 +816,61 @@ def _cmd_check(args: argparse.Namespace) -> int:
     if result.violations:
         for v in result.violations:
             kind = v.rule_type or v.kind
-            print(
-                f"{v.severity.value:4}  [{v.decision_id}] "
-                f"{kind} \"{v.rule}\" -- trigger: {v.trigger}"
-            )
+            if v.details is not None:
+                # ADR-034 P1 gate 6: render the contract in human terms.
+                details = v.details
+                print(
+                    f"{v.severity.value:4}  [{v.decision_id}] {kind}: "
+                    f"{details['contract']}"
+                )
+                print(
+                    f"      line {details['source_line']} "
+                    f"({details['source_kind']}): runtime value "
+                    f"{details['value']} (exactly {details['value_exact']}) "
+                    f"> max {details['max']} {details['unit']}"
+                )
+                print(f"      {details['comparison']}")
+            else:
+                print(
+                    f"{v.severity.value:4}  [{v.decision_id}] "
+                    f"{kind} \"{v.rule}\" -- trigger: {v.trigger}"
+                )
             print(f"      {v.decision_text}")
             if v.input_path:
                 selector = f" via {v.selector}" if v.selector else ""
                 print(f"      path: {v.input_path}{selector}")
         print()
 
+    matcher_traces = [
+        item for item in result.applicability if item.matcher_status is not None
+    ]
+    if matcher_traces:
+        for item in matcher_traces:
+            reason = f" {item.primary_reason}" if item.primary_reason else ""
+            print(
+                f"MATCH {item.matcher_status:19} [{item.decision_id}] "
+                f"{item.rule_type} -> {item.matcher_outcome}{reason}"
+            )
+            for unknown in item.unknown_sources:
+                line = unknown.line if unknown.line is not None else "-"
+                print(
+                    f"      unknown {unknown.kind} source (line {line}): "
+                    f"{unknown.reason}"
+                )
+        print()
+
     scoped_traces = [item for item in result.applicability if item.path_scoped]
     if scoped_traces:
         for item in scoped_traces:
             if item.outcome.value == "UNKNOWN":
+                value = (
+                    "(numeric contract)"
+                    if item.rule_type == "FORBID_NUMERIC_ABOVE"
+                    else repr(item.rule_value)
+                )
                 print(
                     f"ERROR PATH_APPLICABILITY_UNKNOWN [{item.decision_id}] "
-                    f"{item.rule_type} {item.rule_value!r} -- {item.reason}"
+                    f"{item.rule_type} {value} -- {item.reason}"
                 )
                 continue
             path = item.input_path or "(unknown)"
@@ -574,6 +892,10 @@ def _cmd_check(args: argparse.Namespace) -> int:
         print()
 
     if not result.evaluation_complete:
+        if result.has_numeric_rules and result.verdict == Severity.FAIL:
+            # M-a: a proved violation stays visible next to incompleteness.
+            print("Result: FAIL (evaluation incomplete)")
+            return 2
         print("Result: INCOMPLETE")
         return 2
     print(f"Result: {result.verdict.value}")
@@ -713,6 +1035,7 @@ def _require_memory(
             return 2
         memory_path, decisions = loaded
     """
+    from mneme.protection import ProtectionError, load_decisions
     memory_path = Path(memory)
     if not memory_path.exists():
         _error_exit(f"memory file {memory_path} does not exist")
@@ -726,6 +1049,7 @@ def _require_memory(
 
 
 def _cmd_protect_list(args: argparse.Namespace) -> int:
+    from mneme.protection import ENFORCEMENT_BEHAVIOR, find_candidates
     loaded = _require_memory(args.memory)
     if loaded is None:
         return 2
@@ -775,6 +1099,7 @@ def _cmd_protect_list(args: argparse.Namespace) -> int:
 
 
 def _cmd_protect_status(args: argparse.Namespace) -> int:
+    from mneme.protection import ProtectionError, protection_status
     loaded = _require_memory(args.memory)
     if loaded is None:
         return 2
@@ -807,6 +1132,7 @@ def _cmd_protect_status(args: argparse.Namespace) -> int:
 
 
 def _cmd_protect_validate(args: argparse.Namespace) -> int:
+    from mneme.protection import activation_precheck, find_decision, validate_proposal
     loaded = _require_memory(args.memory)
     if loaded is None:
         return 2
@@ -842,7 +1168,121 @@ def _cmd_protect_validate(args: argparse.Namespace) -> int:
     return 1
 
 
+def _availability_is_interactive() -> bool:
+    """Seam for tests; the authority commands need a human at a terminal."""
+    return sys.stdin.isatty() and sys.stdout.isatty()
+
+
+def _availability_prompt(text: str) -> str:
+    return input(text)
+
+
+def _availability_root(args: argparse.Namespace):
+    from mneme.availability_authority import find_policy_root
+    start = Path(args.repo_root) if args.repo_root else Path.cwd()
+    if not start.exists():
+        return None, _error_exit(f"repo root {start} does not exist")
+    root = find_policy_root(start)
+    if root is None:
+        return None, _error_exit(f"no .mneme directory at or above {start}")
+    return root, 0
+
+
+def _print_verification(result) -> None:
+    print(f"authorization: {result.authorization}"
+          + (f" ({result.reason})" if result.reason else ""))
+    if result.detail:
+        print(f"  detail:   {result.detail}")
+    if result.url:
+        print(f"  remote:   {result.url}")
+    if result.tip:
+        print(f"  baseline: {result.branch} @ {result.tip}")
+
+
+def _cmd_availability_status(args: argparse.Namespace) -> int:
+    """Read-only (charter §6): never writes anything."""
+    from mneme.availability_authority import (
+        AUTHORIZED, DECLARATION_PATH, local_relation, verify,
+    )
+    root, rc = _availability_root(args)
+    if root is None:
+        return rc
+    result = verify(root)
+    print(f"policy root: {root}")
+    _print_verification(result)
+    if result.baseline is not None:
+        last = result.baseline["authority"]["events"][-1]
+        review = last["review"]
+        print(f"  last event: #{last['seq']} {last['op']}, recorded by "
+              f"{review['recorded_by']} (review attested, not verified)")
+        print("  independent approver attested: "
+              + ("yes" if review["independent_approver_attested"] else "no")
+              + "; branch protection attested: "
+              + ("yes" if review["baseline_protection_attested"] else "no"))
+    path = root / DECLARATION_PATH
+    if not path.exists():
+        print("  local declaration: absent (no verification trigger)")
+    elif result.authorization == AUTHORIZED and result.baseline is not None:
+        try:
+            data, problem = json.loads(path.read_text(encoding="utf-8")), ""
+        except (OSError, UnicodeError, ValueError):
+            data, problem = None, "unreadable"
+        print(f"  local declaration: {local_relation(data, problem, result.baseline)}")
+    else:
+        print("  local declaration: present")
+    return 0
+
+
+def _cmd_availability_event(args: argparse.Namespace, op: str) -> int:
+    from mneme.availability_authority import (
+        Attestation, AuthorityRefused, prepare_event,
+    )
+    root, rc = _availability_root(args)
+    if root is None:
+        return rc
+    if not _availability_is_interactive():
+        return _error_exit(
+            f"`mneme availability {op}` needs an interactive terminal; "
+            "there is no non-interactive mode"
+        )
+    print(f"This prepares an availability {op} event for {root}.")
+    print("It takes effect only after a reviewed merge to the baseline branch.")
+    name = _availability_prompt("Your name (recorded as review.recorded_by): ").strip()
+    if not name:
+        return _error_exit("a name is required")
+    independent = _availability_prompt(
+        "Will an approver other than you review this change? [y/N]: "
+    ).strip().lower() == "y"
+    protected = _availability_prompt(
+        "Is the baseline branch protected (PR-only merges)? [y/N]: "
+    ).strip().lower() == "y"
+    if _availability_prompt(f"Type {op.upper()} to confirm: ").strip() != op.upper():
+        return _error_exit("not confirmed; nothing written")
+    try:
+        path, document, result = prepare_event(
+            root, op, Attestation(name, independent, protected),
+            replace_local=args.replace_local,
+        )
+    except AuthorityRefused as exc:
+        return _error_exit(f"{op} refused: {exc}")
+    event = document["authority"]["events"][-1]
+    print(f"Wrote {path} (event #{event['seq']} {op}) against "
+          f"{result.branch} @ {result.tip[:7]}.")
+    print("Next: commit this file, open a PR, have it reviewed and merged. "
+          "Nothing was committed, pushed or merged.")
+    return 0
+
+
+def _cmd_availability_authorize(args: argparse.Namespace) -> int:
+    return _cmd_availability_event(args, "authorize")
+
+
+def _cmd_availability_revoke(args: argparse.Namespace) -> int:
+    return _cmd_availability_event(args, "revoke")
+
+
 def _cmd_protect_activate(args: argparse.Namespace) -> int:
+    from mneme.protection import ProtectionError, activate_protection
     loaded = _require_memory(args.memory)
     if loaded is None:
         return 2
@@ -905,6 +1345,7 @@ def _cmd_protect_activate(args: argparse.Namespace) -> int:
 # ── Subcommand: cursor generate ──────────────────────────────────────────────
 
 def _cmd_cursor_generate(args: argparse.Namespace) -> int:
+    from mneme.cursor_generator import generate_mdc
     memory_path = Path(args.memory)
     if not memory_path.exists():
         return _error_exit(f"memory file {memory_path} does not exist")
@@ -932,6 +1373,8 @@ def _cmd_cursor_generate(args: argparse.Namespace) -> int:
 
 def _cmd_benchmark(args: argparse.Namespace) -> int:
     """Run all benchmark scenarios in a directory and report results."""
+    from mneme.benchmark import BenchmarkRunner, ScenarioVerdict
+    from mneme.benchmark_report import format_json, format_markdown, format_terminal
     import sys
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
@@ -1043,7 +1486,11 @@ def _cmd_adr_import(args: argparse.Namespace) -> int:
             "with --apply --update-existing"
         )
 
-    report = compile_for_import(adr_dir)
+    try:
+        report = compile_for_import(adr_dir)
+    except (ADRParseError, ADRValidationError) as exc:
+        return _error_exit(str(exc))
+
     target_memory = json.loads(target_path.read_text(encoding="utf-8"))
     collisions = detect_collisions(report.active_nodes, target_memory)
     continuity = detect_continuity_effects(report, target_memory)
@@ -1085,6 +1532,7 @@ def _preservation_validator(memory_path: Path):
     Shapes the validator does not support (anything but a global
     ``FORBID_LITERAL``) cannot be preserved.
     """
+    from mneme.protection import validate_proposal
 
     import dataclasses
 
@@ -1112,6 +1560,13 @@ def _preservation_validator(memory_path: Path):
 
 def _cmd_eventcatalog_import(args: argparse.Namespace) -> int:
     """Import EventCatalog ADRs from an index into target memory."""
+    from mneme.integrations.eventcatalog import (
+        apply_import as ec_apply_import,
+        compile_for_import as ec_compile_for_import,
+        detect_collisions as ec_detect_collisions,
+        format_preview as ec_format_preview,
+        refuse_canonical_apply as ec_refuse_canonical_apply,
+    )
     import sys
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
@@ -1346,6 +1801,7 @@ def _require_proposal_store(
     document. Nothing is created implicitly and no in-memory fallback
     exists — human authority must act on an existing durable record.
     """
+    from mneme.decision_proposal_store import JsonFileDecisionProposalStore
     if not proposals:
         _error_exit(
             "--proposals requires a path to an existing "
@@ -1480,6 +1936,7 @@ def _cmd_decision_accept(args: argparse.Namespace) -> int:
     live in Core; the CLI implements none of them and activates no
     protection and runs no Audit.
     """
+    from mneme.decision_authority import DecisionAuthorityError, DecisionAuthorityService
     store = _require_proposal_store(args.proposals)
     if store is None:
         return 2
@@ -1518,6 +1975,7 @@ def _cmd_decision_reject(args: argparse.Namespace) -> int:
     CLI memory precheck exists and no memory file is created or
     modified. Exit codes follow the decision-command contract.
     """
+    from mneme.decision_authority import DecisionAuthorityError, DecisionAuthorityService
     store = _require_proposal_store(args.proposals)
     if store is None:
         return 2
@@ -1902,7 +2360,32 @@ def _build_parser() -> argparse.ArgumentParser:
     # check
     p_check = sub.add_parser("check", help="Enforce decisions against an input prompt")
     p_check.add_argument("--memory", required=True, help="Path to project_memory.json")
-    p_check.add_argument("--input", required=True, help="Path to input file to check")
+    check_input = p_check.add_mutually_exclusive_group(required=True)
+    check_input.add_argument("--input", help="Path to input file to check")
+    check_input.add_argument(
+        "--source-file",
+        dest="source_file",
+        default=None,
+        help=(
+            "Whole-file audit (ADR-034 G1): a complete Python source file "
+            "inside the memory's policy root. Read once, hashed, never "
+            "executed; the only input that can decide FORBID_NUMERIC_ABOVE. "
+            "Cannot be combined with --input or --target-path."
+        ),
+    )
+    check_input.add_argument(
+        "--proposed-new-file",
+        dest="proposed_new_file",
+        default=None,
+        metavar="CARRIER",
+        help=(
+            "Pre-write check (ADR-034 G2-1): a text carrier holding the "
+            "complete proposed source of a new file at --target-path "
+            "(required). The checker verifies the target absent, link-free, "
+            "inside the policy root and .py; otherwise the result is exactly "
+            "the --input result. Invalid UTF-8 is an error."
+        ),
+    )
     p_check.add_argument(
         "--target-path",
         default=None,
@@ -2032,6 +2515,43 @@ def _build_parser() -> argparse.ArgumentParser:
     p_protect_activate.add_argument("--repo-root", dest="repo_root", default=None,
                                     help=_REPO_ROOT_HELP)
     p_protect_activate.set_defaults(func=_cmd_protect_activate)
+
+    # availability (ADR-033 C2b authority operations)
+    p_availability = sub.add_parser(
+        "availability",
+        help=(
+            "Opt-in fail-closed availability authorization (ADR-033 C2b): "
+            "verify the baseline, or prepare a reviewed authorize/revoke event"
+        ),
+    )
+    availability_sub = p_availability.add_subparsers(
+        dest="availability_cmd", required=True,
+    )
+    _AVAILABILITY_ROOT_HELP = (
+        "Directory inside the repository (default: current directory); the "
+        "policy root is the first ancestor containing .mneme/"
+    )
+    p_availability_status = availability_sub.add_parser(
+        "status",
+        help="Read-only: verify the live baseline and compare the local declaration",
+    )
+    p_availability_status.add_argument("--repo-root", dest="repo_root", default=None,
+                                       help=_AVAILABILITY_ROOT_HELP)
+    p_availability_status.set_defaults(func=_cmd_availability_status)
+    for _op, _func, _help in (
+        ("authorize", _cmd_availability_authorize,
+         "Write a reviewed-authorization event into .mneme/availability.json "
+         "(interactive; never commits)"),
+        ("revoke", _cmd_availability_revoke,
+         "Write a reviewed-revocation event into .mneme/availability.json "
+         "(interactive; never commits)"),
+    ):
+        _p = availability_sub.add_parser(_op, help=_help)
+        _p.add_argument("--repo-root", dest="repo_root", default=None,
+                        help=_AVAILABILITY_ROOT_HELP)
+        _p.add_argument("--replace-local", dest="replace_local", action="store_true",
+                        help="Overwrite a local declaration that differs from the baseline")
+        _p.set_defaults(func=_func)
 
     # cursor (parent for cursor subcommands)
     p_cursor = sub.add_parser("cursor", help="Cursor.ai integration commands")

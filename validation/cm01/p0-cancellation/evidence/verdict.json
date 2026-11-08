@@ -1,0 +1,325 @@
+{
+  "schema": "mneme.cm01.p0-cancellation.verdict/v1",
+  "question": "When the local QuickJS executor times out while awaiting a genuine MCP client.callTool() request, does the underlying MCP operation also terminate, or does it remain outstanding?",
+  "started_at": "2026-10-24T13:47:57.411Z",
+  "finished_at": "2026-10-24T13:50:22.826Z",
+  "baseline": "ddeb85eec8f7734edde1c921250592d51afedbee",
+  "environment": {
+    "versions": {
+      "node": "v24.13.1",
+      "npm": "11.8.0",
+      "codemode": "0.5.5",
+      "sdk": "1.32.2",
+      "ajv": "8.17.1",
+      "quickjs": "0.32.0",
+      "zod": "4.6.7",
+      "python": "3.12.10",
+      "mneme": "0.10.0",
+      "mcp": "2.2.0"
+    },
+    "time_pin": {
+      "node": "24.13.1",
+      "npm": "11.8.0",
+      "codemode": "0.5.5",
+      "sdk": "1.32.2",
+      "ajv": "8.17.1",
+      "quickjs": "0.32.0",
+      "zod": "4.6.7",
+      "python": "3.12.10",
+      "mneme": "0.10.0",
+      "mcp": "2.2.0"
+    },
+    "platform": "win32",
+    "arch": "x64",
+    "node_exec_path": "C:\\Program Files\\nodejs\\node.exe",
+    "head": "0d367fc61316e8af50161f6bc48b8dee1711c807",
+    "declared_baseline": "ddeb85eec8f7734edde1c921250592d51afedbee",
+    "s1a1_base": "942de7b121994647e99e9b862b44cda784c0ae84",
+    "s1a1_s0": "9eb4057a290795883076ab05bf11c92038c6ca13",
+    "baseline_drift": {
+      "head_moved_since_declared_baseline": true,
+      "paths_changed_between_baseline_and_head": [
+        "docs/validation/adr-034-m4-heldout-scoring-2026-10-24.md"
+      ],
+      "commits_between_baseline_and_head": [
+        "0d367fc61316e8af50161f6bc48b8dee1711c807 docs(validation): ADR-034 M4 held-out scoring results record (PASS) (#628)"
+      ],
+      "code_under_test_paths_changed": [],
+      "code_under_test_unchanged_since_declared_baseline": true,
+      "note": "The working tree fast-forwarded to an upstream docs-only commit during the session. No path under validation/cm01 or mneme changed between the declared baseline and HEAD."
+    }
+  },
+  "identities": {
+    "fixture": {
+      "path": "C:\\dev\\mneme\\validation\\cm01\\s1a-local\\m1\\fixture\\canonical\\project_memory.json",
+      "sha256": "8f73429e70e04a6876b965bb00a1777fc90409f9da2889c72dab9ac26b9621ea"
+    },
+    "pre_migration": {
+      "path": "C:\\dev\\mneme\\validation\\cm01\\s1a-local\\m1\\fixture\\pre_migration.json",
+      "sha256": "1923f12bdef0cec4a3c6bc56704e8e03f0d8531313574bff0ae010b5ce2a2a5c"
+    },
+    "m4_fixture": {
+      "path": "C:\\dev\\mneme\\validation\\cm01\\s1a-local\\m4\\fixture\\canonical\\project_memory.json",
+      "sha256": "b4d83d0cc0f70f442e2a62bd0e527220ae99b07cba1238e39d0ad8c5685d4e7f"
+    },
+    "executor": {
+      "path": "C:\\dev\\mneme\\validation\\cm01\\s1a-local\\e0\\quickjs-executor.mjs",
+      "sha256": "4b960124e9218ed124ed34e3b3595b648477b9dab6540c4ce1609d2efaf31313"
+    },
+    "relay": {
+      "path": "C:\\dev\\mneme\\validation\\cm01\\p0-cancellation\\relay.mjs",
+      "sha256": "e09e9b76c3b2e02b619a9339b7bb98c7c1abd8e358f785b1a08e518109adf9ad"
+    },
+    "runner": {
+      "path": "C:\\dev\\mneme\\validation\\cm01\\p0-cancellation\\run-cancellation.mjs",
+      "sha256": "87d0021d66e95153945265ea10413b6e7834a9eeb783639887e5dff253747133"
+    },
+    "m4_guard": {
+      "path": "C:\\dev\\mneme\\validation\\cm01\\s1a-local\\m4-guard.mjs",
+      "sha256": "7df06ddb301355d2a040e2a3d04e915f513f36177d640e40b5224b7ca9d128a6"
+    },
+    "package_lock": {
+      "path": "C:\\dev\\mneme\\validation\\cm01\\p0-cancellation\\package-lock.json",
+      "sha256": "bdf049f1e8ceeedf68d9fa9628dd00159a1be61d2219e59456af5832ac117ac9"
+    }
+  },
+  "runs": [
+    {
+      "run": "run1",
+      "verdict": "FAIL",
+      "reason": "the underlying MCP client request was still pending when Code Mode returned its timeout error; the underlying MCP client request was still pending after a 1500ms bounded observation period; the withheld late response still fulfilled the abandoned MCP client request; no notifications/cancelled was emitted by the integration",
+      "controls_ok": true,
+      "fault_classification": {
+        "genuine_upstream_request": true,
+        "timeout_error_returned": true,
+        "timeout_error": "Code execution failed: execution exceeded 1500ms",
+        "cancellation_notifications_sent": 0,
+        "cancellation_observed_by_relay": 0,
+        "pending_immediately_after_timeout": true,
+        "pending_after_observation_window": true,
+        "observation_end_reason": "window_elapsed",
+        "late_response_settled_request": true,
+        "required_harness_release_to_settle": true,
+        "transport_open_after_timeout": true,
+        "client_closed_after_timeout": false,
+        "relay_upstream_alive_at_observation": true,
+        "direct_response_delivered_after_release": true
+      },
+      "client_request_id": 2,
+      "pending_after_timeout": true,
+      "pending_after_window": true,
+      "cancellation_notifications_sent": 0,
+      "late_response_settled_request": true,
+      "process_cleanup_ok": true
+    },
+    {
+      "run": "run2",
+      "verdict": "FAIL",
+      "reason": "the underlying MCP client request was still pending when Code Mode returned its timeout error; the underlying MCP client request was still pending after a 1500ms bounded observation period; the withheld late response still fulfilled the abandoned MCP client request; no notifications/cancelled was emitted by the integration",
+      "controls_ok": true,
+      "fault_classification": {
+        "genuine_upstream_request": true,
+        "timeout_error_returned": true,
+        "timeout_error": "Code execution failed: execution exceeded 1500ms",
+        "cancellation_notifications_sent": 0,
+        "cancellation_observed_by_relay": 0,
+        "pending_immediately_after_timeout": true,
+        "pending_after_observation_window": true,
+        "observation_end_reason": "window_elapsed",
+        "late_response_settled_request": true,
+        "required_harness_release_to_settle": true,
+        "transport_open_after_timeout": true,
+        "client_closed_after_timeout": false,
+        "relay_upstream_alive_at_observation": true,
+        "direct_response_delivered_after_release": true
+      },
+      "client_request_id": 2,
+      "pending_after_timeout": true,
+      "pending_after_window": true,
+      "cancellation_notifications_sent": 0,
+      "late_response_settled_request": true,
+      "process_cleanup_ok": true
+    }
+  ],
+  "repeatable": true,
+  "acceptance_criteria": {
+    "genuine_request_reached_server": true,
+    "code_mode_returned_timeout_not_success": true,
+    "integration_cancelled_or_terminated_within_window": false,
+    "no_request_pending_before_harness_cleanup": false,
+    "late_response_cannot_settle_request": false,
+    "reproducible_in_two_runs": true,
+    "no_protected_artifact_changed": true
+  },
+  "failure_conditions_observed": {
+    "request_pending_after_executor_timeout": true,
+    "request_pending_after_bounded_window": true,
+    "late_response_settled_request": true,
+    "harness_release_required_to_settle": true,
+    "cancellation_notification_emitted": false
+  },
+  "no_mutation": {
+    "pass": true,
+    "s1a_evidence_before": "cc7f884866e6e94255b100de57b82eec4a51660aadaf51c6464198131030af57",
+    "s1a_evidence_after": "cc7f884866e6e94255b100de57b82eec4a51660aadaf51c6464198131030af57",
+    "s1a_git_status_before": "",
+    "s1a_git_status_after": "",
+    "empty_cwd_before": {
+      "clean": true,
+      "files": []
+    },
+    "empty_cwd_after": {
+      "clean": true,
+      "files": []
+    },
+    "fixtures_unchanged": true,
+    "working_tree_delta": [
+      "validation/cm01/p0-cancellation/.gitattributes",
+      "validation/cm01/p0-cancellation/.gitignore",
+      "validation/cm01/p0-cancellation/README.md",
+      "validation/cm01/p0-cancellation/evidence/commands.txt",
+      "validation/cm01/p0-cancellation/evidence/raw/run1-control-direct-child-stderr.log",
+      "validation/cm01/p0-cancellation/evidence/raw/run1-control-relay-child-stderr.log",
+      "validation/cm01/p0-cancellation/evidence/raw/run1-control-relay-relay-stderr.log",
+      "validation/cm01/p0-cancellation/evidence/raw/run1-control-relay-relay.jsonl",
+      "validation/cm01/p0-cancellation/evidence/raw/run1-fault-child-stderr.log",
+      "validation/cm01/p0-cancellation/evidence/raw/run1-fault-relay-stderr.log",
+      "validation/cm01/p0-cancellation/evidence/raw/run1-fault-relay.jsonl",
+      "validation/cm01/p0-cancellation/evidence/raw/run2-control-direct-child-stderr.log",
+      "validation/cm01/p0-cancellation/evidence/raw/run2-control-relay-child-stderr.log",
+      "validation/cm01/p0-cancellation/evidence/raw/run2-control-relay-relay-stderr.log",
+      "validation/cm01/p0-cancellation/evidence/raw/run2-control-relay-relay.jsonl",
+      "validation/cm01/p0-cancellation/evidence/raw/run2-fault-child-stderr.log",
+      "validation/cm01/p0-cancellation/evidence/raw/run2-fault-relay-stderr.log",
+      "validation/cm01/p0-cancellation/evidence/raw/run2-fault-relay.jsonl",
+      "validation/cm01/p0-cancellation/evidence/raw/runner-console.log",
+      "validation/cm01/p0-cancellation/evidence/run1.json",
+      "validation/cm01/p0-cancellation/evidence/run2.json",
+      "validation/cm01/p0-cancellation/evidence/verdict.json",
+      "validation/cm01/p0-cancellation/evidence/versions.json",
+      "validation/cm01/p0-cancellation/package-lock.json",
+      "validation/cm01/p0-cancellation/package.json",
+      "validation/cm01/p0-cancellation/relay.mjs",
+      "validation/cm01/p0-cancellation/run-cancellation.mjs"
+    ],
+    "working_tree_paths_outside_validation_scope": [],
+    "baseline_identity": {
+      "executor": {
+        "baseline_sha256": "4b960124e9218ed124ed34e3b3595b648477b9dab6540c4ce1609d2efaf31313",
+        "current_sha256": "4b960124e9218ed124ed34e3b3595b648477b9dab6540c4ce1609d2efaf31313",
+        "matches_baseline": true
+      },
+      "fixture": {
+        "baseline_sha256": "8f73429e70e04a6876b965bb00a1777fc90409f9da2889c72dab9ac26b9621ea",
+        "current_sha256": "8f73429e70e04a6876b965bb00a1777fc90409f9da2889c72dab9ac26b9621ea",
+        "matches_baseline": true
+      },
+      "pre_migration": {
+        "baseline_sha256": "1923f12bdef0cec4a3c6bc56704e8e03f0d8531313574bff0ae010b5ce2a2a5c",
+        "current_sha256": "1923f12bdef0cec4a3c6bc56704e8e03f0d8531313574bff0ae010b5ce2a2a5c",
+        "matches_baseline": true
+      },
+      "m4_fixture": {
+        "baseline_sha256": "b4d83d0cc0f70f442e2a62bd0e527220ae99b07cba1238e39d0ad8c5685d4e7f",
+        "current_sha256": "b4d83d0cc0f70f442e2a62bd0e527220ae99b07cba1238e39d0ad8c5685d4e7f",
+        "matches_baseline": true
+      },
+      "m4_guard": {
+        "baseline_sha256": "7df06ddb301355d2a040e2a3d04e915f513f36177d640e40b5224b7ca9d128a6",
+        "current_sha256": "7df06ddb301355d2a040e2a3d04e915f513f36177d640e40b5224b7ca9d128a6",
+        "matches_baseline": true
+      }
+    },
+    "code_under_test_changed_since_baseline": [],
+    "m4_paths_added_between_baseline_and_head_by_upstream": [
+      "docs/validation/adr-034-m4-heldout-scoring-2026-10-24.md"
+    ]
+  },
+  "m4_worktree_guard": {
+    "schema": "mneme.cm01.s1a1.e0.m4-guard/v1",
+    "s0_sha": "9eb4057a290795883076ab05bf11c92038c6ca13",
+    "base_sha": "0d367fc61316e8af50161f6bc48b8dee1711c807",
+    "head_sha": "0d367fc61316e8af50161f6bc48b8dee1711c807",
+    "base_to_head_is_clean": true,
+    "inherited_m4_diff": "benchmarks/adr034_m4/README.md                     |  222 ++\n benchmarks/adr034_m4/harness.py                    | 2067 +++++++++++++++\n benchmarks/adr034_m4/m4_child.py                   |  153 ++\n ...eliable-enforcement-c3-live-validation-scope.md |   74 +-\n .../adr-034-m4-heldout-scoring-2026-10-24.md       |  256 ++\n .../adr-034-m4-pre-scoring-record-2026-10-23.md    |  262 ++\n .../harness/README.md                              |    3 +-\n .../harness/selftest/run_selftest.sh               |   44 +-\n .../harness/setup_c3_probe.py                      |   50 +-\n scripts/run_test_battery.py                        |    9 +\n tests/adr034_m4_synthetic_corpus.py                |  226 ++\n tests/test_adr034_m4_harness.py                    |  926 +++++++\n tests/test_adr034_m4_harness_old_reader.py         |   47 +\n validation/cm01/s1a-local/.gitattributes           |    3 +\n validation/cm01/s1a-local/.gitignore               |    2 +\n validation/cm01/s1a-local/INCLUSION-MANIFEST.txt   |  123 +\n validation/cm01/s1a-local/README.md                |  107 +\n validation/cm01/s1a-local/S1-A1-SUMMARY.md         |  133 +\n .../cm01/s1a-local/e0/probe-native-promise.mjs     |   47 +\n validation/cm01/s1a-local/e0/quickjs-executor.mjs  |  309 +++\n validation/cm01/s1a-local/e0/run-e0.mjs            |  295 +++\n validation/cm01/s1a-local/e0/synthetic-host.mjs    |   66 +\n validation/cm01/s1a-local/evidence/commands.txt    |   35 +\n validation/cm01/s1a-local/evidence/e0-run1.json    |  492 ++++\n validation/cm01/s1a-local/evidence/e0-run2.json    |  494 ++++\n validation/cm01/s1a-local/evidence/e0.json         |  494 ++++\n validation/cm01/s1a-local/evidence/raw/e0.log      |   75 +\n .../cm01/s1a-local/evidence/repeatability.json     |   19 +\n validation/cm01/s1a-local/m1/README.md             |   84 +\n validation/cm01/s1a-local/m1/evidence/commands.txt |   48 +\n validation/cm01/s1a-local/m1/evidence/m1.json      | 2473 ++++++++++++++++++\n .../cm01/s1a-local/m1/evidence/run1-stderr.log     |    1 +\n .../cm01/s1a-local/m1/evidence/run1-tools.json     |  558 +++++\n .../cm01/s1a-local/m1/evidence/run2-stderr.log     |    1 +\n .../cm01/s1a-local/m1/evidence/run2-tools.json     |  558 +++++\n .../m1/fixture/canonical/project_memory.json       |   97 +\n .../cm01/s1a-local/m1/fixture/pre_migration.json   |   27 +\n .../s1a-local/m1/fixture/work/project_memory.json  |   97 +\n validation/cm01/s1a-local/m1/package-lock.json     | 1223 +++++++++\n validation/cm01/s1a-local/m1/package.json          |   17 +\n validation/cm01/s1a-local/m1/run-m1.mjs            |  296 +++\n validation/cm01/s1a-local/m2/README.md             |   91 +\n validation/cm01/s1a-local/m2/evidence/commands.txt |   50 +\n validation/cm01/s1a-local/m2/evidence/m2.json      | 2628 ++++++++++++++++++++\n .../cm01/s1a-local/m2/evidence/run1-stderr.log     |    4 +\n validation/cm01/s1a-local/m2/evidence/run1.json    | 1199 +++++++++\n .../cm01/s1a-local/m2/evidence/run2-stderr.log     |    4 +\n validation/cm01/s1a-local/m2/evidence/run2.json    | 1199 +++++++++\n validation/cm01/s1a-local/m2/package-lock.json     | 1273 ++++++++++\n validation/cm01/s1a-local/m2/package.json          |   19 +\n validation/cm01/s1a-local/m2/run-m2.mjs            |  561 +++++\n validation/cm01/s1a-local/m3/README.md             |   88 +\n validation/cm01/s1a-local/m3/evidence/commands.txt |   49 +\n validation/cm01/s1a-local/m3/evidence/m3.json      |  961 +++++++\n .../cm01/s1a-local/m3/evidence/run1-stderr.log     |    1 +\n validation/cm01/s1a-local/m3/evidence/run1.json    |  362 +++\n .../cm01/s1a-local/m3/evidence/run2-stderr.log     |    1 +\n validation/cm01/s1a-local/m3/evidence/run2.json    |  362 +++\n validation/cm01/s1a-local/m3/package-lock.json     | 1273 ++++++++++\n validation/cm01/s1a-local/m3/package.json          |   19 +\n validation/cm01/s1a-local/m3/run-m3.mjs            |  484 ++++\n validation/cm01/s1a-local/m4-guard.mjs             |   70 +\n validation/cm01/s1a-local/m4/README.md             |   78 +\n validation/cm01/s1a-local/m4/evidence/commands.txt |   54 +\n validation/cm01/s1a-local/m4/evidence/m4.json      | 1467 +++++++++++\n .../cm01/s1a-local/m4/evidence/run1-stderr.log     |    1 +\n validation/cm01/s1a-local/m4/evidence/run1.json    |  608 +++++\n .../cm01/s1a-local/m4/evidence/run2-stderr.log     |    1 +\n validation/cm01/s1a-local/m4/evidence/run2.json    |  608 +++++\n validation/cm01/s1a-local/m4/f1/README.md          |  116 +\n .../cm01/s1a-local/m4/f1/evidence/commands.txt     |   55 +\n .../cm01/s1a-local/m4/f1/evidence/m4-f1.json       | 2348 +++++++++++++++++\n .../cm01/s1a-local/m4/f1/evidence/run1-stderr.log  |    1 +\n validation/cm01/s1a-local/m4/f1/evidence/run1.json | 1035 ++++++++\n .../cm01/s1a-local/m4/f1/evidence/run2-stderr.log  |    1 +\n validation/cm01/s1a-local/m4/f1/evidence/run2.json | 1035 ++++++++\n validation/cm01/s1a-local/m4/f1/run-m4-f1.mjs      |  623 +++++\n validation/cm01/s1a-local/m4/fixture/SHA256SUMS    |    2 +\n .../m4/fixture/canonical/project_memory.json       |  134 +\n .../cm01/s1a-local/m4/fixture/pre_migration.json   |   39 +\n .../s1a-local/m4/fixture/work/project_memory.json  |  134 +\n validation/cm01/s1a-local/m4/package-lock.json     | 1273 ++++++++++\n validation/cm01/s1a-local/m4/package.json          |   19 +\n validation/cm01/s1a-local/m4/run-m4.mjs            |  547 ++++\n validation/cm01/s1a-local/m5/README.md             |  116 +\n validation/cm01/s1a-local/m5/evidence/commands.txt |   58 +\n validation/cm01/s1a-local/m5/evidence/m5.json      | 1125 +++++++++\n .../cm01/s1a-local/m5/evidence/run1-stderr.log     |    1 +\n validation/cm01/s1a-local/m5/evidence/run1.json    |  405 +++\n .../cm01/s1a-local/m5/evidence/run2-stderr.log     |    1 +\n validation/cm01/s1a-local/m5/evidence/run2.json    |  405 +++\n validation/cm01/s1a-local/m5/package-lock.json     | 1273 ++++++++++\n validation/cm01/s1a-local/m5/package.json          |   19 +\n validation/cm01/s1a-local/m5/run-m5.mjs            |  583 +++++\n validation/cm01/s1a-local/m6/README.md             |  108 +\n validation/cm01/s1a-local/m6/evidence/commands.txt |   55 +\n validation/cm01/s1a-local/m6/evidence/m6.json      | 1925 ++++++++++++++\n .../cm01/s1a-local/m6/evidence/run1-stderr.log     |    1 +\n validation/cm01/s1a-local/m6/evidence/run1.json    |  800 ++++++\n .../cm01/s1a-local/m6/evidence/run2-stderr.log     |    1 +\n validation/cm01/s1a-local/m6/evidence/run2.json    |  800 ++++++\n validation/cm01/s1a-local/m6/package-lock.json     | 1273 ++++++++++\n validation/cm01/s1a-local/m6/package.json          |   19 +\n validation/cm01/s1a-local/m6/run-m6.mjs            |  618 +++++\n validation/cm01/s1a-local/m7/README.md             |  105 +\n validation/cm01/s1a-local/m7/evidence/commands.txt |   60 +\n validation/cm01/s1a-local/m7/evidence/m7.json      | 2256 +++++++++++++++++\n .../cm01/s1a-local/m7/evidence/run1-stderr.log     |    1 +\n validation/cm01/s1a-local/m7/evidence/run1.json    |  958 +++++++\n .../cm01/s1a-local/m7/evidence/run2-stderr.log     |    1 +\n validation/cm01/s1a-local/m7/evidence/run2.json    |  958 +++++++\n validation/cm01/s1a-local/m7/package-lock.json     | 1273 ++++++++++\n validation/cm01/s1a-local/m7/package.json          |   19 +\n validation/cm01/s1a-local/m7/run-m7.mjs            |  630 +++++\n validation/cm01/s1a-local/m8/README.md             |   90 +\n validation/cm01/s1a-local/m8/evidence/commands.txt |   62 +\n .../cm01/s1a-local/m8/evidence/e4-run1-stderr.log  |    1 +\n .../cm01/s1a-local/m8/evidence/e4-run2-stderr.log  |    1 +\n .../cm01/s1a-local/m8/evidence/e5-run1-stderr.log  |    4 +\n .../cm01/s1a-local/m8/evidence/e5-run2-stderr.log  |    4 +\n validation/cm01/s1a-local/m8/evidence/m8.json      |  884 +++++++\n .../cm01/s1a-local/m8/evidence/run1-stderr.log     |    7 +\n validation/cm01/s1a-local/m8/evidence/run1.json    |  258 ++\n .../cm01/s1a-local/m8/evidence/run2-stderr.log     |    7 +\n validation/cm01/s1a-local/m8/evidence/run2.json    |  258 ++\n .../cm01/s1a-local/m8/fixture/sectionless.json     |    9 +\n validation/cm01/s1a-local/m8/package-lock.json     | 1273 ++++++++++\n validation/cm01/s1a-local/m8/package.json          |   19 +\n validation/cm01/s1a-local/m8/run-m8.mjs            |  782 ++++++\n validation/cm01/s1a-local/package-lock.json        |  134 +\n validation/cm01/s1a-local/package.json             |   19 +\n 131 files changed, 53043 insertions(+), 6 deletions(-)",
+    "groups": {
+      "committed_vs_base": [],
+      "staged": [],
+      "unstaged": [],
+      "untracked": [
+        "validation/cm01/p0-cancellation/.gitattributes",
+        "validation/cm01/p0-cancellation/.gitignore",
+        "validation/cm01/p0-cancellation/README.md",
+        "validation/cm01/p0-cancellation/evidence/commands.txt",
+        "validation/cm01/p0-cancellation/evidence/raw/run1-control-direct-child-stderr.log",
+        "validation/cm01/p0-cancellation/evidence/raw/run1-control-relay-child-stderr.log",
+        "validation/cm01/p0-cancellation/evidence/raw/run1-control-relay-relay-stderr.log",
+        "validation/cm01/p0-cancellation/evidence/raw/run1-control-relay-relay.jsonl",
+        "validation/cm01/p0-cancellation/evidence/raw/run1-fault-child-stderr.log",
+        "validation/cm01/p0-cancellation/evidence/raw/run1-fault-relay-stderr.log",
+        "validation/cm01/p0-cancellation/evidence/raw/run1-fault-relay.jsonl",
+        "validation/cm01/p0-cancellation/evidence/raw/run2-control-direct-child-stderr.log",
+        "validation/cm01/p0-cancellation/evidence/raw/run2-control-relay-child-stderr.log",
+        "validation/cm01/p0-cancellation/evidence/raw/run2-control-relay-relay-stderr.log",
+        "validation/cm01/p0-cancellation/evidence/raw/run2-control-relay-relay.jsonl",
+        "validation/cm01/p0-cancellation/evidence/raw/run2-fault-child-stderr.log",
+        "validation/cm01/p0-cancellation/evidence/raw/run2-fault-relay-stderr.log",
+        "validation/cm01/p0-cancellation/evidence/raw/run2-fault-relay.jsonl",
+        "validation/cm01/p0-cancellation/evidence/raw/runner-console.log",
+        "validation/cm01/p0-cancellation/evidence/run1.json",
+        "validation/cm01/p0-cancellation/evidence/run2.json",
+        "validation/cm01/p0-cancellation/evidence/verdict.json",
+        "validation/cm01/p0-cancellation/evidence/versions.json",
+        "validation/cm01/p0-cancellation/package-lock.json",
+        "validation/cm01/p0-cancellation/package.json",
+        "validation/cm01/p0-cancellation/relay.mjs",
+        "validation/cm01/p0-cancellation/run-cancellation.mjs"
+      ]
+    },
+    "protected_patterns": [
+      "^benchmarks\\/adr034_m4\\/",
+      "^tests\\/adr034_m4_",
+      "^tests\\/test_adr034_m4_",
+      "^scripts\\/run_test_battery\\.py$",
+      "^docs\\/validation\\/adr-034-m4-",
+      "^docs\\/plans\\/.*adr-034-m4"
+    ],
+    "violations": [],
+    "pass": true
+  },
+  "m4_validation_scope": {
+    "pass": true,
+    "validation_committed_changes": false,
+    "working_tree_paths_outside_validation_scope": [],
+    "m4_paths_changed_by_validation": [],
+    "upstream_m4_docs_arrived_during_session": [
+      "docs/validation/adr-034-m4-heldout-scoring-2026-10-24.md"
+    ],
+    "note": "The guard is anchored at HEAD so it measures this validation's working-tree delta. The only baseline-to-HEAD delta is an upstream docs-only ADR-034 M4 results record fast-forwarded during the session; no commit or working-tree edit was made by this validation."
+  },
+  "verdict": "FAIL",
+  "reason": "the underlying MCP client request was still pending when Code Mode returned its timeout error; the underlying MCP client request was still pending after a 1500ms bounded observation period; the withheld late response still fulfilled the abandoned MCP client request; no notifications/cancelled was emitted by the integration",
+  "scope": {
+    "tests_transport_response_boundary_only": true,
+    "proves_server_side_cancellation_of_executing_code": false,
+    "production_changes": false,
+    "s1a1_evidence_modified": false,
+    "adr034_m4_modified": false
+  },
+  "observation_notes": {
+    "executor_timeout_ms": 1500,
+    "post_timeout_observation_window_ms": 1500,
+    "mcp_sdk_default_request_timeout_ms": 60000,
+    "abort_signal_passed_to_call_tool": false,
+    "sdk_cancellation_trigger": "MCP SDK 1.32.2 Protocol.request sends notifications/cancelled only when an AbortSignal aborts or its own request timeout fires; the M2 adapter passes no options or signal.",
+    "pending_at_end_not_used_as_cancellation_evidence": true,
+    "server_side_operation_state_at_withhold": "The genuine upstream server had already returned its response before withholding; this experiment measures the client/transport boundary, not server-side cancellation of executing tool code."
+  },
+  "limitations": [
+    "One fault phase per run at the transport-response boundary; no server-side cancellation of executing code is proven.",
+    "The withheld response is released by the harness after measurement; that release is the late-completion probe, not cleanup.",
+    "The 60s MCP SDK default request timeout is deliberately not exercised, so a cancellation at 60s would not be attributable to Code Mode.",
+    "No production implementation, S1-A2, ADR-034 M4, enforcement, performance, or closure claim is made."
+  ],
+  "smallest_correction_boundary": "Host-call boundary only: the adapter/executor bridge would need to propagate an AbortSignal (or equivalent cancellation token) from QuickJS timeout cleanup into client.callTool(), then await transport-level settlement. No server-side cancellation of already-executing tool code is implied."
+}

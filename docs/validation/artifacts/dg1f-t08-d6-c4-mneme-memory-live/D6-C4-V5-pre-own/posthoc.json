@@ -1,0 +1,47 @@
+{
+  "replay": "hook.py:_invoke_check (pinned source)",
+  "checked": [
+    {
+      "tool_use_id": "toolu_D6-C4-V5-pre-own_1",
+      "file_path": "<LIVE>\\D6-C4-V5-pre-own\\A\\repo_a\\app.py",
+      "pre_edit_content_source": "app.before.py",
+      "old_string_found": true,
+      "introduced_content": "import psycopg2",
+      "introduces_psycopg2": true,
+      "hook_record_found": true,
+      "hook_exit": 0,
+      "consistent_with_live_hook": true,
+      "against_hook_selected_memory": {
+        "inputs": {
+          "memory": "<LIVE>\\D6-C4-V5-pre-own\\B\\repo_a\\.mneme\\project_memory.json",
+          "target_path": "<LIVE>\\D6-C4-V5-pre-own\\A\\repo_a\\app.py",
+          "query": "edit to <LIVE>\\D6-C4-V5-pre-own\\A\\repo_a\\app.py",
+          "mode": "strict",
+          "cwd": "<LIVE>\\D6-C4-V5-pre-own\\A\\repo_a",
+          "checked_content_sha256": "8aec72129d8cd7e622ec130908e85d46a3ea7dcda8983f183a5a84f0f0529d40"
+        },
+        "exit": 0,
+        "verdict": "PASS",
+        "evaluation_complete": true,
+        "violations": []
+      },
+      "against_repo_a_own_memory": {
+        "inputs": {
+          "memory": "<LIVE>\\D6-C4-V5-pre-own\\A\\repo_a\\.mneme\\project_memory.json",
+          "target_path": "<LIVE>\\D6-C4-V5-pre-own\\A\\repo_a\\app.py",
+          "query": "edit to <LIVE>\\D6-C4-V5-pre-own\\A\\repo_a\\app.py",
+          "mode": "strict",
+          "cwd": "<LIVE>\\D6-C4-V5-pre-own\\A\\repo_a",
+          "checked_content_sha256": "8aec72129d8cd7e622ec130908e85d46a3ea7dcda8983f183a5a84f0f0529d40"
+        },
+        "exit": 2,
+        "verdict": "FAIL",
+        "evaluation_complete": true,
+        "violations": [
+          "T08-DEC"
+        ]
+      }
+    }
+  ],
+  "not_checked": []
+}

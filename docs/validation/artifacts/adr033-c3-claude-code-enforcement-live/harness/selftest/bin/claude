@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Self-test stand-in for `claude` (see ../stub_claude.py). Never live evidence.
+[ "${C3_SELFTEST:-}" = 1 ] || { echo "stub claude refuses to run outside C3_SELFTEST=1" >&2; exit 1; }
+exec "$PY" -E -P "$(dirname "$0")/../stub_claude.py" "$@"

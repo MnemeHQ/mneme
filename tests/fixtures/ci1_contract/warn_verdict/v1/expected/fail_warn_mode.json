@@ -1,0 +1,23 @@
+{
+  "applicability": [],
+  "evaluation_complete": true,
+  "freshness": [],
+  "mode": "warn",
+  "schema": "mneme.check/v1",
+  "verdict": "FAIL",
+  "violations": [
+    {
+      "decision_id": "storage_json",
+      "decision_text": "Use JSON storage only",
+      "decision_version_id": null,
+      "input_path": null,
+      "kind": "anti_pattern",
+      "rule": "introduce ORM",
+      "rule_id": null,
+      "rule_type": null,
+      "selector": null,
+      "severity": "FAIL",
+      "trigger": "introduce ORM"
+    }
+  ]
+}

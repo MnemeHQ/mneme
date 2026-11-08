@@ -62,6 +62,16 @@ Constructor options:
 | `mode` | `"strict"` or `"warn"`; falls back to `MNEME_HOOK_MODE`, then `strict` |
 | `check_runner` | Test seam replacing the `mneme check` subprocess |
 
+A relative tool `file_path` is resolved against the PreToolUse payload's
+`cwd` (the `cwd` argument of `evaluate_mutation`), for both the file Mneme
+diffs against and the `--target-path` it checks; the host process cwd is not
+used. With an empty `cwd`, relative paths stay relative to the process cwd.
+
+Custom tools outside the `Write`/`Edit`/`MultiEdit` hook matcher can call
+`evaluate_mutation` themselves before mutating (opt-in self-governance, not
+interception). See [custom-tools.md](custom-tools.md) for the tested pattern,
+outcome handling and project-boundary behavior.
+
 ## Policy
 
 | Mneme outcome | strict mode | warn mode |

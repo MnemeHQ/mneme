@@ -1,0 +1,348 @@
+{
+  "path_id": "H1c-stop",
+  "path_type": "command_lifecycle_event",
+  "event": "Stop",
+  "developer_also": "not_observed",
+  "harness": "headless (-p, stream-json)",
+  "rules": "as-run table + R1-R3 (#551)",
+  "emitter_invocations": 9,
+  "control_hook_invocations": 1,
+  "nonce_locations": [
+    {
+      "source": "events",
+      "line": 6,
+      "entry_type": "assistant",
+      "entry_subtype": null,
+      "json_path": "message.content[0].text",
+      "category": "echo"
+    },
+    {
+      "source": "events",
+      "line": 7,
+      "entry_type": "assistant",
+      "entry_subtype": null,
+      "json_path": "message.content[0].text",
+      "category": "echo"
+    },
+    {
+      "source": "events",
+      "line": 8,
+      "entry_type": "assistant",
+      "entry_subtype": null,
+      "json_path": "message.content[0].text",
+      "category": "echo"
+    },
+    {
+      "source": "events",
+      "line": 9,
+      "entry_type": "assistant",
+      "entry_subtype": null,
+      "json_path": "message.content[0].text",
+      "category": "echo"
+    },
+    {
+      "source": "events",
+      "line": 10,
+      "entry_type": "assistant",
+      "entry_subtype": null,
+      "json_path": "message.content[0].text",
+      "category": "echo"
+    },
+    {
+      "source": "events",
+      "line": 11,
+      "entry_type": "assistant",
+      "entry_subtype": null,
+      "json_path": "message.content[0].text",
+      "category": "echo"
+    },
+    {
+      "source": "events",
+      "line": 12,
+      "entry_type": "assistant",
+      "entry_subtype": null,
+      "json_path": "message.content[0].text",
+      "category": "echo"
+    },
+    {
+      "source": "events",
+      "line": 13,
+      "entry_type": "assistant",
+      "entry_subtype": null,
+      "json_path": "message.content[0].text",
+      "category": "echo"
+    },
+    {
+      "source": "events",
+      "line": 14,
+      "entry_type": "result",
+      "entry_subtype": "success",
+      "json_path": "result",
+      "category": "echo"
+    },
+    {
+      "source": "transcript",
+      "line": 9,
+      "entry_type": "attachment",
+      "entry_subtype": null,
+      "json_path": "attachment.stdout",
+      "category": "host_output"
+    },
+    {
+      "source": "transcript",
+      "line": 10,
+      "entry_type": "attachment",
+      "entry_subtype": null,
+      "json_path": "attachment.content[0]",
+      "category": "model_bound"
+    },
+    {
+      "source": "transcript",
+      "line": 12,
+      "entry_type": "assistant",
+      "entry_subtype": null,
+      "json_path": "message.content[0].text",
+      "category": "echo"
+    },
+    {
+      "source": "transcript",
+      "line": 13,
+      "entry_type": "attachment",
+      "entry_subtype": null,
+      "json_path": "attachment.stdout",
+      "category": "host_output"
+    },
+    {
+      "source": "transcript",
+      "line": 14,
+      "entry_type": "attachment",
+      "entry_subtype": null,
+      "json_path": "attachment.content[0]",
+      "category": "model_bound"
+    },
+    {
+      "source": "transcript",
+      "line": 15,
+      "entry_type": "assistant",
+      "entry_subtype": null,
+      "json_path": "message.content[0].text",
+      "category": "echo"
+    },
+    {
+      "source": "transcript",
+      "line": 16,
+      "entry_type": "attachment",
+      "entry_subtype": null,
+      "json_path": "attachment.stdout",
+      "category": "host_output"
+    },
+    {
+      "source": "transcript",
+      "line": 17,
+      "entry_type": "attachment",
+      "entry_subtype": null,
+      "json_path": "attachment.content[0]",
+      "category": "model_bound"
+    },
+    {
+      "source": "transcript",
+      "line": 18,
+      "entry_type": "assistant",
+      "entry_subtype": null,
+      "json_path": "message.content[0].text",
+      "category": "echo"
+    },
+    {
+      "source": "transcript",
+      "line": 19,
+      "entry_type": "attachment",
+      "entry_subtype": null,
+      "json_path": "attachment.stdout",
+      "category": "host_output"
+    },
+    {
+      "source": "transcript",
+      "line": 20,
+      "entry_type": "attachment",
+      "entry_subtype": null,
+      "json_path": "attachment.content[0]",
+      "category": "model_bound"
+    },
+    {
+      "source": "transcript",
+      "line": 21,
+      "entry_type": "assistant",
+      "entry_subtype": null,
+      "json_path": "message.content[0].text",
+      "category": "echo"
+    },
+    {
+      "source": "transcript",
+      "line": 22,
+      "entry_type": "attachment",
+      "entry_subtype": null,
+      "json_path": "attachment.stdout",
+      "category": "host_output"
+    },
+    {
+      "source": "transcript",
+      "line": 23,
+      "entry_type": "attachment",
+      "entry_subtype": null,
+      "json_path": "attachment.content[0]",
+      "category": "model_bound"
+    },
+    {
+      "source": "transcript",
+      "line": 24,
+      "entry_type": "assistant",
+      "entry_subtype": null,
+      "json_path": "message.content[0].text",
+      "category": "echo"
+    },
+    {
+      "source": "transcript",
+      "line": 25,
+      "entry_type": "attachment",
+      "entry_subtype": null,
+      "json_path": "attachment.stdout",
+      "category": "host_output"
+    },
+    {
+      "source": "transcript",
+      "line": 26,
+      "entry_type": "attachment",
+      "entry_subtype": null,
+      "json_path": "attachment.content[0]",
+      "category": "model_bound"
+    },
+    {
+      "source": "transcript",
+      "line": 27,
+      "entry_type": "assistant",
+      "entry_subtype": null,
+      "json_path": "message.content[0].text",
+      "category": "echo"
+    },
+    {
+      "source": "transcript",
+      "line": 30,
+      "entry_type": "attachment",
+      "entry_subtype": null,
+      "json_path": "attachment.stdout",
+      "category": "host_output"
+    },
+    {
+      "source": "transcript",
+      "line": 31,
+      "entry_type": "attachment",
+      "entry_subtype": null,
+      "json_path": "attachment.content[0]",
+      "category": "model_bound"
+    },
+    {
+      "source": "transcript",
+      "line": 32,
+      "entry_type": "assistant",
+      "entry_subtype": null,
+      "json_path": "message.content[0].text",
+      "category": "echo"
+    },
+    {
+      "source": "transcript",
+      "line": 33,
+      "entry_type": "attachment",
+      "entry_subtype": null,
+      "json_path": "attachment.stdout",
+      "category": "host_output"
+    },
+    {
+      "source": "transcript",
+      "line": 34,
+      "entry_type": "attachment",
+      "entry_subtype": null,
+      "json_path": "attachment.content[0]",
+      "category": "model_bound"
+    },
+    {
+      "source": "transcript",
+      "line": 35,
+      "entry_type": "assistant",
+      "entry_subtype": null,
+      "json_path": "message.content[0].text",
+      "category": "echo"
+    },
+    {
+      "source": "transcript",
+      "line": 36,
+      "entry_type": "attachment",
+      "entry_subtype": null,
+      "json_path": "attachment.stdout",
+      "category": "host_output"
+    },
+    {
+      "source": "transcript",
+      "line": 37,
+      "entry_type": "attachment",
+      "entry_subtype": null,
+      "json_path": "attachment.content[0]",
+      "category": "model_bound"
+    }
+  ],
+  "transcript_collected": true,
+  "echoed": true,
+  "turns": 1,
+  "turns_control": 1,
+  "permissions": {
+    "emitter": {
+      "unmatched_denials": []
+    },
+    "control": {
+      "unmatched_denials": []
+    },
+    "comparison": {
+      "equivalent_requests": [],
+      "mismatched_decisions": [],
+      "non_equivalent_attempts": {
+        "emitter": [],
+        "control": []
+      }
+    }
+  },
+  "host_events": {
+    "emitter_subtypes": [],
+    "control_subtypes": [],
+    "indicators": {
+      "emitter": {},
+      "control": {},
+      "mismatched": []
+    }
+  },
+  "controls": {
+    "path_type_emitter": {
+      "init_present": true,
+      "result_success": true,
+      "hook_invocations": 9,
+      "no_stop_reentry": false,
+      "holds": false
+    },
+    "path_type_control_arm": {
+      "init_present": true,
+      "result_success": true,
+      "hook_invocations": 1,
+      "no_stop_reentry": true,
+      "holds": true
+    },
+    "common": {
+      "permission_decisions_equal_for_equivalent_requests": true,
+      "host_indicators_equal": true,
+      "result_not_error": true,
+      "stop_invocations_equal": false
+    }
+  },
+  "label": "DELIVERED_WITH_SIDE_EFFECT",
+  "passes_path": false,
+  "reasons": [
+    "host-induced side-effect control failed"
+  ]
+}

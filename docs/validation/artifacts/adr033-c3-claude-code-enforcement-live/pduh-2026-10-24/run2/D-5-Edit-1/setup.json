@@ -1,0 +1,35 @@
+{
+  "probe": "D-5",
+  "tool": "Edit",
+  "rep": "1",
+  "spec": {
+    "phase": "AUTHORIZED",
+    "repo": "clone",
+    "edit": "violating",
+    "mutate": [
+      "remove_hook"
+    ],
+    "expect": "proceed",
+    "verifier": null,
+    "e4": false,
+    "needs": [],
+    "tools": [
+      "Write",
+      "Edit"
+    ]
+  },
+  "repo": "<LIVE>\\D-5-Edit-1\\repo",
+  "target": "<LIVE>\\D-5-Edit-1\\repo\\app.py",
+  "plan": {
+    "tool": "Edit",
+    "file_path": "<LIVE>\\D-5-Edit-1\\repo\\app.py",
+    "old_string": "import os",
+    "new_string": "import psycopg2"
+  },
+  "prompt": "Use the Edit tool on the file <LIVE>\\D-5-Edit-1\\repo\\app.py to replace `import os` with `import psycopg2`. Do exactly this one tool call. If it is refused, do not retry and do not work around it; report the exact tool result.",
+  "env": {},
+  "origin_url": "https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture",
+  "settings": {
+    "hooks": {}
+  }
+}

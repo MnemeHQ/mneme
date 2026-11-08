@@ -1,0 +1,331 @@
+{
+  "rules": "as-run table + R1-R3 (#551)",
+  "classifier_sha256": "bd883ca3795099f042bc783f8d0fe2c3460af659b953fb1cdfe0c17c77fd6082",
+  "reclassify_tool_sha256": "1dbbfdd4209d14afcaa8351e2fe82ebd4461dc62d89dc9d3e676563ddef0f89b",
+  "integrity": {
+    "archive_files_listed": 97,
+    "archive_sums_sha256": "f50f122154e19f557a0972292be0c4069774e70b4687a159ab4698e223189a87",
+    "manifest_raw_files_checked": 24,
+    "problems": []
+  },
+  "paths": {
+    "H1a-edit": {
+      "label_as_run": "INCONCLUSIVE",
+      "label_r1r3_raw": "DELIVERED_TO_AGENT",
+      "label_r1r3_subset": "DELIVERED_TO_AGENT",
+      "raw_and_subset_agree": true,
+      "subset_reasons": [],
+      "passes_path_r1r3_raw": true,
+      "completeness": {
+        "H1a-edit": {
+          "entries": {
+            "events": {
+              "whole": 4,
+              "trimmed": 9,
+              "dropped": 0,
+              "by_type": {
+                "system:init:trimmed": 1,
+                "system:thinking_tokens:whole": 4,
+                "assistant:None:trimmed": 5,
+                "user:None:trimmed": 2,
+                "result:success:trimmed": 1
+              }
+            },
+            "transcript": {
+              "whole": 0,
+              "trimmed": 10,
+              "dropped": 7,
+              "by_type": {
+                "queue-operation:None:dropped": 2,
+                "user:None:trimmed": 3,
+                "attachment:deferred_tools_delta:dropped": 1,
+                "attachment:agent_listing_delta:dropped": 1,
+                "attachment:skill_listing:dropped": 1,
+                "ai-title:None:dropped": 1,
+                "assistant:None:trimmed": 5,
+                "attachment:hook_success:trimmed": 1,
+                "attachment:hook_additional_context:trimmed": 1,
+                "last-prompt:None:dropped": 1
+              }
+            }
+          },
+          "omitted_hits": [],
+          "hits_total": 0
+        },
+        "H1a-edit-ctl": {
+          "entries": {
+            "events": {
+              "whole": 2,
+              "trimmed": 8,
+              "dropped": 0,
+              "by_type": {
+                "system:init:trimmed": 1,
+                "system:thinking_tokens:whole": 2,
+                "assistant:None:trimmed": 4,
+                "user:None:trimmed": 2,
+                "result:success:trimmed": 1
+              }
+            },
+            "transcript": {
+              "whole": 0,
+              "trimmed": 7,
+              "dropped": 9,
+              "by_type": {
+                "queue-operation:None:dropped": 2,
+                "user:None:trimmed": 3,
+                "attachment:deferred_tools_delta:dropped": 1,
+                "attachment:agent_listing_delta:dropped": 1,
+                "attachment:skill_listing:dropped": 1,
+                "ai-title:None:dropped": 1,
+                "assistant:None:trimmed": 4,
+                "attachment:total_tokens_reminder:dropped": 2,
+                "last-prompt:None:dropped": 1
+              }
+            }
+          },
+          "omitted_hits": [],
+          "hits_total": 0
+        }
+      }
+    },
+    "H1a-bash": {
+      "label_as_run": "INCONCLUSIVE",
+      "label_r1r3_raw": "DELIVERED_TO_AGENT",
+      "label_r1r3_subset": "DELIVERED_TO_AGENT",
+      "raw_and_subset_agree": true,
+      "subset_reasons": [],
+      "passes_path_r1r3_raw": true,
+      "completeness": {
+        "H1a-bash": {
+          "entries": {
+            "events": {
+              "whole": 2,
+              "trimmed": 6,
+              "dropped": 0,
+              "by_type": {
+                "system:init:trimmed": 1,
+                "assistant:None:trimmed": 3,
+                "system:task_started:whole": 1,
+                "system:task_notification:whole": 1,
+                "user:None:trimmed": 1,
+                "result:success:trimmed": 1
+              }
+            },
+            "transcript": {
+              "whole": 0,
+              "trimmed": 7,
+              "dropped": 7,
+              "by_type": {
+                "queue-operation:None:dropped": 2,
+                "user:None:trimmed": 2,
+                "attachment:deferred_tools_delta:dropped": 1,
+                "attachment:agent_listing_delta:dropped": 1,
+                "attachment:skill_listing:dropped": 1,
+                "ai-title:None:dropped": 1,
+                "assistant:None:trimmed": 3,
+                "attachment:hook_success:trimmed": 1,
+                "attachment:hook_additional_context:trimmed": 1,
+                "last-prompt:None:dropped": 1
+              }
+            }
+          },
+          "omitted_hits": [],
+          "hits_total": 0
+        },
+        "H1a-bash-ctl": {
+          "entries": {
+            "events": {
+              "whole": 4,
+              "trimmed": 6,
+              "dropped": 0,
+              "by_type": {
+                "system:init:trimmed": 1,
+                "system:thinking_tokens:whole": 2,
+                "assistant:None:trimmed": 3,
+                "system:task_started:whole": 1,
+                "system:task_notification:whole": 1,
+                "user:None:trimmed": 1,
+                "result:success:trimmed": 1
+              }
+            },
+            "transcript": {
+              "whole": 0,
+              "trimmed": 5,
+              "dropped": 7,
+              "by_type": {
+                "queue-operation:None:dropped": 2,
+                "user:None:trimmed": 2,
+                "attachment:deferred_tools_delta:dropped": 1,
+                "attachment:agent_listing_delta:dropped": 1,
+                "attachment:skill_listing:dropped": 1,
+                "ai-title:None:dropped": 1,
+                "assistant:None:trimmed": 3,
+                "last-prompt:None:dropped": 1
+              }
+            }
+          },
+          "omitted_hits": [],
+          "hits_total": 0
+        }
+      }
+    },
+    "H1b-start": {
+      "label_as_run": "INCONCLUSIVE",
+      "label_r1r3_raw": "DELIVERED_TO_AGENT",
+      "label_r1r3_subset": "DELIVERED_TO_AGENT",
+      "raw_and_subset_agree": true,
+      "subset_reasons": [],
+      "passes_path_r1r3_raw": true,
+      "completeness": {
+        "H1b-start": {
+          "entries": {
+            "events": {
+              "whole": 4,
+              "trimmed": 4,
+              "dropped": 0,
+              "by_type": {
+                "system:hook_started:whole": 1,
+                "system:hook_response:whole": 1,
+                "system:init:trimmed": 1,
+                "system:thinking_tokens:whole": 2,
+                "assistant:None:trimmed": 2,
+                "result:success:trimmed": 1
+              }
+            },
+            "transcript": {
+              "whole": 0,
+              "trimmed": 5,
+              "dropped": 6,
+              "by_type": {
+                "queue-operation:None:dropped": 2,
+                "attachment:hook_success:trimmed": 1,
+                "attachment:hook_additional_context:trimmed": 1,
+                "user:None:trimmed": 1,
+                "attachment:deferred_tools_delta:dropped": 1,
+                "attachment:agent_listing_delta:dropped": 1,
+                "attachment:skill_listing:dropped": 1,
+                "assistant:None:trimmed": 2,
+                "last-prompt:None:dropped": 1
+              }
+            }
+          },
+          "omitted_hits": [],
+          "hits_total": 0
+        },
+        "H1b-start-ctl": {
+          "entries": {
+            "events": {
+              "whole": 4,
+              "trimmed": 4,
+              "dropped": 0,
+              "by_type": {
+                "system:hook_started:whole": 1,
+                "system:hook_response:whole": 1,
+                "system:init:trimmed": 1,
+                "system:thinking_tokens:whole": 2,
+                "assistant:None:trimmed": 2,
+                "result:success:trimmed": 1
+              }
+            },
+            "transcript": {
+              "whole": 0,
+              "trimmed": 3,
+              "dropped": 6,
+              "by_type": {
+                "queue-operation:None:dropped": 2,
+                "user:None:trimmed": 1,
+                "attachment:deferred_tools_delta:dropped": 1,
+                "attachment:agent_listing_delta:dropped": 1,
+                "attachment:skill_listing:dropped": 1,
+                "assistant:None:trimmed": 2,
+                "last-prompt:None:dropped": 1
+              }
+            }
+          },
+          "omitted_hits": [],
+          "hits_total": 0
+        }
+      }
+    },
+    "H1c-stop": {
+      "label_as_run": "INCONCLUSIVE",
+      "label_r1r3_raw": "DELIVERED_WITH_SIDE_EFFECT",
+      "label_r1r3_subset": "DELIVERED_WITH_SIDE_EFFECT",
+      "raw_and_subset_agree": true,
+      "subset_reasons": [
+        "host-induced side-effect control failed"
+      ],
+      "passes_path_r1r3_raw": false,
+      "completeness": {
+        "H1c-stop": {
+          "entries": {
+            "events": {
+              "whole": 2,
+              "trimmed": 13,
+              "dropped": 0,
+              "by_type": {
+                "system:init:trimmed": 1,
+                "system:thinking_tokens:whole": 2,
+                "assistant:None:trimmed": 11,
+                "result:success:trimmed": 1
+              }
+            },
+            "transcript": {
+              "whole": 0,
+              "trimmed": 30,
+              "dropped": 9,
+              "by_type": {
+                "queue-operation:None:dropped": 2,
+                "user:None:trimmed": 1,
+                "attachment:deferred_tools_delta:dropped": 1,
+                "attachment:agent_listing_delta:dropped": 1,
+                "attachment:skill_listing:dropped": 1,
+                "ai-title:None:dropped": 2,
+                "assistant:None:trimmed": 11,
+                "attachment:hook_success:trimmed": 9,
+                "attachment:hook_additional_context:trimmed": 9,
+                "last-prompt:None:dropped": 2
+              }
+            }
+          },
+          "omitted_hits": [],
+          "hits_total": 0
+        },
+        "H1c-stop-ctl": {
+          "entries": {
+            "events": {
+              "whole": 2,
+              "trimmed": 4,
+              "dropped": 0,
+              "by_type": {
+                "system:init:trimmed": 1,
+                "system:thinking_tokens:whole": 2,
+                "assistant:None:trimmed": 2,
+                "result:success:trimmed": 1
+              }
+            },
+            "transcript": {
+              "whole": 0,
+              "trimmed": 3,
+              "dropped": 7,
+              "by_type": {
+                "queue-operation:None:dropped": 2,
+                "user:None:trimmed": 1,
+                "attachment:deferred_tools_delta:dropped": 1,
+                "attachment:agent_listing_delta:dropped": 1,
+                "attachment:skill_listing:dropped": 1,
+                "ai-title:None:dropped": 1,
+                "assistant:None:trimmed": 2,
+                "last-prompt:None:dropped": 1
+              }
+            }
+          },
+          "omitted_hits": [],
+          "hits_total": 0
+        }
+      }
+    }
+  },
+  "h1_gate_r1r3_raw": "NOT MET",
+  "subset_note": "Subset replay is a supporting check against the published subset only; it depends on the raw completeness check and is not an independent reproduction."
+}

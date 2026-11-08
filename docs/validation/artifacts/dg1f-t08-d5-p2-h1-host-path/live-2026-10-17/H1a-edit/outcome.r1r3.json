@@ -1,0 +1,146 @@
+{
+  "path_id": "H1a-edit",
+  "path_type": "command_tool_event",
+  "event": "PreToolUse",
+  "developer_also": "not_observed",
+  "harness": "headless (-p, stream-json)",
+  "rules": "as-run table + R1-R3 (#551)",
+  "emitter_invocations": 1,
+  "control_hook_invocations": 1,
+  "nonce_locations": [
+    {
+      "source": "events",
+      "line": 11,
+      "entry_type": "assistant",
+      "entry_subtype": null,
+      "json_path": "message.content[0].text",
+      "category": "echo"
+    },
+    {
+      "source": "events",
+      "line": 12,
+      "entry_type": "result",
+      "entry_subtype": "success",
+      "json_path": "result",
+      "category": "echo"
+    },
+    {
+      "source": "transcript",
+      "line": 11,
+      "entry_type": "attachment",
+      "entry_subtype": null,
+      "json_path": "attachment.stdout",
+      "category": "host_output"
+    },
+    {
+      "source": "transcript",
+      "line": 12,
+      "entry_type": "attachment",
+      "entry_subtype": null,
+      "json_path": "attachment.content[0]",
+      "category": "model_bound"
+    },
+    {
+      "source": "transcript",
+      "line": 15,
+      "entry_type": "assistant",
+      "entry_subtype": null,
+      "json_path": "message.content[0].text",
+      "category": "echo"
+    }
+  ],
+  "transcript_collected": true,
+  "echoed": true,
+  "turns": 3,
+  "turns_control": 3,
+  "permissions": {
+    "emitter": {
+      "unmatched_denials": []
+    },
+    "control": {
+      "unmatched_denials": []
+    },
+    "comparison": {
+      "equivalent_requests": [],
+      "mismatched_decisions": [],
+      "non_equivalent_attempts": {
+        "emitter": [
+          {
+            "request": [
+              "Read",
+              "{\"file_path\": \"<LIVE>\\\\H1a-edit\\\\ws\\\\notes.txt\"}"
+            ],
+            "decisions": [
+              "executed"
+            ]
+          },
+          {
+            "request": [
+              "Edit",
+              "{\"file_path\": \"<LIVE>\\\\H1a-edit\\\\ws\\\\notes.txt\", \"new_string\": \"beta\", \"old_string\": \"alpha\", \"replace_all\": false}"
+            ],
+            "decisions": [
+              "executed"
+            ]
+          }
+        ],
+        "control": [
+          {
+            "request": [
+              "Read",
+              "{\"file_path\": \"<LIVE>\\\\H1a-edit-ctl\\\\ws\\\\notes.txt\"}"
+            ],
+            "decisions": [
+              "executed"
+            ]
+          },
+          {
+            "request": [
+              "Edit",
+              "{\"file_path\": \"<LIVE>\\\\H1a-edit-ctl\\\\ws\\\\notes.txt\", \"new_string\": \"beta\", \"old_string\": \"alpha\", \"replace_all\": false}"
+            ],
+            "decisions": [
+              "executed"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "host_events": {
+    "emitter_subtypes": [],
+    "control_subtypes": [],
+    "indicators": {
+      "emitter": {},
+      "control": {},
+      "mismatched": []
+    }
+  },
+  "controls": {
+    "path_type_emitter": {
+      "tool_use_present": true,
+      "tool_result_present": true,
+      "tool_result_not_error": true,
+      "not_permission_denied": true,
+      "file_as_expected": true,
+      "holds": true
+    },
+    "path_type_control_arm": {
+      "tool_use_present": true,
+      "tool_result_present": true,
+      "tool_result_not_error": true,
+      "not_permission_denied": true,
+      "file_as_expected": true,
+      "holds": true
+    },
+    "common": {
+      "permission_decisions_equal_for_equivalent_requests": true,
+      "host_indicators_equal": true,
+      "result_not_error": true,
+      "file_matches_control": true
+    }
+  },
+  "label": "DELIVERED_TO_AGENT",
+  "passes_path": true,
+  "reasons": []
+}

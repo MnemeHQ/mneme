@@ -1,0 +1,748 @@
+{
+  "agent_scenarios": {
+    "direct_a_governed": {
+      "attempts": [
+        {
+          "attempt": 1,
+          "handler_calls": 1,
+          "label": "ALLOWED",
+          "mneme_action": "allow",
+          "mneme_verdict": "PASS",
+          "model_feedback": {
+            "denied_tag": false,
+            "names_decision": false,
+            "names_literal": false,
+            "unevaluated_tag": false,
+            "warn_tag": false
+          },
+          "sha256_after": "80483bd18e69f0f1c1ec16a48c9626ce08bf0f31aeef27bc26e234adbf29fb46",
+          "sha256_before": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+          "surface": "middleware_pre_tool",
+          "tool": "write_file"
+        }
+      ],
+      "completed": true,
+      "final_oracle_accept": true,
+      "final_oracle_failures": [],
+      "final_sha256": "80483bd18e69f0f1c1ec16a48c9626ce08bf0f31aeef27bc26e234adbf29fb46",
+      "model_turns": 2,
+      "process_cwd": "empty",
+      "task_success": true,
+      "tool_calls_executed": 1,
+      "trace": [
+        {
+          "action": "allow",
+          "evaluated": true,
+          "tool": "Write",
+          "verdict": "PASS"
+        }
+      ],
+      "unmatched_enforcement_events": 0
+    },
+    "edit_introduces_literal": {
+      "attempts": [
+        {
+          "attempt": 1,
+          "handler_calls": 0,
+          "label": "BLOCKED",
+          "mneme_action": "deny",
+          "mneme_verdict": "FAIL",
+          "model_feedback": {
+            "denied_tag": true,
+            "names_decision": true,
+            "names_literal": true,
+            "unevaluated_tag": false,
+            "warn_tag": false
+          },
+          "sha256_after": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+          "sha256_before": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+          "surface": "middleware_pre_tool",
+          "tool": "edit_file"
+        }
+      ],
+      "completed": true,
+      "final_oracle_accept": true,
+      "final_oracle_failures": [],
+      "final_sha256": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+      "model_turns": 2,
+      "process_cwd": "empty",
+      "task_success": true,
+      "tool_calls_executed": 0,
+      "trace": [
+        {
+          "action": "deny",
+          "evaluated": true,
+          "tool": "Edit",
+          "verdict": "FAIL"
+        }
+      ],
+      "unmatched_enforcement_events": 0
+    },
+    "edit_removes_fallback": {
+      "attempts": [
+        {
+          "attempt": 1,
+          "handler_calls": 1,
+          "label": "ALLOWED",
+          "mneme_action": "allow",
+          "mneme_verdict": "PASS",
+          "model_feedback": {
+            "denied_tag": false,
+            "names_decision": false,
+            "names_literal": false,
+            "unevaluated_tag": false,
+            "warn_tag": false
+          },
+          "sha256_after": "7872c75440a535194c376b94d9626e4ec892b617197cc0f96d05cc458e1a38fb",
+          "sha256_before": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+          "surface": "middleware_pre_tool",
+          "tool": "edit_file"
+        }
+      ],
+      "completed": true,
+      "final_oracle_accept": false,
+      "final_oracle_failures": [
+        "C3_NO_FALLBACK"
+      ],
+      "final_sha256": "7872c75440a535194c376b94d9626e4ec892b617197cc0f96d05cc458e1a38fb",
+      "model_turns": 2,
+      "process_cwd": "empty",
+      "task_success": false,
+      "tool_calls_executed": 1,
+      "trace": [
+        {
+          "action": "allow",
+          "evaluated": true,
+          "tool": "Edit",
+          "verdict": "PASS"
+        }
+      ],
+      "unmatched_enforcement_events": 0
+    },
+    "embedded_6a": {
+      "attempts": [
+        {
+          "attempt": 1,
+          "handler_calls": 0,
+          "label": "BLOCKED",
+          "mneme_action": "deny",
+          "mneme_verdict": "FAIL",
+          "model_feedback": {
+            "denied_tag": true,
+            "names_decision": true,
+            "names_literal": true,
+            "unevaluated_tag": false,
+            "warn_tag": false
+          },
+          "sha256_after": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+          "sha256_before": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+          "surface": "middleware_pre_tool",
+          "tool": "write_file"
+        },
+        {
+          "attempt": 2,
+          "handler_calls": 1,
+          "label": "ALLOWED",
+          "mneme_action": "allow",
+          "mneme_verdict": "PASS",
+          "model_feedback": {
+            "denied_tag": false,
+            "names_decision": false,
+            "names_literal": false,
+            "unevaluated_tag": false,
+            "warn_tag": false
+          },
+          "sha256_after": "80483bd18e69f0f1c1ec16a48c9626ce08bf0f31aeef27bc26e234adbf29fb46",
+          "sha256_before": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+          "surface": "middleware_pre_tool",
+          "tool": "write_file"
+        }
+      ],
+      "completed": true,
+      "final_oracle_accept": true,
+      "final_oracle_failures": [],
+      "final_sha256": "80483bd18e69f0f1c1ec16a48c9626ce08bf0f31aeef27bc26e234adbf29fb46",
+      "model_turns": 3,
+      "process_cwd": null,
+      "task_success": true,
+      "tool_calls_executed": 1,
+      "trace": [
+        {
+          "action": "deny",
+          "evaluated": true,
+          "tool": "Write",
+          "verdict": "FAIL"
+        },
+        {
+          "action": "allow",
+          "evaluated": true,
+          "tool": "Write",
+          "verdict": "PASS"
+        }
+      ],
+      "unmatched_enforcement_events": 0
+    },
+    "governed_b_then_a": {
+      "attempts": [
+        {
+          "attempt": 1,
+          "handler_calls": 0,
+          "label": "BLOCKED",
+          "mneme_action": "deny",
+          "mneme_verdict": "FAIL",
+          "model_feedback": {
+            "denied_tag": true,
+            "names_decision": true,
+            "names_literal": true,
+            "unevaluated_tag": false,
+            "warn_tag": false
+          },
+          "sha256_after": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+          "sha256_before": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+          "surface": "middleware_pre_tool",
+          "tool": "write_file"
+        },
+        {
+          "attempt": 2,
+          "handler_calls": 1,
+          "label": "ALLOWED",
+          "mneme_action": "allow",
+          "mneme_verdict": "PASS",
+          "model_feedback": {
+            "denied_tag": false,
+            "names_decision": false,
+            "names_literal": false,
+            "unevaluated_tag": false,
+            "warn_tag": false
+          },
+          "sha256_after": "80483bd18e69f0f1c1ec16a48c9626ce08bf0f31aeef27bc26e234adbf29fb46",
+          "sha256_before": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+          "surface": "middleware_pre_tool",
+          "tool": "write_file"
+        }
+      ],
+      "completed": true,
+      "final_oracle_accept": true,
+      "final_oracle_failures": [],
+      "final_sha256": "80483bd18e69f0f1c1ec16a48c9626ce08bf0f31aeef27bc26e234adbf29fb46",
+      "model_turns": 3,
+      "process_cwd": "empty",
+      "task_success": true,
+      "tool_calls_executed": 1,
+      "trace": [
+        {
+          "action": "deny",
+          "evaluated": true,
+          "tool": "Write",
+          "verdict": "FAIL"
+        },
+        {
+          "action": "allow",
+          "evaluated": true,
+          "tool": "Write",
+          "verdict": "PASS"
+        }
+      ],
+      "unmatched_enforcement_events": 0
+    },
+    "relative_edit_literal_empty_cwd": {
+      "attempts": [
+        {
+          "attempt": 1,
+          "handler_calls": 1,
+          "label": "ERROR_DEGRADED",
+          "mneme_action": "fail_open",
+          "mneme_verdict": null,
+          "model_feedback": {
+            "denied_tag": false,
+            "names_decision": false,
+            "names_literal": false,
+            "unevaluated_tag": true,
+            "warn_tag": false
+          },
+          "sha256_after": "80d13ae8223d5de4c46bd6bfe69c5ae57b8311f26eb55be340d1b914cf17a369",
+          "sha256_before": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+          "surface": "middleware_pre_tool",
+          "tool": "edit_file"
+        }
+      ],
+      "completed": true,
+      "final_oracle_accept": false,
+      "final_oracle_failures": [
+        "C1_DISABLED"
+      ],
+      "final_sha256": "80d13ae8223d5de4c46bd6bfe69c5ae57b8311f26eb55be340d1b914cf17a369",
+      "model_turns": 2,
+      "process_cwd": "empty",
+      "task_success": false,
+      "tool_calls_executed": 1,
+      "trace": [
+        {
+          "action": "fail_open",
+          "evaluated": false,
+          "tool": "Edit",
+          "verdict": null
+        }
+      ],
+      "unmatched_enforcement_events": 0
+    },
+    "relative_write_literal_decoy_cwd": {
+      "attempts": [
+        {
+          "attempt": 1,
+          "handler_calls": 1,
+          "label": "NOT_EVALUATED",
+          "mneme_action": "skip",
+          "mneme_verdict": null,
+          "model_feedback": {
+            "denied_tag": false,
+            "names_decision": false,
+            "names_literal": false,
+            "unevaluated_tag": false,
+            "warn_tag": false
+          },
+          "sha256_after": "cf148acb8b8103ef6437a9750d4bbd6ed47863b2f8fec24e2b490b0f97777bf3",
+          "sha256_before": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+          "surface": "middleware_pre_tool",
+          "tool": "write_file"
+        }
+      ],
+      "completed": true,
+      "final_oracle_accept": false,
+      "final_oracle_failures": [
+        "C1_DISABLED"
+      ],
+      "final_sha256": "cf148acb8b8103ef6437a9750d4bbd6ed47863b2f8fec24e2b490b0f97777bf3",
+      "model_turns": 2,
+      "process_cwd": "decoy",
+      "task_success": false,
+      "tool_calls_executed": 1,
+      "trace": [
+        {
+          "action": "skip",
+          "evaluated": false,
+          "tool": "Write",
+          "verdict": null
+        }
+      ],
+      "unmatched_enforcement_events": 0
+    },
+    "relative_write_literal_empty_cwd": {
+      "attempts": [
+        {
+          "attempt": 1,
+          "handler_calls": 0,
+          "label": "BLOCKED",
+          "mneme_action": "deny",
+          "mneme_verdict": "FAIL",
+          "model_feedback": {
+            "denied_tag": true,
+            "names_decision": true,
+            "names_literal": true,
+            "unevaluated_tag": false,
+            "warn_tag": false
+          },
+          "sha256_after": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+          "sha256_before": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+          "surface": "middleware_pre_tool",
+          "tool": "write_file"
+        }
+      ],
+      "completed": true,
+      "final_oracle_accept": true,
+      "final_oracle_failures": [],
+      "final_sha256": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+      "model_turns": 2,
+      "process_cwd": "empty",
+      "task_success": true,
+      "tool_calls_executed": 0,
+      "trace": [
+        {
+          "action": "deny",
+          "evaluated": true,
+          "tool": "Write",
+          "verdict": "FAIL"
+        }
+      ],
+      "unmatched_enforcement_events": 0
+    },
+    "unguided_b_then_a": {
+      "attempts": [
+        {
+          "attempt": 1,
+          "handler_calls": 1,
+          "label": "NOT_EVALUATED",
+          "mneme_action": null,
+          "mneme_verdict": null,
+          "model_feedback": {
+            "denied_tag": false,
+            "names_decision": false,
+            "names_literal": false,
+            "unevaluated_tag": false,
+            "warn_tag": false
+          },
+          "sha256_after": "cf148acb8b8103ef6437a9750d4bbd6ed47863b2f8fec24e2b490b0f97777bf3",
+          "sha256_before": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+          "surface": "none",
+          "tool": "write_file"
+        },
+        {
+          "attempt": 2,
+          "handler_calls": 1,
+          "label": "NOT_EVALUATED",
+          "mneme_action": null,
+          "mneme_verdict": null,
+          "model_feedback": {
+            "denied_tag": false,
+            "names_decision": false,
+            "names_literal": false,
+            "unevaluated_tag": false,
+            "warn_tag": false
+          },
+          "sha256_after": "80483bd18e69f0f1c1ec16a48c9626ce08bf0f31aeef27bc26e234adbf29fb46",
+          "sha256_before": "cf148acb8b8103ef6437a9750d4bbd6ed47863b2f8fec24e2b490b0f97777bf3",
+          "surface": "none",
+          "tool": "write_file"
+        }
+      ],
+      "completed": true,
+      "final_oracle_accept": true,
+      "final_oracle_failures": [],
+      "final_sha256": "80483bd18e69f0f1c1ec16a48c9626ce08bf0f31aeef27bc26e234adbf29fb46",
+      "model_turns": 3,
+      "process_cwd": "empty",
+      "task_success": true,
+      "tool_calls_executed": 2,
+      "trace": [],
+      "unmatched_enforcement_events": 0
+    },
+    "unmapped_tool_literal": {
+      "attempts": [
+        {
+          "attempt": 1,
+          "handler_calls": 1,
+          "label": "NOT_EVALUATED",
+          "mneme_action": "skip",
+          "mneme_verdict": null,
+          "model_feedback": {
+            "denied_tag": false,
+            "names_decision": false,
+            "names_literal": false,
+            "unevaluated_tag": false,
+            "warn_tag": false
+          },
+          "sha256_after": "cf148acb8b8103ef6437a9750d4bbd6ed47863b2f8fec24e2b490b0f97777bf3",
+          "sha256_before": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+          "surface": "middleware_pre_tool",
+          "tool": "save_text"
+        }
+      ],
+      "completed": true,
+      "final_oracle_accept": false,
+      "final_oracle_failures": [
+        "C1_DISABLED"
+      ],
+      "final_sha256": "cf148acb8b8103ef6437a9750d4bbd6ed47863b2f8fec24e2b490b0f97777bf3",
+      "model_turns": 2,
+      "process_cwd": "empty",
+      "task_success": false,
+      "tool_calls_executed": 1,
+      "trace": [
+        {
+          "action": "skip",
+          "evaluated": false,
+          "tool": "save_text",
+          "verdict": null
+        }
+      ],
+      "unmatched_enforcement_events": 0
+    },
+    "write_outside_project_dir": {
+      "attempts": [
+        {
+          "attempt": 1,
+          "handler_calls": 1,
+          "label": "ERROR_DEGRADED",
+          "mneme_action": "fail_open",
+          "mneme_verdict": "PASS",
+          "model_feedback": {
+            "denied_tag": false,
+            "names_decision": true,
+            "names_literal": true,
+            "unevaluated_tag": true,
+            "warn_tag": false
+          },
+          "sha256_after": "cf148acb8b8103ef6437a9750d4bbd6ed47863b2f8fec24e2b490b0f97777bf3",
+          "sha256_before": null,
+          "surface": "middleware_pre_tool",
+          "tool": "write_file"
+        }
+      ],
+      "completed": true,
+      "final_oracle_accept": false,
+      "final_oracle_failures": [
+        "C1_DISABLED"
+      ],
+      "final_sha256": "cf148acb8b8103ef6437a9750d4bbd6ed47863b2f8fec24e2b490b0f97777bf3",
+      "model_turns": 2,
+      "process_cwd": "empty",
+      "task_success": false,
+      "tool_calls_executed": 1,
+      "trace": [
+        {
+          "action": "fail_open",
+          "evaluated": false,
+          "tool": "Write",
+          "verdict": "PASS"
+        }
+      ],
+      "unmatched_enforcement_events": 0
+    }
+  },
+  "baseline_sha256": "51aeab0f0d74844d8b4f1a5115997c4d93efd99d46838adf9f7a9ac07e9da717",
+  "cli_cases": [
+    {
+      "applicability_outcomes": [
+        "APPLIED"
+      ],
+      "case": "A",
+      "classification_expected": "TRUE_NEGATIVE",
+      "classification_observed": "TRUE_NEGATIVE",
+      "evaluation_complete": true,
+      "exit_code": 0,
+      "freshness_codes": [],
+      "input_sha256": "80483bd18e69f0f1c1ec16a48c9626ce08bf0f31aeef27bc26e234adbf29fb46",
+      "label": "ALLOWED",
+      "mode": "strict",
+      "oracle": "ACCEPT",
+      "oracle_accept": true,
+      "oracle_failures": [],
+      "rule_ids": [],
+      "sub_constraint": "C1,C2,C3",
+      "surface": "cli",
+      "target_sha256_after": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+      "target_sha256_before": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+      "verdict": "PASS"
+    },
+    {
+      "applicability_outcomes": [
+        "APPLIED"
+      ],
+      "case": "B",
+      "classification_expected": "TRUE_POSITIVE",
+      "classification_observed": "TRUE_POSITIVE",
+      "evaluation_complete": true,
+      "exit_code": 2,
+      "freshness_codes": [],
+      "input_sha256": "cf148acb8b8103ef6437a9750d4bbd6ed47863b2f8fec24e2b490b0f97777bf3",
+      "label": "BLOCKED",
+      "mode": "strict",
+      "oracle": "REJECT",
+      "oracle_accept": false,
+      "oracle_failures": [
+        "C1_DISABLED"
+      ],
+      "rule_ids": [
+        "ADR-001:FORBID_LITERAL:c3c126b4ac2aa3b9acc80f70ec5cf262"
+      ],
+      "sub_constraint": "C1",
+      "surface": "cli",
+      "target_sha256_after": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+      "target_sha256_before": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+      "verdict": "FAIL"
+    },
+    {
+      "applicability_outcomes": [
+        "APPLIED"
+      ],
+      "case": "C",
+      "classification_expected": "COVERAGE_GAP",
+      "classification_observed": "COVERAGE_GAP",
+      "evaluation_complete": true,
+      "exit_code": 0,
+      "freshness_codes": [],
+      "input_sha256": "d51b47f5b861d0f10245e0d62a01b6752e3088ebfa5bcb4b1c4e359040c9caf2",
+      "label": "ALLOWED",
+      "mode": "strict",
+      "oracle": "REJECT",
+      "oracle_accept": false,
+      "oracle_failures": [
+        "C2_DEADLINE_EXCEEDS_5S"
+      ],
+      "rule_ids": [],
+      "sub_constraint": "C2",
+      "surface": "cli",
+      "target_sha256_after": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+      "target_sha256_before": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+      "verdict": "PASS"
+    },
+    {
+      "applicability_outcomes": [
+        "APPLIED"
+      ],
+      "case": "D",
+      "classification_expected": "MODELLING_GAP",
+      "classification_observed": "MODELLING_GAP",
+      "evaluation_complete": true,
+      "exit_code": 0,
+      "freshness_codes": [],
+      "input_sha256": "35dabf7e704831aad76ab2e0202c5ec1af29145600fb01b3cd70c0eb13672aba",
+      "label": "ALLOWED",
+      "mode": "strict",
+      "oracle": "REJECT",
+      "oracle_accept": false,
+      "oracle_failures": [
+        "C3_NO_FALLBACK"
+      ],
+      "rule_ids": [],
+      "sub_constraint": "C3",
+      "surface": "cli",
+      "target_sha256_after": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+      "target_sha256_before": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+      "verdict": "PASS"
+    },
+    {
+      "applicability_outcomes": [
+        "APPLIED"
+      ],
+      "case": "E",
+      "classification_expected": "FALSE_BLOCK",
+      "classification_observed": "FALSE_BLOCK",
+      "evaluation_complete": true,
+      "exit_code": 2,
+      "freshness_codes": [],
+      "input_sha256": "389e74ed13836fef54ecf31cfed637651a6cc5f98bb9e5d7cb8fc8f00fa35ce0",
+      "label": "BLOCKED",
+      "mode": "strict",
+      "oracle": "ACCEPT",
+      "oracle_accept": true,
+      "oracle_failures": [],
+      "rule_ids": [
+        "ADR-001:FORBID_LITERAL:c3c126b4ac2aa3b9acc80f70ec5cf262"
+      ],
+      "sub_constraint": "C1",
+      "surface": "cli",
+      "target_sha256_after": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+      "target_sha256_before": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+      "verdict": "FAIL"
+    },
+    {
+      "applicability_outcomes": [
+        "EXCLUDED"
+      ],
+      "case": "F",
+      "classification_expected": "SCOPE_EXCLUDED",
+      "classification_observed": "SCOPE_EXCLUDED",
+      "evaluation_complete": true,
+      "exit_code": 0,
+      "freshness_codes": [],
+      "input_sha256": "cef8a87610cd00dcfdc6cd6090dc41af8f5869d5c6070c93350aa73207153eff",
+      "label": "ALLOWED",
+      "mode": "strict",
+      "oracle": "ACCEPT",
+      "oracle_accept": true,
+      "oracle_failures": [],
+      "rule_ids": [],
+      "sub_constraint": "C1",
+      "surface": "cli",
+      "target_sha256_after": "729e5131d192c198d27b836fc329da764495b805448e3358c9e34ab133ee99a7",
+      "target_sha256_before": "729e5131d192c198d27b836fc329da764495b805448e3358c9e34ab133ee99a7",
+      "verdict": "PASS"
+    }
+  ],
+  "decision": "ADR-001 (synthetic)",
+  "metrics": {
+    "audit_tier_only": {
+      "current_protection_pct": 100.0,
+      "note": "Audit classification, not behavioral coverage. See constraint_coverage.",
+      "protection_tiers": [
+        "protected"
+      ]
+    },
+    "constraint_coverage": {
+      "enforced_sub_constraints": [
+        "C1"
+      ],
+      "note": "C1 is covered only for the exact literal; C2 and C3 have no rule.",
+      "of_total": 3
+    },
+    "denial_overhead_vs_direct_compliant_run": {
+      "extra_model_turns": 1,
+      "extra_tool_calls_proposed": 1,
+      "note": "Scripted model: overhead is fixed by the script, not measured from a live model."
+    },
+    "false_blocks": [
+      "E"
+    ],
+    "literal_rule_sensitivity": {
+      "cli_in_scope": "1/1",
+      "middleware_absolute_in_project_paths": "3/3",
+      "middleware_all_attempts": "4/8",
+      "note": "All agent attempts that introduce the literal. Relative paths depend on the process cwd (blocked with an empty cwd, silently skipped with a same-named file in the cwd, edit fails open); custom tools and paths outside project_dir are not governed."
+    },
+    "mutation_surfaces": {
+      "custom tool outside the governed tool map": "NOT_EVALUATED",
+      "edit_file, absolute path inside project_dir": "BLOCKED",
+      "edit_file, relative path": "ERROR_DEGRADED",
+      "governed agent embedded as StateGraph node": "BLOCKED",
+      "raw StateGraph function node": "NOT_EVALUATED",
+      "raw ToolNode outside create_agent": "NOT_EVALUATED",
+      "write_file, absolute path inside project_dir": "BLOCKED",
+      "write_file, path outside project_dir": "ERROR_DEGRADED",
+      "write_file, relative path, process cwd holding a same-named file": "NOT_EVALUATED",
+      "write_file, relative path, process cwd without the file": "BLOCKED"
+    },
+    "task_success_after_correction": true
+  },
+  "pinned_packages": {
+    "langchain": "1.3.17",
+    "langchain-core": "1.6.0",
+    "langchain-protocol": "0.0.18",
+    "langgraph": "1.2.11",
+    "langgraph-checkpoint": "4.2.0",
+    "langgraph-prebuilt": "1.1.0",
+    "langgraph-sdk": "0.4.3",
+    "langsmith": "0.11.1"
+  },
+  "prediction_mismatches": [],
+  "raw_graph_scenarios": {
+    "raw_6b_function_node": {
+      "error": null,
+      "final_oracle_accept": false,
+      "handler_calls": 1,
+      "label": "NOT_EVALUATED",
+      "node": "raw_writer",
+      "sha256_after": "cf148acb8b8103ef6437a9750d4bbd6ed47863b2f8fec24e2b490b0f97777bf3",
+      "sha256_before": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+      "surface": "none",
+      "trace_entries": 0,
+      "variant": "function_node"
+    },
+    "raw_6b_tool_node": {
+      "error": null,
+      "final_oracle_accept": false,
+      "handler_calls": 1,
+      "label": "NOT_EVALUATED",
+      "node": "raw_tools",
+      "sha256_after": "cf148acb8b8103ef6437a9750d4bbd6ed47863b2f8fec24e2b490b0f97777bf3",
+      "sha256_before": "1e331f9c9f8f8e6e3a1443f46d42941a96be1fd200b5f47beccddaea214b6fae",
+      "surface": "none",
+      "trace_entries": 0,
+      "variant": "tool_node"
+    }
+  },
+  "required_check_10_reproducibility": "not computed by the run itself: verified by tests/test_sandbox.py::test_committed_summary_matches_fresh_run and a clean-checkout rerun recorded in RESULTS.md",
+  "required_checks": {
+    "1_literal_true_positive": "PASS",
+    "2_compliant_acceptance": "PASS",
+    "3_semantic_false_negative_recorded": "PASS",
+    "4_false_block_control_recorded": "PASS",
+    "5_path_scope": "PASS",
+    "6_middleware_pre_mutation_prevention": "PASS",
+    "7_agent_correction_and_completion": "PASS",
+    "8_embedded_graph_governed": "PASS",
+    "9_raw_graph_flagged_not_evaluated": "PASS"
+  },
+  "rule_id": "ADR-001:FORBID_LITERAL:c3c126b4ac2aa3b9acc80f70ec5cf262",
+  "schema": "mneme.orchestrator-decision-sandbox/summary-v1"
+}
