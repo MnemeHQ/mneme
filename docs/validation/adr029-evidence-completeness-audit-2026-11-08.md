@@ -99,7 +99,7 @@ Dimensions 1, 2 and configuration are absent. Per ADR-029 §2 this is
 | E-1 | **Relevant enforcement observed is achievable in v0.11.0 on exactly one path:** the agent-host hook, a `FORBID_NUMERIC_ABOVE` rule, a new-file `Write`, and a pinned host identity. `relevant_enforcement_per_rule` already implements the fail-closed per-rule check for it. The claim rests on per-rule configuration binding (accepted by owner ruling 2026-11-08) and holds only under a complete `(decision_id, decision_version_id, rule_id)` match (§5.1). Every literal-rule observation on every surface stops at execution observed. | scope fact, conditional (§5.1) |
 | E-2 | CLI omits control/provenance and subject for literal-only checks. This is by design (G2-1 charter §5.2 rule 3, D3 proposal §1), not a defect, but it caps every literal CLI observation at dimension 1/2. | gap, needs owner ruling to change |
 | E-3 | No surface records a per-rule **allow** for literal rules. An `APPLIED` rule with no violation is an inferred allow, which ADR-029 §2 ("attributable allow/reject result is recorded for that rule") does not accept. | gap, runtime change |
-| E-4 | Memory-wide configuration identity is carried only by the CI gate (memory blob). CLI and hook bind configuration per rule only, through content-derived `rule_id` and `decision_version_id` (§5.1). They cannot detect a mismatch in the rest of the loaded memory. | gap, runtime change |
+| E-4 | Memory-wide configuration identity is carried only by the CI gate (memory blob). CLI and hook bind configuration per rule only, through content-derived `rule_id` and `decision_version_id` (§5.1). They cannot detect a mismatch in the rest of the loaded memory. | limitation; not required for relevance under the §5.1 ruling |
 | E-5 | **The production CI gate does not run v0.11.0.** Its evaluator is pinned to the CI1-approved build of `0b74d410` (2026-10-17). CI evidence on Core is evidence about that build, not about v0.11.0. Any v0.11.0 CI claim needs a re-pin under the CI1/R0 process. | scope fact |
 | E-6 | The CI gate's applicability extract drops `decision_version_id`. It survives in the raw `stdout`, so nothing is lost, but the structured record cannot bind dimension 3 without re-parsing. | minor, adapter-only |
 | E-7 | Section-less memory and the `--adr-dir` view still produce no canonical `decision_version_id`; `EvidenceIdentity.complete` is false and binding fails closed at dimension 3, as ADR-031 §10 requires. Confirmed by code; not re-probed here. | conforming |
@@ -194,10 +194,16 @@ Broader configuration and authority guarantees stay unclaimed.
    the hook's existing relevance evaluator (E-1), which #579 predates.
 2. The pinned one-decision/two-checkpoint fixture must state which evaluator
    build each checkpoint runs (E-5).
-3. Literal-rule relevance cannot be reached without at least E-2, E-3 and E-4
-   being resolved. Each is a runtime change and needs its own charter and
-   owner ruling, as #579 already says for "any missing required runtime
-   field".
+3. Literal-rule relevance is blocked by the bindings that are actually
+   missing for literal rules: control/provenance and subject in the CLI
+   payload (E-2), and a per-rule allow record (E-3). On the hook surface,
+   literal rules also have no applicability record (§3.1). Each is a runtime
+   change and needs its own charter and owner ruling, as #579 already says
+   for "any missing required runtime field". Per-rule configuration is
+   already bound for literal rules through `rule_id` and
+   `decision_version_id`. Under the §5.1 ruling, memory-wide configuration
+   identity (E-4) is a documented limitation and optional provenance, not a
+   blocker.
 4. Negative controls that need no runtime change and can run now against
    v0.11.0: missing decision identity (section-less memory, `--adr-dir`),
    mismatched `decision_version_id` / `rule_id`, `EXCLUDED` rule,
