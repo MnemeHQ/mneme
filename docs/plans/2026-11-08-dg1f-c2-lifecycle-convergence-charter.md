@@ -1,6 +1,8 @@
-# DG1F-C2: lifecycle-only convergence charter
+# DG1F-C2: lifecycle-authority consolidation charter
 
-**Status: PROPOSED.** Behavioral charter for the second DG1F increment. On
+**Status: PROPOSED.** Behavioral charter for a **preparatory** DG1F increment.
+C2 consolidates lifecycle authority; it **does not complete** ADR-031 §11
+runtime convergence on the shared resolver result, which stays open (§2). On
 merge it defines the contract and acceptance evidence for C2. **It authorizes
 no implementation by itself.** Implementation also needs a separate
 `[layer1-freeze]` amendment (§7), which has its own review and approval.
@@ -44,9 +46,24 @@ decisions reach enforcement.
 
 ## 2. What C2 is
 
-C2 is **structural convergence, not a new enforcement capability.** It makes
-one object the lifecycle authority, makes the resolver safe for context-free
-use, and pins today's cross-surface behavior with golden tests.
+C2 is **preparatory lifecycle-authority consolidation, not a new enforcement
+capability.** It makes one object the lifecycle authority, makes the resolver
+safe for context-free use, and pins today's cross-surface behavior with golden
+tests.
+
+**C2 is not completion of ADR-031 §11.** §11 requires runtime consumers to
+converge on the **shared resolver result**. Under C2, consumers share only the
+lifecycle predicate the resolver also uses; they keep receiving
+`list[Decision]` and never receive a `GovernanceResolution`. Eliminating
+duplicated lifecycle logic is not decision-governance convergence:
+
+- Full resolver-result convergence (protection, Audit, readiness, evidence and
+  any CLI/agent/MCP consumer acting on `resolve_effective` output, including
+  its causes, trace and applicability) **remains open** under tracker #497's
+  "DG1F — other runtime consumer convergence" item.
+- It needs its own charter and `[layer1-freeze]` amendment. Nothing in this
+  charter or its freeze amendment authorizes it, and no C2 result may be cited
+  as satisfying it.
 
 **No verdict changes.** C2 changes no protection verdict, Audit count or tier,
 activation candidate, precheck result or message, evidence match, readiness
@@ -69,9 +86,10 @@ converged without changing output, it stays as it is and is recorded.
   `evidence.py:241`. Readiness follows through `_build_report`.
 - These consumers keep receiving `list[Decision]`. They **do not call
   `resolve_effective`**: it needs the canonical index, refuses section-less
-  memory, and would add a second load path. Sharing the predicate that defines
-  the resolver's lifecycle eligibility is how they consume the resolver
-  semantics; the freeze amendment (§7) must name this explicitly.
+  memory, and would add a second load path. Sharing the predicate is **not**
+  consumption of the resolver result (§2); the freeze amendment (§7) must
+  authorize predicate sharing only and say that resolver-result consumption
+  stays prohibited.
 - **Out of scope, unchanged:** ADR import and graph statuses (`adr_import.py`,
   `adr_lifecycle.py`, `adr_freshness.py`), the EventCatalog importer, and
   `availability_authority.py` activation state. They describe import-time
@@ -85,11 +103,19 @@ converged without changing output, it stays as it is and is recorded.
   - **supplied, no labels** (`()`);
   - **supplied, with labels**.
 - When labels are **not supplied**, the resolver does not evaluate decision
-  applicability. A lifecycle-eligible decision is reported effective, with
-  trace step `applicability: context_not_supplied`. No decision is ever
-  excluded because context is unknown (ADR-031 §11).
+  applicability. A lifecycle-eligible decision is **conservatively included**:
+  applicability is unknown, so the decision is kept rather than excluded
+  (ADR-031 §11). Its trace step is `applicability: context_not_supplied`.
+- **Conservative inclusion is not proof of applicability.** A conservatively
+  included decision that declares required labels has not been shown to apply
+  to any context. The resolution must say so in data, not only in prose:
+  `applicability_evaluated` is `false` for every decision, and no output,
+  message or change set may present it as matched, applicable or governing a
+  specific context. `resolve_change` keeps refusing to compare a not-supplied
+  resolution with a supplied one.
 - Each `DecisionResolution` gains a `lifecycle_eligible` field, filled
-  regardless of context. The resolution records whether context was supplied.
+  regardless of context, and an `applicability_evaluated` field. The
+  resolution records whether context was supplied.
 - Supplied-context behavior (both supplied states) is unchanged.
 - The C1a preview always supplies labels, so its output is unchanged.
 - The resolver semantics id bumps (proposed
@@ -154,8 +180,9 @@ them byte for byte.
 **Negative and mutation tests** (each must fail if its guard is removed):
 
 1. Applicability not dropped: under not-supplied context, an applicability-scoped
-   decision is effective with `context_not_supplied`; under supplied-empty it
-   stays `not_applicable` (unchanged).
+   decision is conservatively included with `context_not_supplied` and
+   `applicability_evaluated = false`, and is never reported as `matched`;
+   under supplied-empty it stays `not_applicable` (unchanged).
 2. Findings never block: a conflict or dangling `supersedes` changes no
    consumer output.
 3. Legacy D-1 preserved: a superseded section-less decision still FAILs
@@ -192,12 +219,17 @@ CI gate's evaluator pin (CI R0); or touch C1b, DG1B2 or DG1G.
 | Legacy behavior "fixed" in passing | §3.3; test 3 |
 | The default-context change surprises a library caller | listed in PR and release notes; no runtime caller today |
 | The predicate becomes a second authority | it replaces all five copies; test 5 |
+| C2 is mistaken for ADR-031 §11 completion | §2 and §7 keep resolver-result convergence open on #497; the freeze amendment authorizes predicate sharing only |
+| Conservative inclusion read as "applies" | `applicability_evaluated = false`; never reported as `matched`; test 1 |
 
 ## 7. Approval sequence
 
 1. This charter: review and merge. Authorizes nothing to run.
-2. `[layer1-freeze]` amendment: a separate PR naming the C2 consumers, the
-   shared-predicate form of resolver consumption (§3.1), the three-state
-   context and this evidence. Separate approval.
+2. `[layer1-freeze]` amendment: a separate PR naming the C2 consumers,
+   authorizing lifecycle-predicate sharing only (§3.1), the three-state
+   context with conservative inclusion, and this evidence. It restates that
+   resolver-result consumption by runtime consumers stays prohibited.
+   Separate approval.
 3. Goldens commit, then implementation PR, with independent review against §4.
-4. Results recorded on tracker #497. No DG1 completion claim follows from C2.
+4. Results recorded on tracker #497, with the §11 resolver-result convergence
+   item left open. No DG1F or DG1 completion claim follows from C2.
