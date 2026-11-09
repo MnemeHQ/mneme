@@ -40,7 +40,9 @@ Prefer frozen fixtures, deterministic scoring, clear treatment/control boundarie
 
 ### P0 — Four-layer decision-conformance validation
 
-Validate the **existing** governance model end to end: **Guidance → Pre-mutation enforcement → CI checks → Evidence**. This is a cross-cutting acceptance test for the current benchmark, DG1, integration and CI assurance work, **not** a fifth layer, a new policy engine, or DG2 scope.
+Validate the **existing** governance model end to end: **Guidance → Pre-mutation enforcement → CI checks → Verification**. This is a cross-cutting acceptance test for the current benchmark, DG1, integration and CI assurance work, **not** a fifth layer, a new policy engine, or DG2 scope.
+
+Verification is a claim-assessment capability, not an evidence-capture or storage subsystem. Evidence records are produced at the supported checkpoints and assessed for binding completeness under ADR-029; the existing CI and pre-mutation enforcement boundaries remain distinct.
 
 The Decision Index supplies the common decision authority and applicability semantics to each layer. A process or ADR-acknowledgment marker may be useful workflow evidence, but must not count as proof that code conforms to an architectural decision.
 
@@ -54,9 +56,9 @@ The Decision Index supplies the common decision authority and applicability sema
 
 **Exit evidence:** a repeatable trace showing permitted work succeeds, a documented-but-noncompliant change is caught at each *supported* control point, and a complete record of unevaluated or unsupported surfaces. Reuse the production governance trace (#282), DG1 tracker (#497) and separate CI1 enforcement-assurance tracker (#540). Do not claim universal mutation coverage or directly compare an external product without a reproduced baseline.
 
-#### Bounded Evidence & Evaluation validation slice (P0, OSS; proposed, reconciled to v0.11.0)
+#### Bounded Verification slice (P0, OSS; proposed, reconciled to v0.11.0)
 
-**Purpose:** Prove that pre-mutation enforcement and CI produce separately attributable, decision-linked evidence under the existing four-layer validation programme. Reuse ADR-029's six binding dimensions and D1/DG1 canonical decision-version and rule identity; this is **not** a new evidence subsystem, policy engine, or workstream. Pre-mutation and CI evaluate different subjects at different checkpoints and their verdicts must not be conflated.
+**Purpose:** Verify, rather than merely capture, the decision-linked evidence from pre-mutation enforcement and CI. Establish which claims the evidence supports under the existing four-layer validation programme. Reuse ADR-029's six binding dimensions and D1/DG1 canonical decision-version and rule identity; this is **not** a new evidence subsystem, policy engine, or workstream. Pre-mutation and CI evaluate different subjects at different checkpoints and their verdicts must not be conflated.
 
 **Baseline (done):** the read-only ADR-029 evidence completeness audit against v0.11.0 ([record](../validation/adr029-evidence-completeness-audit-2026-11-08.md), [#761](https://github.com/MnemeHQ/mneme/pull/761)) maps the CLI `mneme.check/v1` payload, the Claude Code hook evidence record and the CI trusted-gate report to ADR-029's six bindings. Its results set this slice's scope:
 
