@@ -1,0 +1,137 @@
+{
+  "meta": {
+    "name": "dg1f-c2-goldens",
+    "description": "DG1F-C2 golden-output corpus (pre-change baseline)",
+    "version": "0.1.0"
+  },
+  "items": [],
+  "decisions": [
+    {
+      "id": "C2-LIT",
+      "decision": "Do not import psycopg2; the service uses SQLite.",
+      "rationale": "Single-file deployment.",
+      "scope": [
+        "database",
+        "storage"
+      ],
+      "constraints": [
+        "Use sqlite3 only"
+      ],
+      "anti_patterns": [
+        "psycopg2"
+      ],
+      "status": "active",
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "psycopg2"
+        }
+      ],
+      "test_evidence": [
+        {
+          "selector": "tests/test_storage.py::test_sqlite_only"
+        }
+      ]
+    },
+    {
+      "id": "C2-PICKLE",
+      "decision": "Do not use pickle for persistence.",
+      "rationale": "Untrusted input.",
+      "scope": [
+        "serialization"
+      ],
+      "constraints": [],
+      "anti_patterns": [
+        "pickle"
+      ],
+      "status": "active",
+      "rules": []
+    },
+    {
+      "id": "C2-READY",
+      "decision": "Never call requests.get without a timeout.",
+      "rationale": "Hung workers.",
+      "scope": [
+        "http",
+        "network"
+      ],
+      "constraints": [
+        "Always pass timeout="
+      ],
+      "anti_patterns": [
+        "requests.get(url)"
+      ],
+      "status": "active",
+      "rules": []
+    },
+    {
+      "id": "C2-GUIDE",
+      "decision": "Prefer small, composable modules.",
+      "rationale": "Readability.",
+      "scope": [
+        "architecture"
+      ],
+      "constraints": [],
+      "anti_patterns": [],
+      "status": "active",
+      "rules": []
+    },
+    {
+      "id": "C2-OLD",
+      "decision": "Do not import mysqlclient.",
+      "rationale": "Superseded by C2-LIT.",
+      "scope": [
+        "database"
+      ],
+      "constraints": [],
+      "anti_patterns": [
+        "mysqlclient"
+      ],
+      "status": "superseded",
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "mysqlclient"
+        }
+      ],
+      "test_evidence": [
+        {
+          "selector": "tests/test_storage.py::test_sqlite_only"
+        }
+      ]
+    },
+    {
+      "id": "C2-DEP",
+      "decision": "Do not import cx_Oracle.",
+      "rationale": "Deprecated policy.",
+      "scope": [
+        "database"
+      ],
+      "constraints": [],
+      "anti_patterns": [
+        "cx_Oracle"
+      ],
+      "status": "deprecated",
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "cx_Oracle"
+        }
+      ]
+    },
+    {
+      "id": "C2-OLDPICKLE",
+      "decision": "Do not use marshal for persistence.",
+      "rationale": "Superseded.",
+      "scope": [
+        "serialization"
+      ],
+      "constraints": [],
+      "anti_patterns": [
+        "marshal"
+      ],
+      "status": "superseded",
+      "rules": []
+    }
+  ]
+}

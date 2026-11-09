@@ -42,14 +42,17 @@ from mneme.decision_index import (
     CANONICAL_DECISION_CLASS_ARCHITECTURE,
     SOURCE_TYPE_ADR,
     SOURCE_TYPE_PROPOSAL,
+    GOVERNING_LIFECYCLE_STATUSES,
     VALID_SOURCE_TYPES,
     CanonicalArchitectureIndex,
     CanonicalDecisionRecord,
     CanonicalRuleRecord,
+    lifecycle_governs,
 )
 from mneme.schemas import Decision, Rule
 
-PROJECTABLE_LIFECYCLE_STATUSES: frozenset[str] = frozenset({"active"})
+# DG1F-C2: the projectable set IS the single lifecycle authority (same object).
+PROJECTABLE_LIFECYCLE_STATUSES: frozenset[str] = GOVERNING_LIFECYCLE_STATUSES
 
 ARCHITECTURE_MAPPING = {
     "decision_id": "id",
@@ -168,7 +171,7 @@ def project_canonical_decision(
             f"{record.decision_class!r}; D0 projects only "
             f"{CANONICAL_DECISION_CLASS_ARCHITECTURE!r}"
         )
-    if record.lifecycle_status not in PROJECTABLE_LIFECYCLE_STATUSES:
+    if not lifecycle_governs(record.lifecycle_status):
         raise ValueError(
             f"decision {record.decision_id!r} has lifecycle_status "
             f"{record.lifecycle_status!r}; D0 projects only "
@@ -254,7 +257,7 @@ def project_canonical_index(
     """
     out: list[Decision] = []
     for record in index.records:
-        if record.lifecycle_status not in PROJECTABLE_LIFECYCLE_STATUSES:
+        if not lifecycle_governs(record.lifecycle_status):
             continue
         out.append(project_canonical_decision(
             record,

@@ -43,6 +43,7 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Literal
 
+from mneme.decision_index import lifecycle_governs
 from mneme.decision_retriever import ScoredDecision
 from mneme.enforcer import (
     ArchitectureProtectionReport,
@@ -167,7 +168,7 @@ def find_candidates(
         by_id.setdefault(decision.id, decision)
     candidates: list[ProtectionCandidate] = []
     for item in report.decisions:
-        if item.status != "active" or item.protection_tier != "mneme_ready":
+        if not lifecycle_governs(item.status) or item.protection_tier != "mneme_ready":
             continue
         decision = by_id.get(item.id)
         if decision is None:
@@ -209,7 +210,7 @@ def activation_precheck(
     """Classify activation eligibility exclusively from frozen semantics."""
     assessment = assess_protection(decision, repo_root=repo_root)
     tier = assessment.protection_tier
-    if decision.status != "active":
+    if not lifecycle_governs(decision.status):
         return Precheck(
             decision_id=decision.id,
             tier=tier,
