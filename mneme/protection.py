@@ -122,6 +122,27 @@ def load_decisions(memory_path: str | Path) -> list[Decision]:
     return store.decisions()
 
 
+def load_governed_decisions(memory_path: str | Path) -> list[Decision]:
+    """``protect list`` loading (DG1F-C3a, freeze amendment #775).
+
+    Same validation and error message as :func:`load_decisions`, but the
+    result is the resolver-governed set
+    (``decision_governance.governed_runtime_decisions``). The resolver runs
+    outside the ``try`` so its errors are never wrapped as ``ProtectionError``.
+    :func:`load_decisions` is unchanged for status/validate/activate.
+    """
+    from mneme.decision_governance import governed_runtime_decisions
+
+    store = MemoryStore(memory_path)
+    try:
+        store.load()
+    except Exception as exc:
+        raise ProtectionError(
+            f"memory file {memory_path} failed validation: {exc}"
+        ) from exc
+    return governed_runtime_decisions(store)
+
+
 def find_decision(decisions: list[Decision], decision_id: str) -> Decision | None:
     """Return the first decision with the given id, or ``None``."""
     return next((d for d in decisions if d.id == decision_id), None)

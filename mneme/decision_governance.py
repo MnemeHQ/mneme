@@ -366,6 +366,32 @@ def resolve_effective(
     )
 
 
+def governed_runtime_decisions(store) -> list:
+    """The governed runtime decisions of a loaded ``MemoryStore`` (DG1F-C3a).
+
+    Charter docs/plans/2026-11-09-dg1f-c3a-audit-resolver-charter.md §3.3;
+    Layer 1 freeze amendment #775. Used only by ``mneme audit``, setup
+    readiness and ``protect list``.
+
+    - Canonical memory: the projected decisions whose ids are in the
+      resolver's effective set for the **not supplied** context, in projection
+      order, from the same snapshot (``store.canonical_index`` and
+      ``store.decisions()`` come from one ``MemoryStore.load()``). Labels are
+      never supplied. Only the effective set is used; findings never exclude
+      a decision and resolver errors are never caught.
+    - Section-less memory (no canonical index): ``store.decisions()``
+      unchanged (the DG1F-C2 path).
+
+    This reads no file.
+    """
+    decisions = store.decisions()
+    index = store.canonical_index
+    if index is None:
+        return decisions
+    effective = set(resolve_effective(index, GovernanceContext()).effective_ids)
+    return [decision for decision in decisions if decision.id in effective]
+
+
 def resolve_effective_from_memory_file(
     path: str | Path,
     context: GovernanceContext | None = None,
@@ -678,6 +704,7 @@ __all__ = [
     "FINDING_DANGLING_SUPERSEDES",
     "FINDING_SUPERSESSION_LIFECYCLE_CONFLICT",
     "GOVERNANCE_SEMANTICS_VERSION",
+    "governed_runtime_decisions",
     "STATUS_AMBIGUOUS",
     "STATUS_EFFECTIVE",
     "STATUS_INEFFECTIVE",
