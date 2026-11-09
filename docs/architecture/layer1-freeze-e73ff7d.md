@@ -1906,9 +1906,12 @@ and the merged C2 charter §§2-4.
     `mneme/evidence.py`.
 
   These consumers keep receiving `list[Decision]`. **This is predicate
-  sharing, not consumption of the resolver result.** No runtime consumer may
-  call `resolve_effective` or act on a `GovernanceResolution`, its causes,
-  trace, findings or applicability.
+  sharing, not consumption of the resolver result.** No runtime consumer
+  newly calls `resolve_effective` or acts on a `GovernanceResolution`, its
+  causes, trace, findings or applicability. The sole exception is the
+  existing, non-authoritative `mneme check --applicability-preview` (C1a),
+  which already calls `resolve_effective` under the DG1F-C1a amendment and
+  stays exactly as that amendment authorizes.
 - **Three-state context (charter §3.2).** `GovernanceContext.labels`
   distinguishes not supplied (`None`, the new default), supplied with no
   labels, and supplied with labels.
@@ -1958,8 +1961,11 @@ Before C2 implementation can merge:
 
 1. **ADR-031 §11 resolver-result convergence.** No CLI, enforcer,
    `ConflictDetector`, protection, Audit, readiness, evidence, hook or MCP
-   surface may consume `resolve_effective` output. That needs its own charter
-   and `[layer1-freeze]` amendment; no C2 result may be cited as satisfying it.
+   surface may newly consume `resolve_effective` output, other than the
+   existing, non-authoritative C1a `--applicability-preview` already
+   authorized by the DG1F-C1a amendment. Any further consumption needs its own
+   charter and `[layer1-freeze]` amendment; no C2 result may be cited as
+   satisfying it.
 2. **DG1F-C1b.** No label source or applicability result may exclude an
    otherwise active decision from any runtime path.
 3. Any change to which decisions reach `check_prompt`, the retrieval-gated
@@ -1976,7 +1982,8 @@ Before C2 implementation can merge:
 
 The DG1B1 and DG1F-C1a freeze amendments remain unchanged. Their DG1F
 prohibition on runtime consumption of the resolver result still governs every
-runtime consumer; this amendment permits lifecycle-predicate sharing only.
+runtime consumer other than the C1a preview; this amendment permits
+lifecycle-predicate sharing only.
 
 ---
 
