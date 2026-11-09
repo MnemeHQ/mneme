@@ -1246,6 +1246,11 @@
     "abababababababababababababababababababababababababababababababab"
   ],
   "mneme_version": "0.11.0",
+  "pinned_commit": "101f3f427901c01fa4330e4add62af6ba8057a51",
+  "pinned_paths": [
+    "mneme",
+    "tests/canonical_fixtures.py"
+  ],
   "summary": {
     "controls": 18,
     "failed": [],

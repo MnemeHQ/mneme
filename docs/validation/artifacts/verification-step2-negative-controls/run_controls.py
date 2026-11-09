@@ -9,6 +9,16 @@ Run from the repository root:
 
     python docs/validation/artifacts/verification-step2-negative-controls/run_controls.py
 
+The results are pinned to implementation ``101f3f42`` (runtime identical to
+v0.11.0). Before importing anything, the harness checks that the runtime it
+will import (``mneme/`` and the fixture builder ``tests/canonical_fixtures.py``)
+is byte-identical to that commit, with no untracked files, and refuses to run
+otherwise (exit 2). To replay on a checkout whose runtime has moved, point it
+at a detached checkout of the pinned commit:
+
+    git worktree add --detach ../mneme-101f3f42 101f3f42
+    python docs/validation/artifacts/verification-step2-negative-controls/run_controls.py --runtime-root ../mneme-101f3f42
+
 Writes ``results.json`` next to this file and exits 1 if any control misses
 its expected evidence level OR any of its expected runtime observations
 (action, applicability, matcher status, evaluation completeness, hook
@@ -33,20 +43,70 @@ Claim assessment (harness-side, from the accepted contracts):
 """
 from __future__ import annotations
 
+import argparse
 import contextlib
 import copy
 import hashlib
 import io
 import json
 import os
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
 
-REPO = Path(__file__).resolve().parents[4]
-sys.path.insert(0, str(REPO))
+PINNED_COMMIT = "101f3f427901c01fa4330e4add62af6ba8057a51"
+PINNED_PATHS = ("mneme", "tests/canonical_fixtures.py")
 
+
+def _runtime_root() -> Path:
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--runtime-root", default=str(Path(__file__).resolve().parents[4]),
+                        help="checkout whose mneme/ runtime is imported (default: this repo)")
+    return Path(parser.parse_args().runtime_root).resolve()
+
+
+def _assert_pinned_runtime(root: Path) -> None:
+    """Fail closed unless the runtime to be imported equals PINNED_COMMIT."""
+    def git(*args):
+        return subprocess.run(["git", "-C", str(root), *args],
+                              capture_output=True, text=True, check=False)
+    problems = []
+    try:
+        if git("cat-file", "-e", f"{PINNED_COMMIT}^{{commit}}").returncode != 0:
+            problems.append(f"pinned commit {PINNED_COMMIT[:8]} not available in {root}")
+        else:
+            diff = git("diff", "--name-only", PINNED_COMMIT, "--", *PINNED_PATHS)
+            if diff.returncode != 0:
+                problems.append(f"git diff failed: {diff.stderr.strip()}")
+            elif diff.stdout.strip():
+                problems.append("runtime differs from the pin: "
+                                + ", ".join(diff.stdout.split()))
+            untracked = git("ls-files", "--others", "--exclude-standard", "--", *PINNED_PATHS)
+            if untracked.stdout.strip():
+                problems.append("untracked runtime files: " + ", ".join(untracked.stdout.split()))
+    except OSError as exc:
+        problems.append(f"git unavailable: {exc}")
+    if problems:
+        print(f"REFUSED: results are pinned to {PINNED_COMMIT[:8]}; " + "; ".join(problems),
+              file=sys.stderr)
+        print("Replay with --runtime-root <detached checkout of the pinned commit>.",
+              file=sys.stderr)
+        raise SystemExit(2)
+
+
+RUNTIME_ROOT = _runtime_root() if __name__ == "__main__" else Path(__file__).resolve().parents[4]
+_assert_pinned_runtime(RUNTIME_ROOT)
+sys.path.insert(0, str(RUNTIME_ROOT))
+
+import mneme  # noqa: E402
 from mneme import __version__  # noqa: E402
+
+if Path(mneme.__file__).resolve().parent != RUNTIME_ROOT / "mneme":
+    print(f"REFUSED: mneme imported from {mneme.__file__}, not {RUNTIME_ROOT}",
+          file=sys.stderr)
+    raise SystemExit(2)
+
 from mneme.cli import main as cli_main  # noqa: E402
 from mneme.decision_governance import evidence_identity_of  # noqa: E402
 from mneme.integrations.agent_sdk import MnemeAgentSdk  # noqa: E402
@@ -317,7 +377,9 @@ def adapter_obs(a: dict) -> dict:
 
 
 def main() -> int:
-    results: dict = {"mneme_version": __version__, "host_pin": list(HOST), "controls": []}
+    results: dict = {"mneme_version": __version__, "host_pin": list(HOST),
+                     "pinned_commit": PINNED_COMMIT, "pinned_paths": list(PINNED_PATHS),
+                     "controls": []}
     work = Path(tempfile.mkdtemp(prefix="mneme-step2-"))
 
     def project(name: str, fixture: str) -> Path:

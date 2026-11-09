@@ -99,13 +99,33 @@ level alone would have hidden that change; the observation checks catch it.
 identity. These are fixture observations of the shipped code paths, not a
 verified live-host enforcement observation, and no attestation is claimed.
 
-**Reproduce** from the repository root:
+**Reproduce.** The results are pinned to `101f3f42`. Before importing
+anything, the harness checks that the runtime it will import (`mneme/` and the
+fixture builder `tests/canonical_fixtures.py`) is byte-identical to that commit
+and has no untracked files. It also checks that `mneme` was actually imported
+from that checkout. If any check fails it refuses to run (exit 2) and names the
+differing files, so a run on a later commit can never silently test a
+different implementation. On any checkout whose runtime has moved (current
+`main` includes #770), replay against a detached checkout of the pin:
 
 ```bash
-python docs/validation/artifacts/verification-step2-negative-controls/run_controls.py
+git worktree add --detach ../mneme-101f3f42 101f3f42
+python docs/validation/artifacts/verification-step2-negative-controls/run_controls.py --runtime-root ../mneme-101f3f42
+git worktree remove ../mneme-101f3f42
 ```
 
-It rewrites
+On a checkout already at the pin, `--runtime-root` can be omitted. Checked on
+2026-11-09:
+
+| Runtime root | Result |
+|---|---|
+| this branch (based on `101f3f42`) | runs, 18/18, 98/98 |
+| detached checkout of `101f3f42` | runs, 18/18, 98/98, `results.json` byte-identical |
+| detached checkout of `origin/main` (`b719dc96`) | **refused**, names the 6 files #770 changed |
+| pin checkout with one runtime line appended | **refused** (`mneme/enforcer.py`) |
+| pin checkout with an untracked runtime file | **refused** |
+
+The harness rewrites
 [`results.json`](artifacts/verification-step2-negative-controls/results.json),
 which lists each control's expected and actual observations, and exits 1 if
 any control misses its level or any observation. Two consecutive runs of the
