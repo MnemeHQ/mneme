@@ -1987,6 +1987,128 @@ lifecycle-predicate sharing only.
 
 ---
 
+## Amendment — authorize DG1F-C3a resolver-result consumption by three reporting consumers (2026-11-09)
+
+> This authorizes a **future, bounded implementation**, not a statement that
+> any behavior has changed. It authorizes resolver-result consumption by
+> exactly three reporting consumers, with no observable change. It does
+> **not** authorize full ADR-031 §11 convergence, Audit-family convergence,
+> C1b, waivers, explanation output or any change to enforcement inputs.
+
+**Change:** Permit `mneme audit`, setup readiness and `protect list` to take
+their governed decision set from `resolve_effective` on canonical memory, with
+labels not supplied, from the same validated `MemoryStore` snapshot, with
+**every observable output of every surface unchanged**.
+
+**Sections referenced:** the Freeze Anchor **Status** clause ("No behavioral
+change to retrieval or enforcement without an explicit charter amendment"),
+the DG1B1 amendment's "Not authorized by this amendment" list, the DG1F-C1a
+amendment's closing paragraph, the DG1F-C2 amendment's "Not authorized" item 1
+(resolver-result consumption) and closing paragraph, and the Amendment
+Procedure below. This amendment is the explicit, narrow exception to those
+prohibitions for the three consumers named here only.
+
+**Rationale (Amendment Procedure §3(b)).** A distinct behavioral charter was
+**already merged** before this amendment:
+[DG1F-C3a charter](../plans/2026-11-09-dg1f-c3a-audit-resolver-charter.md),
+PR [#774](https://github.com/MnemeHQ/mneme/pull/774), squash `5a1fdb20`. Its
+basis is the [C3 feasibility assessment](../plans/2026-11-09-dg1f-c3-resolver-result-feasibility.md)
+(#773, squash `7af4645a`). No behavior change is retroactively justified.
+
+**Governing authority:** accepted
+[ADR-031](../adr/ADR-031-decision-governance-semantics.md) §6/§7/§11,
+[ADR-023](../adr/ADR-023-canonical-decision-index-and-runtime-projection-boundary.md),
+[ADR-026](../adr/ADR-026-audit-tier-semantics-and-mneme-potential.md),
+[ADR-030](../adr/ADR-030-canonical-decision-persistence-version-identity-and-stable-rule-lineage.md),
+and the merged C3a charter §§2-4.
+
+### Authorized change — C3a only (charter §3)
+
+- **Consumers (charter §3.1), and only these:**
+  - `mneme audit` (text and `--json`), at its load site `_cmd_audit`;
+  - setup readiness, at `setup._load_validated_decisions` (which feeds
+    `decision_count` and `readiness_counts`);
+  - `protect list`, through a **new list-only loader**. `protection.load_decisions`
+    and `cli._require_memory`, which also feed `protect status`, `validate`
+    and `activate`, stay unchanged. The new loader keeps their missing-file
+    and "failed validation" messages and exit code 2.
+- **Governed-set derivation (charter §3.3).** One shared helper over a loaded
+  `MemoryStore`:
+  - canonical memory: `resolve_effective(store.canonical_index,
+    GovernanceContext())`, labels **not supplied**, returning the projected
+    decisions from `store.decisions()` whose ids are in the effective set, in
+    projection order;
+  - section-less memory (`canonical_index` is `None`): `store.decisions()`
+    unchanged (the C2 path).
+
+  The index and decisions come from one load; the helper never reads the
+  memory file. Supplying labels, including `labels=()`, is prohibited. Only
+  the effective set is used: causes, trace, `superseded_by`, findings and
+  applicability are neither surfaced nor acted on, and integrity findings
+  never exclude a decision or fail a consumer. The helper is called outside
+  the load's error handling, so a resolver `ValueError` is never converted
+  into `SetupError`, `ProtectionError` or an empty result.
+- **Output invariance is mandatory.** `mneme audit` text and JSON
+  (`mneme.audit/v1`), the setup summary and activation record, `protect list`
+  output and exit codes, and every output of every excluded surface stay
+  byte-identical. ADR-026 formulas, ADR-017 tiers, ADR-020 rule-path selection
+  and canonical identities are unchanged. Legacy section-less memory and
+  newly created memory keep their exact behavior.
+
+### Validation gate for the later implementation PR
+
+Before C3a implementation can merge:
+
+1. **Loader/resolver validation compatibility (charter §3.4)** is pinned by
+   tests before any production change: every repository canonical fixture
+   loads and resolves; duplicate decision ids, unknown lifecycle and rules
+   naming an unknown decision or version are rejected by the loader; the
+   lineage condition is shown impossible by construction; a property-style
+   check over the C2 golden forms and mutations passes; on every canonical
+   golden the effective set equals the projected ids. If any loader-accepted
+   index fails resolver validation, implementation stops; the conflict is
+   never caught or hidden.
+2. **Goldens first:** a separate commit before any production change adds
+   goldens for `mneme audit` and `protect list` with `--repo-root` evidence,
+   `run_setup` over each golden form and over newly created memory, and the
+   `protect list` error paths. Run-specific values (temporary paths,
+   generated timestamps, interpreter metadata) are normalized as exact
+   tokens only. All C2 and new goldens reproduce byte for byte, with captures
+   from the pre-change and C3a code identical on Linux CI and a local Windows
+   run.
+3. The seven charter §4 negative and mutation tests pass, and each fails when
+   its guard is removed.
+4. All DG1 tests, the full gate battery and the frozen Layer 1 benchmark (7/7)
+   pass. New tests live outside the frozen benchmark fixtures and methodology.
+5. An independent review checks the implementation against charter §4.
+
+### Not authorized by this amendment
+
+1. **Any other resolver-result consumer.** `audit_with_github_claim`,
+   `protect status`, `protect validate`, `protect activate`, the persistence
+   protection-install check, CI evidence-matching APIs, `mneme check`, hooks,
+   the CI gates, MCP and any other CLI or agent surface may not newly consume
+   `resolve_effective` output. The C1a preview stays exactly as the DG1F-C1a
+   amendment authorizes. No C3a result may be cited as Audit-family, §11,
+   DG1F or DG1 completion.
+2. **DG1F-C1b.** No supplied labels and no applicability result may exclude
+   a decision from any path.
+3. Any change to outputs, schemas, exit codes, ADR-026 formulas, retrieval,
+   rule matching, `ConflictDetector`, ADR-020 applicability, typed rules,
+   enforcement inputs, CI workflows or the trusted gate's evaluator pin.
+4. Surfacing causes, trace, findings or applicability (explanation output).
+5. Any change to legacy section-less semantics, an in-memory canonical view,
+   implicit v1 → v2 migration, loader tightening, new persisted fields,
+   schema versions or semantic features, waivers, or benchmark fixture or
+   methodology changes.
+
+The DG1B1, DG1F-C1a and DG1F-C2 freeze amendments remain unchanged. Their
+prohibition on runtime consumption of the resolver result still governs every
+runtime consumer other than the C1a preview and the three C3a consumers named
+above.
+
+---
+
 ## Amendment Procedure
 
 This document is frozen at `e73ff7d`. To amend it:
