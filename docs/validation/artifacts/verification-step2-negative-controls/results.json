@@ -1,0 +1,1261 @@
+{
+  "controls": [
+    {
+      "actual_level": "relevant_enforcement_observed",
+      "assessment": {
+        "function_relevance": true,
+        "identity_match": true,
+        "level": "relevant_enforcement_observed",
+        "per_rule": {
+          "ADR-034T:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096": true
+        },
+        "subject_match": true
+      },
+      "evidence": {
+        "record": {
+          "carrier_sha256": "0411bf1f25562302303a35ca1badd6c536a80ccb78610d6792986d79f999e342",
+          "checker": {
+            "evaluation_complete": true,
+            "problem": "",
+            "subject": {
+              "absence_verified": true,
+              "governed_path": "src/new.py",
+              "input_kind": "proposed_new_source",
+              "subject_sha256": "0411bf1f25562302303a35ca1badd6c536a80ccb78610d6792986d79f999e342",
+              "target_path": "<project>/src/new.py"
+            },
+            "trusted": true
+          },
+          "disposition": {
+            "cause": "numeric_violation",
+            "mode": "strict"
+          },
+          "event": {
+            "cwd": "<project>",
+            "file_path": "<project>/src/new.py",
+            "identifiers": {
+              "session_id": "sess-step2",
+              "tool_use_id": "toolu_step2"
+            },
+            "tool_name": "Write"
+          },
+          "hook_outcome": "refused",
+          "host": {
+            "executable_sha256": "abababababababababababababababababababababababababababababababab",
+            "version": "2.1.303"
+          },
+          "mneme_version": "0.11.0",
+          "rules": [
+            {
+              "applicability": "APPLIED",
+              "decision_version_id": "dver-86427d8aadb1002800428def00f17e61",
+              "governed_path": "src/new.py",
+              "matcher_outcome": "VIOLATION",
+              "matcher_status": "RECOGNIZED",
+              "primary_reason": null,
+              "rule_id": "ADR-034T:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096",
+              "subject_sha256": "0411bf1f25562302303a35ca1badd6c536a80ccb78610d6792986d79f999e342"
+            }
+          ],
+          "schema": "mneme.hook_evidence/v1",
+          "surface": "claude_code.PreToolUse",
+          "violations": [
+            {
+              "rule_id": "ADR-034T:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096",
+              "rule_type": "FORBID_NUMERIC_ABOVE"
+            }
+          ]
+        }
+      },
+      "expected_level": "relevant_enforcement_observed",
+      "id": "P1",
+      "level_ok": true,
+      "negative": false,
+      "observations": {
+        "applicability": {
+          "actual": "APPLIED",
+          "expected": "APPLIED",
+          "ok": true
+        },
+        "checker_trusted": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "disposition_cause": {
+          "actual": "numeric_violation",
+          "expected": "numeric_violation",
+          "ok": true
+        },
+        "evaluation_complete": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "function_relevance": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "hook_exit": {
+          "actual": 2,
+          "expected": 2,
+          "ok": true
+        },
+        "hook_outcome": {
+          "actual": "refused",
+          "expected": "refused",
+          "ok": true
+        },
+        "identity_match": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "matcher_outcome": {
+          "actual": "VIOLATION",
+          "expected": "VIOLATION",
+          "ok": true
+        },
+        "matcher_status": {
+          "actual": "RECOGNIZED",
+          "expected": "RECOGNIZED",
+          "ok": true
+        },
+        "numeric_rule_entries": {
+          "actual": 1,
+          "expected": 1,
+          "ok": true
+        },
+        "record_written": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "subject_match": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "violation_rule_ids": {
+          "actual": [
+            "ADR-034T:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096"
+          ],
+          "expected": [
+            "ADR-034T:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096"
+          ],
+          "ok": true
+        }
+      },
+      "observations_ok": true,
+      "pass": true,
+      "title": "Baseline: hook refuses a numeric violation; matching claim"
+    },
+    {
+      "actual_level": "execution_observed",
+      "assessment": {
+        "evaluation_complete": true,
+        "has_subject_record": false,
+        "level": "execution_observed",
+        "literal_identity": [
+          {
+            "complete": false,
+            "decision_version_id": "",
+            "missing": [
+              "decision_version_id"
+            ],
+            "rule_id": "LIT-1:FORBID_LITERAL:dce58d45cafc99df7c5c1df9642234d0"
+          }
+        ],
+        "note": "mneme check has no relevance assessor (#761 E-1/E-2)",
+        "numeric_identity": null,
+        "numeric_trace": null,
+        "verdict": "FAIL"
+      },
+      "evidence": {},
+      "expected_level": "at most execution_observed",
+      "id": "C1a",
+      "level_ok": true,
+      "negative": true,
+      "observations": {
+        "exit": {
+          "actual": 2,
+          "expected": 2,
+          "ok": true
+        },
+        "literal_identity_complete": {
+          "actual": [
+            false
+          ],
+          "expected": [
+            false
+          ],
+          "ok": true
+        },
+        "literal_identity_missing": {
+          "actual": [
+            [
+              "decision_version_id"
+            ]
+          ],
+          "expected": [
+            [
+              "decision_version_id"
+            ]
+          ],
+          "ok": true
+        },
+        "verdict": {
+          "actual": "FAIL",
+          "expected": "FAIL",
+          "ok": true
+        }
+      },
+      "observations_ok": true,
+      "pass": true,
+      "title": "Section-less memory, literal violation via mneme check"
+    },
+    {
+      "actual_level": "not_executed",
+      "assessment": {
+        "function_relevance": false,
+        "identity_match": false,
+        "level": "not_executed",
+        "per_rule": {},
+        "subject_match": true
+      },
+      "evidence": {
+        "cli": {
+          "exception": "DecisionIndexMigrationRequired",
+          "message": "FORBID_NUMERIC_ABOVE rules require a mneme.decision-index/v2 decision_index declaring 'numeric_upper_bound_rule'; migrate with `mneme decision-index migrate`"
+        },
+        "record": {
+          "carrier_sha256": "0411bf1f25562302303a35ca1badd6c536a80ccb78610d6792986d79f999e342",
+          "checker": {
+            "evaluation_complete": null,
+            "problem": "no parseable verdict from mneme check (exit 1)",
+            "subject": null,
+            "trusted": false
+          },
+          "disposition": {
+            "cause": "fail_open",
+            "mode": "strict"
+          },
+          "event": {
+            "cwd": "<project>",
+            "file_path": "<project>/src/new.py",
+            "identifiers": {
+              "session_id": "sess-step2",
+              "tool_use_id": "toolu_step2"
+            },
+            "tool_name": "Write"
+          },
+          "hook_outcome": "proceeded",
+          "host": {
+            "executable_sha256": "abababababababababababababababababababababababababababababababab",
+            "version": "2.1.303"
+          },
+          "mneme_version": "0.11.0",
+          "rules": [],
+          "schema": "mneme.hook_evidence/v1",
+          "surface": "claude_code.PreToolUse",
+          "violations": []
+        }
+      },
+      "expected_level": "at most execution_observed",
+      "id": "C1b",
+      "level_ok": true,
+      "negative": true,
+      "observations": {
+        "checker_trusted": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        },
+        "cli_exception": {
+          "actual": "DecisionIndexMigrationRequired",
+          "expected": "DecisionIndexMigrationRequired",
+          "ok": true
+        },
+        "disposition_cause": {
+          "actual": "fail_open",
+          "expected": "fail_open",
+          "ok": true
+        },
+        "function_relevance": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        },
+        "hook_exit": {
+          "actual": 0,
+          "expected": 0,
+          "ok": true
+        },
+        "hook_outcome": {
+          "actual": "proceeded",
+          "expected": "proceeded",
+          "ok": true
+        },
+        "numeric_rule_entries": {
+          "actual": 0,
+          "expected": 0,
+          "ok": true
+        },
+        "record_written": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        }
+      },
+      "observations_ok": true,
+      "pass": true,
+      "title": "Section-less memory with a numeric rule (CLI and hook)"
+    },
+    {
+      "actual_level": "execution_observed",
+      "assessment": {
+        "function_relevance": true,
+        "identity_match": false,
+        "level": "execution_observed",
+        "per_rule": {
+          "ADR-034T:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096": true
+        },
+        "subject_match": true
+      },
+      "evidence": {
+        "claim": {
+          "decision_id": "ADR-034T",
+          "decision_version_id": "",
+          "rule_id": "ADR-034T:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096",
+          "subject_sha256": "0411bf1f25562302303a35ca1badd6c536a80ccb78610d6792986d79f999e342"
+        },
+        "record": "P1"
+      },
+      "expected_level": "at most execution_observed",
+      "id": "C1c",
+      "level_ok": true,
+      "negative": true,
+      "observations": {
+        "function_relevance": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "identity_match": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        },
+        "subject_match": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        }
+      },
+      "observations_ok": true,
+      "pass": true,
+      "title": "Genuine record; claim omits decision_version_id"
+    },
+    {
+      "actual_level": "execution_observed",
+      "assessment": {
+        "function_relevance": true,
+        "identity_match": false,
+        "level": "execution_observed",
+        "per_rule": {
+          "ADR-034T:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096": true
+        },
+        "subject_match": true
+      },
+      "evidence": {
+        "claim": {
+          "decision_id": "ADR-034T",
+          "decision_version_id": "dver-768f92638173ca66cf6b644b834e8b5a",
+          "rule_id": "ADR-034T:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096",
+          "subject_sha256": "0411bf1f25562302303a35ca1badd6c536a80ccb78610d6792986d79f999e342"
+        },
+        "record": "P1"
+      },
+      "expected_level": "at most execution_observed",
+      "id": "C2a",
+      "level_ok": true,
+      "negative": true,
+      "observations": {
+        "function_relevance": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "identity_match": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        },
+        "subject_match": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        }
+      },
+      "observations_ok": true,
+      "pass": true,
+      "title": "Genuine V1 record; claim names V2 (same rule_id, new version)"
+    },
+    {
+      "actual_level": "execution_observed",
+      "assessment": {
+        "function_relevance": false,
+        "identity_match": false,
+        "level": "execution_observed",
+        "per_rule": {
+          "ADR-034T:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096": true
+        },
+        "subject_match": true
+      },
+      "evidence": {
+        "claim": {
+          "decision_id": "ADR-034T",
+          "decision_version_id": "dver-86427d8aadb1002800428def00f17e61",
+          "rule_id": "ADR-034T:FORBID_NUMERIC_ABOVE:3e08297fda4fdb7b9e7969cd05cbbe14",
+          "subject_sha256": "0411bf1f25562302303a35ca1badd6c536a80ccb78610d6792986d79f999e342"
+        },
+        "record": "P1"
+      },
+      "expected_level": "at most execution_observed",
+      "id": "C2b",
+      "level_ok": true,
+      "negative": true,
+      "observations": {
+        "function_relevance": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        },
+        "identity_match": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        },
+        "subject_match": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        }
+      },
+      "observations_ok": true,
+      "pass": true,
+      "title": "Genuine V1 record; claim names V3 rule (bound changed)"
+    },
+    {
+      "actual_level": "execution_observed",
+      "assessment": {
+        "function_relevance": true,
+        "identity_match": false,
+        "level": "execution_observed",
+        "per_rule": {
+          "ADR-034T:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096": true
+        },
+        "subject_match": true
+      },
+      "evidence": {
+        "claim": {
+          "decision_id": "ADR-034T",
+          "decision_version_id": "dver-86427d8aadb1002800428def00f17e61",
+          "rule_id": "ADR-034T:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096",
+          "subject_sha256": "0411bf1f25562302303a35ca1badd6c536a80ccb78610d6792986d79f999e342"
+        },
+        "record": "P1 with rules[0].decision_version_id := V2"
+      },
+      "expected_level": "at most execution_observed",
+      "id": "C2c",
+      "level_ok": true,
+      "negative": true,
+      "observations": {
+        "function_relevance": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "identity_match": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        },
+        "subject_match": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        }
+      },
+      "observations_ok": true,
+      "pass": true,
+      "title": "Record version rewritten to V2; claim names V1"
+    },
+    {
+      "actual_level": "execution_observed",
+      "assessment": {
+        "evaluation_complete": true,
+        "has_subject_record": true,
+        "level": "execution_observed",
+        "literal_identity": [
+          {
+            "complete": true,
+            "decision_version_id": "dver-ee2aef61bf9e85cae24b86a5d3b5ae9f",
+            "missing": [],
+            "rule_id": "LIT-1:FORBID_LITERAL:dce58d45cafc99df7c5c1df9642234d0"
+          }
+        ],
+        "note": "mneme check has no relevance assessor (#761 E-1/E-2)",
+        "numeric_identity": {
+          "complete": true,
+          "malformed": [],
+          "missing": []
+        },
+        "numeric_trace": {
+          "decision_id": "ADR-034T",
+          "decision_version_id": "dver-86427d8aadb1002800428def00f17e61",
+          "matcher_outcome": null,
+          "matcher_status": null,
+          "outcome": "EXCLUDED",
+          "primary_reason": null,
+          "rule_id": "ADR-034T:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096"
+        },
+        "verdict": "PASS"
+      },
+      "evidence": {},
+      "expected_level": "at most execution_observed",
+      "id": "C3a",
+      "level_ok": true,
+      "negative": true,
+      "observations": {
+        "evaluation_complete": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "exit": {
+          "actual": 0,
+          "expected": 0,
+          "ok": true
+        },
+        "matcher_status": {
+          "actual": null,
+          "expected": null,
+          "ok": true
+        },
+        "numeric_applicability": {
+          "actual": "EXCLUDED",
+          "expected": "EXCLUDED",
+          "ok": true
+        },
+        "numeric_identity_complete": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "verdict": {
+          "actual": "PASS",
+          "expected": "PASS",
+          "ok": true
+        }
+      },
+      "observations_ok": true,
+      "pass": true,
+      "title": "Numeric rule EXCLUDED (target outside src/**) via mneme check"
+    },
+    {
+      "actual_level": "execution_observed",
+      "assessment": {
+        "function_relevance": false,
+        "identity_match": false,
+        "level": "execution_observed",
+        "per_rule": {},
+        "subject_match": true
+      },
+      "evidence": {
+        "record": {
+          "carrier_sha256": "0411bf1f25562302303a35ca1badd6c536a80ccb78610d6792986d79f999e342",
+          "checker": {
+            "evaluation_complete": true,
+            "problem": "",
+            "subject": null,
+            "trusted": true
+          },
+          "disposition": {
+            "cause": "no_violation",
+            "mode": "strict"
+          },
+          "event": {
+            "cwd": "<project>",
+            "file_path": "<project>/docs/new.py",
+            "identifiers": {
+              "session_id": "sess-step2",
+              "tool_use_id": "toolu_step2"
+            },
+            "tool_name": "Write"
+          },
+          "hook_outcome": "proceeded",
+          "host": {
+            "executable_sha256": "abababababababababababababababababababababababababababababababab",
+            "version": "2.1.303"
+          },
+          "mneme_version": "0.11.0",
+          "rules": [],
+          "schema": "mneme.hook_evidence/v1",
+          "surface": "claude_code.PreToolUse",
+          "violations": []
+        }
+      },
+      "expected_level": "at most execution_observed",
+      "id": "C3b",
+      "level_ok": true,
+      "negative": true,
+      "observations": {
+        "checker_trusted": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "disposition_cause": {
+          "actual": "no_violation",
+          "expected": "no_violation",
+          "ok": true
+        },
+        "function_relevance": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        },
+        "hook_exit": {
+          "actual": 0,
+          "expected": 0,
+          "ok": true
+        },
+        "hook_outcome": {
+          "actual": "proceeded",
+          "expected": "proceeded",
+          "ok": true
+        },
+        "numeric_rule_entries": {
+          "actual": 0,
+          "expected": 0,
+          "ok": true
+        },
+        "record_written": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "violation_rule_ids": {
+          "actual": [],
+          "expected": [],
+          "ok": true
+        }
+      },
+      "observations_ok": true,
+      "pass": true,
+      "title": "Numeric rule EXCLUDED via the hook; claim names the numeric rule"
+    },
+    {
+      "actual_level": "execution_observed",
+      "assessment": {
+        "evaluation_complete": false,
+        "has_subject_record": true,
+        "level": "execution_observed",
+        "literal_identity": [
+          {
+            "complete": true,
+            "decision_version_id": "dver-ee2aef61bf9e85cae24b86a5d3b5ae9f",
+            "missing": [],
+            "rule_id": "LIT-1:FORBID_LITERAL:dce58d45cafc99df7c5c1df9642234d0"
+          }
+        ],
+        "note": "mneme check has no relevance assessor (#761 E-1/E-2)",
+        "numeric_identity": {
+          "complete": true,
+          "malformed": [],
+          "missing": []
+        },
+        "numeric_trace": {
+          "decision_id": "ADR-034T",
+          "decision_version_id": "dver-86427d8aadb1002800428def00f17e61",
+          "matcher_outcome": "UNEVALUATED",
+          "matcher_status": "MATCHER_UNEVALUATED",
+          "outcome": "APPLIED",
+          "primary_reason": "INCOMPLETE_SOURCE_INPUT",
+          "rule_id": "ADR-034T:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096"
+        },
+        "verdict": "PASS"
+      },
+      "evidence": {},
+      "expected_level": "at most execution_observed",
+      "id": "C4a",
+      "level_ok": true,
+      "negative": true,
+      "observations": {
+        "evaluation_complete": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        },
+        "matcher_status": {
+          "actual": "MATCHER_UNEVALUATED",
+          "expected": "MATCHER_UNEVALUATED",
+          "ok": true
+        },
+        "numeric_applicability": {
+          "actual": "APPLIED",
+          "expected": "APPLIED",
+          "ok": true
+        },
+        "numeric_identity_complete": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "primary_reason": {
+          "actual": "INCOMPLETE_SOURCE_INPUT",
+          "expected": "INCOMPLETE_SOURCE_INPUT",
+          "ok": true
+        },
+        "verdict": {
+          "actual": "PASS",
+          "expected": "PASS",
+          "ok": true
+        }
+      },
+      "observations_ok": true,
+      "pass": true,
+      "title": "Unverified input; numeric rule APPLIED but unevaluated (mneme check)"
+    },
+    {
+      "actual_level": "execution_observed",
+      "assessment": {
+        "function_relevance": false,
+        "identity_match": true,
+        "level": "execution_observed",
+        "per_rule": {
+          "ADR-034T:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096": false
+        },
+        "subject_match": true
+      },
+      "evidence": {
+        "record": {
+          "carrier_sha256": "1ea6c0134c53eb27e3fa15f3263ed4cc2216c8eb18e4b6c659942b59c4d60b98",
+          "checker": {
+            "evaluation_complete": false,
+            "problem": "",
+            "subject": {
+              "absence_verified": true,
+              "governed_path": "src/new.py",
+              "input_kind": "proposed_new_source",
+              "subject_sha256": "1ea6c0134c53eb27e3fa15f3263ed4cc2216c8eb18e4b6c659942b59c4d60b98",
+              "target_path": "<project>/src/new.py"
+            },
+            "trusted": true
+          },
+          "disposition": {
+            "cause": "fail_open",
+            "mode": "strict"
+          },
+          "event": {
+            "cwd": "<project>",
+            "file_path": "<project>/src/new.py",
+            "identifiers": {
+              "session_id": "sess-step2",
+              "tool_use_id": "toolu_step2"
+            },
+            "tool_name": "Write"
+          },
+          "hook_outcome": "proceeded",
+          "host": {
+            "executable_sha256": "abababababababababababababababababababababababababababababababab",
+            "version": "2.1.303"
+          },
+          "mneme_version": "0.11.0",
+          "rules": [
+            {
+              "applicability": "APPLIED",
+              "decision_version_id": "dver-86427d8aadb1002800428def00f17e61",
+              "governed_path": "src/new.py",
+              "matcher_outcome": "UNEVALUATED",
+              "matcher_status": "MATCHER_UNEVALUATED",
+              "primary_reason": "UNRECOGNIZED_FORM",
+              "rule_id": "ADR-034T:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096",
+              "subject_sha256": "1ea6c0134c53eb27e3fa15f3263ed4cc2216c8eb18e4b6c659942b59c4d60b98"
+            }
+          ],
+          "schema": "mneme.hook_evidence/v1",
+          "surface": "claude_code.PreToolUse",
+          "violations": []
+        }
+      },
+      "expected_level": "at most execution_observed",
+      "id": "C4b",
+      "level_ok": true,
+      "negative": true,
+      "observations": {
+        "applicability": {
+          "actual": "APPLIED",
+          "expected": "APPLIED",
+          "ok": true
+        },
+        "checker_trusted": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "disposition_cause": {
+          "actual": "fail_open",
+          "expected": "fail_open",
+          "ok": true
+        },
+        "evaluation_complete": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        },
+        "function_relevance": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        },
+        "hook_exit": {
+          "actual": 0,
+          "expected": 0,
+          "ok": true
+        },
+        "hook_outcome": {
+          "actual": "proceeded",
+          "expected": "proceeded",
+          "ok": true
+        },
+        "identity_match": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "matcher_outcome": {
+          "actual": "UNEVALUATED",
+          "expected": "UNEVALUATED",
+          "ok": true
+        },
+        "matcher_status": {
+          "actual": "MATCHER_UNEVALUATED",
+          "expected": "MATCHER_UNEVALUATED",
+          "ok": true
+        },
+        "numeric_rule_entries": {
+          "actual": 1,
+          "expected": 1,
+          "ok": true
+        },
+        "primary_reason": {
+          "actual": "UNRECOGNIZED_FORM",
+          "expected": "UNRECOGNIZED_FORM",
+          "ok": true
+        },
+        "subject_match": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "violation_rule_ids": {
+          "actual": [],
+          "expected": [],
+          "ok": true
+        }
+      },
+      "observations_ok": true,
+      "pass": true,
+      "title": "Hook new-file Write with a dynamic value the matcher cannot decide"
+    },
+    {
+      "actual_level": "execution_observed",
+      "assessment": {
+        "function_relevance": true,
+        "identity_match": true,
+        "level": "execution_observed",
+        "per_rule": {
+          "ADR-034T:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096": true
+        },
+        "subject_match": false
+      },
+      "evidence": {
+        "claim": {
+          "decision_id": "ADR-034T",
+          "decision_version_id": "dver-86427d8aadb1002800428def00f17e61",
+          "rule_id": "ADR-034T:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096",
+          "subject_sha256": "864e7c59a93a4c268e6a445b42896eebeaad29cd79926574aabfd729fdf2e0e0"
+        },
+        "record": "P1"
+      },
+      "expected_level": "at most execution_observed",
+      "id": "C5a",
+      "level_ok": true,
+      "negative": true,
+      "observations": {
+        "function_relevance": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "identity_match": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "subject_match": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        }
+      },
+      "observations_ok": true,
+      "pass": true,
+      "title": "Genuine record for content A; claim about later content B"
+    },
+    {
+      "actual_level": "execution_observed",
+      "assessment": {
+        "function_relevance": false,
+        "identity_match": true,
+        "level": "execution_observed",
+        "per_rule": {
+          "ADR-034T:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096": false
+        },
+        "subject_match": false
+      },
+      "evidence": {
+        "claim": {
+          "decision_id": "ADR-034T",
+          "decision_version_id": "dver-86427d8aadb1002800428def00f17e61",
+          "rule_id": "ADR-034T:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096",
+          "subject_sha256": "864e7c59a93a4c268e6a445b42896eebeaad29cd79926574aabfd729fdf2e0e0"
+        },
+        "record": "P1 with subject and rule digests := sha256(WITHIN)"
+      },
+      "expected_level": "at most execution_observed",
+      "id": "C5b",
+      "level_ok": true,
+      "negative": true,
+      "observations": {
+        "function_relevance": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        },
+        "identity_match": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "subject_match": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        }
+      },
+      "observations_ok": true,
+      "pass": true,
+      "title": "Record subject/rule digests point at B; carrier digest is A"
+    },
+    {
+      "actual_level": "not_executed",
+      "assessment": {
+        "action": "fail_open",
+        "level": "not_executed",
+        "payload_present": false,
+        "trace_identity_keys": [],
+        "trace_keys": [
+          "action",
+          "evaluation_complete",
+          "file_path",
+          "kind",
+          "reason",
+          "tool",
+          "verdict"
+        ],
+        "verdict": null
+      },
+      "evidence": {
+        "reason_prefix": "mneme-agent-sdk: cannot materialize content, failing open: c"
+      },
+      "expected_level": "at most not_executed",
+      "id": "C6a",
+      "level_ok": true,
+      "negative": true,
+      "observations": {
+        "action": {
+          "actual": "fail_open",
+          "expected": "fail_open",
+          "ok": true
+        },
+        "payload_present": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        },
+        "trace_identity_keys": {
+          "actual": [],
+          "expected": [],
+          "ok": true
+        },
+        "verdict": {
+          "actual": null,
+          "expected": null,
+          "ok": true
+        }
+      },
+      "observations_ok": true,
+      "pass": true,
+      "title": "Agent SDK Edit of a missing file (fail_open)"
+    },
+    {
+      "actual_level": "not_executed",
+      "assessment": {
+        "action": "skip",
+        "level": "not_executed",
+        "payload_present": false,
+        "trace_identity_keys": [],
+        "trace_keys": [
+          "action",
+          "evaluation_complete",
+          "file_path",
+          "kind",
+          "reason",
+          "tool",
+          "verdict"
+        ],
+        "verdict": null
+      },
+      "evidence": {
+        "reason_prefix": "not a mutating tool"
+      },
+      "expected_level": "at most not_executed",
+      "id": "C6b",
+      "level_ok": true,
+      "negative": true,
+      "observations": {
+        "action": {
+          "actual": "skip",
+          "expected": "skip",
+          "ok": true
+        },
+        "payload_present": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        },
+        "trace_identity_keys": {
+          "actual": [],
+          "expected": [],
+          "ok": true
+        },
+        "verdict": {
+          "actual": null,
+          "expected": null,
+          "ok": true
+        }
+      },
+      "observations_ok": true,
+      "pass": true,
+      "title": "Agent SDK non-mutating tool (skip)"
+    },
+    {
+      "actual_level": "not_executed",
+      "assessment": {
+        "action": "skip",
+        "level": "not_executed",
+        "payload_present": false,
+        "trace_identity_keys": [
+          "via"
+        ],
+        "trace_keys": [
+          "action",
+          "evaluation_complete",
+          "file_path",
+          "kind",
+          "reason",
+          "tool",
+          "verdict",
+          "via"
+        ],
+        "verdict": null
+      },
+      "evidence": {
+        "reason_prefix": "not a governed langchain file tool"
+      },
+      "expected_level": "at most not_executed",
+      "id": "C6c",
+      "level_ok": true,
+      "negative": true,
+      "observations": {
+        "action": {
+          "actual": "skip",
+          "expected": "skip",
+          "ok": true
+        },
+        "payload_present": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        },
+        "trace_identity_keys": {
+          "actual": [
+            "via"
+          ],
+          "expected": [
+            "via"
+          ],
+          "ok": true
+        },
+        "verdict": {
+          "actual": null,
+          "expected": null,
+          "ok": true
+        }
+      },
+      "observations_ok": true,
+      "pass": true,
+      "title": "LangChain unmapped tool (skip)"
+    },
+    {
+      "actual_level": "not_executed",
+      "assessment": {
+        "action": "fail_open",
+        "level": "not_executed",
+        "payload_present": false,
+        "trace_identity_keys": [],
+        "trace_keys": [
+          "action",
+          "evaluation_complete",
+          "file_path",
+          "kind",
+          "reason",
+          "tool",
+          "verdict"
+        ],
+        "verdict": null
+      },
+      "evidence": {
+        "reason_prefix": "mneme-agent-sdk: cannot materialize content, failing open: c"
+      },
+      "expected_level": "at most not_executed",
+      "id": "C6d",
+      "level_ok": true,
+      "negative": true,
+      "observations": {
+        "action": {
+          "actual": "fail_open",
+          "expected": "fail_open",
+          "ok": true
+        },
+        "payload_present": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        },
+        "trace_identity_keys": {
+          "actual": [],
+          "expected": [],
+          "ok": true
+        },
+        "verdict": {
+          "actual": null,
+          "expected": null,
+          "ok": true
+        }
+      },
+      "observations_ok": true,
+      "pass": true,
+      "title": "LangChain edit_file of a missing file (fail_open)"
+    },
+    {
+      "actual_level": "execution_observed",
+      "assessment": {
+        "action": "deny",
+        "level": "execution_observed",
+        "payload_present": true,
+        "trace_identity_keys": [],
+        "trace_keys": [
+          "action",
+          "evaluation_complete",
+          "file_path",
+          "kind",
+          "reason",
+          "tool",
+          "verdict"
+        ],
+        "verdict": "FAIL"
+      },
+      "evidence": {
+        "reason_prefix": "mneme: FAIL - architectural decision violated\n  [LIT-1] FAIL"
+      },
+      "expected_level": "at most execution_observed",
+      "id": "C6e",
+      "level_ok": true,
+      "negative": true,
+      "observations": {
+        "action": {
+          "actual": "deny",
+          "expected": "deny",
+          "ok": true
+        },
+        "payload_present": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "trace_identity_keys": {
+          "actual": [],
+          "expected": [],
+          "ok": true
+        },
+        "verdict": {
+          "actual": "FAIL",
+          "expected": "FAIL",
+          "ok": true
+        }
+      },
+      "observations_ok": true,
+      "pass": true,
+      "title": "Agent SDK trusted deny: trace-only claim"
+    }
+  ],
+  "fixture_identities": {
+    "v1_canonical": {
+      "decision_id": "ADR-034T",
+      "decision_version_id": "dver-86427d8aadb1002800428def00f17e61",
+      "rule_id": "ADR-034T:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096"
+    },
+    "v2_canonical": {
+      "decision_id": "ADR-034T",
+      "decision_version_id": "dver-768f92638173ca66cf6b644b834e8b5a",
+      "rule_id": "ADR-034T:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096"
+    },
+    "v3_canonical": {
+      "decision_id": "ADR-034T",
+      "decision_version_id": "dver-86427d8aadb1002800428def00f17e61",
+      "rule_id": "ADR-034T:FORBID_NUMERIC_ABOVE:3e08297fda4fdb7b9e7969cd05cbbe14"
+    }
+  },
+  "host_pin": [
+    "2.1.303",
+    "abababababababababababababababababababababababababababababababab"
+  ],
+  "mneme_version": "0.11.0",
+  "pinned_commit": "101f3f427901c01fa4330e4add62af6ba8057a51",
+  "pinned_paths": [
+    "mneme",
+    "tests/canonical_fixtures.py"
+  ],
+  "summary": {
+    "controls": 18,
+    "failed": [],
+    "observation_checks": 98,
+    "observation_checks_ok": 98,
+    "passed": 18
+  }
+}
