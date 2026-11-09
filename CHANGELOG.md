@@ -1,5 +1,30 @@
 # Changelog
 
+## Unreleased
+
+**DG1F-C2 lifecycle-authority consolidation (preparatory; no runtime output
+change).** Charter #764, Layer 1 freeze amendment #767.
+
+- **One lifecycle authority.** `mneme.decision_index.lifecycle_governs` and
+  `GOVERNING_LIFECYCLE_STATUSES` now define "only `active` governs" once.
+  Projection (`PROJECTABLE_LIFECYCLE_STATUSES` is the same object), the DG1
+  resolver, Audit aggregation, protection and CI evidence matching read it.
+  Every `mneme audit`, `protect`, readiness, evidence, `mneme check`, hook and
+  MCP output is byte-identical (pinned by golden tests). Section-less legacy
+  memory keeps its exact semantics, including enforcement of superseded legacy
+  decisions by `mneme check`. This is not ADR-031 §11 resolver-result
+  convergence, which remains open.
+- **Library change: `GovernanceContext()` now means labels *not supplied*.**
+  `GovernanceContext.labels` defaults to `None`. With labels not supplied,
+  `resolve_effective` conservatively includes a lifecycle-active decision that
+  declares applicability (trace `applicability: context_not_supplied`,
+  `applicability_evaluated=False`) instead of reporting it `not_applicable`.
+  Pass `GovernanceContext(labels=())` for the previous "no labels" behavior.
+  `DecisionResolution` gains `lifecycle_eligible` and `applicability_evaluated`.
+  The resolver semantics id is now `mneme.governance-semantics/dg1f-c2-1`;
+  `resolve_change` refuses to compare results across semantics versions. The
+  `mneme check --applicability-preview` output is unchanged.
+
 ## v0.11.0 — 2026-11-07
 
 **Decision governance semantics (ADR-031 DG1), the `FORBID_NUMERIC_ABOVE`

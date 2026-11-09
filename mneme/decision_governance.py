@@ -8,8 +8,11 @@ decision_governance.py — DG1 governance semantics over v1 (ADR-031).
 - DG1D ``resolve_change``: the governance delta between two supplied
   snapshots, derived only by comparing two ``resolve_effective`` results.
 
-None of these adds governance semantics: they make the v1 semantics that
-0.10.0 already applies explicit and explainable.
+DG1C/E/D make the v1 semantics that 0.10.0 already applies explicit and
+explainable. DG1B1 adds decision applicability over v2 memory; DG1F-C2 adds
+the three-state context (labels not supplied / supplied empty / supplied) and
+reads lifecycle eligibility from the single ``decision_index.lifecycle_governs``
+authority.
 
 v1 semantics (ADR-030 §11, ADR-031 §2-§3)
 -----------------------------------------
@@ -41,10 +44,12 @@ Whether such a finding should block execution is a later decision (DG1F),
 not a DG1C semantic. ``ambiguous`` is reserved for genuine governance
 ambiguity introduced by later slices (DG1P onward); DG1C never emits it.
 
-The resolver never reads the clock, retrieval scores, or input order.
-``GovernanceContext`` is accepted and validated, but no v1 semantic depends
-on it: the result is invariant to paths, labels, and ``as_of`` until
-decision applicability or waivers exist (ADR-031 §6-§7).
+The resolver never reads the clock, retrieval scores, or input order. The
+result is invariant to ``GovernanceContext.paths`` and ``as_of`` (no path- or
+time-bound semantic exists yet, ADR-031 §6-§7). Labels matter only for
+decisions that declare applicability, and only when supplied: with labels not
+supplied, such decisions are conservatively included and reported with
+``applicability_evaluated=False`` (DG1F-C2).
 
 Nothing here changes retrieval, enforcement, Audit, or MCP outcomes (DG1F).
 The enforcement trace carries canonical identity (DG1E), but no verdict
@@ -59,12 +64,13 @@ from pathlib import Path
 from mneme.decision_index import (
     VALID_LIFECYCLE_STATUSES,
     CanonicalArchitectureIndex,
+    lifecycle_governs,
 )
 from mneme.decision_index_persistence import load_decision_index_from_memory_file
 from mneme.path_selectors import validate_relative_path
 from mneme.schemas import VALID_RULE_TYPES
 
-GOVERNANCE_SEMANTICS_VERSION = "mneme.governance-semantics/dg1b1-1"
+GOVERNANCE_SEMANTICS_VERSION = "mneme.governance-semantics/dg1f-c2-1"
 
 STATUS_EFFECTIVE = "effective"
 STATUS_INEFFECTIVE = "ineffective"
@@ -80,7 +86,6 @@ CAUSE_NOT_APPLICABLE = "not_applicable"
 FINDING_SUPERSESSION_LIFECYCLE_CONFLICT = "supersession_lifecycle_conflict"
 FINDING_DANGLING_SUPERSEDES = "dangling_supersedes"
 
-_EFFECTIVE_LIFECYCLE = "active"
 _NON_AUTHORITATIVE_LIFECYCLE = "inactive"
 _LIFECYCLE_CAUSES = {
     "superseded": CAUSE_LIFECYCLE_SUPERSEDED,
@@ -100,22 +105,35 @@ class GovernanceContext:
         as_of:  Explicit instant for time-bound semantics. The resolver never
                 reads the clock. ``None`` means no instant was supplied.
         labels: Opaque project-local strings with no identity, team, role or
-                organization meaning. Stored sorted and de-duplicated.
+                organization meaning. Three states (DG1F-C2 charter §3.2):
+                ``None`` (the default) means labels were **not supplied**;
+                ``()`` means supplied with no labels; a non-empty tuple means
+                supplied with those labels. Supplied labels are stored sorted
+                and de-duplicated.
     """
 
     paths: tuple[str, ...] = ()
     as_of: str | None = None
-    labels: tuple[str, ...] = ()
+    labels: tuple[str, ...] | None = None
 
     def __post_init__(self) -> None:
         paths = tuple(sorted({validate_relative_path(p) for p in self.paths}))
-        for label in self.labels:
-            if not isinstance(label, str) or not label:
-                raise ValueError("governance context labels must be non-empty strings")
+        if self.labels is not None:
+            if isinstance(self.labels, str):
+                raise ValueError("governance context labels must be a sequence of strings")
+            for label in self.labels:
+                if not isinstance(label, str) or not label:
+                    raise ValueError("governance context labels must be non-empty strings")
         if self.as_of is not None and (not isinstance(self.as_of, str) or not self.as_of):
             raise ValueError("governance context as_of must be a non-empty string or None")
         object.__setattr__(self, "paths", paths)
-        object.__setattr__(self, "labels", tuple(sorted(set(self.labels))))
+        if self.labels is not None:
+            object.__setattr__(self, "labels", tuple(sorted(set(self.labels))))
+
+    @property
+    def labels_supplied(self) -> bool:
+        """Whether governance labels were supplied (charter §3.2)."""
+        return self.labels is not None
 
 
 @dataclass(frozen=True)
@@ -143,6 +161,14 @@ class DecisionResolution:
         superseded_by:       Authoritative decisions declaring ``supersedes`` on it.
         applicability_required_labels: Declared decision applicability (DG1B1);
                              empty means globally eligible.
+        lifecycle_eligible:  Whether the lifecycle governs
+                             (``decision_index.lifecycle_governs``), regardless
+                             of context (DG1F-C2).
+        applicability_evaluated: Whether declared required labels were
+                             evaluated against supplied labels. ``False`` for a
+                             decision that declares none, and always ``False``
+                             when labels were not supplied: a conservatively
+                             included decision has **not** been shown to apply.
         trace:               Ordered explanation of the resolution.
     """
 
@@ -154,6 +180,8 @@ class DecisionResolution:
     rule_ids: tuple[str, ...] = ()
     superseded_by: tuple[str, ...] = ()
     applicability_required_labels: tuple[str, ...] = ()
+    lifecycle_eligible: bool = False
+    applicability_evaluated: bool = False
     trace: tuple[TraceStep, ...] = ()
 
     @property
@@ -194,6 +222,11 @@ class GovernanceResolution:
     @property
     def effective_ids(self) -> tuple[str, ...]:
         return tuple(d.decision_id for d in self.effective)
+
+    @property
+    def labels_supplied(self) -> bool:
+        """Whether this resolution evaluated applicability (charter §3.2)."""
+        return self.context.labels_supplied
 
 
 def _validate(index: CanonicalArchitectureIndex) -> None:
@@ -266,7 +299,9 @@ def resolve_effective(
             TraceStep("precedence", "not_recorded"),
         ]
         required_labels = record.applicability_required_labels
-        if record.lifecycle_status == _EFFECTIVE_LIFECYCLE:
+        lifecycle_eligible = lifecycle_governs(record.lifecycle_status)
+        applicability_evaluated = False
+        if lifecycle_eligible:
             if superseded_by:
                 findings.append(GovernanceFinding(
                     code=FINDING_SUPERSESSION_LIFECYCLE_CONFLICT,
@@ -280,7 +315,17 @@ def resolve_effective(
             if not required_labels:
                 status, cause = STATUS_EFFECTIVE, None
                 trace.append(TraceStep("applicability", "not_declared"))
+            elif not context.labels_supplied:
+                # DG1F-C2 charter §3.2: labels not supplied. Applicability is
+                # unknown, so the decision is conservatively included, never
+                # excluded (ADR-031 §11). This is not proof that it applies:
+                # applicability_evaluated stays False and it is never "matched".
+                status, cause = STATUS_EFFECTIVE, None
+                trace.append(TraceStep(
+                    "applicability", "context_not_supplied", required_labels
+                ))
             else:
+                applicability_evaluated = True
                 context_labels = set(context.labels)
                 missing = tuple(
                     label for label in required_labels if label not in context_labels
@@ -308,6 +353,8 @@ def resolve_effective(
             rule_ids=record.derived_rule_ids,
             superseded_by=superseded_by,
             applicability_required_labels=required_labels,
+            lifecycle_eligible=lifecycle_eligible,
+            applicability_evaluated=applicability_evaluated,
             trace=tuple(trace),
         ))
 
