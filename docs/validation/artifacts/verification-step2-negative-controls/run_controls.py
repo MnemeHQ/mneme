@@ -9,9 +9,14 @@ Run from the repository root:
 
     python docs/validation/artifacts/verification-step2-negative-controls/run_controls.py
 
-Writes ``results.json`` next to this file and exits 1 if any negative
-control reaches "relevant enforcement observed" or any positive baseline
-fails to.
+Writes ``results.json`` next to this file and exits 1 if any control misses
+its expected evidence level OR any of its expected runtime observations
+(action, applicability, matcher status, evaluation completeness, hook
+outcome and disposition, identity and subject matches).
+
+The hook runs in process with a synthetic pinned host identity. That is a
+fixture, not a verified live-host enforcement observation, and no
+attestation is claimed (ADR-034 section 7a, ADR-025).
 
 Claim assessment (harness-side, from the accepted contracts):
 
@@ -267,6 +272,50 @@ def rel_record(record: dict, project: Path) -> dict:
     return scrub(out)
 
 
+def hook_obs(hk: dict, rec: dict | None, a: dict) -> dict:
+    """Runtime observations of one hook event, independent of the level."""
+    numeric = [r for r in (rec or {}).get("rules") or []]
+    first = numeric[0] if numeric else {}
+    return {
+        "hook_exit": hk["exit"] if hk else None,
+        "record_written": rec is not None,
+        "checker_trusted": (rec or {}).get("checker", {}).get("trusted"),
+        "evaluation_complete": (rec or {}).get("checker", {}).get("evaluation_complete"),
+        "hook_outcome": (rec or {}).get("hook_outcome"),
+        "disposition_cause": ((rec or {}).get("disposition") or {}).get("cause"),
+        "numeric_rule_entries": len(numeric),
+        "applicability": first.get("applicability"),
+        "matcher_status": first.get("matcher_status"),
+        "matcher_outcome": first.get("matcher_outcome"),
+        "primary_reason": first.get("primary_reason"),
+        "violation_rule_ids": [v.get("rule_id") for v in (rec or {}).get("violations") or []],
+        "function_relevance": a["function_relevance"],
+        "identity_match": a["identity_match"],
+        "subject_match": a["subject_match"],
+    }
+
+
+def cli_obs(cli: dict, a: dict) -> dict:
+    trace = a["numeric_trace"] or {}
+    return {
+        "exit": cli["exit"],
+        "verdict": a["verdict"],
+        "evaluation_complete": a["evaluation_complete"],
+        "numeric_applicability": trace.get("outcome"),
+        "matcher_status": trace.get("matcher_status"),
+        "primary_reason": trace.get("primary_reason"),
+        "numeric_identity_complete": (a["numeric_identity"] or {}).get("complete"),
+        "literal_identity_complete": [x["complete"] for x in a["literal_identity"]],
+        "literal_identity_missing": [x["missing"] for x in a["literal_identity"]],
+    }
+
+
+def adapter_obs(a: dict) -> dict:
+    return {"action": a["action"], "verdict": a["verdict"],
+            "payload_present": a["payload_present"],
+            "trace_identity_keys": a["trace_identity_keys"]}
+
+
 def main() -> int:
     results: dict = {"mneme_version": __version__, "host_pin": list(HOST), "controls": []}
     work = Path(tempfile.mkdtemp(prefix="mneme-step2-"))
@@ -274,13 +323,22 @@ def main() -> int:
     def project(name: str, fixture: str) -> Path:
         return make_project(work / name, fixture)
 
-    def add(cid, title, expected_max, assessment, evidence, negative=True):
-        passed = (ORDER[assessment["level"]] <= ORDER[expected_max]) if negative \
+    def add(cid, title, expected_max, assessment, evidence, expect, observed,
+            negative=True):
+        """PASS needs BOTH the expected evidence level AND every expected
+        runtime observation, so a behavior change cannot hide behind a
+        correct-looking level."""
+        level_ok = (ORDER[assessment["level"]] <= ORDER[expected_max]) if negative \
             else assessment["level"] == expected_max
+        checks = {k: {"expected": v, "actual": observed.get(k), "ok": observed.get(k) == v}
+                  for k, v in expect.items()}
+        obs_ok = all(c["ok"] for c in checks.values())
         results["controls"].append({
             "id": cid, "title": title, "negative": negative,
             "expected_level": ("at most " if negative else "") + expected_max,
-            "actual_level": assessment["level"], "pass": passed,
+            "actual_level": assessment["level"], "level_ok": level_ok,
+            "observations": checks, "observations_ok": obs_ok,
+            "pass": level_ok and obs_ok,
             "assessment": assessment, "evidence": evidence,
         })
 
@@ -292,131 +350,198 @@ def main() -> int:
         ids[fx] = {k: trace.get(k) for k in ("decision_id", "decision_version_id", "rule_id")}
     results["fixture_identities"] = ids
     v1 = ids["v1_canonical"]
+    nid = v1["rule_id"]
+    claim_v1 = {**v1, "subject_sha256": sha(ABOVE)}
+    assert ids["v2_canonical"]["rule_id"] == nid
+    assert ids["v2_canonical"]["decision_version_id"] != v1["decision_version_id"]
+    assert ids["v3_canonical"]["rule_id"] != nid
 
-    # P1: positive baseline. Genuine hook refusal, claim matches.
+    # P1: positive baseline. The refusal is asserted on its own, apart from
+    # the relevance calculation.
     p = project("p1", "v1_canonical")
     hk = run_hook(p, "src/new.py", ABOVE)
     rec = hk["records"][0]
-    add("P1", "Baseline: hook refuses a numeric violation; matching claim",
-        RELEVANT, assess_hook(rec, {**v1, "subject_sha256": sha(ABOVE)}),
-        {"hook_exit": hk["exit"], "record": rel_record(rec, p)}, negative=False)
-    genuine, genuine_project = rec, p
+    a = assess_hook(rec, claim_v1)
+    add("P1", "Baseline: hook refuses a numeric violation; matching claim", RELEVANT, a,
+        {"record": rel_record(rec, p)},
+        {"hook_exit": 2, "record_written": True, "checker_trusted": True,
+         "evaluation_complete": True, "hook_outcome": "refused",
+         "disposition_cause": "numeric_violation", "numeric_rule_entries": 1,
+         "applicability": "APPLIED", "matcher_status": "RECOGNIZED",
+         "matcher_outcome": "VIOLATION", "violation_rule_ids": [nid],
+         "function_relevance": True, "identity_match": True, "subject_match": True},
+        hook_obs(hk, rec, a), negative=False)
+    genuine = rec
+
+    def against_genuine(cid, title, claim, record, expect, note):
+        a = assess_hook(record, claim)
+        add(cid, title, EXECUTION, a, {"record": note, "claim": claim}, expect,
+            hook_obs(None, record, a))
 
     # C1 missing canonical decision identity.
     p = project("c1a", "sectionless_literal")
     cli = run_cli(p, "--input", "import psycopg2\n", "docs/a.md")
-    add("C1a", "Section-less memory, literal violation via mneme check",
-        EXECUTION, assess_cli(cli), {"exit": cli["exit"]})
+    a = assess_cli(cli)
+    add("C1a", "Section-less memory, literal violation via mneme check", EXECUTION, a,
+        {}, {"exit": 2, "verdict": "FAIL", "literal_identity_complete": [False],
+             "literal_identity_missing": [["decision_version_id"]]}, cli_obs(cli, a))
     p = project("c1b", "sectionless_numeric")
     try:
         cli = run_cli(p, "--proposed-new-file", ABOVE, "src/new.py")
-        c1b_cli = {"exit": cli["exit"], "payload_verdict": cli["payload"].get("verdict")}
+        c1b_cli = {"exception": None, "exit": cli["exit"]}
     except Exception as exc:  # the loader refuses: nothing is evaluated
         c1b_cli = {"exception": type(exc).__name__, "message": str(exc)[:160]}
     hk = run_hook(p, "src/new.py", ABOVE)
     rec = hk["records"][0] if hk["records"] else None
-    claim = {"decision_id": "ADR-034T", "decision_version_id": "",
-             "rule_id": v1["rule_id"], "subject_sha256": sha(ABOVE)}
-    add("C1b", "Section-less memory with a numeric rule (CLI and hook)", EXECUTION,
-        assess_hook(rec, claim),
-        {"cli": c1b_cli, "hook_exit": hk["exit"],
-         "record": rel_record(rec, p) if rec else None})
-    add("C1c", "Genuine record; claim omits decision_version_id", EXECUTION,
-        assess_hook(genuine, {**v1, "decision_version_id": "", "subject_sha256": sha(ABOVE)}),
-        {"record": "P1"})
+    a = assess_hook(rec, {"decision_id": "ADR-034T", "decision_version_id": "",
+                          "rule_id": nid, "subject_sha256": sha(ABOVE)})
+    obs = {**hook_obs(hk, rec, a), "cli_exception": c1b_cli["exception"]}
+    add("C1b", "Section-less memory with a numeric rule (CLI and hook)", EXECUTION, a,
+        {"cli": c1b_cli, "record": rel_record(rec, p) if rec else None},
+        {"cli_exception": "DecisionIndexMigrationRequired", "hook_exit": 0,
+         "record_written": True, "checker_trusted": False, "hook_outcome": "proceeded",
+         "disposition_cause": "fail_open", "numeric_rule_entries": 0,
+         "function_relevance": False}, obs)
+    against_genuine("C1c", "Genuine record; claim omits decision_version_id",
+                    {**claim_v1, "decision_version_id": ""}, genuine,
+                    {"function_relevance": True, "identity_match": False,
+                     "subject_match": True}, "P1")
 
     # C2 mismatched decision version or rule identity.
-    add("C2a", "Genuine V1 record; claim names V2 (same rule_id, new version)",
-        EXECUTION, assess_hook(genuine, {**ids["v2_canonical"], "subject_sha256": sha(ABOVE)}),
-        {"record": "P1", "claimed": ids["v2_canonical"]})
-    add("C2b", "Genuine V1 record; claim names V3 rule (bound changed)", EXECUTION,
-        assess_hook(genuine, {**ids["v3_canonical"], "subject_sha256": sha(ABOVE)}),
-        {"record": "P1", "claimed": ids["v3_canonical"]})
+    against_genuine("C2a", "Genuine V1 record; claim names V2 (same rule_id, new version)",
+                    {**ids["v2_canonical"], "subject_sha256": sha(ABOVE)}, genuine,
+                    {"function_relevance": True, "identity_match": False,
+                     "subject_match": True}, "P1")
+    against_genuine("C2b", "Genuine V1 record; claim names V3 rule (bound changed)",
+                    {**ids["v3_canonical"], "subject_sha256": sha(ABOVE)}, genuine,
+                    {"function_relevance": False, "identity_match": False,
+                     "subject_match": True}, "P1")
     tampered = copy.deepcopy(genuine)
     tampered["rules"][0]["decision_version_id"] = ids["v2_canonical"]["decision_version_id"]
-    add("C2c", "Record version rewritten to V2; claim names V1", EXECUTION,
-        assess_hook(tampered, {**v1, "subject_sha256": sha(ABOVE)}),
-        {"record": "P1 with rules[0].decision_version_id := V2"})
+    against_genuine("C2c", "Record version rewritten to V2; claim names V1", claim_v1,
+                    tampered, {"function_relevance": True, "identity_match": False,
+                               "subject_match": True},
+                    "P1 with rules[0].decision_version_id := V2")
 
     # C3 excluded rule applicability.
     p = project("c3a", "v1_canonical")
     cli = run_cli(p, "--proposed-new-file", ABOVE, "docs/new.py")
+    a = assess_cli(cli)
     add("C3a", "Numeric rule EXCLUDED (target outside src/**) via mneme check",
-        EXECUTION, assess_cli(cli), {"exit": cli["exit"]})
+        EXECUTION, a, {},
+        {"exit": 0, "verdict": "PASS", "evaluation_complete": True,
+         "numeric_applicability": "EXCLUDED", "matcher_status": None,
+         "numeric_identity_complete": True}, cli_obs(cli, a))
     p = project("c3b", "v1_canonical")
     hk = run_hook(p, "docs/new.py", ABOVE)
     rec = hk["records"][0] if hk["records"] else None
+    a = assess_hook(rec, claim_v1)
     add("C3b", "Numeric rule EXCLUDED via the hook; claim names the numeric rule",
-        EXECUTION, assess_hook(rec, {**v1, "subject_sha256": sha(ABOVE)}),
-        {"hook_exit": hk["exit"], "record": rel_record(rec, p) if rec else None})
+        EXECUTION, a, {"record": rel_record(rec, p) if rec else None},
+        {"hook_exit": 0, "record_written": True, "checker_trusted": True,
+         "hook_outcome": "proceeded", "disposition_cause": "no_violation",
+         "numeric_rule_entries": 0, "violation_rule_ids": [],
+         "function_relevance": False}, hook_obs(hk, rec, a))
 
     # C4 incomplete evaluation.
     p = project("c4a", "v1_canonical")
     cli = run_cli(p, "--input", ABOVE, "src/new.py")
+    a = assess_cli(cli)
     add("C4a", "Unverified input; numeric rule APPLIED but unevaluated (mneme check)",
-        EXECUTION, assess_cli(cli), {"exit": cli["exit"]})
+        EXECUTION, a, {},
+        {"verdict": "PASS", "evaluation_complete": False,
+         "numeric_applicability": "APPLIED", "matcher_status": "MATCHER_UNEVALUATED",
+         "primary_reason": "INCOMPLETE_SOURCE_INPUT",
+         "numeric_identity_complete": True}, cli_obs(cli, a))
     p = project("c4b", "v1_canonical")
     hk = run_hook(p, "src/new.py", DYNAMIC)
     rec = hk["records"][0] if hk["records"] else None
+    a = assess_hook(rec, {**v1, "subject_sha256": sha(DYNAMIC)})
     add("C4b", "Hook new-file Write with a dynamic value the matcher cannot decide",
-        EXECUTION, assess_hook(rec, {**v1, "subject_sha256": sha(DYNAMIC)}),
-        {"hook_exit": hk["exit"], "record": rel_record(rec, p) if rec else None})
+        EXECUTION, a, {"record": rel_record(rec, p) if rec else None},
+        {"hook_exit": 0, "checker_trusted": True, "evaluation_complete": False,
+         "hook_outcome": "proceeded", "disposition_cause": "fail_open",
+         "numeric_rule_entries": 1, "applicability": "APPLIED",
+         "matcher_status": "MATCHER_UNEVALUATED", "matcher_outcome": "UNEVALUATED",
+         "primary_reason": "UNRECOGNIZED_FORM", "violation_rule_ids": [],
+         "function_relevance": False, "identity_match": True, "subject_match": True},
+        hook_obs(hk, rec, a))
 
     # C5 stale subject digest on the numeric hook path.
-    add("C5a", "Genuine record for content A; claim about later content B", EXECUTION,
-        assess_hook(genuine, {**v1, "subject_sha256": sha(WITHIN)}),
-        {"record": "P1", "claimed_subject": "sha256(WITHIN)"})
+    against_genuine("C5a", "Genuine record for content A; claim about later content B",
+                    {**v1, "subject_sha256": sha(WITHIN)}, genuine,
+                    {"function_relevance": True, "identity_match": True,
+                     "subject_match": False}, "P1")
     stale = copy.deepcopy(genuine)
     stale["checker"]["subject"]["subject_sha256"] = sha(WITHIN)
     stale["rules"][0]["subject_sha256"] = sha(WITHIN)
-    add("C5b", "Record subject/rule digests point at B; carrier digest is A", EXECUTION,
-        assess_hook(stale, {**v1, "subject_sha256": sha(WITHIN)}),
-        {"record": "P1 with subject and rule digests := sha256(WITHIN)"})
+    against_genuine("C5b", "Record subject/rule digests point at B; carrier digest is A",
+                    {**v1, "subject_sha256": sha(WITHIN)}, stale,
+                    {"function_relevance": False, "identity_match": True,
+                     "subject_match": False},
+                    "P1 with subject and rule digests := sha256(WITHIN)")
 
     # C6 Agent SDK / LangChain fail-open and skip (#769).
     p = project("c6", "v1_canonical")
     sdk = MnemeAgentSdk(project_dir=str(p), mode="strict")
-    with env(**BASE_ENV):
-        r = sdk.evaluate_mutation("Edit", {"file_path": "src/missing.py",
-                                           "old_string": "a", "new_string": "psycopg2"},
-                                  cwd=str(p))
-    add("C6a", "Agent SDK Edit of a missing file (fail_open)", NOT_EXECUTED,
-        assess_adapter(r, sdk.trace[-1]), {"reason_prefix": r.reason[:60]})
-    with env(**BASE_ENV):
-        r = sdk.evaluate_mutation("Read", {"file_path": "src/x.py"}, cwd=str(p))
-    add("C6b", "Agent SDK non-mutating tool (skip)", NOT_EXECUTED,
-        assess_adapter(r, sdk.trace[-1]), {})
     lc = MnemeLangChain(project_dir=str(p), mode="strict")
-    with env(**BASE_ENV):
-        r = lc.evaluate_tool_call("shell", {"cmd": "echo"}, cwd=str(p))
-    add("C6c", "LangChain unmapped tool (skip)", NOT_EXECUTED,
-        assess_adapter(r, lc.trace[-1]), {})
-    with env(**BASE_ENV):
-        r = lc.evaluate_tool_call("edit_file", {"file_path": "src/missing.py",
-                                                 "old_string": "a", "new_string": "b"},
-                                  cwd=str(p))
-    add("C6d", "LangChain edit_file of a missing file (fail_open)", NOT_EXECUTED,
-        assess_adapter(r, lc.trace[-1]), {})
+
+    def adapter(cid, title, call, trace, level, expect):
+        with env(**BASE_ENV):
+            r = call()
+        a = assess_adapter(r, trace[-1])
+        add(cid, title, level, a, {"reason_prefix": r.reason[:60]}, expect, adapter_obs(a))
+
+    adapter("C6a", "Agent SDK Edit of a missing file (fail_open)",
+            lambda: sdk.evaluate_mutation("Edit", {"file_path": "src/missing.py",
+                                                   "old_string": "a",
+                                                   "new_string": "psycopg2"}, cwd=str(p)),
+            sdk.trace, NOT_EXECUTED,
+            {"action": "fail_open", "verdict": None, "payload_present": False,
+             "trace_identity_keys": []})
+    adapter("C6b", "Agent SDK non-mutating tool (skip)",
+            lambda: sdk.evaluate_mutation("Read", {"file_path": "src/x.py"}, cwd=str(p)),
+            sdk.trace, NOT_EXECUTED,
+            {"action": "skip", "verdict": None, "payload_present": False,
+             "trace_identity_keys": []})
+    adapter("C6c", "LangChain unmapped tool (skip)",
+            lambda: lc.evaluate_tool_call("shell", {"cmd": "echo"}, cwd=str(p)),
+            lc.trace, NOT_EXECUTED,
+            {"action": "skip", "verdict": None, "payload_present": False,
+             "trace_identity_keys": ["via"]})
+    adapter("C6d", "LangChain edit_file of a missing file (fail_open)",
+            lambda: lc.evaluate_tool_call("edit_file", {"file_path": "src/missing.py",
+                                                         "old_string": "a",
+                                                         "new_string": "b"}, cwd=str(p)),
+            lc.trace, NOT_EXECUTED,
+            {"action": "fail_open", "verdict": None, "payload_present": False,
+             "trace_identity_keys": []})
     (p / "docs" / "a.md").write_text("hello\n", encoding="utf-8")
-    with env(**BASE_ENV):
-        r = sdk.evaluate_mutation("Edit", {"file_path": "docs/a.md", "old_string": "hello",
-                                           "new_string": "hello\nimport psycopg2"},
-                                  cwd=str(p))
-    add("C6e", "Agent SDK trusted deny: trace-only claim", EXECUTION,
-        assess_adapter(r, sdk.trace[-1]), {})
+    adapter("C6e", "Agent SDK trusted deny: trace-only claim",
+            lambda: sdk.evaluate_mutation("Edit", {"file_path": "docs/a.md",
+                                                   "old_string": "hello",
+                                                   "new_string": "hello\nimport psycopg2"},
+                                          cwd=str(p)),
+            sdk.trace, EXECUTION,
+            {"action": "deny", "verdict": "FAIL", "payload_present": True,
+             "trace_identity_keys": []})
 
     results["summary"] = {
         "controls": len(results["controls"]),
         "passed": sum(c["pass"] for c in results["controls"]),
+        "observation_checks": sum(len(c["observations"]) for c in results["controls"]),
+        "observation_checks_ok": sum(v["ok"] for c in results["controls"]
+                                     for v in c["observations"].values()),
         "failed": [c["id"] for c in results["controls"] if not c["pass"]],
     }
     out = Path(__file__).with_name("results.json")
-    out.write_text(json.dumps(results, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    with open(out, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write(json.dumps(results, indent=2, sort_keys=True) + "\n")
     for c in results["controls"]:
-        a = c["assessment"]
+        bad = [k for k, v in c["observations"].items() if not v["ok"]]
         print(f"{c['id']:4} {'PASS' if c['pass'] else 'FAIL'}  {c['actual_level']:31}"
-              f" fn={a.get('function_relevance')} id={a.get('identity_match')}"
-              f" subj={a.get('subject_match')}  {c['title']}")
+              f" obs={len(c['observations']) - len(bad)}/{len(c['observations'])}"
+              f"{' MISMATCH ' + str(bad) if bad else ''}  {c['title']}")
     print(json.dumps(results["summary"]))
     return 0 if not results["summary"]["failed"] else 1
 

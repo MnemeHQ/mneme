@@ -6,15 +6,19 @@ validation), 2026-11-09, under the
 [roadmap Verification slice](../roadmap/README.md) (#579, #768).
 **Implementation:** `main` at `101f3f42`. The runtime (`mneme/`) is identical to
 v0.11.0 (`619d5405`): `git diff 619d5405 101f3f42 -- mneme/` is empty.
-`mneme.__version__` reports `0.11.0`. Python 3.12.10, Windows.
+`mneme.__version__` reports `0.11.0`. Python 3.12.10, Windows. `main` has
+since moved: DG1F-C2 (#770, `b719dc96`) changed 6 runtime files. These results
+are claimed for `101f3f42` (= v0.11.0) only, not for any later commit.
 **Type:** validation record. No runtime, adapter, CI, evaluator pin, frozen
 benchmark or waiver change. No earlier result is upgraded.
 
 ## 1. Result
 
-**18 of 18 controls meet their expectation.** All 17 negative controls stay at or
-below execution observed, and the positive baseline reaches relevant
-enforcement observed.
+**18 of 18 controls meet their expectation, with 98 of 98 runtime observation
+checks passing.** All 17 negative controls stay at or below execution observed,
+and the positive baseline reaches relevant enforcement observed. A control
+passes only if both its evidence level and every expected runtime observation
+hold (§2, revised after review).
 
 **One qualification decides how to read that.** In 4 negative controls (C1c, C2a,
 C2c, C5a), the shipped function `relevant_enforcement_per_rule` returns `True`
@@ -67,6 +71,34 @@ It drives only the shipped producers, in process:
 
 Levels: not executed < execution observed < relevant enforcement observed.
 
+**Pass rule (revised after review on #772).** Each control declares its
+expected evidence level **and** its expected runtime observations, and passes
+only if both hold. The observations cover, where they apply:
+
+- hook: exit code, record written, checker trusted, evaluation completeness,
+  hook outcome, disposition cause, numeric rule entries, applicability,
+  matcher status/outcome/primary reason, reported violation rule IDs;
+- `mneme check`: exit code, verdict, evaluation completeness, numeric
+  applicability, matcher status, primary reason, identity completeness;
+- adapters: action, verdict, whether a trusted payload exists, identity keys
+  in the trace;
+- every hook claim: the function's raw result, identity match and subject
+  match, asserted separately.
+
+So a control cannot pass on a correct-looking level while the behavior it
+targets has changed. P1 asserts the refusal itself (`hook_exit` 2, `refused`,
+`numeric_violation`), independently of the relevance calculation.
+
+**Sensitivity check.** Re-running the harness once with the hook in warn mode
+(`BASE_ENV["MNEME_HOOK_MODE"] = "warn"`, not committed) made P1 FAIL on
+`hook_exit` and `hook_outcome` (96/98 checks). Its evidence level stayed
+relevant, because a warn-mode deferral is still attributable to the rule. The
+level alone would have hidden that change; the observation checks catch it.
+
+**Fixture boundary.** The hook runs in process with a synthetic pinned host
+identity. These are fixture observations of the shipped code paths, not a
+verified live-host enforcement observation, and no attestation is claimed.
+
 **Reproduce** from the repository root:
 
 ```bash
@@ -74,14 +106,18 @@ python docs/validation/artifacts/verification-step2-negative-controls/run_contro
 ```
 
 It rewrites
-[`results.json`](artifacts/verification-step2-negative-controls/results.json)
-and exits 1 if any control misses its expectation. Two consecutive runs
-produced byte-identical output; temporary paths are scrubbed to `<project>`.
+[`results.json`](artifacts/verification-step2-negative-controls/results.json),
+which lists each control's expected and actual observations, and exits 1 if
+any control misses its level or any observation. Two consecutive runs of the
+revised harness produced byte-identical output; temporary paths are scrubbed
+to `<project>`.
 
 ## 3. Controls: expected versus actual
 
 `fn` = `relevant_enforcement_per_rule` for the claimed rule; `id` = complete
-identity match; `subj` = claimed subject digest equals `carrier_sha256`.
+identity match; `subj` = claimed subject digest equals `carrier_sha256`. Every
+value in the "Key observation" column is an asserted expectation, not only a
+note; `results.json` has the full expected-versus-actual list per control.
 
 | ID | Control | Expected | Actual | fn | id | subj | Key observation |
 |---|---|---|---|---|---|---|---|
@@ -127,6 +163,9 @@ identity match; `subj` = claimed subject digest equals `carrier_sha256`.
 - No authenticity: the hook record is the control's own provenance, not an
   attestation (ADR-034 §7a, ADR-025). Consistently forged records are out of
   scope.
+- No live-host observation: the hook was driven in process with a synthetic
+  host pin. P1 shows the shipped code path can produce a relevant record; it
+  is not evidence that a real Claude Code host enforced anything.
 - No coverage of closed availability, warn mode, fork PRs, CI, or the
   `--adr-dir` view.
 - No change to any earlier result, and no authorization of step 3 (frozen
