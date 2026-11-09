@@ -1854,6 +1854,132 @@ All earlier freeze amendments and records remain unchanged.
 
 ---
 
+## Amendment — authorize DG1F-C2 lifecycle-authority consolidation (2026-11-09)
+
+> This authorizes a **future, bounded, preparatory implementation**, not a
+> statement that any behavior has changed. It does **not** authorize ADR-031
+> §11 runtime convergence on the shared resolver result, enforcement-changing
+> applicability (C1b), waivers (DG1B2) or any change to which decisions reach
+> enforcement.
+
+**Change:** Permit (1) one shared lifecycle predicate to replace the duplicated
+"only `active` governs" checks in projection, the resolver and the named
+runtime consumers, and (2) a three-state `GovernanceContext` in the resolver,
+with **every observable output of every runtime surface unchanged**.
+
+**Sections referenced:** the Freeze Anchor **Status** clause ("No behavioral
+change to retrieval or enforcement without an explicit charter amendment"),
+the DG1B1 amendment's "Not authorized by this amendment" list (DG1F runtime
+consumer convergence), the DG1F-C1a amendment's closing paragraph (that
+prohibition still governs all runtime consumers other than the C1a preview),
+and the Amendment Procedure below.
+
+**Rationale (Amendment Procedure §3(b)).** A distinct behavioral charter was
+**already merged** before this amendment:
+[DG1F-C2 lifecycle-authority consolidation charter](../plans/2026-11-08-dg1f-c2-lifecycle-convergence-charter.md),
+PR [#764](https://github.com/MnemeHQ/mneme/pull/764), squash `00b9781d`. Its
+basis is the [DG1 v0.11.0 architecture reconciliation](../validation/dg1-v0110-architecture-reconciliation-2026-11-08.md)
+(#762) and its independent review. No behavior change is retroactively
+justified.
+
+**Governing authority:** accepted
+[ADR-031](../adr/ADR-031-decision-governance-semantics.md) §3/§6/§7/§11
+(as corrected by the #763 erratum),
+[ADR-017](../adr/ADR-017-enforcement-scope-vs-retrieval-scope.md),
+[ADR-020](../adr/ADR-020-explicit-path-applicability-for-typed-rules.md),
+[ADR-023](../adr/ADR-023-canonical-decision-index-and-runtime-projection-boundary.md),
+[ADR-026](../adr/ADR-026-audit-tier-semantics-and-mneme-potential.md),
+[ADR-030](../adr/ADR-030-canonical-decision-persistence-version-identity-and-stable-rule-lineage.md),
+and the merged C2 charter §§2-4.
+
+### Authorized change — C2 only (charter §3)
+
+- **One lifecycle predicate (charter §3.1).** Define the governing lifecycle
+  set and one predicate next to `VALID_LIFECYCLE_STATUSES` in
+  `mneme/decision_index.py`. Use it in:
+  - projection (`PROJECTABLE_LIFECYCLE_STATUSES` stays a public name bound to
+    the same object);
+  - the resolver (in place of `_EFFECTIVE_LIFECYCLE`);
+  - `_build_report` in `mneme/enforcer.py` (Audit, readiness, protection
+    candidates, `github_evidence`), protection candidate selection and
+    activation precheck in `mneme/protection.py`, and CI evidence matching in
+    `mneme/evidence.py`.
+
+  These consumers keep receiving `list[Decision]`. **This is predicate
+  sharing, not consumption of the resolver result.** No runtime consumer may
+  call `resolve_effective` or act on a `GovernanceResolution`, its causes,
+  trace, findings or applicability.
+- **Three-state context (charter §3.2).** `GovernanceContext.labels`
+  distinguishes not supplied (`None`, the new default), supplied with no
+  labels, and supplied with labels.
+  - Not supplied: decision applicability is not evaluated, a lifecycle-eligible
+    decision is **conservatively included**, the trace records
+    `applicability: context_not_supplied`, and `applicability_evaluated` is
+    `false`. Conservative inclusion is not proof of applicability and is never
+    reported as `matched` or as governing a specific context.
+  - Each resolution carries `lifecycle_eligible` and `applicability_evaluated`.
+    The semantics id bumps; `resolve_change` keeps refusing cross-semantics and
+    cross-context comparisons.
+  - Supplied-context behavior, including the C1a preview, is unchanged.
+- **Output invariance is mandatory.** For every input in the charter §4
+  matrix, the following are byte-identical before and after: `mneme audit`
+  text and JSON, `mneme protect list` / `status` / `validate`, readiness
+  counts, `match_ci_evidence` results, the `github_evidence` report,
+  `mneme check` stdout, the `mneme.check/v1` JSON payload, exit codes, the
+  C1a preview stderr, hook outcomes and MCP responses. ADR-026 tier formulas,
+  ADR-017 tiers, ADR-020 rule-path selection and canonical
+  decision/version/rule identities are unchanged.
+- **Legacy section-less memory (charter §3.3)** keeps its exact current
+  semantics, including enforcement of superseded and deprecated legacy
+  decisions by `mneme check`, hooks and CI while Audit, protection and evidence
+  exclude them. The resolver keeps refusing section-less memory.
+- **Integrity findings (charter §3.4)** stay reported only; they never exclude
+  a decision or fail a consumer. Resolver `ValueError` is never caught and
+  turned into an empty decision set.
+
+### Validation gate for the later implementation PR
+
+Before C2 implementation can merge:
+
+1. Golden outputs for the full charter §4 matrix are captured from the
+   pre-change build in a **separate commit before any production code
+   change**, and the implementation reproduces them byte for byte.
+2. The seven charter §4 negative and mutation tests pass, and each fails when
+   its guard is removed.
+3. All existing DG1 tests pass, changed only where the §3.2 default change
+   requires it, each change listed in the PR.
+4. The full gate battery and the frozen Layer 1 benchmark (7/7) pass. New
+   tests live **outside** the frozen canonical benchmark fixtures and
+   methodology.
+5. An independent review checks the implementation against charter §4 before
+   merge.
+
+### Not authorized by this amendment
+
+1. **ADR-031 §11 resolver-result convergence.** No CLI, enforcer,
+   `ConflictDetector`, protection, Audit, readiness, evidence, hook or MCP
+   surface may consume `resolve_effective` output. That needs its own charter
+   and `[layer1-freeze]` amendment; no C2 result may be cited as satisfying it.
+2. **DG1F-C1b.** No label source or applicability result may exclude an
+   otherwise active decision from any runtime path.
+3. Any change to which decisions reach `check_prompt`, the retrieval-gated
+   tier, `DecisionRetriever` scoring or top-K / tie order, rule matching,
+   `ConflictDetector`, ADR-020 applicability, typed rules, Audit tier
+   formulas, MCP `decision.applicable_to`, hooks, CI workflows or the trusted
+   gate's evaluator pin.
+4. Any change to legacy section-less semantics, an in-memory canonical view of
+   section-less memory, or implicit v1 → v2 migration.
+5. New persisted fields, schema versions or semantic features, a context
+   declaration or trusted context source, waiver representation, new authority
+   writers, benchmark fixture or methodology changes, or any DG1F, DG1 or
+   enforcement-completeness claim.
+
+The DG1B1 and DG1F-C1a freeze amendments remain unchanged. Their DG1F
+prohibition on runtime consumption of the resolver result still governs every
+runtime consumer; this amendment permits lifecycle-predicate sharing only.
+
+---
+
 ## Amendment Procedure
 
 This document is frozen at `e73ff7d`. To amend it:
