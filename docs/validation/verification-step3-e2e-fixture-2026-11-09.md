@@ -9,7 +9,9 @@ ConflictDetector, enforcement, CI workflow, evaluator pin or benchmark change.
 
 ## 1. Result
 
-**13 of 13 verification checks pass, with 60 of 60 observation assertions.**
+**13 of 13 verification checks pass, with 71 of 71 observation assertions.**
+Revised after review on #776: every CI check now also asserts the
+authoritative `verify-report` decision (§3).
 The fixture shows, for one reviewed decision and one typed rule:
 
 - **A prohibited mutation is prevented at the pre-mutation checkpoint.** The
@@ -18,10 +20,12 @@ The fixture shows, for one reviewed decision and one typed rule:
 - **A CI revision is evaluated independently.** The pinned C4 adapter with the
   approved `0b74d410` evaluator evaluated the resulting revision (PASS) and a
   revision carrying the same prohibited content by another route (VIOLATION).
-- **The cross-checkpoint claim is established only where the evidence allows
-  it.** The allowed change carries the same full identity and the same subject
-  digest at both checkpoints. Missing identity and a later revision are
-  rejected.
+- **Cross-checkpoint correlation holds only where the evidence allows it.** The
+  allowed change carries the same full identity at both checkpoints, and the
+  same content digest. This is **fixture-level correlation, not ADR-029
+  evidence binding**: the pre-mutation digest is computed by the harness from
+  the tool arguments, because Mneme emits no subject record for literal-only
+  checks. Missing identity and a later revision are rejected.
 
 **Every observation is at most "execution observed".** No checkpoint reaches
 ADR-029 "relevant enforcement observed". For this literal rule, neither
@@ -86,10 +90,21 @@ observations and derives the evidence level from the record itself:
   **and** applicability is `APPLIED`;
 - execution observed otherwise.
 
-A cross-checkpoint claim takes the weaker of the two levels. It is
-established only if both identities are complete and equal as the full
+**CI decision.** `verify-report` is the authoritative CI decision under C4: it
+recomputes the aggregate and disposition from the per-file results and checks
+every pin, and it exits 1 for any problem. A non-success disposition is itself
+reported as the problem `required check fails: <aggregate> under availability
+<posture>`. Each CI check therefore asserts both the `verify-report` exit code
+(B1 0, B2 1, B3 1, B4 1, B5 0) **and** the exact problem list: empty for the
+two successes, and only that decision line for the three failures. A failure
+caused by an integrity problem (a tampered report, a pin mismatch) would add
+other lines and fail the check.
+
+**Cross-checkpoint correlation** takes the weaker of the two levels. It holds
+only if both identities are complete and equal as the full
 `(decision_id, decision_version_id, rule_id)` tuple (Step 2 N-2), **and** the
-pre-mutation subject digest equals the CI file's content digest.
+pre-mutation subject digest equals the CI file's content digest. It is
+fixture-level correlation, not ADR-029 evidence binding (§1).
 
 The pre-mutation subject digest is computed by the harness from the tool
 arguments. Mneme emits none for literal-only checks.
@@ -121,23 +136,23 @@ fails. It rewrites `results.json` and `ci-reports/`.
 
 ### Checkpoint B: CI (offline replay, `0b74d410`, posture closed)
 
-| Case | Base → head | Change | Aggregate / disposition | File result | Identity | Level |
-|---|---|---|---|---|---|---|
-| B1 allow | `978de46e` → `e7b90432` | `docs/guide.md` = A1's written bytes | PASS / success | `VERIFIED_PASS`, `37c6e073…` | complete | execution |
-| B2 bypass | `978de46e` → `99bdbccb` | `docs/install.md` = A2's denied content, by another route | VIOLATION / failure | `VIOLATION`, `04f34575…` | complete | execution |
-| B3 incomplete | `978de46e` → `1729a0ab` | `docs/link.md` symlink | UNEVALUATED / failure | `UNEVALUATED` (kind `mode`) | none | **not executed** |
-| B4 missing identity | `cff670b1` → `d7e9451f` | section-less memory (blob `65d9f95d`); forbidden file | VIOLATION / failure | `VIOLATION` | `decision_version_id` **empty** | execution |
-| B5 later revision | `e7b90432` → `f77bd0f8` | `docs/guide.md` edited after A1 | PASS / success | `VERIFIED_PASS`, `424fb9f4…` | complete | execution |
+| Case | Base → head | Change | Aggregate / disposition | `verify-report` (exit, problems) | File result | Identity | Level |
+|---|---|---|---|---|---|---|---|
+| B1 allow | `978de46e` → `e7b90432` | `docs/guide.md` = A1's written bytes | PASS / success | **0**, none | `VERIFIED_PASS`, `37c6e073…` | complete | execution |
+| B2 bypass | `978de46e` → `99bdbccb` | `docs/install.md` = A2's denied content, by another route | VIOLATION / failure | **1**, only "required check fails: VIOLATION under availability closed" | `VIOLATION`, `04f34575…` | complete | execution |
+| B3 incomplete | `978de46e` → `1729a0ab` | `docs/link.md` symlink | UNEVALUATED / failure | **1**, only "required check fails: UNEVALUATED under availability closed" | `UNEVALUATED` (kind `mode`) | none | **not executed** |
+| B4 missing identity | `cff670b1` → `d7e9451f` | section-less memory (blob `65d9f95d`); forbidden file | VIOLATION / failure | **1**, only "required check fails: VIOLATION under availability closed" | `VIOLATION` | `decision_version_id` **empty** | execution |
+| B5 later revision | `e7b90432` → `f77bd0f8` | `docs/guide.md` edited after A1 | PASS / success | **0**, none | `VERIFIED_PASS`, `424fb9f4…` | complete | execution |
 
 ### Verification checks
 
 | Check | Acceptance criterion | Result |
 |---|---|---|
-| V1 allow (A1, B1, linkage) | permitted content reaches the handler and the file; CI evaluates that revision; same full identity and same digest `37c6e073…` at both | PASS (3 checks) |
+| V1 allow (A1, B1, correlation) | permitted content reaches the handler and the file; CI evaluates that revision and `verify-report` accepts it (exit 0); same full identity and same (harness-computed) digest `37c6e073…` at both | PASS (3 checks) |
 | V2 deny (A2, A3, B2) | rejected, handler not called, target absent/unchanged; the same bytes arriving by another route are a CI violation (`04f34575…` at both) | PASS (3 checks) |
 | V3 incomplete (A4, B3) | evaluation cannot establish compliance and says so: UNEVALUATED at both, not executed | PASS (2 checks) |
 | V4 missing identity (A5, B4, linkage) | the rule still blocks, but identity is incomplete at both and no cross-checkpoint claim is made | PASS (3 checks) |
-| V5 stale evidence (A1 vs B5, B1 vs B5) | A1's evidence cannot verify the later `docs/guide.md` (`37c6e073…` ≠ `424fb9f4…`, though the identity is the same); B1's report is bound to `e7b90432`, not `f77bd0f8` | PASS (2 checks) |
+| V5 stale evidence (A1 vs B5, B1 vs B5) | A1's evidence cannot verify the later `docs/guide.md` (`37c6e073…` ≠ `424fb9f4…`, though the identity is the same); B1's report is bound to `e7b90432`, not `f77bd0f8`, and B5 is its own accepted `verify-report` decision (exit 0) | PASS (2 checks) |
 
 `results.json` holds every expected and actual value. `ci-reports/` holds the
 five raw `mneme.c4.gate-report/v1` reports.
@@ -147,8 +162,8 @@ made V2 (both) and V4 fail on `action`, `handler_called`, `target_unchanged`
 and the tool marker. In warn mode the forbidden content was written. The
 checks detect a change in enforcement outcome; they do not only check labels.
 
-**Reproducibility.** Two consecutive normal runs produced byte-identical
-`results.json`. Running with `--runtime-root` at a non-pinned checkout, or with
+**Reproducibility.** Two consecutive normal runs of the revised harness
+produced byte-identical `results.json`. Running with `--runtime-root` at a non-pinned checkout, or with
 a file that is not the approved wheel, was refused (exit 2).
 
 ## 5. Observations

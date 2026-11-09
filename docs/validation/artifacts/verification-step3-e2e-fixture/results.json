@@ -37,7 +37,8 @@
         },
         "report_base_sha": "978de46e3e3223b466ed3b0667f37d11296796ee",
         "report_head_sha": "e7b90432d1fc63592f80ed7bc01e2ca920342ae5",
-        "verify_exit": 0
+        "verify_exit": 0,
+        "verify_problems": []
       },
       "B2_bypass_violation": {
         "adapter_exit": 1,
@@ -75,7 +76,10 @@
         },
         "report_base_sha": "978de46e3e3223b466ed3b0667f37d11296796ee",
         "report_head_sha": "99bdbccb6386da15d53e37308e7ac9dba753a770",
-        "verify_exit": 1
+        "verify_exit": 1,
+        "verify_problems": [
+          "required check fails: VIOLATION under availability closed"
+        ]
       },
       "B3_incomplete_symlink": {
         "adapter_exit": 1,
@@ -104,7 +108,10 @@
         },
         "report_base_sha": "978de46e3e3223b466ed3b0667f37d11296796ee",
         "report_head_sha": "1729a0ab8a62ba3e70f424119b56ae24e81eeafa",
-        "verify_exit": 1
+        "verify_exit": 1,
+        "verify_problems": [
+          "required check fails: UNEVALUATED under availability closed"
+        ]
       },
       "B4_missing_identity": {
         "adapter_exit": 1,
@@ -142,7 +149,10 @@
         },
         "report_base_sha": "cff670b109e47884675de511b04f1a1ab89c815f",
         "report_head_sha": "d7e9451f6483b1b6dbd9a804334bbd577324dac0",
-        "verify_exit": 1
+        "verify_exit": 1,
+        "verify_problems": [
+          "required check fails: VIOLATION under availability closed"
+        ]
       },
       "B5_later_revision": {
         "adapter_exit": 0,
@@ -180,7 +190,8 @@
         },
         "report_base_sha": "e7b90432d1fc63592f80ed7bc01e2ca920342ae5",
         "report_head_sha": "f77bd0f8ed87cc61eff0aa7b04d10355e3ac7e30",
-        "verify_exit": 0
+        "verify_exit": 0,
+        "verify_problems": []
       }
     },
     "pins": {
@@ -416,6 +427,16 @@
           "actual": false,
           "expected": false,
           "ok": true
+        },
+        "verify_exit": {
+          "actual": 0,
+          "expected": 0,
+          "ok": true
+        },
+        "verify_problems": {
+          "actual": [],
+          "expected": [],
+          "ok": true
         }
       },
       "pass": true,
@@ -446,7 +467,7 @@
         }
       },
       "pass": true,
-      "title": "Same full identity and same subject digest across checkpoints"
+      "title": "Fixture-level correlation: same full identity and same (harness-computed) subject digest"
     },
     {
       "evidence_level": {
@@ -597,6 +618,20 @@
           "actual": true,
           "expected": true,
           "ok": true
+        },
+        "verify_exit": {
+          "actual": 1,
+          "expected": 1,
+          "ok": true
+        },
+        "verify_problems": {
+          "actual": [
+            "required check fails: VIOLATION under availability closed"
+          ],
+          "expected": [
+            "required check fails: VIOLATION under availability closed"
+          ],
+          "ok": true
         }
       },
       "pass": true,
@@ -661,6 +696,20 @@
           "actual": "failure",
           "expected": "failure",
           "ok": true
+        },
+        "verify_exit": {
+          "actual": 1,
+          "expected": 1,
+          "ok": true
+        },
+        "verify_problems": {
+          "actual": [
+            "required check fails: UNEVALUATED under availability closed"
+          ],
+          "expected": [
+            "required check fails: UNEVALUATED under availability closed"
+          ],
+          "ok": true
         }
       },
       "pass": true,
@@ -719,6 +768,20 @@
         "identity_complete": {
           "actual": false,
           "expected": false,
+          "ok": true
+        },
+        "verify_exit": {
+          "actual": 1,
+          "expected": 1,
+          "ok": true
+        },
+        "verify_problems": {
+          "actual": [
+            "required check fails: VIOLATION under availability closed"
+          ],
+          "expected": [
+            "required check fails: VIOLATION under availability closed"
+          ],
           "ok": true
         }
       },
@@ -786,10 +849,25 @@
           "actual": true,
           "expected": true,
           "ok": true
+        },
+        "disposition": {
+          "actual": "success",
+          "expected": "success",
+          "ok": true
+        },
+        "verify_exit": {
+          "actual": 0,
+          "expected": 0,
+          "ok": true
+        },
+        "verify_problems": {
+          "actual": [],
+          "expected": [],
+          "ok": true
         }
       },
       "pass": true,
-      "title": "B1 CI evidence is bound to its head, not the later one"
+      "title": "B1 CI evidence is bound to its head, not the later one; B5 is its own accepted decision"
     }
   ]
 }

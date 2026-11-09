@@ -312,6 +312,10 @@ def ci_replay(cases: dict, repo: Path, wheel: Path, work: Path) -> dict:
         d = out / cid
         report = json.loads((d / "gate-report.json").read_text(encoding="utf-8"))
         exits = json.loads((d / "exit.json").read_text())
+        verify_log = (d / "verify.log").read_text(encoding="utf-8")
+        prefix = "::error title=ADR-033 C4 decision::"
+        verify_problems = [line[len(prefix):] for line in verify_log.splitlines()
+                           if line.startswith(prefix)]
         files = []
         for f in report.get("files", []):
             payload = None
@@ -339,6 +343,9 @@ def ci_replay(cases: dict, repo: Path, wheel: Path, work: Path) -> dict:
             "aggregate": (report.get("aggregate") or {}).get("classification"),
             "disposition": report.get("disposition"),
             "adapter_exit": exits["adapter_exit"], "verify_exit": exits["verify_exit"],
+            # verify-report is the authoritative CI decision (C4). Its only
+            # problem on a correct failing report is the decision itself.
+            "verify_problems": verify_problems,
             "files": files,
         }
         shutil.copy2(d / "gate-report.json", HERE / "ci-reports" / f"{cid}.gate-report.json")
@@ -382,8 +389,11 @@ def weakest(*levels: str) -> str:
 
 
 def linkage(pre: dict, ci_file: dict | None) -> dict:
-    """Cross-checkpoint claim: CI evaluated exactly what pre-mutation allowed,
-    under the same full identity. Literal rules: execution observed at most."""
+    """Fixture-level correlation, not ADR-029 evidence binding: the
+    pre-mutation digest is computed by this harness from the tool arguments,
+    because Mneme emits no subject record for literal-only checks (#761 E-2).
+    Established only if the full identities are complete and equal and the
+    digests match. Literal rules: execution observed at most."""
     if ci_file is None:
         return {"established": False, "reason": "no CI file for this subject"}
     same_identity = (identity_complete(pre["identity"]) and identity_complete(ci_file["identity"])
@@ -438,11 +448,12 @@ def main() -> int:
     b1 = ci_file("B1_allow", "docs/guide.md")
     check("V1_allow_ci", "CI independently evaluates the resulting revision", lvl(level_ci(b1)),
           {"payload_has_subject": False, "aggregate": "PASS", "disposition": "success", "classification": "VERIFIED_PASS",
+           "verify_exit": 0, "verify_problems": [],
            "applicability": "APPLIED", "identity_complete": True, "head_matches_report": True},
           {**B["B1_allow"], **(b1 or {}), "identity_complete": identity_complete((b1 or {}).get("identity")),
            "head_matches_report": B["B1_allow"]["report_head_sha"] == B["B1_allow"]["head_sha"]})
     link = linkage(A["A1_allow"], b1)
-    check("V1_allow_linkage", "Same full identity and same subject digest across checkpoints",
+    check("V1_allow_linkage", "Fixture-level correlation: same full identity and same (harness-computed) subject digest",
           lvl(weakest(level_pre(A["A1_allow"]), level_ci(b1))), {"established": True, "same_full_identity": True, "same_subject_digest": True},
           link)
 
@@ -459,6 +470,7 @@ def main() -> int:
     b2 = ci_file("B2_bypass_violation", "docs/install.md")
     check("V2_ci_catches_bypass", "Content that bypassed pre-mutation is a CI violation", lvl(level_ci(b2)),
           {"aggregate": "VIOLATION", "disposition": "failure", "classification": "VIOLATION", "applicability": "APPLIED",
+           "verify_exit": 1, "verify_problems": ["required check fails: VIOLATION under availability closed"],
            "identity_complete": True, "same_subject_as_denied_attempt": True},
           {**B["B2_bypass_violation"], **(b2 or {}),
            "identity_complete": identity_complete((b2 or {}).get("identity")),
@@ -474,7 +486,8 @@ def main() -> int:
     b3 = ci_file("B3_incomplete_symlink", "docs/link.md")
     check("V3_incomplete_ci", "Non-regular entry: UNEVALUATED, fails closed under posture closed",
           lvl(level_ci(b3), NOT_EXECUTED),
-          {"aggregate": "UNEVALUATED", "disposition": "failure", "classification": "UNEVALUATED"}, {**B["B3_incomplete_symlink"], **(b3 or {})})
+          {"aggregate": "UNEVALUATED", "disposition": "failure", "classification": "UNEVALUATED",
+           "verify_exit": 1, "verify_problems": ["required check fails: UNEVALUATED under availability closed"]}, {**B["B3_incomplete_symlink"], **(b3 or {})})
 
     # 4. Missing identity
     c = A["A5_missing_identity"]
@@ -485,7 +498,9 @@ def main() -> int:
            "decision_version_id": (c["identity"] or {}).get("decision_version_id")})
     b4 = ci_file("B4_missing_identity", "docs/install.md")
     check("V4_missing_identity_ci", "Section-less memory at CI: violation, identity incomplete",
-          lvl(level_ci(b4)), {"aggregate": "VIOLATION", "disposition": "failure", "identity_complete": False},
+          lvl(level_ci(b4)), {"aggregate": "VIOLATION", "disposition": "failure", "identity_complete": False,
+                              "verify_exit": 1,
+                              "verify_problems": ["required check fails: VIOLATION under availability closed"]},
           {**B["B4_missing_identity"], "identity_complete": identity_complete((b4 or {}).get("identity"))})
     check("V4_missing_identity_linkage", "No cross-checkpoint claim without complete identity",
           lvl(weakest(level_pre(c), level_ci(b4))), {"established": False, "same_full_identity": False},
@@ -497,9 +512,11 @@ def main() -> int:
     check("V5_stale_reuse", "A1 pre-mutation evidence cannot verify a later revision of the file",
           lvl(weakest(level_pre(A["A1_allow"]), level_ci(b5))), {"established": False, "same_full_identity": True,
                            "same_subject_digest": False}, link5)
-    check("V5_stale_ci_head", "B1 CI evidence is bound to its head, not the later one", lvl(level_ci(b1)),
-          {"different_head": True},
-          {"different_head": B["B1_allow"]["head_sha"] != B["B5_later_revision"]["head_sha"]})
+    check("V5_stale_ci_head", "B1 CI evidence is bound to its head, not the later one; B5 is its own accepted decision",
+          lvl(level_ci(b1)),
+          {"different_head": True, "verify_exit": 0, "verify_problems": [], "disposition": "success"},
+          {"different_head": B["B1_allow"]["head_sha"] != B["B5_later_revision"]["head_sha"],
+           **B["B5_later_revision"]})
 
     for c in A.values():
         c.pop("attempted_content", None)
