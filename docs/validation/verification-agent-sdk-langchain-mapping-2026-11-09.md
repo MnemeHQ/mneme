@@ -80,7 +80,7 @@ runtime needed):
 | Agent SDK `Write` `docs/probe.md` with the ADR-005 forbidden install line, `warn` | `action=warn`, `verdict=FAIL` | `action, evaluation_complete, file_path, kind, reason, tool, verdict` | present; no `subject`; `ADR-005:FORBID_LITERAL:cbf4d27…`, `dver-d6631efd…`, `APPLIED`; violation with the same `rule_id` |
 | Agent SDK `Write`, benign content | `action=allow`, `verdict=PASS` | same | present; same rule `APPLIED`, zero violations (allow inferred, not recorded) |
 | LangChain `edit_file` on an existing file introducing the forbidden line, `strict` | `action=deny`, `verdict=FAIL` | same, `tool: "Edit"`, **no `via`** | present; same rule `APPLIED` |
-| LangChain `edit_file` on a missing file | `action=fail_open` | same | absent (`MaterializeError`) |
+| LangChain `edit_file` on a missing file (gate called directly, so no middleware annotation is exercised) | `action=fail_open` | same | absent (`MaterializeError`) |
 | LangChain unmapped tool `shell` | `action=skip` | adds `via: "langchain"` | absent |
 
 ## 5. Findings
@@ -93,7 +93,7 @@ runtime needed):
 | V-4 | **LangChain decisions carry no surface marker.** Delegated enforcement entries are written by the Agent SDK adapter without `via`, so control provenance cannot separate the two surfaces from the trace. | gap, adapter change |
 | V-5 | **No subject digest anywhere**, and for `Edit`/`MultiEdit` the checked subject is the introduced lines. A claim about the resulting file is a different subject (ADR-029 §2 mismatch). | gap; partly by design |
 | V-6 | **No pre-write numeric decision.** No `--proposed-new-file` routing, so numeric rules stay `MATCHER_UNEVALUATED`. The #761 E-1 path does not extend to these surfaces. | scope fact, consistent with adapter docs |
-| V-7 | **Fail-open and skip are visible, not silent.** Every `fail_open` and `skip` is in `trace`, and the agent sees an UNEVALUATED marker. This meets ADR-029's fail-closed rule for *claims*: none of these can be read as enforcement. | conforming |
+| V-7 | **Fail-open and skip are always visible in `trace`; only fail-open is (usually) visible to the agent.** Two separate guarantees. *Trace visibility:* every `fail_open` and `skip` gets a `trace` entry (`_gate`, `_record_unmapped_skip`), so none can be read as enforcement. That meets ADR-029's fail-closed rule for claims. *Agent visibility:* `fail_open` produces an UNEVALUATED message. The Agent SDK returns it as `additionalContext`; LangChain appends it to the tool result. A LangChain `Command` result with no recognizable `ToolMessage` cannot be annotated, and that gap is itself recorded in `trace` (`annotation: "skipped"`). `skip` produces no agent-visible notice: the Agent SDK returns `{}` and LangChain passes the tool result through unchanged. | conforming for claims; agent notification partial |
 | V-8 | **The trace is in-memory and per-instance.** Nothing persists it, consistent with ADR-029 §7 (no evidence store). Verification needs the caller to capture it. | scope fact |
 
 ## 6. Consequences for the Verification slice
