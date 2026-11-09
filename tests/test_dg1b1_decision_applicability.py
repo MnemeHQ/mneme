@@ -401,7 +401,9 @@ def test_required_label_absent_is_not_applicable() -> None:
     index = _index(document)
     assert _effective_ids(index) == ()
     assert _causes(index) == {"A": CAUSE_NOT_APPLICABLE}
-    resolution = resolve_effective(index)
+    # DG1F-C2: "no labels" must now be supplied explicitly; the default is
+    # "labels not supplied" (conservative inclusion, charter §3.2).
+    resolution = resolve_effective(index, GovernanceContext(labels=()))
     (decision,) = resolution.decisions
     assert decision.applicability_required_labels == WINDOWS_LABELS
     trace = {step.step: step.outcome for step in decision.trace}

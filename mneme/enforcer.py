@@ -35,6 +35,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 
+from mneme.decision_index import lifecycle_governs
 from mneme.decision_retriever import ScoredDecision
 from mneme.path_selectors import (
     RuleEvaluation,
@@ -726,7 +727,8 @@ class ArchitectureProtectionReport:
     """Aggregate P1.2 report over a decision corpus.
 
     Percentages are exactly recomputable from ``decisions`` filtered to
-    ``status == "active"``.
+    governing lifecycle (``decision_index.lifecycle_governs``, i.e.
+    ``status == "active"``).
     """
 
     schema: str
@@ -1332,7 +1334,7 @@ def _build_report(
         _assess_protection(decision, repo_root, test_evidence_results)
         for decision in decisions
     ]
-    active = [r for r in reports if r.status == "active"]
+    active = [r for r in reports if lifecycle_governs(r.status)]
     protected = sum(1 for r in active if r.protection_tier == "protected")
     mneme_ready = sum(1 for r in active if r.protection_tier == "mneme_ready")
     requires_modelling = sum(

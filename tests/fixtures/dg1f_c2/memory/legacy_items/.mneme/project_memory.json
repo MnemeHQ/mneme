@@ -1,0 +1,76 @@
+{
+  "meta": {
+    "name": "dg1f-c2-goldens",
+    "description": "DG1F-C2 golden-output corpus (pre-change baseline)",
+    "version": "0.1.0"
+  },
+  "items": [
+    {
+      "id": "C2-ITEM-RULE",
+      "type": "rule",
+      "title": "No print debugging",
+      "content": "Use the logging module",
+      "tags": []
+    },
+    {
+      "id": "C2-ITEM-AP",
+      "type": "anti_pattern",
+      "title": "eval(",
+      "content": "Never evaluate user input",
+      "tags": []
+    }
+  ],
+  "decisions": [
+    {
+      "id": "C2-LIT",
+      "decision": "Do not import psycopg2; the service uses SQLite.",
+      "rationale": "Single-file deployment.",
+      "scope": [
+        "database",
+        "storage"
+      ],
+      "constraints": [
+        "Use sqlite3 only"
+      ],
+      "anti_patterns": [
+        "psycopg2"
+      ],
+      "status": "active",
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "psycopg2"
+        }
+      ],
+      "test_evidence": [
+        {
+          "selector": "tests/test_storage.py::test_sqlite_only"
+        }
+      ]
+    },
+    {
+      "id": "C2-OLD",
+      "decision": "Do not import mysqlclient.",
+      "rationale": "Superseded by C2-LIT.",
+      "scope": [
+        "database"
+      ],
+      "constraints": [],
+      "anti_patterns": [
+        "mysqlclient"
+      ],
+      "status": "superseded",
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "mysqlclient"
+        }
+      ],
+      "test_evidence": [
+        {
+          "selector": "tests/test_storage.py::test_sqlite_only"
+        }
+      ]
+    }
+  ]
+}

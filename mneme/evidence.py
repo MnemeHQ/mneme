@@ -89,6 +89,8 @@ import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
+from mneme.decision_index import lifecycle_governs
+
 _GIT_TIMEOUT_S = 30
 
 # Fixed, deterministic reason codes used in evidence-source strings.
@@ -238,7 +240,7 @@ def match_ci_evidence(
 
     declared: dict[str, set[str]] = {}
     for decision in decisions:
-        if decision.status != "active":
+        if not lifecycle_governs(decision.status):
             continue
         for entry in _declared_entries(decision):
             selector = entry.get("selector")
