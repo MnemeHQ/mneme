@@ -263,10 +263,40 @@ exists without the no-bypass protections. Read both back with
 
 ### 6. Actions policy
 
-Where an organization or repository restricts `pull_request_target`, allow it
-for this workflow. On Core after GitHub's 2026-11-02 change, runs for PRs from
-branches of the same repository started with no approval step and no policy
-change. PRs from forks and first-time contributors have not been observed.
+**Public repositories must explicitly allow `pull_request_target` for this
+workflow.** GitHub blocks `pull_request_target` by default in public
+repositories from **2026-12-02**, unless an applicable Actions event policy
+explicitly allows it
+([changelog](https://github.blog/changelog/2026-11-02-pull_request_target-blocked-by-default-december-2)).
+Private and internal repositories are not affected. A blocked run never
+starts: it ends as `startup_failure` with no jobs and no `gate-report.json`.
+Because the gate is a required check, every PR is then unmergeable without the
+bypass. That is fail-closed, but it is an outage, not a verdict.
+
+Before that date GitHub runs brownouts, 16:00-18:00 UTC on 2026-11-09 and
+2026-11-16, where the default block is enforced. Outside them the rule only
+evaluates and runs proceed with a warning. Core's gate failed at startup on
+every PR during the 2026-11-09 brownout (first failure 16:05 UTC; the last
+passing run was 15:46 UTC) because Core had no event policy. The workflow, the
+rulesets and the posture variable were unchanged.
+
+To allow it, a repository administrator (or organization owner) creates or
+updates an Actions event policy under **Settings → Actions → Policies** that
+allows `pull_request_target`. Use workflow file targeting to scope the
+exception to `.github/workflows/mneme-trusted-gate.yml` only, so other
+workflows stay blocked
+([control workflow execution](https://docs.github.com/en/actions/how-tos/administer/control-workflow-execution)).
+Like the posture variable and the rulesets, this policy is administrative
+trust (P7/P8): whoever can change it can disable the gate. Confirm the policy
+in GitHub's policy evaluation view before relying on it, and check the current
+GitHub documentation for the exact settings path, which this guide has not
+verified.
+
+Where an organization or repository otherwise restricts `pull_request_target`,
+allow it for this workflow the same way. On Core after GitHub's 2026-11-02
+change, runs for PRs from branches of the same repository started with no
+approval step. PRs from forks and first-time contributors have not been
+observed.
 
 ### 7. Verify
 
@@ -350,6 +380,11 @@ exit by itself.
 - `pull_request_target` after GitHub's 2026-11-02 change was observed only for
   same-repository PRs (Core, 2026-11-02/03); fork and first-time-contributor
   PRs are unobserved.
+- In public repositories the gate depends on an Actions event policy that
+  allows `pull_request_target` (step 6). Without one, from 2026-12-02 (and
+  during GitHub's brownouts before then) every run fails at startup and every
+  PR needs the bypass. A run blocked this way leaves no report, so it is not an
+  UNEVALUATED result the adapter can record.
 - The gate covers the CI merge boundary only. Agent-host hooks are a separate
   boundary and are not fail-closed when the host does not invoke them.
 
