@@ -20,6 +20,7 @@ Regenerate (only with explicit review; goldens are the parity contract):
 from __future__ import annotations
 
 import copy
+import re
 import io
 import json
 import shutil
@@ -50,6 +51,7 @@ APPLICABILITY_DECISION = "C2-LIT"
 APPLICABILITY_LABELS = ["windows"]
 EVIDENCE_SHA = "0" * 40
 EVIDENCE_SELECTOR = "tests/test_storage.py::test_sqlite_only"
+MEMORY_ARG = ".mneme/project_memory.json"
 
 
 # ── memory fixtures ─────────────────────────────────────────────────────────
@@ -117,12 +119,39 @@ def build_memory_fixtures() -> None:
 # ── output capture ──────────────────────────────────────────────────────────
 
 
+_WORK_PATH = re.compile(r"""<WORK>[^\s"'<>|,;:]*""")
+_RUNTIME_FIELD = re.compile(r'"runtime": "CPython [0-9.]+[^"]*"')
+
+
 def _normalize(text: str, workdir: Path) -> str:
+    """Normalize only the temporary working-directory path.
+
+    The capture runs in a fresh temporary directory, so its absolute path and
+    the platform's separator inside paths under it are the only expected
+    differences between runs and between Windows and Linux. Each such path is
+    replaced by ``<WORK>`` plus a POSIX-separated relative tail, whether it was
+    printed raw or JSON-escaped. Nothing outside those path tokens changes.
+    """
     text = text.replace("\r\n", "\n")
-    for raw in {str(workdir), str(workdir.resolve()), workdir.resolve().as_posix()}:
+    for raw in sorted(
+        {str(workdir), str(workdir.resolve()), workdir.resolve().as_posix()},
+        key=len,
+        reverse=True,
+    ):
         text = text.replace(json.dumps(raw)[1:-1], "<WORK>")
         text = text.replace(raw, "<WORK>")
-    return text.replace("<WORK>\\\\", "<WORK>/").replace("<WORK>\\", "<WORK>/")
+    text = _WORK_PATH.sub(
+        lambda m: m.group(0).replace("\\\\", "/").replace("\\", "/"), text
+    )
+    # The relative ``--memory`` argument, when echoed through ``Path``, uses
+    # the platform separator. Normalize exactly that known token.
+    native = str(Path(MEMORY_ARG))
+    if native != MEMORY_ARG:
+        text = text.replace(json.dumps(native)[1:-1], MEMORY_ARG)
+        text = text.replace(native, MEMORY_ARG)
+    # ``mneme.check/v1`` records the interpreter in ``subject.runtime``; it is
+    # environment identity (CI runs CPython 3.11), not decision behavior.
+    return _RUNTIME_FIELD.sub('"runtime": "<RUNTIME>"', text)
 
 
 def _cli(workdir: Path, *args: str) -> dict[str, Any]:
@@ -182,7 +211,7 @@ def _capture_form(form: str) -> dict[str, Any]:
         workdir = Path(tmp) / "repo"
         shutil.copytree(MEMORY_DIR / form, workdir)
         shutil.copy(MEMORY_DIR / "app.py", workdir / "app.py")
-        memory = ".mneme/project_memory.json"
+        memory = MEMORY_ARG
         out: dict[str, Any] = {}
 
         out["audit"] = _cli(workdir, "audit", "--memory", memory, "--json", "audit.json")
