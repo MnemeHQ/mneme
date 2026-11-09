@@ -25,6 +25,8 @@ from mneme.decision_governance import (
     STATUS_INEFFECTIVE,
     GovernanceContext,
     compare_resolutions,
+    resolve_change,
+    resolve_change_from_memory_files,
     resolve_effective,
     resolve_effective_from_memory_file,
 )
@@ -37,12 +39,12 @@ from mneme.enforcer import check_prompt, generate_protection_report
 from mneme.evidence import CiEvidenceDocument, match_ci_evidence
 from mneme.memory_store import MemoryStore
 from mneme.protection import activation_precheck, find_candidates
+from mneme.readiness import readiness_counts
 from tests.dg1f_c2_corpus import (
     APPLICABILITY_DECISION,
     APPLICABILITY_LABELS,
     EVIDENCE_SELECTOR,
     EVIDENCE_SHA,
-    GOLDENS,
     MEMORY_DIR,
 )
 
@@ -127,9 +129,16 @@ def test_2_findings_change_no_consumer_output(form: str) -> None:
     baseline = resolve_effective_from_memory_file(_memory("canonical_v1"))
     assert resolution.effective_ids == baseline.effective_ids
 
-    goldens = json.loads(GOLDENS.read_text(encoding="utf-8"))
-    for key in ("runtime_decisions", "readiness_counts", "match_ci_evidence"):
-        assert goldens[form]["in_process"][key] == goldens["canonical_v1"]["in_process"][key]
+    def live(name: str):
+        decisions = _runtime(name)
+        return (
+            dict(readiness_counts(decisions)),
+            match_ci_evidence(decisions, EVIDENCE_SHA, _evidence_document()),
+            [c.decision_id for c in find_candidates(decisions).candidates],
+        )
+
+    assert live(form) == live("canonical_v1")
+
     def runtime_view(name: str):
         return [dataclasses.replace(d, memory_path="") for d in _runtime(name)]
 
@@ -247,6 +256,14 @@ def test_6_malformed_index_raises_through_every_entry_point(tmp_path: Path) -> N
         resolve_effective_from_memory_file(path)
     with pytest.raises(ValueError):
         resolve_effective_from_memory_file(path, GovernanceContext(labels=()))
+    good = load_decision_index_from_memory_file(_memory("canonical_v1"))
+    bad = dataclasses.replace(good, records=good.records + (good.records[0],))
+    with pytest.raises(ValueError, match="duplicate canonical decision id"):
+        resolve_effective(bad)
+    with pytest.raises(ValueError, match="duplicate canonical decision id"):
+        resolve_change(good, bad)
+    with pytest.raises(ValueError):
+        resolve_change_from_memory_files(_memory("canonical_v1"), path)
 
 
 # ── 7. cross-semantics and cross-context comparisons are refused ───────────
