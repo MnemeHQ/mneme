@@ -278,7 +278,9 @@ Before that date GitHub runs brownouts, 16:00-18:00 UTC on 2026-11-09 and
 evaluates and runs proceed with a warning. Core's gate failed at startup on
 every PR during the 2026-11-09 brownout (first failure 16:05 UTC; the last
 passing run was 15:46 UTC) because Core had no event policy. The workflow, the
-rulesets and the posture variable were unchanged.
+rulesets and the posture variable were unchanged. After an administrator added
+an event policy allowing `pull_request_target` for this workflow, a run at
+16:44 UTC, still inside the brownout, completed successfully.
 
 To allow it, a repository administrator (or organization owner) creates or
 updates an Actions event policy under **Settings → Actions → Policies** that
