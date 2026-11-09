@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+**DG1F-C3a resolver-result consumption by three reporting consumers (no
+output change).** Charter #774, Layer 1 freeze amendment #775.
+
+- `mneme audit`, `mneme setup` readiness and `mneme protect list` now take
+  their governed decision set from the DG1 resolver result on canonical
+  memory (`decision_governance.governed_runtime_decisions`: labels not
+  supplied, same validated snapshot), and keep the C2 path on section-less
+  memory. Every output is byte-identical (golden tests, including
+  `--repo-root` evidence, setup and `protect list` error paths).
+- Not converged: `github_evidence.audit_with_github_claim`, `protect
+  status/validate/activate`, CI evidence-matching APIs and every enforcement
+  input. This is not full ADR-031 §11 convergence.
+
 **DG1F-C2 lifecycle-authority consolidation (preparatory; no runtime output
 change).** Charter #764, Layer 1 freeze amendment #767.
 

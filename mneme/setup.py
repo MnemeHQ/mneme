@@ -168,7 +168,12 @@ def _load_validated_decisions(memory_path: Path) -> list:
         raise SetupError(
             f"existing memory file {memory_path} failed validation: {exc}"
         ) from exc
-    return store.decisions()
+    # DG1F-C3a: resolver-governed set (canonical) or the C2 path
+    # (section-less), resolved outside the ``try`` so resolver errors are
+    # never wrapped as ``SetupError``.
+    from mneme.decision_governance import governed_runtime_decisions
+
+    return governed_runtime_decisions(store)
 
 
 def run_setup(

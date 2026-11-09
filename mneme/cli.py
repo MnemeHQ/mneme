@@ -62,7 +62,11 @@ from mneme.adr_import import (
 )
 from mneme.adr_schema import ADRParseError, ADRValidationError
 from mneme.context_builder import DEFAULT_MAX_DECISIONS, format_decisions
-from mneme.decision_governance import GovernanceContext, resolve_effective
+from mneme.decision_governance import (
+    GovernanceContext,
+    governed_runtime_decisions,
+    resolve_effective,
+)
 from mneme.decision_index_persistence import (
     DecisionIndexMigrationRefused,
     DecisionIndexMigrationRequired,
@@ -971,7 +975,11 @@ def _cmd_audit(args: argparse.Namespace) -> int:
 
     store = MemoryStore(args.memory)
     store.load()
-    report = generate_protection_report(store.decisions(), repo_root=repo_root)
+    # DG1F-C3a: the governed set comes from the resolver result (canonical
+    # memory) or the C2 path (section-less memory).
+    report = generate_protection_report(
+        governed_runtime_decisions(store), repo_root=repo_root
+    )
 
     if args.json:
         out = Path(args.json)
@@ -1048,9 +1056,29 @@ def _require_memory(
     return memory_path, decisions
 
 
+def _require_governed_memory(
+    memory: str,
+) -> tuple[Path, list] | None:
+    """``protect list`` loader (DG1F-C3a): like ``_require_memory``, but
+    returns the resolver-governed decisions. ``_require_memory`` and
+    ``protection.load_decisions`` stay unchanged for status/validate/activate.
+    """
+    from mneme.protection import ProtectionError, load_governed_decisions
+    memory_path = Path(memory)
+    if not memory_path.exists():
+        _error_exit(f"memory file {memory_path} does not exist")
+        return None
+    try:
+        decisions = load_governed_decisions(memory_path)
+    except ProtectionError as exc:
+        _error_exit(str(exc))
+        return None
+    return memory_path, decisions
+
+
 def _cmd_protect_list(args: argparse.Namespace) -> int:
     from mneme.protection import ENFORCEMENT_BEHAVIOR, find_candidates
-    loaded = _require_memory(args.memory)
+    loaded = _require_governed_memory(args.memory)
     if loaded is None:
         return 2
     memory_path, decisions = loaded

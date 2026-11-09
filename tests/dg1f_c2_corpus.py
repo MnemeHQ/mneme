@@ -36,6 +36,9 @@ FIXTURES = ROOT / "tests" / "fixtures" / "dg1f_c2"
 SOURCE = FIXTURES / "legacy_source.json"
 MEMORY_DIR = FIXTURES / "memory"
 GOLDENS = FIXTURES / "goldens.json"
+# DG1F-C3a (charter #774 §4): additional pre-change goldens, kept separate so
+# the C2 goldens stay byte-identical.
+GOLDENS_C3A = FIXTURES / "goldens_c3a.json"
 
 FORMS = (
     "canonical_v1",
@@ -255,7 +258,115 @@ def write_goldens() -> None:
     )
 
 
+# ── DG1F-C3a additional goldens (charter #774 §4) ──────────────────────────
+
+_EVIDENCE_WORKFLOW = """name: ci
+on: [push]
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: forbid pickle
+        run: "! grep -rn 'pickle' --include='*.py' src"
+      - name: note
+        run: echo "mysqlclient was removed"
+"""
+
+_EVIDENCE_TEST = "def test_sqlite_only():\n    assert True\n"
+
+
+def _evidence_repo(workdir: Path) -> None:
+    (workdir / ".git").mkdir()
+    workflows = workdir / ".github" / "workflows"
+    workflows.mkdir(parents=True)
+    (workflows / "ci.yml").write_bytes(_EVIDENCE_WORKFLOW.encode("utf-8"))
+    (workdir / "tests").mkdir()
+    (workdir / "tests" / "test_storage.py").write_bytes(_EVIDENCE_TEST.encode("utf-8"))
+
+
+def _setup_in_process(workdir: Path) -> dict[str, Any]:
+    from mneme.setup import run_setup
+
+    outcome = run_setup(root=workdir, pairing=None)
+    return {
+        "created_memory": outcome.created_memory,
+        "previous_state": outcome.previous_state,
+        "state": outcome.state,
+        "rerun": outcome.rerun,
+        "decision_count": outcome.decision_count,
+        "readiness": dict(outcome.readiness),
+    }
+
+
+def _capture_c3a_form(form: str) -> dict[str, Any]:
+    with tempfile.TemporaryDirectory() as tmp:
+        workdir = Path(tmp) / "repo"
+        shutil.copytree(MEMORY_DIR / form, workdir)
+        shutil.copy(MEMORY_DIR / "app.py", workdir / "app.py")
+        _evidence_repo(workdir)
+        memory = MEMORY_ARG
+        out: dict[str, Any] = {}
+        out["audit_repo_root"] = _cli(
+            workdir, "audit", "--memory", memory, "--repo-root", ".",
+            "--json", "audit.json",
+        )
+        audit_json = workdir / "audit.json"
+        out["audit_repo_root_json"] = (
+            _normalize(audit_json.read_text(encoding="utf-8"), workdir)
+            if audit_json.exists() else None
+        )
+        out["audit_repo_root_text"] = _cli(
+            workdir, "audit", "--memory", memory, "--repo-root", "."
+        )
+        out["protect_list_repo_root"] = _cli(
+            workdir, "protect", "list", "--memory", memory, "--repo-root", "."
+        )
+        out["setup_cli"] = _cli(workdir, "setup")
+        out["setup_in_process_rerun"] = _setup_in_process(workdir)
+        return out
+
+
+def _capture_c3a_new_memory() -> dict[str, Any]:
+    with tempfile.TemporaryDirectory() as tmp:
+        workdir = Path(tmp) / "repo"
+        workdir.mkdir()
+        _evidence_repo(workdir)
+        out = {"setup_cli": _cli(workdir, "setup")}
+        created = workdir / ".mneme" / "project_memory.json"
+        out["created_memory_exists"] = created.exists()
+        out["setup_in_process_rerun"] = _setup_in_process(workdir)
+        return out
+
+
+def _capture_c3a_error_paths() -> dict[str, Any]:
+    with tempfile.TemporaryDirectory() as tmp:
+        workdir = Path(tmp) / "repo"
+        workdir.mkdir()
+        missing = _cli(workdir, "protect", "list", "--memory", "missing.json")
+        broken = workdir / "broken.json"
+        broken.write_bytes(b'{"meta": {"name": "x", "description": "y"}, '
+                           b'"decision_index": {"schema": "mneme.decision-index/v1"}}\n')
+        invalid = _cli(workdir, "protect", "list", "--memory", "broken.json")
+        return {"protect_list_missing": missing, "protect_list_invalid": invalid}
+
+
+def capture_c3a() -> dict[str, Any]:
+    out: dict[str, Any] = {form: _capture_c3a_form(form) for form in FORMS}
+    out["new_memory"] = _capture_c3a_new_memory()
+    out["error_paths"] = _capture_c3a_error_paths()
+    return out
+
+
+def write_goldens_c3a() -> None:
+    GOLDENS_C3A.write_bytes(
+        (json.dumps(capture_c3a(), indent=2, sort_keys=True) + "\n").encode("utf-8")
+    )
+
+
 if __name__ == "__main__":
+    if "--write-goldens-c3a" in sys.argv:
+        write_goldens_c3a()
     if "--build-memory" in sys.argv:
         build_memory_fixtures()
     if "--write-goldens" in sys.argv:
