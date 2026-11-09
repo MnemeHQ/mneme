@@ -183,6 +183,8 @@ def test_5_excluded_surfaces_never_call_the_helper(tmp_path, capsys, monkeypatch
         raise AssertionError("excluded surface called governed_runtime_decisions")
 
     monkeypatch.setattr(governance, "governed_runtime_decisions", forbidden)
+    monkeypatch.setattr(cli, "governed_runtime_decisions", forbidden)
+    monkeypatch.setattr(protection, "load_governed_decisions", forbidden)
     memory = _memory(workdir)
     assert protection.load_decisions(memory)
     cli.main(["protect", "status", "C2-PICKLE", "--memory", memory])
@@ -216,3 +218,31 @@ def test_6_findings_do_not_change_the_governed_set(form: str) -> None:
     )
     assert resolution.findings
     assert governed_ids(form) == governed_ids("canonical_v1")
+
+
+# ── 3b. resolver errors are never caught, wrapped or turned into a list ────
+
+
+@pytest.fixture
+def resolver_raises(monkeypatch):
+    def boom(index, context=None):
+        raise ValueError("injected resolver failure")
+
+    monkeypatch.setattr(governance, "resolve_effective", boom)
+
+
+def test_3b_resolver_errors_propagate_unwrapped(tmp_path, resolver_raises) -> None:
+    from mneme.setup import SetupError, _load_validated_decisions
+
+    workdir = _repo(tmp_path, "canonical_v1")
+    memory = Path(_memory(workdir))
+    store = MemoryStore(memory)
+    store.load()
+    for call in (
+        lambda: governed_runtime_decisions(store),
+        lambda: _load_validated_decisions(memory),
+        lambda: protection.load_governed_decisions(memory),
+    ):
+        with pytest.raises(ValueError, match="injected resolver failure") as caught:
+            call()
+        assert not isinstance(caught.value, (SetupError, protection.ProtectionError))

@@ -83,7 +83,9 @@ def _resolves(section: dict) -> None:
 
 
 def test_a_repository_has_canonical_documents() -> None:
-    assert len(_DOCUMENTS) >= 5, [str(p) for p in _DOCUMENTS]
+    # 15 tracked canonical documents at the C3a anchor; a fixture move must
+    # not silently shrink coverage.
+    assert len(_DOCUMENTS) >= 15, [str(p) for p in _DOCUMENTS]
 
 
 @pytest.mark.parametrize(
