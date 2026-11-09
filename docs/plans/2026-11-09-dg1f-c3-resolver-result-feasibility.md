@@ -30,11 +30,14 @@ completion record.
 - **The resolver's real added value (causes, `superseded_by`, findings) needs
   an output change.** That is a separate output-contract decision, not part of
   parity convergence.
-- **Recommendation: GO, narrowly, for C3a** (§6): the Audit-report family
-  (`mneme audit`, readiness, `protect list` candidates, the `github_evidence`
-  report) takes its governed set from the resolver result on canonical memory,
-  with context not supplied, with output pinned by the existing C2 goldens.
-  It needs its own charter and `[layer1-freeze]` amendment.
+- **Recommendation: GO, narrowly, for C3a** (§6): `mneme audit`, readiness
+  and `protect list` candidates take their governed set from the resolver
+  result on canonical memory, with context not supplied, with output pinned
+  by goldens. The public `audit_with_github_claim` API is **excluded by
+  default** (it receives a caller-supplied decision list, not a store with the
+  canonical snapshot); its convergence stays open on #497 unless a charter
+  adds a separately reviewed, compatibility-preserving authority contract.
+  C3a needs its own charter and `[layer1-freeze]` amendment.
 - **NO-GO for now:** protection validate/activate (authority write path),
   enforcement inputs (`mneme check`, hooks, CI, MCP), any supplied-labels
   consumption (that is C1b), and any new explanation output.
@@ -133,27 +136,38 @@ may instead leave it on the caller's list and record that.
 | A second file read or snapshot | load paths | one `MemoryStore` load; test that the resolver index is the store's object |
 | Findings turned into errors or exclusions | report consumers | consumers use only the effective set; findings ignored, never raised |
 | Legacy behavior changed in passing | section-less path | dual path named; C2 legacy goldens unchanged |
-| Output drift | all four consumers | C2 goldens byte-identical, both platforms |
-| Scope creep into explanations or activation | Audit, protection | charter non-goals; freeze amendment restricted to the four consumers |
+| Output drift | the three C3a consumers | C2 goldens byte-identical, both platforms |
+| Scope creep into explanations or activation | Audit, protection | charter non-goals; freeze amendment restricted to the three consumers |
 | Resolver `ValueError` on memory that loads fine turns a working audit into a crash (the C2 freeze forbids catching it) | report consumers | prove `_validate` (`decision_governance.py`) is implied by `load_persisted_decision_index`, or test mutated indexes the loader accepts |
 | Setup with newly created memory has no store and no index (`setup.py`, empty decisions) | readiness | dual path covers it; golden for `run_setup` |
-| Unobservable change mistaken for progress | programme | record C3a as §11 closure for the Audit family only, not DG1F completion |
+| Unobservable change mistaken for progress | programme | record C3a as §11 closure for the three named consumers only, not the whole Audit family or DG1F |
+| Public API left unconverged but claimed as converged | `audit_with_github_claim` | explicit exclusion recorded on #497, or a reviewed authority contract (§6) |
 
 ## 6. Smallest defensible next increment: C3a
 
 **C3a: Audit-family resolver-result consumption (parity only).**
 
-- **Scope:** the `_build_report` family: `mneme audit`, readiness,
-  `protect list` candidates, the `github_evidence` report. On canonical
+- **Scope:** three `_build_report` consumers that load memory themselves:
+  `mneme audit`, readiness (setup) and `protect list` candidates. On canonical
   memory, the governed decision set is the projected decisions whose ids are
   in `resolve_effective(store.canonical_index, GovernanceContext()).effective`,
   from the same `MemoryStore` load. Section-less memory keeps the C2 path.
+- **`audit_with_github_claim` acceptance condition (explicit).** The C3a
+  charter must choose one:
+  1. **Exclude it (recommended default).** The public API keeps its
+     caller-supplied decision list unchanged, and its resolver-result
+     convergence stays an open item on #497. C3a then claims §11 convergence
+     for the three consumers above only, never for "the Audit family".
+  2. **Include it** only with a separately reviewed, compatibility-preserving
+     authority contract (for example an additive entry point that takes the
+     validated store or index while the existing signature keeps working),
+     plus goldens for the authenticated-results path.
 - **Unchanged:** every output byte (C2 goldens), `mneme.audit/v1`, ADR-026
   formulas, enforcement inputs, protection validate/activate, evidence
   matching semantics, C1a preview.
-- **Required evidence:** new goldens for `--repo-root` evidence paths,
-  `run_setup` and `audit_with_github_claim` (or a recorded exclusion of it),
-  captured before code; C2 goldens unchanged on Windows and Linux; proof that
+- **Required evidence:** new goldens for `--repo-root` evidence paths and
+  `run_setup` (and, only under option 2, `audit_with_github_claim` with
+  authenticated results), captured before code; C2 goldens unchanged on Windows and Linux; proof that
   the resolver cannot raise on memory the loader accepts; mutation
   tests showing the consumer follows the resolver result (for example, a
   resolver that excludes a decision changes the report) and that a
@@ -163,8 +177,10 @@ may instead leave it on the caller's list and record that.
 - **Authorization needed:** a C3a behavioral charter and a `[layer1-freeze]`
   amendment. The DG1B1/C1a/C2 amendments prohibit Audit, readiness,
   protection and evidence surfaces from consuming the resolver result.
-- **What it buys:** §11 convergence for four of the surfaces §11 names, with no
-  observable change; the binding that a later explanation surface needs.
+- **What it buys:** §11 convergence for `mneme audit`, readiness and
+  `protect list` candidates, with no observable change; the binding that a
+  later explanation surface needs. It does **not** claim full Audit-family
+  convergence while `audit_with_github_claim` is unchanged.
 
 **Deferred, each needing its own decision:**
 
@@ -181,7 +197,8 @@ may instead leave it on the caller's list and record that.
 
 | Candidate | Verdict | Reason |
 |---|---|---|
-| C3a Audit family, parity, not-supplied context | **GO** (subject to charter + freeze amendment) | feasible, provable with existing goldens, no trust gap, low risk |
+| C3a (`mneme audit`, readiness, `protect list`), parity, not-supplied context | **GO** (subject to charter + freeze amendment) | feasible, provable with existing goldens, no trust gap, low risk |
+| `audit_with_github_claim` convergence | open; excluded from C3a by default | public API takes caller-supplied decisions; needs a reviewed authority contract |
 | Explanation output | NO-GO now | output contract change; needs its own decision after C3a |
 | Protection validate/activate | NO-GO now | authority write path; behavior or message changes |
 | Enforcement inputs (`check`, hooks, CI, MCP) | NO-GO | no parity value; anything more is C1b |
