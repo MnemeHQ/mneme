@@ -2109,6 +2109,169 @@ above.
 
 ---
 
+## Amendment — authorize DG1B2a canonical waiver records (2026-11-10)
+
+> This authorizes a **future, bounded implementation**, not a statement that
+> any behavior has changed. It authorizes the canonical waiver record, its
+> authority operations, resolver evaluation with cause `waived`, a read-only
+> listing and one informational C1a preview display. It does **not** authorize
+> any authoritative consumer to act on a waiver (DG1B2b), C1b, a trusted
+> context or `as_of` source, or any change to enforcement inputs.
+
+**Change:** Permit a canonical, authority-written waiver record under
+`mneme.decision-index/v2` (semantic feature `decision_waivers`), evaluated by
+the shared resolver as cause `waived`, with **every enforcement input and every
+authoritative surface unchanged**.
+
+**Sections referenced:** the Freeze Anchor **Status** clause ("No behavioral
+change to retrieval or enforcement without an explicit charter amendment"),
+the DG1B1 amendment's "Not authorized by this amendment" list (DG1B2 waivers),
+the DG1F-C1a amendment's "Explicitly not authorized" item 3 (new waiver
+representation/semantics) and closing paragraph, the DG1F-C2 amendment's "Not
+authorized" item 5 (waiver representation), the DG1F-C3a amendment's "Not
+authorized" item 5 (waivers), and the Amendment Procedure below. This
+amendment is the explicit, narrow exception to those prohibitions for the
+DG1B2a scope named here only.
+
+**Rationale (Amendment Procedure §3(b)).** A distinct behavioral charter was
+**already merged** before this amendment:
+[DG1B2 canonical waiver charter](../plans/2026-11-10-dg1b2-waiver-charter.md),
+PR [#784](https://github.com/MnemeHQ/mneme/pull/784), squash `412a1e46`. Its
+evidence gate is the
+[DG1B2 waiver evidence packet](../validation/dg1b2-waiver-evidence-packet-2026-11-10.md)
+(#783, squash `27c92223`), required by ADR-031 §7 and §12. No behavior change
+is retroactively justified.
+
+**Governing authority:** accepted
+[ADR-031](../adr/ADR-031-decision-governance-semantics.md) §3/§6/§7/§8/§8a/§11/§12,
+[ADR-027](../adr/ADR-027-decision-mcp-proposal-ingestion-and-authority-boundary.md),
+[ADR-029](../adr/ADR-029-enforcement-evidence-binding-semantics.md),
+[ADR-030](../adr/ADR-030-canonical-decision-persistence-version-identity-and-stable-rule-lineage.md),
+and the merged DG1B2 charter §§2-5.
+
+### Authorized change — DG1B2a only (charter §3)
+
+- **Waiver record (charter §3.1).** Persisted only under
+  `mneme.decision-index/v2` with the declared semantic feature
+  `decision_waivers`, with the closed field set of charter §3.1: `waiver_id`,
+  `target_decision_id`, `target_decision_version_id`, `scope.required_labels`
+  (required, non-empty), optional `valid_from` / `valid_until`
+  (`YYYY-MM-DDTHH:MM:SSZ`, `valid_from` < `valid_until`), `requester`,
+  `approver` (≠ `requester`), `approval_reference`, `reason`, `status`
+  (`active` or `revoked`), `revocation` (`revoked_by`, `revocation_reference`,
+  `reason`) and `created_at`. Non-empty scope is a deliberate DG1B2a
+  limitation; rule-level and path-scoped waivers are excluded.
+- **Persistence location (charter §3.1.1), frozen.** A top-level `waivers`
+  array on the v2 `decision_index` root, added to the closed root key set.
+  `waivers` is present if and only if `decision_waivers` is declared; a
+  `waivers` key without the feature, the feature without `waivers`, and an
+  empty array are load-time refusals. Waivers are never nested in decision
+  rows and never stored in `extensions`. Optional keys are omitted, never
+  `null`; `revocation` is present if and only if `status == "revoked"`.
+- **Identity and serialization (charter §3.1.2), frozen.**
+  `waiver_id = "wvr-" + sha256_hex(payload)[:32]` using the ADR-030 helpers in
+  `mneme/rule_identity.py`, where `payload` is
+  `[target_decision_id, target_decision_version_id, required_labels,
+  valid_from, valid_until, requester, approver, approval_reference, reason]`,
+  with `required_labels` sorted and de-duplicated and absent window bounds as
+  `null`. No other normalization. The loader recomputes every `waiver_id` and
+  refuses a mismatch or duplicate. The writer stores labels sorted and
+  de-duplicated, sorts `waivers` by `waiver_id` and writes through the
+  existing canonical memory writer. The prefix, payload order and truncation
+  are public contract; changing them needs a new semantic feature.
+- **Resolver semantics (charter §3.2).** After the unchanged lifecycle and
+  applicability steps, a decision is `ineffective` with cause `waived` only
+  when an `active` waiver binds its active version, labels were **supplied**
+  and contain every waiver label, and any time window holds at a supplied,
+  parseable `as_of` (`valid_from` ≤ `as_of` < `valid_until`). `as_of` is
+  parsed only in this step; `GovernanceContext` validation is unchanged. In
+  every other case the decision stays effective (fail closed to the decision).
+  The resolver never raises on a waiver; `dangling_waiver_target` and
+  `waiver_version_mismatch` are non-blocking findings. The decision is never
+  mutated.
+- **Authority operations (charter §3.3).** Two explicit local CLI operations
+  (for example `mneme decision waive` and `mneme decision revoke-waiver`) are
+  the **only** writers of waiver records. They follow ADR-030 writer
+  discipline (verify before mutate, atomic write, reload and verify, no
+  repair, no implicit migration; v1 memory refuses with the migration
+  message). `waive` refuses a missing field, empty scope,
+  `approver == requester`, a non-active target or a non-active bound version.
+  `revoke-waiver` only sets `status` and adds `revocation`; it never deletes a
+  record. No clock writes expiry.
+- **Outputs (charter §3.7).** `GovernanceResolution` gains cause `waived`, a
+  `waiver` trace step and `DecisionResolution.waiver_ids`; the semantics id
+  bumps (proposed `mneme.governance-semantics/dg1b2a-1`), and the C2 test
+  pinning the old id changes deliberately. `resolve_change` reports waiver
+  effects through its existing kinds and is not a waiver lifecycle audit. A
+  read-only waiver listing command is permitted.
+- **C1a preview, informational only.** Under its existing NON-AUTHORITATIVE
+  stderr header and with caller-asserted labels, the preview may show
+  `cause=waived` for memory that contains waivers, and any waiver finding
+  makes it report PREVIEW UNAVAILABLE through its existing finding gate. The
+  gate is not narrowed. The DG1F-C1a non-interference requirement is
+  unchanged: stdout, the `mneme.check/v1` JSON payload, exit codes, enforced
+  decisions and hook outcomes stay identical with and without the preview.
+- **Self-authorization safeguards (charter §3.5).** No producer path (Decision
+  MCP tools, the proposal store, proposal acceptance) and no runtime surface
+  (hooks, the C1a preview, Audit, protection, readiness) creates, edits or
+  revokes a waiver. The MCP tool set is unchanged. Mneme records identity
+  claims and does not authenticate them (charter §3.4).
+- **Unchanged (charter §3.8), mandatory.** Projection, `mneme check` stdout,
+  JSON and exit codes, hooks, CI gates, MCP tools and responses,
+  `decision.applicable_to`, Audit, setup readiness, `protect
+  list/status/validate/activate`, evidence matching, ADR-026 formulas, ADR-017
+  tiers, ADR-020 rule applicability, retrieval and benchmark fixtures behave
+  identically for well-formed waiver memory read by a binary that supports the
+  feature. The C3a consumers resolve with labels not supplied, so no waiver
+  applies to them. Readers without the feature refuse waiver memory (ADR-031
+  §8).
+
+### Validation gate for the later implementation PR
+
+Before DG1B2a implementation can merge:
+
+1. **Goldens first:** the C2 and C3a goldens reproduce byte for byte on Linux
+   CI and a local Windows run, before and after the implementation.
+2. Every charter §4 fixture and test (items 1-13 and 9a) passes, and each
+   negative fails when its guard is removed. This includes the frozen
+   identity golden, persistence-location refusals, the 0.11.0-reader refusal
+   and the C1a preview cases.
+3. All DG1 tests, the full gate battery and the frozen Layer 1 benchmark (7/7)
+   pass. New tests live outside the frozen benchmark fixtures and methodology
+   and are registered in `GATE_PATHS` or `GATE_EXCLUSIONS`.
+4. ADR-031 §8 release notes are drafted for the implementation PR (older
+   readers and the trusted gate's pinned evaluator refuse waiver memory).
+5. An independent review checks the implementation against charter §4.
+
+### Not authorized by this amendment
+
+1. **DG1B2b / waiver-aware DG1F convergence.** No CLI, enforcer,
+   `ConflictDetector`, projection, protection, Audit, readiness, evidence,
+   hook, CI gate, MCP surface, C3a consumer or production decision set may
+   exclude or treat differently a decision because of a waiver. The C1a
+   display above is the only waiver-aware output and stays non-authoritative.
+2. **DG1F-C1b**, a trusted context source or a trusted `as_of` source; any
+   change to `GovernanceContext` validation.
+3. **Global (unscoped), rule-level or path-scoped waivers**; licence
+   semantics; import of external exception registries; inference of waivers
+   from PR approvals or other implicit signals; clock-based expiry.
+4. **New MCP tools** or any producer path that writes waivers; any change to
+   the ADR-027 boundary.
+5. **Writing any waiver to Core's own `.mneme/project_memory.json`**, or any
+   change to CI workflows or the trusted gate's evaluator pin. Bumping the pin
+   before Core memory carries a waiver needs its own approval.
+6. Any change to schema v1, implicit v1 → v2 migration, legacy section-less
+   semantics, loader behavior beyond the waiver key set, other semantic
+   features, retrieval, rule matching, ADR-020/ADR-026 semantics, benchmark
+   fixtures or methodology, or a release.
+7. Any DG1B2, DG1F, DG1G or DG1 completion claim.
+
+The DG1B1, DG1F-C1a, DG1F-C2 and DG1F-C3a freeze amendments remain unchanged.
+Their prohibitions still govern every surface other than the DG1B2a scope
+named above.
+
+---
+
 ## Amendment Procedure
 
 This document is frozen at `e73ff7d`. To amend it:
