@@ -7,7 +7,10 @@
 > not allow DG1G closeout before the full sequence is complete, so **DG1G and
 > DG1 remain open**. This record authorizes no new test, enforcement change,
 > waiver, charter, freeze amendment or release.
-> **Anchor:** `main` at `b5e0e1dd`. Basis:
+> **Updated 2026-11-10 at `d0a1b1d8`:** F13 reclassified from *blocked* to
+> *supported* after DG1B2a merged (#787); see §2 F13 and §5. Every other
+> classification is unchanged from the original anchor.
+> **Anchor:** `main` at `b5e0e1dd` (original record). Basis:
 > [DG1 post-C3a reconciliation](dg1-post-c3a-reconciliation-2026-11-09.md)
 > (#781) §5–§6; [ADR-031](../adr/ADR-031-decision-governance-semantics.md)
 > §13; tracker [#497](https://github.com/MnemeHQ/mneme/issues/497).
@@ -16,10 +19,10 @@
 
 | Classification | Count | Items |
 |---|---|---|
-| supported | 11 | §13 fixtures F1–F9, F11, F12 |
+| supported | 12 | §13 fixtures F1–F9, F11, F12, F13 |
 | partial | 2 | F10 (ADR-029 §6), G3 host-boundary control |
 | missing | 0 | none beyond the partials |
-| blocked | 1 | F13 waiver fixtures (DG1B2 has no qualifying case) |
+| blocked | 0 | none (F13 was blocked until DG1B2a, #787) |
 | unevaluated | 2 | G1 self-authorization control (host side), G2 authorized-transition control |
 
 Two obligations are kept separate (§4): the **ADR-031 §13 fixture floor**
@@ -65,12 +68,17 @@ representative, and the suite as a whole is the pinning evidence.
 | F11 | canonical rule identity through enforcement; section-less fail-closed evidence | `test_dg1e_evidence_identity.py::test_runtime_rule_id_equals_persisted_rule_id`, `::test_canonical_memory_trace_carries_complete_evidence_identity`, `::test_check_json_reports_canonical_identity`, `::test_adr_dir_view_uses_canonical_rule_ids_without_version_identity`, `::test_section_less_memory_has_rule_identity_but_fails_closed`, `::test_legacy_prose_violation_identity_is_incomplete`, `::test_verdicts_do_not_depend_on_evidence_identity` | yes | supported |
 | F12 | snapshot A → B change explanations | all 14 tests in `test_dg1d_change_resolution.py`, incl. `test_dg1d_change_resolution.py::test_supersession_moves_governance_and_rules`, `::test_version_evolution_reports_version_and_rule_changes`, `::test_persisted_snapshots_report_deprecation_and_retired_rules`, `::test_resolutions_from_different_semantics_are_not_comparable`; applicability: `test_dg1b1_functional_acceptance.py::test_f10_resolve_change_reports_governed_scope_change` | yes | supported |
 | F12a | applicability fixtures (added with DG1B1) | `test_dg1b1_decision_applicability.py` (62), the twelve F1–F12 tests in `test_dg1b1_functional_acceptance.py` (from `test_dg1b1_functional_acceptance.py::test_f1_v1_decision_is_globally_eligible` to `::test_f12_runtime_projection_and_enforcement_inputs_unchanged`); three-state context `test_dg1f_c2_lifecycle_consolidation.py::test_1_unknown_context_conservatively_includes_and_never_claims_a_match`, `::test_1b_context_states_are_distinct_and_validated` | yes | supported |
-| F13 | waiver fixtures, incl. expiry at an explicit `as_of` and out-of-scope waivers | none | n/a | **blocked** (DG1B2: no verified, decision-version-bound waiver case) |
+| F13 | waiver fixtures, incl. expiry at an explicit `as_of` and out-of-scope waivers | expiry at an explicit `as_of`: `test_dg1b2a_canonical_waivers.py::test_2_time_bound_waiver_applies_only_inside_window` (inside, before `valid_from`, at `valid_until`, missing and unparseable `as_of`); out-of-scope: `::test_3_labels_not_matching_or_not_supplied_leave_decision_effective`; positive: `::test_1_cncf_modelled_waiver_applies_only_with_matching_labels`; revoked and version-bound: `::test_4_revoked_waiver_never_applies_and_is_retained`, `::test_5_waiver_bound_to_another_version_never_applies_and_is_reported`; lifecycle and applicability ordering: `::test_11_waiver_on_superseded_decision_is_not_evaluated`, `::test_11_not_applicable_decision_is_not_waived`; change explanation: `::test_11_resolve_change_reports_effect_but_is_not_a_waiver_audit` | yes | supported (added with DG1B2a, #787) |
 
 Notes:
 
 - F12a is counted with F12 in §0 (applicability fixtures are added by their
   slice under §13; they are supported).
+- **F13 scope, precisely:** the fixtures pin DG1B2a **resolver** semantics,
+  which ADR-031 §13 asks for. They do not exercise any runtime consumer acting
+  on a waiver: DG1B2b (waiver-aware enforcement) is deferred with C1b
+  ([readiness assessment](../plans/2026-11-10-dg1b2b-readiness-assessment.md),
+  #788), and no authoritative surface consumes waivers.
 - **F10 gap, precisely:** the evidence distinctions (configured, execution
   observed, relevant enforcement observed) are established and reviewed by
   the Verification track, but no test in the DG1 suite asserts that a DG1
@@ -83,7 +91,7 @@ Notes:
 | # | Control (#497, 7 Nov intake) | CI side | Host side | Class |
 |---|---|---|---|---|
 | G1 | Self-authorization negative: a change alters its own memory, rule, waiver, authority source or instructions and introduces a violation | pinned: CI1 live V2/V3/V3a (#540); C4 `test_adr033_c4_ci_gate.py::test_symlink_and_submodule_on_protected_paths_are_policy_refusals_not_mode`, `::test_valid_trusted_surface_entries_protect_their_paths`, `::test_path_refusals`; R0 S7 records `.mneme/` changes merge only through the human bypass | not tested: no host test of a change that alters its own governance inputs (the related wrong-source observation is recorded under G3) | **unevaluated** (host side) |
-| G2 | Authorized transition positive: a distinct human approves a governance revision or waiver through the accepted path; a previous PASS cannot be reused for a new authority state | background only: C4 and R0 S7 record a procedural human bypass for `.mneme/` changes. That is not a positive test of an authorized, version-bound transition; no test binds approver identity, decision version, scope and effective time | none | **unevaluated** |
+| G2 | Authorized transition positive: a distinct human approves a governance revision or waiver through the accepted path; a previous PASS cannot be reused for a new authority state | background only: C4 and R0 S7 record a procedural human bypass for `.mneme/` changes. That is not a positive test of an authorized, version-bound transition. Since DG1B2a (#787) the waiver **record** binds distinct requester and approver claims, the exact decision version, scope and an optional window (`test_dg1b2a_canonical_waivers.py::test_7_waive_refusals_change_nothing`, `::test_9_load_guards_hold_even_with_a_consistent_id`), but identities are unauthenticated claims and nothing tests the accepted approval path or PASS reuse | none | **unevaluated** |
 | G3 | Host boundary: missing local declaration, removed hook, changed tool configuration or altered workflow is never an authoritative PASS | partial: C4 O4/O5 (missing or malformed base memory → UNEVALUATED), `test_adr033_c4_ci_gate.py::test_unnormalizable_path_is_refused_for_every_status_and_mode`; R0 S7 records the R6 administrator-credential exposure | partial, with a **known bounded host risk**: [T-08 D6 C4](dg1f-t08-d6-mneme-memory-c4-live-2026-10-16.md) observed a wrong-source **false complete PASS** (an uncommitted `.claude/settings.local.json` `env.MNEME_MEMORY` redirected enforcement to another repository's memory). The same record shows the agent's attempted local-settings edit was denied by the host, so no agent-controlled bypass is established. Also: ADR-033 availability (opt-in), `test_dg1f_g4_cli_memory_failures.py` (corrupt memory is an operational error); hook removal and administrator bypass remain possible | **partial** |
 
 Ownership (unchanged from #497): DG1 owns canonical decision and waiver
@@ -100,7 +108,9 @@ and CI1, not to a DG1 implementation slice.
 
 ## 5. What would be needed before any DG1G closeout (not authorized here)
 
-1. DG1B2 delivered under its own evidence gate, with F13 waiver fixtures.
+1. ~~DG1B2 delivered under its own evidence gate, with F13 waiver
+   fixtures.~~ DG1B2a delivered with F13 fixtures (#787). DG1B2b is deferred
+   with C1b (#788), so the ADR-031 §11 sequence is still incomplete (item 4).
 2. A DG1-mapped test for F10.
 3. A decision, with CI1 and T-08, on the host-side G1–G3 controls.
 4. The remaining ADR-031 §11 sequence complete or explicitly scoped by an
@@ -111,7 +121,11 @@ BLOCKED is counted as passed.
 
 ## 6. Non-claims
 
-No DG1G, DG1F or DG1 completion is claimed. No test was added. All 56 cited
+No DG1G, DG1F or DG1 completion is claimed. No test was added.
+**2026-11-10 update:** the eight F13 test IDs were checked to exist by
+collection at `d0a1b1d8`; `test_dg1b2a_canonical_waivers.py` is in
+`GATE_PATHS` and not in `GATE_EXCLUSIONS`, and ran locally on Windows at
+that anchor: 81 passed, 0 failed. The original anchor figures follow. All 56 cited
 test IDs were checked to exist by collection at the anchor, and every cited
 test file was run locally on Windows at the anchor: 745 passed, 5 skipped,
 0 failed. Gate membership was read from `GATE_PATHS` and `GATE_EXCLUSIONS` in
