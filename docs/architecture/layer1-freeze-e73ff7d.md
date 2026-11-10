@@ -2248,8 +2248,11 @@ Before DG1B2a implementation can merge:
 1. **DG1B2b / waiver-aware DG1F convergence.** No CLI, enforcer,
    `ConflictDetector`, projection, protection, Audit, readiness, evidence,
    hook, CI gate, MCP surface, C3a consumer or production decision set may
-   exclude or treat differently a decision because of a waiver. The C1a
-   display above is the only waiver-aware output and stays non-authoritative.
+   exclude or treat differently a decision because of a waiver. Among
+   existing runtime-consumer displays, C1a is the only permitted waiver-aware
+   output, and it remains non-authoritative. The separately authorized DG1B2a
+   resolver, change-reporting and listing interfaces do not alter enforcement
+   inputs or authoritative consumer behavior.
 2. **DG1F-C1b**, a trusted context source or a trusted `as_of` source; any
    change to `GovernanceContext` validation.
 3. **Global (unscoped), rule-level or path-scoped waivers**; licence
