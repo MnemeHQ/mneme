@@ -457,6 +457,29 @@ def test_8_other_authority_writers_preserve_waivers() -> None:
     assert [w.waiver_id for w in _index(upgraded).waivers] == [waiver_id]
 
 
+def test_8_proposal_acceptance_writer_preserves_and_never_creates_waivers() -> None:
+    document, waiver_id = _waive(_base())
+    accepted = persistence.append_initial_canonical_decision(
+        document,
+        decision_id="ACC-001",
+        statement="Accepted proposal",
+        rationale="",
+        context_scope=["general"],
+        lifecycle_status="active",
+        created_at=CREATED,
+        updated_at=CREATED,
+        occurrence_source_identity=["proposal", "dprop-test"],
+        source_evidence=[{
+            "source_type": "runtime", "source_locator": "",
+            "source_revision": "", "observed_at": "", "verification_status": "",
+        }],
+    )
+    accepted = accepted[0] if isinstance(accepted, tuple) else accepted
+    index = _index(accepted)
+    assert "ACC-001" in {r.decision_id for r in index.records}
+    assert [w.waiver_id for w in index.waivers] == [waiver_id]
+
+
 # ── 9. v2 contract: closed key sets, feature gating ───────────────────────
 
 
@@ -509,6 +532,47 @@ def test_9_malformed_waiver_rows_refuse_the_document(mutate) -> None:
     document, _ = _waive(_base())
     mutate(document["decision_index"]["waivers"][0])
     with pytest.raises(DecisionIndexPersistenceError):
+        _index(document)
+
+
+def _rehash(row: dict) -> None:
+    """Recompute ``waiver_id`` so only the guard under test can refuse."""
+    row["waiver_id"] = waiver_id_of(
+        target_decision_id=row["target_decision_id"],
+        target_decision_version_id=row["target_decision_version_id"],
+        required_labels=row["scope"]["required_labels"],
+        valid_from=row.get("valid_from"),
+        valid_until=row.get("valid_until"),
+        requester=row["requester"],
+        approver=row["approver"],
+        approval_reference=row["approval_reference"],
+        reason=row["reason"],
+    )
+
+
+@pytest.mark.parametrize(
+    ("mutate", "message"),
+    [
+        (lambda r: r.update(approver=r["requester"]), "must differ from requester"),
+        (lambda r: r["scope"].update(required_labels=[]), "must be non-empty"),
+        (
+            lambda r: r.update(
+                valid_from="2026-07-01T00:00:00Z", valid_until="2026-05-01T00:00:00Z"
+            ),
+            "earlier than valid_until",
+        ),
+        (lambda r: r.update(reason="   "), "must not be blank"),
+        (lambda r: r.update(approver=" "), "must not be blank"),
+    ],
+    ids=["same-identities", "empty-scope", "inverted-window", "blank-reason",
+         "blank-approver"],
+)
+def test_9_load_guards_hold_even_with_a_consistent_id(mutate, message) -> None:
+    document, _ = _waive(_base())
+    row = document["decision_index"]["waivers"][0]
+    mutate(row)
+    _rehash(row)
+    with pytest.raises(DecisionIndexPersistenceError, match=message):
         _index(document)
 
 

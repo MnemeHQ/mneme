@@ -148,7 +148,6 @@ WAIVER_STATUS_ACTIVE = "active"
 WAIVER_STATUS_REVOKED = "revoked"
 WAIVER_STATUSES = frozenset({WAIVER_STATUS_ACTIVE, WAIVER_STATUS_REVOKED})
 WAIVER_ID_PREFIX = "wvr-"
-_WAIVER_ID_PATTERN = re.compile(r"wvr-[0-9a-f]{32}")
 # RFC 3339 UTC instants in exactly one shape, so no time normalization exists
 # (charter §3.1.2).
 WAIVER_TIMESTAMP_PATTERN = re.compile(
@@ -2114,7 +2113,13 @@ def _parse_waiver_row(raw_row: object, index: int) -> CanonicalWaiverRecord:
             )
 
     def text(key: str) -> str:
-        return _require_str(row.get(key), f"{label}.{key}", non_empty=True)
+        value = _require_str(row.get(key), f"{label}.{key}", non_empty=True)
+        if not value.strip():
+            # Same rule as the writer: a blank identity or reference is absent.
+            raise DecisionIndexPersistenceError(
+                f"{label}.{key} must not be blank"
+            )
+        return value
 
     waiver_id = text("waiver_id")
     target = text("target_decision_id")
