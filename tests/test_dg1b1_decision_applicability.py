@@ -204,8 +204,12 @@ def test_v1_row_applicability_is_ignored_and_globally_eligible() -> None:
 
 
 def test_v2_rejects_unknown_root_key() -> None:
+    # DG1B2a made ``waivers`` a known, feature-gated root key (charter #784
+    # §3.1.1); an undeclared ``waivers`` array still fails closed, pinned in
+    # tests/test_dg1b2a_canonical_waivers.py. The closed-root rule is pinned
+    # here with a key no slice defines.
     document = _v2(_decision("A"))
-    document["decision_index"]["waivers"] = []
+    document["decision_index"]["exceptions"] = []
     with pytest.raises(DecisionIndexPersistenceError, match="unsupported fields"):
         load_persisted_decision_index(document["decision_index"])
 

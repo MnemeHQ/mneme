@@ -529,7 +529,8 @@ def test_mcp_six_tool_inventory_unchanged():
 
 
 def test_authority_cli_keeps_the_four_command_surface(tmp_path, capsys):
-    """`mneme decision` remains proposals | show | accept | reject."""
+    """`mneme decision` keeps proposals | show | accept | reject, plus only the
+    DG1B2a waiver authority commands (charter #784 §3.3, freeze #785)."""
     store_path = tmp_path / "decision_proposals.json"
     store_path.write_text(
         json.dumps({"schema": PROPOSALS_SCHEMA, "proposals": []}) + "\n",
@@ -539,4 +540,4 @@ def test_authority_cli_keeps_the_four_command_surface(tmp_path, capsys):
         main(["decision", "--help"])
     assert excinfo.value.code == 0
     out = capsys.readouterr().out
-    assert "{proposals,show,accept,reject}" in out
+    assert "{proposals,show,accept,reject,waive,revoke-waiver,waivers}" in out

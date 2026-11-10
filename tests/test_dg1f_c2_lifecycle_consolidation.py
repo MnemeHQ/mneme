@@ -273,13 +273,15 @@ def test_7_resolutions_from_other_semantics_or_context_states_are_not_comparable
     index = load_decision_index_from_memory_file(_memory("canonical_v2_applicability"))
     current = resolve_effective(index)
     assert current.semantics_version == GOVERNANCE_SEMANTICS_VERSION
-    assert GOVERNANCE_SEMANTICS_VERSION.endswith("/dg1f-c2-1")
+    # DG1B2a (charter #784 §3.7) bumped the id deliberately from dg1f-c2-1.
+    assert GOVERNANCE_SEMANTICS_VERSION.endswith("/dg1b2a-1")
 
-    older = dataclasses.replace(
-        current, semantics_version="mneme.governance-semantics/dg1b1-1"
-    )
-    with pytest.raises(ValueError, match="different governance semantics"):
-        compare_resolutions(older, current)
+    for previous in ("dg1b1-1", "dg1f-c2-1"):
+        older = dataclasses.replace(
+            current, semantics_version=f"mneme.governance-semantics/{previous}"
+        )
+        with pytest.raises(ValueError, match="different governance semantics"):
+            compare_resolutions(older, current)
 
     supplied = resolve_effective(index, GovernanceContext(labels=()))
     with pytest.raises(ValueError, match="different contexts"):

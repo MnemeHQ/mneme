@@ -2019,6 +2019,125 @@ def _cmd_decision_reject(args: argparse.Namespace) -> int:
     return 0
 
 
+# ── Subcommands: decision waive | revoke-waiver | waivers (DG1B2a) ──────────
+
+
+def _waiver_payload(waiver) -> dict:
+    from mneme.decision_index_persistence import waiver_row
+    return waiver_row(waiver)
+
+
+def _print_waiver(waiver) -> None:
+    window = ""
+    if waiver.valid_from or waiver.valid_until:
+        window = f" window=[{waiver.valid_from or '-'}, {waiver.valid_until or '-'})"
+    print(
+        f"{waiver.waiver_id} {waiver.status} decision={waiver.target_decision_id} "
+        f"version={waiver.target_decision_version_id} "
+        f"labels={','.join(waiver.required_labels)}{window}"
+    )
+    print(f"  requester={waiver.requester} approver={waiver.approver}")
+    print(f"  approval={waiver.approval_reference}")
+    print(f"  reason={waiver.reason}")
+    if waiver.status == "revoked":
+        print(
+            f"  revoked_by={waiver.revoked_by} "
+            f"reference={waiver.revocation_reference} reason={waiver.revocation_reason}"
+        )
+
+
+_WAIVER_NOTE = (
+    "Note: DG1B2a waivers are recorded and explained only. They do not "
+    "change what mneme check, hooks, CI, MCP, Audit or protection enforce or "
+    "report. Identities are recorded claims, not authenticated."
+)
+
+
+def _waiver_error_exit(exc: Exception, memory: str) -> int:
+    from mneme.decision_index_persistence import DecisionWaiverRefused
+    from mneme.decision_waiver_authority import WaiverAuthorityError
+    if isinstance(exc, DecisionIndexMigrationRequired):
+        return _error_exit(f"{exc} (memory: {memory})")
+    if isinstance(exc, DecisionWaiverRefused):
+        return _authority_error_exit(f"waiver refused: {exc}")
+    if isinstance(exc, DecisionIndexPersistenceError):
+        return _error_exit(
+            f"the canonical Decision Index in {memory} is invalid; waiver "
+            f"operations never repair it: {exc}"
+        )
+    if isinstance(exc, WaiverAuthorityError):
+        return _authority_error_exit(exc)
+    raise exc
+
+
+def _cmd_decision_waive(args: argparse.Namespace) -> int:
+    """Record a canonical waiver (explicit human authority action, §3.3)."""
+    from mneme.decision_waiver_authority import waive
+    try:
+        result = waive(
+            args.memory,
+            target_decision_id=args.decision_id,
+            required_labels=list(args.label or []),
+            requester=args.requester,
+            approver=args.approver,
+            approval_reference=args.approval_reference,
+            reason=args.reason,
+            valid_from=args.valid_from,
+            valid_until=args.valid_until,
+            target_decision_version_id=args.version_id,
+        )
+    except Exception as exc:  # mapped deterministically; others re-raise
+        return _waiver_error_exit(exc, args.memory)
+    print(f"Waived: {result.waiver_id}")
+    _print_waiver(result.waiver)
+    print()
+    print(_WAIVER_NOTE)
+    return 0
+
+
+def _cmd_decision_revoke_waiver(args: argparse.Namespace) -> int:
+    """Revoke a canonical waiver; the record is retained (§3.3)."""
+    from mneme.decision_waiver_authority import revoke_waiver
+    try:
+        result = revoke_waiver(
+            args.memory,
+            waiver_id=args.waiver_id,
+            revoked_by=args.revoked_by,
+            revocation_reference=args.revocation_reference,
+            reason=args.reason,
+        )
+    except Exception as exc:
+        return _waiver_error_exit(exc, args.memory)
+    print(f"Revoked: {result.waiver_id}")
+    _print_waiver(result.waiver)
+    return 0
+
+
+def _cmd_decision_waivers(args: argparse.Namespace) -> int:
+    """List canonical waivers, active and revoked (read-only, §3.7)."""
+    from mneme.decision_waiver_authority import list_waivers
+    try:
+        waivers = list_waivers(args.memory)
+    except Exception as exc:
+        return _waiver_error_exit(exc, args.memory)
+    if args.json:
+        print(json.dumps(
+            {
+                "schema": "mneme.decision-waivers/v1",
+                "waivers": [_waiver_payload(w) for w in waivers],
+            },
+            indent=2,
+            ensure_ascii=True,
+        ))
+        return 0
+    if not waivers:
+        print("No waivers recorded.")
+        return 0
+    for waiver in waivers:
+        _print_waiver(waiver)
+    return 0
+
+
 # ── Subcommand: research open-architecture ───────────────────────────────────
 
 def _cmd_research_o1a_validate(args: argparse.Namespace) -> int:
@@ -2800,7 +2919,8 @@ def _build_parser() -> argparse.ArgumentParser:
         "decision",
         help=(
             "Decision proposal inspection and human authority actions "
-            "(proposals | show | accept | reject). A thin adapter over the "
+            "(proposals | show | accept | reject | waive | revoke-waiver | "
+            "waivers). A thin adapter over the "
             "Core DecisionAuthorityService; accept/reject are explicit "
             "human authority actions, never producer/MCP capabilities."
         ),
@@ -2897,6 +3017,74 @@ def _build_parser() -> argparse.ArgumentParser:
         ),
     )
     p_decision_reject.set_defaults(func=_cmd_decision_reject)
+
+    # DG1B2a canonical waivers (charter #784 §3.3; freeze amendment #785).
+    # Explicit local human authority actions only; never MCP or producers.
+    p_decision_waive = decision_sub.add_parser(
+        "waive",
+        help=(
+            "Record a canonical, label-scoped waiver for an active decision "
+            "version (explicit human authority action; recorded and "
+            "explained only, never changes enforcement)"
+        ),
+    )
+    p_decision_waive.add_argument("decision_id", help="Canonical decision id to waive")
+    p_decision_waive.add_argument(
+        "--label", action="append", required=True, metavar="LABEL",
+        help="Required context label (repeatable; at least one)",
+    )
+    p_decision_waive.add_argument("--requester", required=True,
+                                  help="Opaque identity claim of who asked")
+    p_decision_waive.add_argument("--approver", required=True,
+                                  help="Opaque identity claim of who authorized (must differ)")
+    p_decision_waive.add_argument("--approval-reference", required=True,
+                                  dest="approval_reference",
+                                  help="Where the authorization is recorded")
+    p_decision_waive.add_argument("--reason", required=True,
+                                  help="Why the exception exists")
+    p_decision_waive.add_argument("--valid-from", dest="valid_from", default=None,
+                                  help="Optional RFC 3339 UTC start YYYY-MM-DDTHH:MM:SSZ")
+    p_decision_waive.add_argument("--valid-until", dest="valid_until", default=None,
+                                  help="Optional RFC 3339 UTC end (exclusive)")
+    p_decision_waive.add_argument(
+        "--version-id", dest="version_id", default=None,
+        help="Bound decision version (default and only accepted: the active version)",
+    )
+    p_decision_waive.add_argument(
+        "--memory", default=DEFAULT_MEMORY_PATH,
+        help=f"Path to project_memory.json (default: {DEFAULT_MEMORY_PATH})",
+    )
+    p_decision_waive.set_defaults(func=_cmd_decision_waive)
+
+    p_decision_revoke = decision_sub.add_parser(
+        "revoke-waiver",
+        help="Revoke a canonical waiver; the record is retained (explicit human authority action)",
+    )
+    p_decision_revoke.add_argument("waiver_id", help="Waiver id, e.g. wvr-…")
+    p_decision_revoke.add_argument("--revoked-by", required=True, dest="revoked_by",
+                                   help="Opaque identity claim of who revoked")
+    p_decision_revoke.add_argument("--revocation-reference", required=True,
+                                   dest="revocation_reference",
+                                   help="Where the revocation is recorded")
+    p_decision_revoke.add_argument("--reason", required=True,
+                                   help="Why the waiver is revoked")
+    p_decision_revoke.add_argument(
+        "--memory", default=DEFAULT_MEMORY_PATH,
+        help=f"Path to project_memory.json (default: {DEFAULT_MEMORY_PATH})",
+    )
+    p_decision_revoke.set_defaults(func=_cmd_decision_revoke_waiver)
+
+    p_decision_waivers = decision_sub.add_parser(
+        "waivers",
+        help="List canonical waivers, active and revoked (read-only)",
+    )
+    p_decision_waivers.add_argument("--json", action="store_true",
+                                    help="Emit mneme.decision-waivers/v1 JSON")
+    p_decision_waivers.add_argument(
+        "--memory", default=DEFAULT_MEMORY_PATH,
+        help=f"Path to project_memory.json (default: {DEFAULT_MEMORY_PATH})",
+    )
+    p_decision_waivers.set_defaults(func=_cmd_decision_waivers)
 
     # research
     p_research = sub.add_parser(

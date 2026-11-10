@@ -248,16 +248,48 @@ class CanonicalDecisionRecord:
 
 
 @dataclass(frozen=True)
+class CanonicalWaiverRecord:
+    """One persisted canonical waiver (DG1B2a, ADR-031 §12).
+
+    Charter docs/plans/2026-11-10-dg1b2-waiver-charter.md §3.1. A waiver is
+    its own canonical object: it targets an exact decision version, is scoped
+    by non-empty required labels and optionally by an RFC 3339 UTC window,
+    and never mutates the decision it targets. Only the explicit authority
+    operations write it. ``valid_from`` / ``valid_until`` / ``revoked_by`` /
+    ``revocation_reference`` / ``revocation_reason`` are empty when absent.
+    """
+
+    waiver_id: str
+    target_decision_id: str
+    target_decision_version_id: str
+    required_labels: tuple[str, ...]
+    requester: str
+    approver: str
+    approval_reference: str
+    reason: str
+    status: str
+    created_at: str
+    valid_from: str = ""
+    valid_until: str = ""
+    revoked_by: str = ""
+    revocation_reference: str = ""
+    revocation_reason: str = ""
+
+
+@dataclass(frozen=True)
 class CanonicalArchitectureIndex:
     """D0 canonical Decision Index contents for the architecture class.
 
     A flat, ordered pair of decision records and derived rule records.
     Records appear in adapter input order; rules appear grouped by owning
-    decision, in derived order. This is an in-memory view, not storage.
+    decision, in derived order. ``waivers`` (DG1B2a) are sorted by
+    ``waiver_id`` and empty unless the persisted v2 document declares
+    ``decision_waivers``. This is an in-memory view, not storage.
     """
 
     records: tuple[CanonicalDecisionRecord, ...] = ()
     rules: tuple[CanonicalRuleRecord, ...] = ()
+    waivers: tuple[CanonicalWaiverRecord, ...] = ()
 
     def rules_for_decision(self, decision_id: str) -> tuple[CanonicalRuleRecord, ...]:
         """Return the rules whose ``decision_id`` matches, in derived order."""
