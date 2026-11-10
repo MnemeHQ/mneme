@@ -17,10 +17,10 @@
 | Classification | Count | Items |
 |---|---|---|
 | supported | 11 | §13 fixtures F1–F9, F11, F12 |
-| partial | 3 | F10 (ADR-029 §6), G2 authorized-transition control, G3 host-boundary control |
+| partial | 2 | F10 (ADR-029 §6), G3 host-boundary control |
 | missing | 0 | none beyond the partials |
 | blocked | 1 | F13 waiver fixtures (DG1B2 has no qualifying case) |
-| unevaluated | 1 | G1 self-authorization control on the host side |
+| unevaluated | 2 | G1 self-authorization control (host side), G2 authorized-transition control |
 
 Two obligations are kept separate (§4): the **ADR-031 §13 fixture floor**
 (owned by DG1) and the roadmap's **cross-cutting four-layer acceptance test**
@@ -39,8 +39,14 @@ DG1G gate without an explicit architectural decision.
 - **unevaluated:** a test or run is possible but has not been performed; it
   is never counted as passed.
 
-Test IDs are relative to `tests/`. "Gate" means the test file is in the
-`gate` manifest of `scripts/run_test_battery.py`.
+Test IDs are relative to `tests/`. "Gate" means the test file is in
+`GATE_PATHS` of `scripts/run_test_battery.py`; a file listed in
+`GATE_EXCLUSIONS` runs only in the `main` battery and is cited as
+supplementary evidence, never as the basis of a "supported" classification.
+
+This is a **fixture-to-test mapping**, not a complete inventory: where a row
+cites a whole suite or a range (F12, F12a), the named test IDs are
+representative, and the suite as a whole is the pinning evidence.
 
 ## 2. ADR-031 §13 fixture floor
 
@@ -55,7 +61,7 @@ Test IDs are relative to `tests/`. "Gate" means the test file is in the
 | F7 | lifecycle exclusion with honest `lifecycle_inactive` cause | `test_dg1c_effective_resolver.py::test_ineffective_causes_follow_lifecycle_and_never_guess`, `::test_unknown_lifecycle_fails_closed`; `test_dg1f_c2_lifecycle_consolidation.py::test_5_widening_the_authority_moves_every_consumer` | yes | supported |
 | F8 | input-order invariance | `test_dg1c_effective_resolver.py::test_input_order_invariance`; `test_dg1d_change_resolution.py::test_change_set_is_input_order_invariant`; `test_dg1b1_decision_applicability.py::test_resolution_is_invariant_to_record_order`, `::test_label_set_is_order_and_duplicate_invariant` | yes | supported |
 | F9 | irrelevant-decision invariance; context-path invariance for the parity resolver | `test_dg1c_effective_resolver.py::test_irrelevant_decision_invariance`, `::test_context_invariance_for_v1_semantics`; `test_dg1b1_decision_applicability.py::test_irrelevant_context_labels_do_not_change_the_result` | yes | supported |
-| F10 | configured versus execution-observed evidence (ADR-029 §6) | no DG1-mapped test. Evidence: [#761 audit](adr029-evidence-completeness-audit-2026-11-08.md) (E-1, E-8), [Verification step 3](verification-step3-e2e-fixture-2026-11-09.md), [step 4](verification-step4-independent-review-2026-11-09.md); `test_adr034_g2_1_harness.py::test_observed_disposition` (numeric path only) | n/a | **partial** |
+| F10 | configured versus execution-observed evidence (ADR-029 §6) | no DG1-mapped test. Evidence: [#761 audit](adr029-evidence-completeness-audit-2026-11-08.md) (E-1, E-8), [Verification step 3](verification-step3-e2e-fixture-2026-11-09.md), [step 4](verification-step4-independent-review-2026-11-09.md); supplementary, main-only (`GATE_EXCLUSIONS`): `test_adr034_g2_1_harness.py::test_observed_disposition` (numeric path only) | no | **partial** |
 | F11 | canonical rule identity through enforcement; section-less fail-closed evidence | `test_dg1e_evidence_identity.py::test_runtime_rule_id_equals_persisted_rule_id`, `::test_canonical_memory_trace_carries_complete_evidence_identity`, `::test_check_json_reports_canonical_identity`, `::test_adr_dir_view_uses_canonical_rule_ids_without_version_identity`, `::test_section_less_memory_has_rule_identity_but_fails_closed`, `::test_legacy_prose_violation_identity_is_incomplete`, `::test_verdicts_do_not_depend_on_evidence_identity` | yes | supported |
 | F12 | snapshot A → B change explanations | all 14 tests in `test_dg1d_change_resolution.py`, incl. `test_dg1d_change_resolution.py::test_supersession_moves_governance_and_rules`, `::test_version_evolution_reports_version_and_rule_changes`, `::test_persisted_snapshots_report_deprecation_and_retired_rules`, `::test_resolutions_from_different_semantics_are_not_comparable`; applicability: `test_dg1b1_functional_acceptance.py::test_f10_resolve_change_reports_governed_scope_change` | yes | supported |
 | F12a | applicability fixtures (added with DG1B1) | `test_dg1b1_decision_applicability.py` (62), the twelve F1–F12 tests in `test_dg1b1_functional_acceptance.py` (from `test_dg1b1_functional_acceptance.py::test_f1_v1_decision_is_globally_eligible` to `::test_f12_runtime_projection_and_enforcement_inputs_unchanged`); three-state context `test_dg1f_c2_lifecycle_consolidation.py::test_1_unknown_context_conservatively_includes_and_never_claims_a_match`, `::test_1b_context_states_are_distinct_and_validated` | yes | supported |
@@ -76,9 +82,9 @@ Notes:
 
 | # | Control (#497, 7 Nov intake) | CI side | Host side | Class |
 |---|---|---|---|---|
-| G1 | Self-authorization negative: a change alters its own memory, rule, waiver, authority source or instructions and introduces a violation | pinned: CI1 live V2/V3/V3a (#540); C4 `test_adr033_c4_ci_gate.py::test_symlink_and_submodule_on_protected_paths_are_policy_refusals_not_mode`, `::test_valid_trusted_surface_entries_protect_their_paths`, `::test_path_refusals`; R0 S7 records `.mneme/` changes merge only through the human bypass | not pinned: T-08 D6 C4 showed uncommitted local settings can redirect host memory (false complete PASS); no host test | **unevaluated** (host) |
-| G2 | Authorized transition positive: a distinct human approves a governance revision or waiver through the accepted path; a previous PASS cannot be reused for a new authority state | partial: C4 records a procedural human bypass for `.mneme/` changes; no test binds approver identity, scope and effective time | none | **partial** |
-| G3 | Host boundary: missing local declaration, removed hook, changed tool configuration or altered workflow is never an authoritative PASS | partial: C4 O4/O5 (missing or malformed base memory → UNEVALUATED), `test_adr033_c4_ci_gate.py::test_unnormalizable_path_is_refused_for_every_status_and_mode`; R0 S7 records the R6 administrator-credential exposure | partial: ADR-033 availability (opt-in), `test_dg1f_g4_cli_memory_failures.py` (corrupt memory is an operational error); hook removal and admin bypass remain possible | **partial** |
+| G1 | Self-authorization negative: a change alters its own memory, rule, waiver, authority source or instructions and introduces a violation | pinned: CI1 live V2/V3/V3a (#540); C4 `test_adr033_c4_ci_gate.py::test_symlink_and_submodule_on_protected_paths_are_policy_refusals_not_mode`, `::test_valid_trusted_surface_entries_protect_their_paths`, `::test_path_refusals`; R0 S7 records `.mneme/` changes merge only through the human bypass | not tested: no host test of a change that alters its own governance inputs (the related wrong-source observation is recorded under G3) | **unevaluated** (host side) |
+| G2 | Authorized transition positive: a distinct human approves a governance revision or waiver through the accepted path; a previous PASS cannot be reused for a new authority state | background only: C4 and R0 S7 record a procedural human bypass for `.mneme/` changes. That is not a positive test of an authorized, version-bound transition; no test binds approver identity, decision version, scope and effective time | none | **unevaluated** |
+| G3 | Host boundary: missing local declaration, removed hook, changed tool configuration or altered workflow is never an authoritative PASS | partial: C4 O4/O5 (missing or malformed base memory → UNEVALUATED), `test_adr033_c4_ci_gate.py::test_unnormalizable_path_is_refused_for_every_status_and_mode`; R0 S7 records the R6 administrator-credential exposure | partial, with a **known bounded host risk**: [T-08 D6 C4](dg1f-t08-d6-mneme-memory-c4-live-2026-10-16.md) observed a wrong-source **false complete PASS** (an uncommitted `.claude/settings.local.json` `env.MNEME_MEMORY` redirected enforcement to another repository's memory). The same record shows the agent's attempted local-settings edit was denied by the host, so no agent-controlled bypass is established. Also: ADR-033 availability (opt-in), `test_dg1f_g4_cli_memory_failures.py` (corrupt memory is an operational error); hook removal and administrator bypass remain possible | **partial** |
 
 Ownership (unchanged from #497): DG1 owns canonical decision and waiver
 authority and lifecycle; CI1 (#540) owns protected source, host credentials,
@@ -108,5 +114,8 @@ BLOCKED is counted as passed.
 No DG1G, DG1F or DG1 completion is claimed. No test was added. All 56 cited
 test IDs were checked to exist by collection at the anchor, and every cited
 test file was run locally on Windows at the anchor: 745 passed, 5 skipped,
-0 failed. Gate membership was read from `scripts/run_test_battery.py`. The CI and host evidence cited for §3 is from
+0 failed. Gate membership was read from `GATE_PATHS` and `GATE_EXCLUSIONS` in
+`scripts/run_test_battery.py`: every file cited for a supported fixture is in
+the gate; `test_adr034_g2_1_harness.py` is main-only and cited only as
+supplementary F10 evidence. The CI and host evidence cited for §3 is from
 the linked records, not re-run here.
