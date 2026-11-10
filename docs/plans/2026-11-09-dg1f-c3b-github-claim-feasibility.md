@@ -1,5 +1,13 @@
 # DG1F-C3b: `audit_with_github_claim` resolver-result feasibility (2026-11-09)
 
+> **Owner disposition (2026-11-09): findings accepted; charter and
+> implementation deferred.** C3b is technically feasible, but it adds a public
+> API with no current consumer and leaves two decisions unresolved (memory
+> containment inside `repo_root`, and working-tree versus HEAD binding of
+> memory, §3). It is revisited only when an actual consumer or a specific
+> architectural requirement justifies the new API. This record authorizes no
+> charter, ADR amendment, freeze amendment or implementation.
+
 **Status: read-only assessment.** It decides whether the authenticated Audit
 API can take its governed decision set from the resolver without weakening its
 evidence trust contract, and names the smallest defensible increment. It
@@ -36,8 +44,10 @@ unchanged at `5e252a17`.
   sole supported authenticated operation. A second entry point needs that
   wording amended to name both, in addition to the charter and freeze
   amendment (§3).
-- **Closure must be defined by entry point, not by "Audit family".** Every
-  entry point where Mneme loads memory would then use the resolver; the
+- **Closure must be defined by entry point, not by "Audit family".** C3b
+  would complete resolver convergence for Mneme-owned, memory-loading Audit
+  entry points only, not every Audit API. Every entry point where Mneme loads
+  memory would then use the resolver; the
   list-taking public library APIs (`audit_with_github_claim(decisions, …)`,
   `generate_protection_report`, `assess_protection`, `match_ci_evidence`)
   report on caller lists by contract and stay outside the claim (§6).
@@ -114,6 +124,12 @@ No in-package caller exists.
   that overlaps CI1's trusted-revision work. Recommended for C3b: working-tree
   memory with parity to `mneme audit`, the gap recorded; HEAD binding as a
   separate decision.
+- **Risk of implied binding.** A memory-loading authenticated entry point
+  could suggest that the CI evidence belongs to the same authoritative memory
+  snapshot. It does not: the chain authenticates only the GitHub run and its
+  artifact (ADR-024 `authenticated_ci_claim`, never verified execution), and
+  repository identity and API URL may be caller-supplied. Any C3b charter must
+  keep and document these limits.
 - **Also open: memory containment.** Neither path requires the memory file to
   lie inside `repo_root`. Memory from another repository would pair foreign
   decisions with this repository's HEAD-bound claim (selector files resolve
@@ -179,7 +195,7 @@ resolver result", not "the Audit family" or §11.
 
 | Candidate | Verdict | Reason |
 |---|---|---|
-| C3b: additive memory-loading authenticated entry point, parity, labels not supplied | **GO** (charter + freeze amendment) | feasible with exact parity; evidence chain untouched; no trust gap |
+| C3b: additive memory-loading authenticated entry point, parity, labels not supplied | **Feasible; deferred by the owner** (would need charter + ADR-024 wording amendment + freeze amendment) | exact parity; evidence chain untouched; but no consumer, and memory containment and revision binding unresolved |
 | Changing `audit_with_github_claim(decisions, …)` | NO-GO | breaks the existing public contract and its tests |
 | HEAD-bound memory for the authenticated path | not in C3b | new behavior; separate decision overlapping CI1 |
 | Explanation output, protection paths, enforcement inputs, C1b, DG1B2 | unchanged | deferred as before |
