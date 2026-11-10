@@ -28,8 +28,10 @@ from mneme.decision_index import (
     CanonicalRuleRecord,
     CanonicalSourceEvidence,
     CanonicalTestEvidence,
+    CanonicalWaiverRecord,
     VALID_BINDING_AUTHORITIES,
     VALID_LIFECYCLE_STATUSES,
+    lifecycle_governs,
 )
 from mneme.decision_projection import project_canonical_index
 from mneme.rule_identity import (
@@ -60,9 +62,14 @@ APPLICABILITY_FEATURE = "decision_applicability"
 # does not support it refuses the whole document instead of skipping rules.
 NUMERIC_UPPER_BOUND_FEATURE = "numeric_upper_bound_rule"
 NUMERIC_RULE_TYPE = "FORBID_NUMERIC_ABOVE"
+# DG1B2a (ADR-031 §12; charter docs/plans/2026-11-10-dg1b2-waiver-charter.md
+# §3.1): canonical waiver records live in the top-level v2 ``waivers`` array,
+# present if and only if this feature is declared.
+WAIVER_FEATURE = "decision_waivers"
 SUPPORTED_SEMANTIC_FEATURES = frozenset({
     APPLICABILITY_FEATURE,
     NUMERIC_UPPER_BOUND_FEATURE,
+    WAIVER_FEATURE,
 })
 
 # Closed semantic key sets (ADR-031 §8). Present only for v2; v1 keeps its
@@ -74,6 +81,7 @@ _V2_ROOT_KEYS = frozenset({
     "decisions",
     "versions",
     "rules",
+    "waivers",
 })
 _V2_DECISION_KEYS = frozenset({
     "decision_id",
@@ -114,6 +122,38 @@ _V2_RULE_KEYS = frozenset({
 _V2_RELATIONSHIP_KEYS = frozenset({"type", "target_decision_id"})
 _V2_TEST_EVIDENCE_KEYS = frozenset({"selector", "sha"})
 _V2_APPLICABILITY_KEYS = frozenset({"required_labels"})
+# DG1B2a waiver rows (charter §3.1, §3.1.1): closed key sets.
+_V2_WAIVER_KEYS = frozenset({
+    "waiver_id",
+    "target_decision_id",
+    "target_decision_version_id",
+    "scope",
+    "valid_from",
+    "valid_until",
+    "requester",
+    "approver",
+    "approval_reference",
+    "reason",
+    "status",
+    "revocation",
+    "created_at",
+})
+_V2_WAIVER_SCOPE_KEYS = frozenset({"required_labels"})
+_V2_WAIVER_REVOCATION_KEYS = frozenset({
+    "revoked_by",
+    "revocation_reference",
+    "reason",
+})
+WAIVER_STATUS_ACTIVE = "active"
+WAIVER_STATUS_REVOKED = "revoked"
+WAIVER_STATUSES = frozenset({WAIVER_STATUS_ACTIVE, WAIVER_STATUS_REVOKED})
+WAIVER_ID_PREFIX = "wvr-"
+_WAIVER_ID_PATTERN = re.compile(r"wvr-[0-9a-f]{32}")
+# RFC 3339 UTC instants in exactly one shape, so no time normalization exists
+# (charter §3.1.2).
+WAIVER_TIMESTAMP_PATTERN = re.compile(
+    r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z"
+)
 
 # ADR-031 §8a namespaced ``extensions`` key contract. Validation is syntactic
 # only: the grammar below is checked, but domain ownership, producer identity,
@@ -210,6 +250,65 @@ def version_id_of(
         predecessor,
     ])
     return f"dver-{digest[:32]}"
+
+
+
+# ── DG1B2a canonical waiver identity (charter §3.1.2) ──────────────────────
+
+
+def normalize_waiver_labels(labels: list[str] | tuple[str, ...]) -> list[str]:
+    """Sorted, de-duplicated waiver scope labels (DG1B1 normalization)."""
+    return sorted(set(labels))
+
+
+def waiver_id_of(
+    *,
+    target_decision_id: str,
+    target_decision_version_id: str,
+    required_labels: list[str] | tuple[str, ...],
+    valid_from: str | None,
+    valid_until: str | None,
+    requester: str,
+    approver: str,
+    approval_reference: str,
+    reason: str,
+) -> str:
+    """Deterministic waiver identity over the creation fields only.
+
+    Public contract (charter §3.1.2; Layer 1 freeze amendment #785):
+    ``"wvr-" + sha256_hex(payload)[:32]`` with the ADR-030 helpers in
+    ``mneme.rule_identity``, where ``payload`` is, in this order,
+    ``[target_decision_id, target_decision_version_id, required_labels,
+    valid_from, valid_until, requester, approver, approval_reference,
+    reason]``. Labels are sorted and de-duplicated; an absent window bound is
+    ``None`` (JSON ``null``). Every other string is hashed exactly as written.
+    ``status``, ``revocation`` and ``created_at`` never participate.
+    """
+    payload = [
+        target_decision_id,
+        target_decision_version_id,
+        normalize_waiver_labels(required_labels),
+        valid_from or None,
+        valid_until or None,
+        requester,
+        approver,
+        approval_reference,
+        reason,
+    ]
+    return f"{WAIVER_ID_PREFIX}{sha256_hex(payload)[:32]}"
+
+
+def is_waiver_timestamp(value: object) -> bool:
+    """Whether ``value`` is an RFC 3339 UTC instant ``YYYY-MM-DDTHH:MM:SSZ``."""
+    from datetime import datetime
+
+    if not isinstance(value, str) or not WAIVER_TIMESTAMP_PATTERN.fullmatch(value):
+        return False
+    try:
+        datetime.strptime(value, "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError:
+        return False
+    return True
 
 
 def _require_dict(value: object, label: str) -> dict[str, Any]:
@@ -1008,6 +1107,229 @@ def set_decision_applicability(
     return migrated, changed
 
 
+class DecisionWaiverRefused(DecisionIndexPersistenceError):
+    """A waiver authority operation was refused; nothing was written."""
+
+
+def _require_waiver_section(document: dict[str, Any]) -> tuple[
+    dict[str, Any], dict[str, Any]
+]:
+    migrated = require_canonical_document(document)
+    section = copy.deepcopy(
+        _require_dict(migrated["decision_index"], "decision_index")
+    )
+    if section.get("schema") != DECISION_INDEX_SCHEMA_V2:
+        raise DecisionIndexMigrationRequired(
+            "decision waivers require mneme.decision-index/v2; upgrade "
+            "project memory with `mneme decision-index migrate --to-v2` first"
+        )
+    # Verify the canonical state before mutating (ADR-030 writer discipline).
+    load_persisted_decision_index(section)
+    return migrated, section
+
+
+def add_decision_waiver(
+    document: dict[str, Any],
+    *,
+    target_decision_id: str,
+    required_labels: list[str] | tuple[str, ...],
+    requester: str,
+    approver: str,
+    approval_reference: str,
+    reason: str,
+    created_at: str,
+    valid_from: str | None = None,
+    valid_until: str | None = None,
+    target_decision_version_id: str | None = None,
+) -> tuple[dict[str, Any], str]:
+    """Add one canonical waiver (DG1B2a charter §3.3). Returns ``(doc, id)``.
+
+    A persistence primitive: the caller owns authority and persists the
+    returned document atomically. Refuses (``DecisionWaiverRefused``, nothing
+    changed) unless the target exists, is lifecycle-active, the bound version
+    is its active version, scope is non-empty, every identity field is
+    present, ``approver != requester`` and the window is well formed. Refuses
+    re-issuing an existing ``waiver_id``, including a revoked one. v1 memory
+    raises ``DecisionIndexMigrationRequired``. Never repairs, never migrates.
+    """
+    migrated, section = _require_waiver_section(document)
+    for name, value in (
+        ("target decision id", target_decision_id),
+        ("requester", requester),
+        ("approver", approver),
+        ("approval reference", approval_reference),
+        ("reason", reason),
+    ):
+        if not isinstance(value, str) or not value.strip():
+            raise DecisionWaiverRefused(f"waiver {name} is required")
+    if isinstance(required_labels, str) or not isinstance(
+        required_labels, (list, tuple)
+    ):
+        raise DecisionWaiverRefused(
+            "waiver labels must be a list of non-empty strings"
+        )
+    for label in required_labels:
+        if not isinstance(label, str) or not label:
+            raise DecisionWaiverRefused("waiver labels must be non-empty strings")
+    labels = normalize_waiver_labels(required_labels)
+    if not labels:
+        raise DecisionWaiverRefused(
+            "waiver scope must name at least one label (DG1B2a waivers are "
+            "label-scoped; retire a decision through its lifecycle instead)"
+        )
+    if approver == requester:
+        raise DecisionWaiverRefused("waiver approver must differ from requester")
+    for name, value in (("valid_from", valid_from), ("valid_until", valid_until)):
+        if value is not None and not is_waiver_timestamp(value):
+            raise DecisionWaiverRefused(
+                f"waiver {name} must be an RFC 3339 UTC instant "
+                "YYYY-MM-DDTHH:MM:SSZ"
+            )
+    if valid_from and valid_until and not valid_from < valid_until:
+        raise DecisionWaiverRefused("waiver valid_from must be earlier than valid_until")
+    if not is_waiver_timestamp(created_at):
+        raise DecisionWaiverRefused(
+            "waiver created_at must be an RFC 3339 UTC instant"
+        )
+
+    index = load_persisted_decision_index(section)
+    record = next(
+        (r for r in index.records if r.decision_id == target_decision_id), None
+    )
+    if record is None:
+        raise DecisionWaiverRefused(
+            f"decision {target_decision_id!r} does not exist canonically"
+        )
+    if not lifecycle_governs(record.lifecycle_status):
+        raise DecisionWaiverRefused(
+            f"decision {target_decision_id!r} is {record.lifecycle_status}; "
+            "only a lifecycle-active decision can be waived"
+        )
+    bound_version = target_decision_version_id or record.version_id
+    if bound_version != record.version_id:
+        raise DecisionWaiverRefused(
+            f"version {bound_version!r} is not the active version "
+            f"{record.version_id!r} of decision {target_decision_id!r}"
+        )
+    waiver_id = waiver_id_of(
+        target_decision_id=target_decision_id,
+        target_decision_version_id=bound_version,
+        required_labels=labels,
+        valid_from=valid_from,
+        valid_until=valid_until,
+        requester=requester,
+        approver=approver,
+        approval_reference=approval_reference,
+        reason=reason,
+    )
+    if any(w.waiver_id == waiver_id for w in index.waivers):
+        raise DecisionWaiverRefused(
+            f"waiver {waiver_id!r} already exists; a revoked waiver is never "
+            "re-issued with identical creation fields"
+        )
+    row: dict[str, Any] = {
+        "waiver_id": waiver_id,
+        "target_decision_id": target_decision_id,
+        "target_decision_version_id": bound_version,
+        "scope": {"required_labels": labels},
+    }
+    if valid_from:
+        row["valid_from"] = valid_from
+    if valid_until:
+        row["valid_until"] = valid_until
+    row.update({
+        "requester": requester,
+        "approver": approver,
+        "approval_reference": approval_reference,
+        "reason": reason,
+        "status": WAIVER_STATUS_ACTIVE,
+        "created_at": created_at,
+    })
+    rows = list(section.get("waivers", [])) + [row]
+    section["waivers"] = sorted(rows, key=lambda item: item["waiver_id"])
+    features = list(section.get("semantic_features", []))
+    if WAIVER_FEATURE not in features:
+        features.append(WAIVER_FEATURE)
+    section["semantic_features"] = sorted(set(features))
+    migrated["decision_index"] = section
+    load_persisted_decision_index(section)
+    return migrated, waiver_id
+
+
+def revoke_decision_waiver(
+    document: dict[str, Any],
+    *,
+    waiver_id: str,
+    revoked_by: str,
+    revocation_reference: str,
+    reason: str,
+) -> dict[str, Any]:
+    """Revoke one canonical waiver (DG1B2a charter §3.3).
+
+    Sets ``status`` to ``revoked`` and adds ``revocation``; the record and its
+    id are retained. Refuses an unknown or already revoked waiver and missing
+    revocation fields.
+    """
+    migrated, section = _require_waiver_section(document)
+    for name, value in (
+        ("revoked_by", revoked_by),
+        ("revocation reference", revocation_reference),
+        ("revocation reason", reason),
+    ):
+        if not isinstance(value, str) or not value.strip():
+            raise DecisionWaiverRefused(f"waiver {name} is required")
+    rows = section.get("waivers", [])
+    row = next(
+        (
+            item for item in rows
+            if isinstance(item, dict) and item.get("waiver_id") == waiver_id
+        ),
+        None,
+    )
+    if row is None:
+        raise DecisionWaiverRefused(f"waiver {waiver_id!r} does not exist")
+    if row.get("status") == WAIVER_STATUS_REVOKED:
+        raise DecisionWaiverRefused(f"waiver {waiver_id!r} is already revoked")
+    row["status"] = WAIVER_STATUS_REVOKED
+    row["revocation"] = {
+        "revoked_by": revoked_by,
+        "revocation_reference": revocation_reference,
+        "reason": reason,
+    }
+    migrated["decision_index"] = section
+    load_persisted_decision_index(section)
+    return migrated
+
+
+def waiver_row(waiver: CanonicalWaiverRecord) -> dict[str, Any]:
+    """The persisted row shape of a parsed waiver (listing and tests)."""
+    row: dict[str, Any] = {
+        "waiver_id": waiver.waiver_id,
+        "target_decision_id": waiver.target_decision_id,
+        "target_decision_version_id": waiver.target_decision_version_id,
+        "scope": {"required_labels": list(waiver.required_labels)},
+    }
+    if waiver.valid_from:
+        row["valid_from"] = waiver.valid_from
+    if waiver.valid_until:
+        row["valid_until"] = waiver.valid_until
+    row.update({
+        "requester": waiver.requester,
+        "approver": waiver.approver,
+        "approval_reference": waiver.approval_reference,
+        "reason": waiver.reason,
+        "status": waiver.status,
+        "created_at": waiver.created_at,
+    })
+    if waiver.status == WAIVER_STATUS_REVOKED:
+        row["revocation"] = {
+            "revoked_by": waiver.revoked_by,
+            "revocation_reference": waiver.revocation_reference,
+            "reason": waiver.revocation_reason,
+        }
+    return row
+
+
 def empty_decision_index_section() -> dict[str, Any]:
     """Return a fresh, valid, empty canonical ``decision_index`` section.
 
@@ -1771,6 +2093,184 @@ def _parse_relationships(
     return tuple(out)
 
 
+
+def _require_waiver_timestamp(value: object, label: str) -> str:
+    if not is_waiver_timestamp(value):
+        raise DecisionIndexPersistenceError(
+            f"{label} must be an RFC 3339 UTC instant YYYY-MM-DDTHH:MM:SSZ"
+        )
+    return str(value)
+
+
+def _parse_waiver_row(raw_row: object, index: int) -> CanonicalWaiverRecord:
+    """Validate one persisted v2 waiver row (charter §3.1, §3.1.1, §3.1.2)."""
+    label = f"waivers[{index}]"
+    row = _require_dict(raw_row, label)
+    _reject_unknown_keys(row, _V2_WAIVER_KEYS, label)
+    for key in ("valid_from", "valid_until", "revocation"):
+        if key in row and row[key] is None:
+            raise DecisionIndexPersistenceError(
+                f"{label}.{key} must be omitted when absent, not null"
+            )
+
+    def text(key: str) -> str:
+        return _require_str(row.get(key), f"{label}.{key}", non_empty=True)
+
+    waiver_id = text("waiver_id")
+    target = text("target_decision_id")
+    target_version = text("target_decision_version_id")
+    scope = _require_dict(row.get("scope"), f"{label}.scope")
+    _reject_unknown_keys(scope, _V2_WAIVER_SCOPE_KEYS, f"{label}.scope")
+    labels = _require_list(
+        scope.get("required_labels"), f"{label}.scope.required_labels"
+    )
+    for item in labels:
+        if not isinstance(item, str) or not item:
+            raise DecisionIndexPersistenceError(
+                f"{label}.scope.required_labels must contain only non-empty strings"
+            )
+    if not labels:
+        raise DecisionIndexPersistenceError(
+            f"{label}.scope.required_labels must be non-empty (DG1B2a "
+            "waivers are label-scoped)"
+        )
+    if labels != normalize_waiver_labels(labels):
+        raise DecisionIndexPersistenceError(
+            f"{label}.scope.required_labels must be sorted and de-duplicated"
+        )
+    valid_from = (
+        _require_waiver_timestamp(row["valid_from"], f"{label}.valid_from")
+        if "valid_from" in row else ""
+    )
+    valid_until = (
+        _require_waiver_timestamp(row["valid_until"], f"{label}.valid_until")
+        if "valid_until" in row else ""
+    )
+    if valid_from and valid_until and not valid_from < valid_until:
+        raise DecisionIndexPersistenceError(
+            f"{label}.valid_from must be earlier than valid_until"
+        )
+    requester = text("requester")
+    approver = text("approver")
+    if requester == approver:
+        raise DecisionIndexPersistenceError(
+            f"{label}.approver must differ from requester"
+        )
+    approval_reference = text("approval_reference")
+    reason = text("reason")
+    status = text("status")
+    if status not in WAIVER_STATUSES:
+        raise DecisionIndexPersistenceError(
+            f"{label}.status must be one of {sorted(WAIVER_STATUSES)}"
+        )
+    created_at = _require_waiver_timestamp(
+        row.get("created_at"), f"{label}.created_at"
+    )
+    revoked_by = revocation_reference = revocation_reason = ""
+    if status == WAIVER_STATUS_REVOKED:
+        if "revocation" not in row:
+            raise DecisionIndexPersistenceError(
+                f"{label} is revoked but has no revocation record"
+            )
+        revocation = _require_dict(row["revocation"], f"{label}.revocation")
+        _reject_unknown_keys(
+            revocation, _V2_WAIVER_REVOCATION_KEYS, f"{label}.revocation"
+        )
+        revoked_by = _require_str(
+            revocation.get("revoked_by"),
+            f"{label}.revocation.revoked_by",
+            non_empty=True,
+        )
+        revocation_reference = _require_str(
+            revocation.get("revocation_reference"),
+            f"{label}.revocation.revocation_reference",
+            non_empty=True,
+        )
+        revocation_reason = _require_str(
+            revocation.get("reason"),
+            f"{label}.revocation.reason",
+            non_empty=True,
+        )
+    elif "revocation" in row:
+        raise DecisionIndexPersistenceError(
+            f"{label} is active but carries a revocation record"
+        )
+    expected = waiver_id_of(
+        target_decision_id=target,
+        target_decision_version_id=target_version,
+        required_labels=labels,
+        valid_from=valid_from or None,
+        valid_until=valid_until or None,
+        requester=requester,
+        approver=approver,
+        approval_reference=approval_reference,
+        reason=reason,
+    )
+    if waiver_id != expected:
+        raise DecisionIndexPersistenceError(
+            f"waiver {waiver_id!r} identity mismatch: its creation fields "
+            f"derive {expected!r}"
+        )
+    return CanonicalWaiverRecord(
+        waiver_id=waiver_id,
+        target_decision_id=target,
+        target_decision_version_id=target_version,
+        required_labels=tuple(labels),
+        requester=requester,
+        approver=approver,
+        approval_reference=approval_reference,
+        reason=reason,
+        status=status,
+        created_at=created_at,
+        valid_from=valid_from,
+        valid_until=valid_until,
+        revoked_by=revoked_by,
+        revocation_reference=revocation_reference,
+        revocation_reason=revocation_reason,
+    )
+
+
+def _parse_waivers(
+    root: dict[str, Any],
+    semantic_features: list[str],
+) -> tuple[CanonicalWaiverRecord, ...]:
+    """Parse the v2 ``waivers`` array (charter §3.1.1).
+
+    ``waivers`` is present if and only if ``decision_waivers`` is declared,
+    and never empty. Target existence and version binding are **not**
+    load-time checks: the resolver reports them as non-blocking findings
+    (charter §3.2), so a later decision version never makes memory unloadable.
+    """
+    declared = WAIVER_FEATURE in semantic_features
+    if "waivers" not in root:
+        if declared:
+            raise DecisionIndexPersistenceError(
+                f"decision_index declares {WAIVER_FEATURE!r} but has no "
+                "waivers array"
+            )
+        return ()
+    if not declared:
+        raise DecisionIndexPersistenceError(
+            "decision_index.waivers requires the "
+            f"{WAIVER_FEATURE!r} semantic feature declaration"
+        )
+    rows = _require_list(root["waivers"], "decision_index.waivers")
+    if not rows:
+        raise DecisionIndexPersistenceError(
+            "decision_index.waivers must be non-empty; omit it and the "
+            f"{WAIVER_FEATURE!r} declaration when there are no waivers"
+        )
+    waivers: dict[str, CanonicalWaiverRecord] = {}
+    for index, row in enumerate(rows):
+        waiver = _parse_waiver_row(row, index)
+        if waiver.waiver_id in waivers:
+            raise DecisionIndexPersistenceError(
+                f"duplicate waiver_id {waiver.waiver_id!r}"
+            )
+        waivers[waiver.waiver_id] = waiver
+    return tuple(waivers[key] for key in sorted(waivers))
+
+
 def _validate_semantic_features(root: dict[str, Any]) -> list[str]:
     """Validate the v2 ``semantic_features`` declaration (ADR-031 §8)."""
     if "semantic_features" not in root:
@@ -2262,6 +2762,7 @@ def load_persisted_decision_index(
     return CanonicalArchitectureIndex(
         records=tuple(records),
         rules=tuple(all_rules),
+        waivers=_parse_waivers(root, semantic_features) if is_v2 else (),
     )
 
 
@@ -2673,6 +3174,7 @@ __all__ = [
     "DecisionIndexMigrationRefused",
     "DecisionIndexMigrationRequired",
     "DecisionIndexPersistenceError",
+    "DecisionWaiverRefused",
     "LegacyDecisionsWriteRefused",
     "MemoryMigrationPlan",
     "apply_memory_migration",
@@ -2698,4 +3200,13 @@ __all__ = [
     "upgrade_decision_index_v1_to_v2",
     "verify_compatibility_snapshot",
     "version_id_of",
+    "WAIVER_FEATURE",
+    "WAIVER_STATUS_ACTIVE",
+    "WAIVER_STATUS_REVOKED",
+    "add_decision_waiver",
+    "is_waiver_timestamp",
+    "normalize_waiver_labels",
+    "revoke_decision_waiver",
+    "waiver_id_of",
+    "waiver_row",
 ]

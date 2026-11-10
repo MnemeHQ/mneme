@@ -2,6 +2,41 @@
 
 ## Unreleased
 
+**DG1B2a canonical waiver records (recorded and explained only; no
+enforcement change).** Charter #784, Layer 1 freeze amendment #785, evidence
+packet #783.
+
+- **New v2 semantic feature `decision_waivers`.** A waiver is a canonical
+  record in the top-level `decision_index.waivers` array: it binds an exact
+  active decision version, is scoped by non-empty required labels and
+  optionally by an RFC 3339 UTC window, and records requester, approver
+  (must differ), approval reference and reason. Its id is
+  `wvr-` + the first 32 hex of the SHA-256 of the canonical JSON creation
+  payload; loaders recompute it and refuse mismatches and duplicates.
+- **Explicit authority commands only:** `mneme decision waive`,
+  `mneme decision revoke-waiver` (the record is retained) and the read-only
+  `mneme decision waivers [--json]`. v1 and section-less memory are refused
+  with the migration message. No MCP tool, producer, hook or runtime surface
+  writes waivers. Identities are recorded claims, not authenticated.
+- **Resolver:** `resolve_effective` reports cause `waived` (with
+  `DecisionResolution.waiver_ids` and a `waiver` trace step) only for an
+  active waiver on the active version, with supplied matching labels and,
+  for a time-bound waiver, a supplied `as_of` inside the window. Every other
+  case leaves the decision effective. `dangling_waiver_target` and
+  `waiver_version_mismatch` are non-blocking findings. Semantics id is now
+  `mneme.governance-semantics/dg1b2a-1`. Resolutions of memory without
+  waivers are unchanged apart from that id.
+- **No authoritative consumer acts on waivers (DG1B2b is deferred).**
+  Projection, `mneme check` (stdout, JSON, exit codes), hooks, CI, MCP,
+  Audit, setup readiness and `protect` behave exactly as before. Only the
+  NON-AUTHORITATIVE `mneme check --applicability-preview` may show
+  `cause=waived`, and a waiver finding makes it report PREVIEW UNAVAILABLE.
+- **Compatibility (ADR-031 §8):** memory that contains a waiver declares
+  `decision_waivers`, so readers without the feature, including
+  `mneme-hq` 0.11.0 and earlier and any pinned trusted-gate evaluator, refuse
+  the whole document. Do not write waivers to memory read by an older binary.
+  Memory without waivers is unaffected.
+
 **DG1F-C3a resolver-result consumption by three reporting consumers (no
 output change).** Charter #774, Layer 1 freeze amendment #775.
 
