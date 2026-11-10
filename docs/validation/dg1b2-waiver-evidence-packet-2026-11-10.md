@@ -18,7 +18,7 @@
 |---|---|---|
 | CNCF Governing Board licence exception: picolibc for Hyperlight | **confirmed waiver-like** | qualifying positive |
 | DfE CSP ADR-0028 analytics-domain carve-out | applicability (scope defined in the decision) | **primary hard negative** |
-| CNCF registry: Chart.js (MIT) `allowlisted` | applicability (policy-defined allowlist) | secondary negative |
+| CNCF registry: Chart.js (MIT) `allowlisted` | applicability (policy-defined allowlist; no project-specific waiver needed) | secondary negative |
 | CNCF registry: Grafana k6 for the OpenTelemetry Demo, `not-eligible` | refused request; rule stands | secondary negative |
 | Kubernetes `gorilla/websocket` untagged pin (PR #129872) | strong candidate, **not qualifying** (approval implicit) | considered, rejected |
 
@@ -36,7 +36,7 @@ operation**, not inferred from an ordinary change approval.
 | Original decision remains authoritative | The policy is unchanged by the exception and continues to govern every other project and dependency. |
 | Independent exception record and lifecycle | CNCF exceptions registry, [`license-exceptions/exceptions.json`](https://github.com/cncf/foundation/blob/4960dc90f44411f1ff09ad1d573fba3508f6c6c4/license-exceptions/exceptions.json) (stated source of truth): id `exc-2026-04-23-001`, status `approved`, approved 2026-04-22, with its own scope text and results link. Registry statuses include `approved`, `allowlisted`, `apache-2.0`, `denied` and `not-eligible`. |
 | Approval provenance | request issue → Legal Committee review and questions → Governing Board resolution → registry record, all public and dated. |
-| Optional time bound, `as_of` | **Not present.** The exception is scope-bound with an explicit obligation; effective from 2026-04-22. ADR-031 §12 makes a time bound optional; §13 expiry fixtures still need a separate time-bound example. |
+| Optional time bound, `as_of` | **Not present.** The exception is scope-bound with an explicit obligation and no expiry. 2026-04-22 is the recorded resolution and registry approval date; the sources state no separate effective date, so it is **not** treated as a verified `effective_from`. ADR-031 §12 makes a time bound optional; §13 expiry fixtures still need a separate time-bound example. |
 
 ### Distinctions to carry into any DG1B2 fixture or charter
 
@@ -62,7 +62,7 @@ operation**, not inferred from an ordinary change approval.
 
 ### Secondary
 
-- **Chart.js (MIT), CNCF registry `exc-2019-11-01-001`, status `allowlisted`, scope "See Allowlist Policy requirements":** covered by the policy's own allowlist; no exception exists or is needed → applicability.
+- **Chart.js (MIT), CNCF registry `exc-2019-11-01-001`, status `allowlisted`, scope "See Allowlist Policy requirements":** covered by the policy's own allowlist, which the policy treats as automatic approval when its conditions are met; no project-specific waiver is needed → applicability.
 - **Grafana k6 (AGPL-3.0-only) for the OpenTelemetry Demo, `exc-2026-08-19-001`, status `not-eligible`** ([cncf/foundation#1482](https://github.com/cncf/foundation/issues/1482)): an exception request was refused. A request does not itself confer authority; the rule stands.
 
 ## 3. Considered and not qualifying
@@ -86,7 +86,9 @@ approvals as evidence a human may turn into a waiver, never as a waiver.
 Exact decision-version targeting; explicit authority distinct from the
 requester; defined scope; independent lifecycle and provenance; optional
 expiry evaluated only at `GovernanceContext.as_of`; fail-closed handling of
-invalid, expired, out-of-scope or unauthorized waivers; protection against
+invalid, expired, out-of-scope or unauthorized waivers, meaning such a waiver
+never applies and the governing decision **remains effective** for that
+context; protection against
 agent self-authorization (no producer, MCP, discovery or agent path creates a
 waiver); and a preserved distinction between waivers, applicability and
 supersession, with the hard negatives above as fixtures.
