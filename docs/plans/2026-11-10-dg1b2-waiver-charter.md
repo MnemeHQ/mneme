@@ -53,8 +53,14 @@ same unsolved prerequisites as DG1F-C1b. This charter therefore splits DG1B2:
   §3.5. Waivers become authoritative, explainable and auditable.
   **No enforcement input changes:** projection, `mneme check`, hooks, CI,
   MCP and the C3a consumers behave exactly as today.
-- **DG1B2b (= ADR-031 §11 "waiver-aware DG1F convergence"; not authorized):** any runtime consumer that excludes a decision
-  from enforcement or reporting because of a waiver. It needs a trusted
+  **One informational reporting consumer:** the existing C1a preview may
+  display a `waived` resolution computed from caller-asserted labels (§3.7).
+  That display is non-authoritative: it is not an enforcement input, not a
+  production decision set, and no authoritative consumer excludes a decision
+  because of it.
+- **DG1B2b (= ADR-031 §11 "waiver-aware DG1F convergence"; not authorized):** any authoritative consumer (enforcement, CI, hooks, MCP, the C3a
+  reporting consumers or any production decision set) that excludes a
+  decision because of a waiver. It needs a trusted
   context and `as_of` source, an explicit fail-safe contract, its own charter
   and its own `[layer1-freeze]` amendment, and is sequenced with DG1F-C1b.
 
@@ -67,14 +73,14 @@ can act on safely.
 ### 3.1 The waiver record
 
 - Persisted only under `mneme.decision-index/v2` with a new declared semantic
-  feature (proposed name `decision_waivers`). v1 memory refuses waiver writes
+  feature named `decision_waivers`. v1 memory refuses waiver writes
   with the existing migration message; a reader that does not support the
   feature refuses the document (ADR-031 §8).
 - Closed key set (ADR-031 §8). Proposed fields:
 
 | Field | Required | Meaning |
 |---|---|---|
-| `waiver_id` | yes | stable id derived deterministically from the creation fields only (target, version, scope, window, requester, approver, approval reference, reason), excluding `status`, `revocation` and `created_at`; shape fixed by the implementation PR. Re-issuing a waiver with identical creation fields after revocation is refused; a changed field (for example a new approval reference) produces a new id. |
+| `waiver_id` | yes | deterministic id over the creation fields only, fixed in §3.1.2. Re-issuing a waiver with identical creation fields after revocation is refused; a changed field (for example a new approval reference) produces a new id. |
 | `target_decision_id` | yes | the waived decision |
 | `target_decision_version_id` | yes | the exact decision version the waiver binds to (`dver-…`) |
 | `scope.required_labels` | yes, non-empty | decision-applicability-style scope (DG1B1 label containment) |
@@ -85,14 +91,64 @@ can act on safely.
 | `reason` | yes | why the exception exists |
 | `status` | yes | `active` or `revoked` |
 | `revocation` | when revoked | `revoked_by`, `revocation_reference`, `reason` |
-| `created_at` | yes | provenance timestamp written by the authority operation |
+| `created_at` | yes | provenance timestamp written by the authority operation, same shape as `valid_from` |
 
-- **Non-empty scope is required.** A waiver without scope would make a
-  decision ineffective everywhere, which is deprecation or supersession in
-  disguise. Those keep their existing lifecycle operations (§3.6).
+- **Non-empty scope is required, as a deliberate DG1B2a limitation.** A
+  temporary global waiver can be a legitimate exception, so this is not a
+  claim that unscoped waivers are conceptually deprecation. DG1B2a excludes
+  them because a global waiver removes a decision everywhere, which is the
+  hardest case to tell apart from retirement and the one with the largest
+  blast radius once DG1B2b gives waivers runtime effect. Retirement keeps its
+  existing lifecycle operations (§3.6). Allowing global waivers later needs a
+  charter amendment.
 - **Rule-level and path-scoped waivers are out of scope.** ADR-031 §12 targets
   a decision or decision version and uses decision-applicability-style scope;
   rule-level or ADR-020-path scope would be new semantics.
+
+#### 3.1.1 Persistence location
+
+- Waivers live in a new top-level array `waivers` on the v2
+  `decision_index` root, added to the closed root key set beside
+  `decisions`, `versions` and `rules`. They are not nested in decision rows
+  (a waiver is its own canonical object with its own lifecycle, ADR-031 §12,
+  and must survive changes to its target's active version) and never live in
+  `extensions` (ADR-031 §8a: semantic data is a declared feature, not an
+  extension).
+- `waivers` is present if and only if `semantic_features` declares
+  `decision_waivers`. A `waivers` key without the feature, the feature without
+  a `waivers` key, or an empty `waivers` array is a load-time refusal. Revoked
+  records are retained, so once a waiver is written the array never becomes
+  empty.
+- Row key sets are closed: the fields in the table above; `scope` contains
+  only `required_labels`; `revocation` contains only `revoked_by`,
+  `revocation_reference` and `reason`. Optional keys (`valid_from`,
+  `valid_until`) are omitted when absent, never written as `null`.
+  `revocation` is present if and only if `status == "revoked"`.
+
+#### 3.1.2 Identity and canonical serialization
+
+- `waiver_id = "wvr-" + sha256_hex(payload)[:32]`, using the ADR-030
+  identity helpers in `mneme/rule_identity.py` (`canonical_json`:
+  `sort_keys=True`, `separators=(",", ":")`, `ensure_ascii=True`; SHA-256 of
+  its UTF-8 bytes), where `payload` is the JSON array, in this order:
+  `[target_decision_id, target_decision_version_id, required_labels,
+  valid_from, valid_until, requester, approver, approval_reference, reason]`.
+  `required_labels` is the sorted, de-duplicated list (DG1B1 normalization);
+  an absent `valid_from` or `valid_until` is `null` in the payload. No other
+  field participates.
+- Normalization before hashing is limited to label sort and de-duplication.
+  All other strings are hashed exactly as written; timestamps must already be
+  in the `YYYY-MM-DDTHH:MM:SSZ` shape, so no time normalization exists.
+- The loader recomputes every `waiver_id` and refuses a mismatch, and
+  refuses duplicate ids, as it already does for `version_id` and `rule_id`.
+- The writer stores `required_labels` sorted and de-duplicated, sorts the
+  `waivers` array by `waiver_id`, and writes through the existing canonical
+  memory writer (same file formatting as the rest of the document).
+  `revoke-waiver` changes only `status` and adds `revocation`; the id is
+  unchanged.
+- The `wvr-` prefix, the payload order and the 32-hex truncation are part of
+  the public contract. Changing any of them is a new semantic feature, not an
+  implementation detail.
 
 ### 3.2 Resolver semantics
 
@@ -209,10 +265,18 @@ applicability negative; a supersession negative.
   through the existing kinds (`became_ineffective`, `became_effective`,
   `resolution_cause_changed`); waiver ids travel on the resolutions. A waiver
   change that does not alter any resolution for the given context produces
-  no change entry; the listing covers it.
+  no change entry; the listing covers it. For example, adding a second
+  waiver that matches an already-waived decision leaves the resolution
+  unchanged and produces no entry. **`resolve_change` is therefore not a
+  waiver lifecycle audit**, and DG1B2a provides none: the listing shows
+  current waiver state, and history (creation, revocation, superseded
+  approvals) is reconstructed only from version control of the memory file.
 - A read-only waiver listing (for example `mneme decision waivers`).
-- **C1a preview:** it supplies labels but no `as_of`, so untimed label-scoped
-  waivers would show as `waived`. Any waiver finding
+- **C1a preview (informational, non-authoritative):** it supplies
+  caller-asserted labels but no `as_of`, so untimed label-scoped waivers
+  would show as `waived`. The preview output must label that resolution as
+  informational; it is not an enforcement input and does not change what
+  `mneme check` or any other §3.8 surface enforces or reports. Any waiver finding
   (`dangling_waiver_target`, `waiver_version_mismatch`) makes the preview
   report PREVIEW UNAVAILABLE through its existing finding gate. Both outputs
   appear only for memory that contains waivers, which no memory does today;
@@ -256,7 +320,14 @@ and a local Windows run.
 8. Self-authorization: the MCP tool set is unchanged; proposal acceptance
    cannot create a waiver; no runtime surface writes waivers.
 9. v2 contract: closed waiver key set, feature declaration required, readers
-   without the feature refuse the document.
+   without the feature refuse the document; `waivers` without the feature,
+   the feature without `waivers`, and an empty `waivers` array each refuse;
+   `null` optional keys refuse; `revocation` present iff revoked.
+9a. Identity and serialization (§3.1.2): a golden `waiver_id` for a fixed
+   payload; label order and duplicates do not change the id; every creation
+   field does; `status`, `revocation` and `created_at` do not; a tampered id
+   and a duplicate id each refuse at load; rows are written sorted by
+   `waiver_id`; revocation keeps the id.
 10. Projection and every §3.8 surface unchanged with waivers present.
 11. Time and integrity edge cases: unparseable `as_of`; multiple waivers with
     deterministically sorted ids; a waiver on a superseded or deprecated
@@ -264,7 +335,9 @@ and a local Windows run.
     `supersession_lifecycle_conflict` finding; a waiver on a `not_applicable`
     decision (labels match the waiver but not the decision, so it stays
     `not_applicable`); a dangling waiver target (finding, no raise).
-12. C1a preview: a waiver finding produces PREVIEW UNAVAILABLE.
+12. C1a preview: a waiver finding produces PREVIEW UNAVAILABLE; a `waived`
+    resolution is labelled informational, and `mneme check` output for the
+    same memory and change is unchanged.
 13. A reader without the waiver feature (for example `mneme-hq==0.11.0`)
     refuses waiver memory.
 
@@ -283,11 +356,13 @@ approvals or other implicit signals; add MCP tools; or change schema v1.
 
 | Risk | Control |
 |---|---|
-| A waiver silently weakens enforcement | DG1B2a has no runtime consumer; DG1B2b needs its own charter and freeze amendment |
+| A waiver silently weakens enforcement | DG1B2a has no authoritative consumer; the C1a preview display is informational only (§2, §3.7); DG1B2b needs its own charter and freeze amendment |
+| Waiver identity drifts between implementation and later readers | id derivation, persistence location and serialization fixed in §3.1.1 and §3.1.2; loader recomputes ids |
+| `resolve_change` mistaken for a waiver audit trail | §3.7 states it is not one; history comes from version control |
 | An agent grants itself a waiver | only the explicit CLI operations write; no producer, hook or MCP path; `.mneme/` changes go through the reviewed path (§3.4) |
 | A waiver outlives the decision it was granted against | exact version binding; mismatch never applies and is reported |
 | Time handling depends on the clock | expiry only at a supplied `as_of`; missing `as_of` → waiver does not apply |
-| Waivers used as disguised deprecation | non-empty scope required; lifecycle operations stay the route for retirement |
+| Waivers used for retirement | non-empty scope required in DG1B2a (deliberate limitation, §3.1); lifecycle operations stay the route for retirement |
 | Missing or conflicting context drops protection | fail closed to the decision in every unclear case |
 | Overclaiming authority | §3.4 states the trust root and its limits |
 | Older binaries, and the CI R0 pinned evaluator, refuse memory containing waivers, so `check`, hooks, MCP and the trusted gate fail on it | ADR-031 §8 release notes; bump the trusted-gate evaluator pin before any waiver is written to Core memory |
@@ -296,11 +371,16 @@ approvals or other implicit signals; add MCP tools; or change schema v1.
 
 ## 7. Decisions for the owner before merge
 
-1. Accept the DG1B2a / DG1B2b split, with no runtime consumption in DG1B2a.
-2. Require non-empty scope.
-3. Accept the trust-root statement in §3.4 (Mneme records identities; the
-   repository's reviewed `.mneme/` change path is the authority check).
-4. Accept the additive C1a preview behavior in §3.7.
+1. Accept the DG1B2a / DG1B2b split, with no authoritative consumption in
+   DG1B2a.
+2. Require non-empty scope as a deliberate DG1B2a limitation (§3.1).
+3. Accept the trust-root statement in §3.4 (Mneme records identity claims
+   and does not authenticate them; the repository's reviewed `.mneme/` change
+   path is the authority check).
+4. Accept the additive C1a preview behavior in §3.7, explicitly
+   informational and non-authoritative.
+5. Accept the persistence location and identity contract in §3.1.1 and
+   §3.1.2 as public and frozen with this charter.
 
 ## 8. Recording
 
@@ -311,6 +391,6 @@ delivered and keeps DG1B2b, DG1F-C1b and DG1G open.
 
 1. This charter: independent review and merge. Authorizes nothing to run.
 2. `[layer1-freeze]` amendment: a separate PR authorizing exactly DG1B2a
-   (§3), restating §3.8 and §5. Separate approval.
+   (§3), restating §3.1.1, §3.1.2, §3.8 and §5. Separate approval.
 3. Goldens confirmation and fixtures, then the implementation PR, with
    independent review against §4.
