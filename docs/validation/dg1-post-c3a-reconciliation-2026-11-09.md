@@ -29,9 +29,10 @@
   decision-version-bound waiver case), C3b (needs a consumer).
 - **Smallest defensible next DG1 decision (§6):** a **DG1G fixture-floor
   mapping record**: map each ADR-031 §13 fixture to the existing test that
-  pins it, and list exactly the fixtures that are missing. It is read-only,
-  needs no charter or freeze amendment, and is the precondition for any
-  DG1G closeout claim. No implementation increment is recommended now.
+  pins it, and list exactly the fixtures that are supported, missing,
+  blocked or unevaluated. It is read-only, needs no charter or freeze
+  amendment, and is a partial fixture-coverage record, not a closeout. DG1G
+  and DG1 stay open. No implementation increment is recommended now.
 
 ## 1. Delivered since the v0.11.0 reconciliation
 
@@ -112,7 +113,7 @@ consumer need is decided.
 | applicability fixtures | `test_dg1b1_*` (incl. functional acceptance F1–F12), C2 three-state tests | pinned |
 | waiver fixtures (incl. `as_of` expiry, out-of-scope) | none | **blocked by DG1B2** |
 | #497 governance-of-governance controls (self-authorization negative, authorized-transition positive, host boundary) | CI side: CI1 V2/V3, C4 O8; host side: none | **partly pinned** |
-| four-layer end-to-end acceptance (roadmap P0 entry) | Verification step 3 fixture covers a subset | **not run for DG1** |
+| four-layer end-to-end acceptance (roadmap P0, cross-cutting; owned outside DG1) | Verification step 3 fixture covers a subset | **not an ADR-031 §13 fixture**; can supply evidence for DG1G, but is not a DG1G gate without an explicit architectural decision |
 
 Current DG1 test count: 296 tests in `tests/test_dg1*.py` at the anchor.
 
@@ -123,19 +124,24 @@ only).
 
 - Map each §13 fixture and each #497 governance-of-governance control to the
   exact test or validation record that pins it, as in §5, but at test-id
-  granularity, with the four-layer end-to-end acceptance test (roadmap P0
-  entry) as the closing gate.
+  granularity.
 - State exactly what is missing: the ADR-029 §6 DG1-mapped fixture, the host
-  governance-of-governance controls, the waiver fixtures (blocked by DG1B2),
-  and the four-layer end-to-end run.
-- Define what DG1G can honestly claim if DG1B2 stays evidence-gated: closeout
-  of the supported subset, with waiver coverage explicitly unevaluated, never
-  silently passed.
+  governance-of-governance controls, and the waiver fixtures (blocked by
+  DG1B2, marked UNEVALUATED).
+- Keep two obligations and their owners separate: the ADR-031 §13 fixture
+  floor (DG1) and the roadmap's cross-cutting Governance → Guidance →
+  Enforcement → Verification acceptance test (P0, outside DG1). The latter can
+  supply evidence for DG1G but is not imposed as a DG1G gate here, and the
+  mapping does not duplicate the Verification track.
+- **No partial closeout.** ADR-031 §11 does not allow DG1G closeout before the
+  full sequence is complete. While DG1B2 stays evidence-gated, the record is a
+  partial fixture-coverage record with waiver fixtures UNEVALUATED, never
+  silently passed; DG1G and DG1 remain open.
 
 **Why this, not an implementation increment:** every remaining §11 consumer
 needs an output-contract decision, an authority-path charter or C1b evidence
-(§3); DG1B2 has no case; and a DG1G closeout claim is impossible until the
-fixture floor is mapped precisely. The mapping record needs no charter or
+(§3); DG1B2 has no case; and any future DG1G closeout needs the fixture floor
+mapped precisely first. The mapping record needs no charter or
 freeze amendment and turns DG1G from a heading into a checklist.
 
 **Not recommended now:** further §11 parity increments (no value at parity),
