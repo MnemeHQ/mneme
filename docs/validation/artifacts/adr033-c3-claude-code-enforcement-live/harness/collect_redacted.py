@@ -39,7 +39,9 @@ from pathlib import Path
 FILES = ("observer.txt", "prompt.txt", "setup.json", "hook-registration.json",
          "events.jsonl", "hook-log.jsonl", "outcome.json", "target.before",
          "target.after", "operator-attestation.txt", "netcap-sni.txt",
-         "transcript.jsonl")
+         "transcript.jsonl",
+         # T-08 G3 rows only: the local settings file as run, and the replay.
+         "settings.local.json", "replay-g3.json", "outcome.initial.json")
 LEAKS = re.compile(r"(gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|"
                    r"sk-ant-[A-Za-z0-9_\-]{10,}|Authorization:\s*\S+|"
                    r"-----BEGIN [A-Z ]*PRIVATE KEY-----)")

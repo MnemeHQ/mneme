@@ -45,16 +45,42 @@ sys.path.insert(0, sys.argv[1]); import matrix
 r = matrix.row(sys.argv[2])
 if sys.argv[3] not in r['tools']: raise SystemExit('tool not allowed for this probe')
 if sys.argv[4] == 'interactive' and sys.argv[2] not in matrix.INTERACTIVE_ROWS: raise SystemExit('no interactive arm for this probe')
-print(json.dumps({'phase': r['phase'], 'needs': r['needs']}))" "$(cygpath -w "$BASE")" "$PROBE" "$TOOL" "$ARM" | tr -d '\r') \
+print(json.dumps({'phase': r['phase'], 'needs': r['needs'], 'sources': r['sources'], 'g3': matrix.is_g3(sys.argv[2])}))" "$(cygpath -w "$BASE")" "$PROBE" "$TOOL" "$ARM" | tr -d '\r') \
   || { echo "ABORT: $PROBE/$TOOL/$ARM rejected by the matrix"; exit 1; }
 PHASE=$(echo "$SPEC" | "$PY" -E -P -c "import json,sys; print(json.load(sys.stdin)['phase'] or '')" | tr -d '\r')
 NEEDS=$(echo "$SPEC" | "$PY" -E -P -c "import json,sys; print(' '.join(json.load(sys.stdin)['needs']))" | tr -d '\r')
+SOURCES=$(echo "$SPEC" | "$PY" -E -P -c "import json,sys; print(json.load(sys.stdin)['sources'])" | tr -d '\r')
+G3=$(echo "$SPEC" | "$PY" -E -P -c "import json,sys; print('yes' if json.load(sys.stdin)['g3'] else 'no')" | tr -d '\r')
+
+# T-08 G3 guards (charter §5). A G3 row runs only under its own pin set, and no
+# other row may run under it.
+if [ "$G3" = yes ]; then
+  [ "${C3_PINSET:-}" = G3 ] || { echo "ABORT: $PROBE is a G3 row; set C3_PINSET=G3 (run_c3_batch.sh G3 does)"; exit 1; }
+  # Charter §4, O1: each G3 probe runs once; there is no repetition 2.
+  [ "$REP" = 1 ] || { echo "ABORT: $PROBE runs exactly once (rep 1); got rep '$REP' (charter §4, O1)"; exit 1; }
+  # Self-test only: the negative case that the stub does not apply the local
+  # file under `project` alone (charter §8).
+  if [ "${C3_SELFTEST:-}" = 1 ] && [ -n "${C3_ST_G3_SOURCES:-}" ]; then SOURCES="$C3_ST_G3_SOURCES"; fi
+  if [ "${C3_SELFTEST:-}" != 1 ]; then
+    [ "${DISABLE_AUTOUPDATER:-}" = 1 ] || { echo "ABORT: $PROBE needs DISABLE_AUTOUPDATER=1 in this shell (charter O2)"; exit 1; }
+    v=$(claude --version | tr -d '\r')
+    [ "$v" = "$PIN_CLAUDE_VERSION" ] || { echo "ABORT: claude '$v' != G3 pin '$PIN_CLAUDE_VERSION' (host changed)"; exit 1; }
+  fi
+elif [ -n "${C3_PINSET:-}" ]; then
+  echo "ABORT: C3_PINSET=$C3_PINSET is for G3 rows only, not $PROBE"; exit 1
+fi
 
 G="$LIVE_ROOT/_golden"
 [ -s "$LIVE_ROOT/_golden.json" ] || { echo "ABORT: run refresh_golden.sh first"; exit 1; }
 GPHASE=$("$PY" -E -P -c "import json,sys; print(json.load(open(sys.argv[1]))['phase'])" "$(cygpath -w "$LIVE_ROOT/_golden.json")" | tr -d '\r')
 if [ -n "$PHASE" ] && [ "$PHASE" != "$GPHASE" ]; then
   echo "ABORT: $PROBE needs fixture phase $PHASE; golden is $GPHASE"; exit 1
+fi
+if [ "$G3" = yes ]; then
+  # Both G3 rows copy the golden (G3-2 its memory and app), so both need the
+  # pinned tip, read from the golden itself rather than the recorded summary.
+  GTIP=$(git -C "$G" rev-parse HEAD 2>/dev/null)
+  [ "$GTIP" = "$G3_FIXTURE_TIP" ] || { echo "ABORT: $PROBE needs fixture tip $G3_FIXTURE_TIP; golden is '$GTIP'"; exit 1; }
 fi
 
 if echo " $NEEDS " | grep -q " network_blocked "; then
@@ -67,7 +93,25 @@ if echo " $NEEDS " | grep -q " network_blocked "; then
 fi
 
 P="$LIVE_ROOT/$NAME"
-"$PY" -E -P "$BASE/safe_rmtree.py" delete "$NAME" || { echo "ABORT: guarded delete refused"; exit 1; }
+if [ "$G3" = yes ] && { [ "${C3_SELFTEST:-}" != 1 ] || [ "${C3_ST_G3_ENFORCE_ONCE:-}" = 1 ]; }; then
+  # Charter §6, O1: a live G3 probe runs once and its evidence is never
+  # replaced. The only re-run is for INVALID (a harness failure, no label),
+  # once, after the operator moves the failed probe directory aside as
+  # `_invalid-<name>-<n>` with a nonempty INVALID_REASON.txt (README). The
+  # self-test exercises this path with C3_ST_G3_ENFORCE_ONCE=1.
+  [ -e "$P" ] && { echo "ABORT: $NAME already has evidence at $P; a G3 probe never runs twice (charter §6)"; exit 1; }
+  n=0
+  for inv in "$LIVE_ROOT"/_invalid-"$NAME"-*; do
+    [ -e "$inv" ] || continue
+    n=$((n + 1))
+    [ -s "$inv/INVALID_REASON.txt" ] || { echo "ABORT: $inv has no INVALID_REASON.txt"; exit 1; }
+    [ -s "$inv/out/harness_failure.txt" ] && [ ! -e "$inv/out/outcome.json" ] \
+      || { echo "ABORT: $inv is not an INVALID run (it has a label, or no harness_failure.txt); only INVALID may be re-run"; exit 1; }
+  done
+  [ "$n" -le 1 ] || { echo "ABORT: $NAME was already re-run once after INVALID (charter §6)"; exit 1; }
+else
+  "$PY" -E -P "$BASE/safe_rmtree.py" delete "$NAME" || { echo "ABORT: guarded delete refused"; exit 1; }
+fi
 mkdir -p "$P/out" || { echo "ABORT: cannot create $P"; exit 1; }
 OUT="$P/out"
 die() { echo "HARNESS_FAILURE: $*" | tee -a "$OUT/harness_failure.txt"; exit 1; }
@@ -81,6 +125,9 @@ PROMPT=$(jget "d['prompt']")
 printf '%s\n' "$PROMPT" > "$OUT/prompt.txt" || die "cannot write prompt"
 cp "$SETUP" "$OUT/setup.json" && cp "$REPO/.claude/settings.json" "$OUT/hook-registration.json" \
   || die "cannot copy setup"
+if [ "$G3" = yes ]; then
+  cp "$REPO/.claude/settings.local.json" "$OUT/settings.local.json" || die "cannot copy settings.local.json"
+fi
 
 h() { [ -f "$1" ] && sha256sum < "$1" | cut -d' ' -f1 || echo absent; }
 USER_SETTINGS="$HOME/.claude/settings.json"; USER_LOCAL="$HOME/.claude/settings.local.json"
@@ -107,6 +154,11 @@ eval "$("$PY" -E -P -c "
 import json, shlex, sys
 for k, v in json.load(open(sys.argv[1], encoding='utf-8'))['env'].items():
     print(f'export {k}={shlex.quote(v)}')" "$SETUP" | tr -d '\r')" || die "cannot export row env"
+if [ "$G3" = yes ]; then
+  # Charter §5: the override may reach the hook only through settings.local.json.
+  leaked=$(env | cut -d= -f1 | grep -E '^MNEME_' | tr '\n' ' ')
+  [ -z "$leaked" ] || die "G3 launch environment carries $leaked"
+fi
 
 {
   echo "probe=$PROBE tool=$TOOL rep=$REP arm=$ARM"
@@ -119,6 +171,7 @@ for k, v in json.load(open(sys.argv[1], encoding='utf-8'))['env'].items():
   echo "harness_head=$(git -C "$BASE" rev-parse HEAD) harness_dirty=$([ -z "$(git -C "$BASE" status --porcelain -- .)" ] && echo no || echo yes)"
   echo "git=$(git --version) os=$(uname -sr)"
   echo "setting_sources=$SOURCES row_env_keys=$(env | cut -d= -f1 | grep -E '^(MNEME_MEMORY|C3_STALL_)' | tr '\n' ' ')"
+  [ "$G3" = yes ] && echo "g3=yes pinset=$C3_PINSET g3_fixture_tip=$G3_FIXTURE_TIP disable_autoupdater=${DISABLE_AUTOUPDATER:-unset}"
   echo "network_blocked_required=$(echo " $NEEDS " | grep -q ' network_blocked ' && echo yes || echo no)"
   snap BEFORE
 } > "$OUT/observer.txt" || die "cannot write observer.txt"
@@ -165,6 +218,10 @@ fi
 
 snap AFTER >> "$OUT/observer.txt" || die "cannot record AFTER hashes"
 [ -f "$TARGET" ] && cp "$TARGET" "$OUT/target.after"
+if [ "$G3" = yes ]; then
+  # Charter §6 item 6: replay, not observation. Pinned build, both memories.
+  "$PY" -E -P "$BASE/replay_g3.py" "$(w "$OUT")" "$MNEME_SRC_W" > /dev/null || die "replay_g3.py failed"
+fi
 "$PY" -E -P "$BASE/classify_c3.py" "$(w "$OUT")" "$PIN_MODEL" > /dev/null || die "classify_c3.py failed"
 [ -s "$OUT/outcome.json" ] || die "no outcome.json"
 "$PY" -E -P -c "import json,sys; o=json.load(open(sys.argv[1])); print(o['probe'], o['tool'], o['rep'], o['arm'], o['label'])" "$(w "$OUT/outcome.json")"

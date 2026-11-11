@@ -27,6 +27,14 @@ transcript is EVIDENCE_INCOMPLETE. `outcome.json` reports this under
 `diagnostic`, apart from the refusal `delivery` levels; `user_visible` is
 always `not_tested` (headless).
 
+T-08 G3 rows (charter docs/plans/2026-11-10-t08-g3-host-boundary-live-charter.md
+§6) are classified on items 1-6 on top of E1-E4 and get the charter's labels
+instead of PASS: REFUSED_MEMORY_PATH_MISMATCH (G3-1) or
+RECORDED_FALSE_COMPLETE_PASS (G3-2) when every item holds (item 5 may be
+not observed), UNEXPECTED on any contradiction or deviation, and
+EVIDENCE_INCOMPLETE when evidence is missing. ``outcome.json`` carries a
+``g3`` block that keeps the observed items apart from the replay.
+
 ``--pair`` compares a diagnostic probe with a paired control of the same tool
 (R3: stream-json `system` subtypes other than init and `thinking_tokens`, and
 the permission indicators in them) and writes ``pair-<control>.json`` in the
@@ -36,6 +44,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -231,9 +240,223 @@ def expected_after_ok(plan: dict, after: str | None) -> bool:
     return True
 
 
+def g3_capture(sni: Path, origin_url: str, selftest: bool) -> tuple[str, str]:
+    """G3 E4 OS capture rule (PR #792 review): stricter than the C3 rule.
+
+    Returns ``(state, reason)``; state is ok, contradicts, missing or
+    "not required in self-test".
+
+    - absent, empty, or not in the extraction format (host lines, then exactly
+      one final "# N other host(s) observed, not published" line): missing;
+    - a forbidden host, or a published host outside matrix.G3_E4_HOST_FAMILIES:
+      contradicts;
+    - the origin's host not observed: missing, never a pass. Two of the
+      historical networked C3 captures (P-6-MultiEdit-1, R-1-Edit-2) lacked it,
+      so its absence shows a capture gap, not a verifier fault;
+    - otherwise ok.
+    The capture cannot attribute a host to a process; the verifier's exact
+    destinations are the wrapper half (E4_wrapper).
+    """
+    from urllib.parse import urlparse
+
+    if not sni.exists():
+        return ("not required in self-test" if selftest else "missing",
+                "netcap-sni.txt absent")
+    lines = [ln.strip() for ln in sni.read_text(encoding="utf-8", errors="replace").splitlines()
+             if ln.strip()]
+    comments = [ln for ln in lines if ln.startswith("#")]
+    summary = re.fullmatch(matrix.G3_E4_SUMMARY, lines[-1]) if lines else None
+    if not lines or summary is None or len(comments) != 1:
+        return "missing", "netcap-sni.txt is empty or not in the G3 extraction format"
+    hosts = sorted({ln.lower().rstrip(".") for ln in lines if not ln.startswith("#")})
+    forbidden = [h for h in hosts if any(h == f.split(":")[0] for f in matrix.FORBIDDEN_HOSTS)]
+    if forbidden:
+        return "contradicts", f"forbidden host(s) observed: {forbidden}"
+    outside = [h for h in hosts
+               if not any(h == fam or h.endswith("." + fam) for fam in matrix.G3_E4_HOST_FAMILIES)]
+    if outside:
+        return "contradicts", f"published host(s) outside the G3 families: {outside}"
+    forge = (urlparse(origin_url).hostname or "").lower()
+    if forge not in hosts:
+        return "missing", f"forge endpoint {forge!r} not observed in the capture"
+    return "ok", f"forge {forge!r} observed; published {hosts}; {summary.group(1)} other host(s) counted"
+
+
+def g3_recheck_gate(out: Path) -> str:
+    """Whether `run_c3_batch.sh G3 1 --recheck` may classify this probe again.
+
+    Prints and returns ``KEEP <label>`` (already at its G3 label: left as is),
+    ``RECHECK`` (eligible), or ``REFUSE <reason>``. Eligible only when the
+    current outcome is EVIDENCE_INCOMPLETE with no failure or deviation, every
+    missing item is the G3 E4 OS capture, and that capture was absent at
+    classification. So the capture is attached once; an UNEXPECTED result, a
+    capture already judged, or any other missing evidence is never
+    reclassified, and the earlier outcome stays (PR #792 re-review).
+    """
+    path = out / "outcome.json"
+    if not path.exists():
+        return "REFUSE no outcome.json (an INVALID probe is re-run, not rechecked)"
+    outcome = json.loads(path.read_text(encoding="utf-8"))
+    want = matrix.row(outcome["probe"]).get("g3_label")
+    label = outcome.get("label")
+    if label == want:
+        return f"KEEP {label}"
+    if label != "EVIDENCE_INCOMPLETE":
+        return f"REFUSE the recorded label is {label}; it is final (charter §6)"
+    if outcome.get("failures") or outcome.get("deviations"):
+        return "REFUSE the recorded outcome has failures or deviations"
+    missing = outcome.get("missing") or []
+    if not missing or any(not m.startswith("E4 OS capture (G3)") for m in missing):
+        return f"REFUSE missing evidence other than the E4 OS capture: {missing}"
+    if (outcome.get("facts") or {}).get("g3_e4_capture") != "netcap-sni.txt absent":
+        return "REFUSE the capture was already attached and judged; it is attached once"
+    return "RECHECK"
+
+
+def _complete(payload, verdict: str) -> bool:
+    return (isinstance(payload, dict) and payload.get("verdict") == verdict
+            and payload.get("evaluation_complete") is True)
+
+
+def classify_g3(out: Path, setup: dict, spec: dict, plan: dict, observer: str,
+                hashes: dict, mine: list, facts: dict, checks: dict) -> dict:
+    """Charter §6 items 1-6 for a G3 row. Returns the ``g3`` outcome block.
+
+    ``observed`` holds what the live run showed (items 1-5); ``replayed`` holds
+    the post-hoc replay (item 6). Item 5 may be ``not_observed`` without
+    failing the row; the record must then say so (charter §6, §7).
+    """
+    g3 = setup.get("g3") or {}
+    items: dict[str, str] = {}
+    fails: list[str] = []
+    miss: list[str] = []
+
+    def verdict(name: str, ok: bool | None, why: str) -> None:
+        if ok is None:
+            items[name] = "missing"
+            miss.append(f"G3 {name}: {why}")
+        else:
+            items[name] = "ok" if ok else "contradicts"
+            if not ok:
+                fails.append(f"G3 {name}: {why}")
+
+    use_id = facts.get("tool_use_id")
+    entry = next((e for e in mine if use_id and e.get("tool_use_id") == use_id), None)
+    foreign = norm_path(g3.get("foreign_memory") or "")
+    stderr = (entry or {}).get("stderr", "")
+
+    # Item 1: the channel. Hook env from the local file only; file unchanged.
+    env_keys = re.search(r"row_env_keys=(.*)$", observer, re.M)
+    local_before = hashes.get(("BEFORE", "project_local"))
+    local_after = hashes.get(("AFTER", "project_local"))
+    if entry is None or env_keys is None or not g3:
+        verdict("item1_channel", None, "no hook record for this call, no observer env line, or no setup g3")
+    else:
+        ok = (entry.get("MNEME_MEMORY") == g3["mneme_memory_value"]
+              and env_keys.group(1).strip() == ""
+              and local_before == local_after == g3["settings_local_sha256"])
+        verdict("item1_channel", ok, f"hook MNEME_MEMORY {entry.get('MNEME_MEMORY')!r}, "
+                f"launch env keys {env_keys.group(1).strip()!r}, local file "
+                f"{local_before} -> {local_after}")
+
+    # Item 2: the hook's own find_memory call during this Edit (observed).
+    calls = (entry or {}).get("find_memory_calls")
+    if entry is None or calls is None:
+        verdict("item2_selection", None, "no find_memory observation for this call")
+    else:
+        last = calls[-1] if calls else {}
+        ok = (bool(calls) and not last.get("exception")
+              and norm_path(last.get("returned") or "") == foreign)
+        facts["g3_selected_memory"] = last.get("returned")
+        verdict("item2_selection", ok, f"hook find_memory returned {last.get('returned')!r}"
+                + (f", raised {last['exception']}" if last.get("exception") else ""))
+
+    # Item 3: availability. G3-1 the SS-3 refusal at the golden tip; G3-2 none.
+    if entry is None:
+        verdict("item3_availability", None, "no hook record for this call")
+    elif spec["verifier"] == "AUTHORIZED":
+        golden = re.search(r'"tip": "([0-9a-f]{40})"', observer)
+        ok = (checks.get("verifier") == "ok" and golden is not None
+              and f"baseline=main@{golden.group(1)[:7]}" in stderr
+              and "SS-3 memory path mismatch" in stderr
+              and "operational refusal (UNEVALUATED: MEMORY_PATH_MISMATCH)" in stderr)
+        verdict("item3_availability", ok, "no verified AUTHORIZED SS-3 mismatch refusal")
+    else:
+        ok = not entry.get("verifications") and "mneme-hook: availability" not in stderr
+        verdict("item3_availability", ok, "the verifier ran or an availability line appeared")
+
+    # Item 4: the host outcome (E1-E3 plus, for a landed edit, the exact bytes).
+    base = [checks.get(k) for k in ("E1", "E2", "E3")]
+    if None in base:
+        verdict("item4_host_outcome", None, "E1, E2 or E3 not established")
+    else:
+        ok = all(v == "ok" for v in base)
+        if ok and spec["expect"] == "proceed":
+            before_p, after_p = out / "target.before", out / "target.after"
+            if before_p.exists() and after_p.exists():
+                b = before_p.read_text(encoding="utf-8").replace("\r\n", "\n")
+                a = after_p.read_text(encoding="utf-8").replace("\r\n", "\n")
+                ok = a == b.replace(plan["old_string"], plan["new_string"], 1) and a != b
+            else:
+                ok = False
+        verdict("item4_host_outcome", ok, f"E1/E2/E3 {base}, or the change is not exactly "
+                "the forbidden replacement")
+
+    # Item 5: the live checker's own result (observed), or not observed.
+    checked = (entry or {}).get("check_calls") or []
+    payloads = [c for c in checked if isinstance(c.get("payload"), dict)]
+    if not payloads:
+        items["item5_live_checker"] = "not_observed"
+    else:
+        c = payloads[-1]
+        ok = (len(checked) == 1 and norm_path(c.get("memory") or "") == foreign
+              and c.get("returncode") == 0 and _complete(c["payload"], "PASS"))
+        verdict("item5_live_checker", ok, f"live check against {c.get('memory')!r}: "
+                f"exit {c.get('returncode')}, payload {c.get('payload')}")
+
+    # Item 6: the post-hoc replay (replay, not observation).
+    replay_p = out / "replay-g3.json"
+    replay = json.loads(replay_p.read_text(encoding="utf-8")) if replay_p.exists() else None
+    if replay is None:
+        verdict("item6_replay", None, "replay-g3.json missing")
+    else:
+        f_rec, o_rec = replay.get("foreign") or {}, replay.get("own") or {}
+        ok = (f_rec.get("exit") == 0 and _complete(f_rec.get("payload"), "PASS")
+              and _complete(o_rec.get("payload"), "FAIL")
+              and "C3-DEC" in (o_rec.get("payload") or {}).get("decision_ids", []))
+        verdict("item6_replay", ok, f"foreign {f_rec.get('payload')}, own {o_rec.get('payload')}")
+
+    return {
+        "charter": "docs/plans/2026-11-10-t08-g3-host-boundary-live-charter.md",
+        "items": items,
+        "item5": "observed" if items.get("item5_live_checker") == "ok" else
+                 "not_observed" if items.get("item5_live_checker") == "not_observed" else
+                 "contradicted",
+        "observed": {"hook_MNEME_MEMORY": (entry or {}).get("MNEME_MEMORY"),
+                     "find_memory_calls": (entry or {}).get("find_memory_calls"),
+                     "check_calls": checked},
+        "replayed": replay,
+        "complete_claim": ("observed" if items.get("item5_live_checker") == "ok"
+                           else "replay-confirmed only"),
+        "_failures": fails, "_missing": miss,
+    }
+
+
 def main() -> int:
     out, model_pin = Path(sys.argv[1]), sys.argv[2]
     setup = json.loads((out / "setup.json").read_text(encoding="utf-8"))
+    g3_row = matrix.is_g3(setup["probe"])
+    if g3_row and (out / "outcome.json").exists():
+        # PR #792 re-reviews: a G3 classification is final once written. Only
+        # `run_c3_batch.sh G3 1 --recheck` may classify again, and the
+        # classifier re-applies the eligibility gate itself: the environment
+        # flag alone never authorizes an overwrite (charter §6: stop and preserve).
+        if os.environ.get("C3_G3_RECHECK") != "1":
+            raise SystemExit("classify_c3: refusing to rewrite a G3 outcome.json; "
+                             "use `run_c3_batch.sh G3 1 --recheck`")
+        gate = g3_recheck_gate(out)
+        if gate != "RECHECK":
+            raise SystemExit(f"classify_c3: refusing to rewrite a G3 outcome.json ({gate})")
     observer = (out / "observer.txt").read_text(encoding="utf-8", errors="replace")
     spec, plan = setup["spec"], setup["plan"]
     arm = "interactive" if "arm=interactive" in observer else "headless"
@@ -363,7 +586,15 @@ def main() -> int:
             if not ok:
                 failures.append(f"E4: verifier endpoints {sorted(urls)}, env extras {sorted(bad_env)}")
             sni = out / "netcap-sni.txt"
-            if sni.exists():
+            if matrix.is_g3(setup["probe"]):
+                state, why = g3_capture(sni, setup["origin_url"], selftest)
+                checks["E4_os_capture"] = state
+                if state == "contradicts":
+                    failures.append(f"E4 (G3): {why}")
+                elif state == "missing":
+                    missing.append(f"E4 OS capture (G3): {why}")
+                facts["g3_e4_capture"] = why
+            elif sni.exists():
                 hosts = {line.strip().lower() for line in sni.read_text(encoding="utf-8", errors="replace").splitlines() if line.strip()}
                 ok = not any(h.split(":")[0] in hosts for h in matrix.FORBIDDEN_HOSTS)
                 checks["E4_os_capture"] = "ok" if ok else "contradicts"
@@ -478,6 +709,13 @@ def main() -> int:
             if not ok:
                 failures.append(f"Q2: the operator attestation does not report {key!r}")
 
+    # T-08 G3 (charter §6): items 1-6, observation kept apart from replay.
+    g3 = classify_g3(out, setup, spec, plan, observer, hashes, mine, facts, checks) \
+        if matrix.is_g3(setup["probe"]) else None
+    if g3 is not None:
+        failures.extend(g3.pop("_failures"))
+        missing.extend(g3.pop("_missing"))
+
     # Three delivery levels, never merged into one claim (scope §1, §7):
     # emitted = the hook's own output (E3); model_delivered = the host's
     # tool_result (E2); user_visible = the interactive arm (Q2).
@@ -510,6 +748,11 @@ def main() -> int:
         label = "EVIDENCE_INCOMPLETE"
     else:
         label = "PASS"
+    if g3 is not None and not not_offered:
+        # Charter §6 labels: any contradiction or deviation is UNEXPECTED (stop,
+        # report raw); missing evidence stays EVIDENCE_INCOMPLETE, never a label.
+        label = ("UNEXPECTED" if deviations or failures
+                 else "EVIDENCE_INCOMPLETE" if missing else spec["g3_label"])
     outcome = {
         "probe": setup["probe"], "tool": setup["tool"], "rep": setup["rep"], "arm": arm,
         "selftest": selftest, "expect": expect, "verifier_expect": verifier_expect,
@@ -517,6 +760,11 @@ def main() -> int:
         "checks": checks, "failures": failures, "missing": missing,
         "deviations": deviations, "facts": facts,
     }
+    if g3 is not None:
+        outcome["g3"] = g3
+    if g3_row and (out / "outcome.json").exists() and not (out / "outcome.initial.json").exists():
+        # Keep the first classification beside any recheck result.
+        (out / "outcome.initial.json").write_bytes((out / "outcome.json").read_bytes())
     (out / "outcome.json").write_text(json.dumps(outcome, indent=2) + "\n", encoding="utf-8")
     print(label)
     return 0
@@ -553,6 +801,9 @@ def pair(diag_out: Path, control_out: Path) -> int:
 
 
 if __name__ == "__main__":
+    if sys.argv[1:2] == ["--g3-recheck-gate"]:
+        print(g3_recheck_gate(Path(sys.argv[2])))
+        raise SystemExit(0)
     if sys.argv[1:2] == ["--pair"]:
         raise SystemExit(pair(Path(sys.argv[2]), Path(sys.argv[3])))
     raise SystemExit(main())

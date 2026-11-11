@@ -2,7 +2,12 @@
 # Offline self-test of the C3 harness. NOT live evidence.
 #
 # usage: C3_ST_PY=<python.exe> C3_ST_MNEME_SRC=<windows path of a mneme checkout> \
+#          [C3_ST_G3_MNEME_SRC=<windows path of a checkout at the G3 pin>] \
 #          selftest/run_selftest.sh
+#
+# C3_ST_MNEME_SRC's mneme/ must equal PIN_MNEME_BASE (the batch preflight checks
+# it); the T-08 G3 cases use C3_ST_G3_MNEME_SRC (default C3_ST_MNEME_SRC), whose
+# mneme/ must equal G3_PIN_MNEME_BASE.
 #
 # Builds a local bare "fixture" remote in a temporary live root, seeds it with
 # the real CLI (`mneme init`, `add_decision`, `protect activate`), walks it
@@ -202,6 +207,212 @@ if phase AUTHORIZED; then
   run R-3 Edit PASS && r3_genuine Edit
   run R-3 Write PASS && r3_genuine Write
 fi
+
+# T-08 G3 (charter docs/plans/2026-11-10-t08-g3-host-boundary-live-charter.md §8).
+# G3 rows run under C3_PINSET=G3 against C3_ST_G3_MNEME_SRC (a checkout whose
+# mneme/ equals the G3 pin; default C3_ST_MNEME_SRC), with the self-test
+# remote's own tip standing in for the fixture tip.
+G3_SRC="${C3_ST_G3_MNEME_SRC:-$C3_ST_MNEME_SRC}"
+G3_TIP=$("$PY" -E -P -c "import json,sys; print(json.load(open(sys.argv[1]))['tip'])" \
+         "$(cygpath -w "$ROOT/live/_golden.json" 2>/dev/null || echo "$ROOT/live/_golden.json")" | tr -d '\r')
+g3run() {  # probe expected-label [VAR=value ...]
+  local probe=$1 want=$2; shift 2
+  env C3_PINSET=G3 C3_ST_MNEME_SRC="$G3_SRC" C3_ST_G3_FIXTURE_TIP="$G3_TIP" "$@" \
+    bash "$BASE/run_c3_probe.sh" "$probe" Edit 1 2>&1 | tail -1 | tr -d '\r'
+}
+g3expect() {  # probe expected-label [VAR=value ...]
+  local line; line=$(g3run "$@")
+  case "$line" in *" $2") echo "ok   $1 Edit -> $2" ;; *) echo "FAIL $1 Edit: $line"; fail=1 ;; esac
+}
+g3abort() {  # probe message-fragment description [VAR=value ...]
+  local probe=$1 frag=$2 what=$3 out rc; shift 3
+  out=$(env C3_ST_MNEME_SRC="$G3_SRC" C3_ST_G3_FIXTURE_TIP="$G3_TIP" "$@" \
+        bash "$BASE/run_c3_probe.sh" "$probe" Edit 1 2>&1); rc=$?
+  if [ $rc -ne 0 ] && echo "$out" | grep -qF "$frag"; then echo "ok   $what -> refused"
+  else echo "FAIL $what: exit $rc, $(echo "$out" | tail -1)"; fail=1; fi
+}
+g3facts() {  # probe description python-assertion-on-o
+  if "$PY" -E -P -c "import json,sys; o=json.load(open(sys.argv[1], encoding='utf-8')); $3" \
+       "$(cygpath -w "$ROOT/live/$1-Edit-1/out/outcome.json" 2>/dev/null || echo "$ROOT/live/$1-Edit-1/out/outcome.json")"; then
+    echo "ok   $1 $2"
+  else
+    echo "FAIL $1 $2"; fail=1
+  fi
+}
+if "$PY" -E -P "$HERE/test_observers.py" "$G3_SRC" > "$ROOT/observers.txt" 2>&1; then
+  echo "ok   G3 observers pass-through ($(grep -c '^ok' "$ROOT/observers.txt") checks)"
+else
+  echo "FAIL G3 observers"; cat "$ROOT/observers.txt"; fail=1
+fi
+g3expect G3-2 RECORDED_FALSE_COMPLETE_PASS
+g3facts G3-2 "items 1-6 ok, item 5 observed, live and replay complete PASS, own replay FAIL C3-DEC" \
+  "g=o['g3']; assert set(g['items'].values()) == {'ok'}, g['items']; assert g['item5'] == 'observed' and g['complete_claim'] == 'observed', g; r=g['replayed']; assert r['foreign']['payload']['verdict'] == 'PASS' and r['own']['payload']['decision_ids'] == ['C3-DEC'], r; assert o['facts']['target_changed'] is True"
+g3expect G3-1 REFUSED_MEMORY_PATH_MISMATCH
+g3facts G3-1 "items 1-6 ok, selected memory is the foreign file, target unchanged" \
+  "g=o['g3']; assert set(g['items'].values()) == {'ok'}, g['items']; s=json.load(open(sys.argv[1].replace('outcome.json','setup.json'), encoding='utf-8'))['g3']; assert o['facts']['g3_selected_memory'] == s['foreign_memory'], o['facts']; assert o['facts']['target_changed'] is False"
+# Negative self-tests. A host that ignores the hook, or the local file applied
+# under `project` alone (the stub must not), is UNEXPECTED, never a G3 label.
+g3expect G3-1 UNEXPECTED C3_STUB_IGNORE_HOOK=1
+g3expect G3-2 UNEXPECTED C3_ST_G3_SOURCES=project
+g3facts G3-2 "under 'project' alone: the hook saw no MNEME_MEMORY and selected its own memory" \
+  "g=o['g3']; assert g['observed']['hook_MNEME_MEMORY'] is None, g['observed']; assert g['items']['item1_channel'] == 'contradicts' and g['items']['item2_selection'] == 'contradicts', g['items']"
+# Guards: fixture tip, pin set, and the pin set on a non-G3 row.
+g3abort G3-1 "needs fixture tip" "G3-1 with a different fixture tip" C3_PINSET=G3 C3_ST_G3_FIXTURE_TIP=0000000000000000000000000000000000000000
+g3abort G3-2 "set C3_PINSET=G3" "G3-2 without the G3 pin set"
+g3abort P-1 "is for G3 rows only" "P-1 under the G3 pin set" C3_PINSET=G3
+# The G3 batch: G3-2 then G3-1, n=1, BATCH_DONE only if both reach their label.
+G3_OUT=$(env C3_ST_MNEME_SRC="$G3_SRC" C3_ST_G3_FIXTURE_TIP="$G3_TIP" bash "$BASE/run_c3_batch.sh" G3 < /dev/null 2>&1)
+if echo "$G3_OUT" | tail -1 | grep -q '^BATCH_DONE G3$' \
+   && echo "$G3_OUT" | grep -q '^G3-2 Edit 1 headless RECORDED_FALSE_COMPLETE_PASS$' \
+   && echo "$G3_OUT" | grep -q '^G3-1 Edit 1 headless REFUSED_MEMORY_PATH_MISMATCH$'; then
+  echo "ok   batch G3 -> BATCH_DONE (G3-2 then G3-1)"
+else
+  echo "FAIL batch G3"; echo "$G3_OUT" | tail -6; fail=1
+fi
+# Keep this good evidence for the E4 and --recheck cases below (the next batch
+# overwrites the live directories).
+mkdir -p "$ROOT/g3good" && cp -r "$ROOT/live/G3-1-Edit-1" "$ROOT/live/G3-2-Edit-1" "$ROOT/g3good/"
+G3_BAD=$(env C3_ST_MNEME_SRC="$G3_SRC" C3_ST_G3_FIXTURE_TIP="$G3_TIP" C3_STUB_IGNORE_HOOK=1 \
+         bash "$BASE/run_c3_batch.sh" G3 < /dev/null 2>&1)
+# G3-2 exits 0 and lands either way, so a hook-ignoring host changes only G3-1.
+if echo "$G3_BAD" | tail -1 | grep -q '^BATCH_STOPPED G3: G3-1' \
+   && echo "$G3_BAD" | grep -q '^G3-2 Edit 1 headless RECORDED_FALSE_COMPLETE_PASS$' \
+   && ! echo "$G3_BAD" | grep -q '^BATCH_DONE'; then
+  echo "ok   batch G3 with a hook-ignoring host -> G3-2 unaffected, BATCH_STOPPED at G3-1"
+else
+  echo "FAIL batch G3 stop: $(echo "$G3_BAD" | tail -1)"; fail=1
+fi
+
+# PR #792 review, finding 2: exactly one run, and live evidence never replaced.
+G3_REPS=$(env C3_ST_MNEME_SRC="$G3_SRC" C3_ST_G3_FIXTURE_TIP="$G3_TIP" bash "$BASE/run_c3_batch.sh" G3 2 < /dev/null 2>&1 | tail -1)
+echo "$G3_REPS" | grep -q "exactly once" && echo "ok   batch G3 with reps=2 -> refused" \
+  || { echo "FAIL batch G3 reps=2: $G3_REPS"; fail=1; }
+out=$(env C3_PINSET=G3 C3_ST_MNEME_SRC="$G3_SRC" C3_ST_G3_FIXTURE_TIP="$G3_TIP" bash "$BASE/run_c3_probe.sh" G3-2 Edit 2 2>&1); rc=$?
+[ $rc -ne 0 ] && echo "$out" | grep -q "runs exactly once" && echo "ok   G3-2 rep 2 -> refused" \
+  || { echo "FAIL G3-2 rep 2: exit $rc, $(echo "$out" | tail -1)"; fail=1; }
+once=(C3_PINSET=G3 C3_ST_G3_ENFORCE_ONCE=1)
+g3abort G3-2 "never runs twice" "G3-2 again over its own evidence (live rule)" "${once[@]}"
+mv "$ROOT/live/G3-2-Edit-1" "$ROOT/live/_invalid-G3-2-Edit-1-1"
+g3abort G3-2 "has no INVALID_REASON.txt" "G3-2 re-run without a recorded reason" "${once[@]}"
+echo "selftest: labelled run moved aside" > "$ROOT/live/_invalid-G3-2-Edit-1-1/INVALID_REASON.txt"
+g3abort G3-2 "only INVALID may be re-run" "G3-2 re-run after a labelled (not INVALID) run" "${once[@]}"
+rm -f "$ROOT/live/_invalid-G3-2-Edit-1-1/out/outcome.json"
+echo "HARNESS_FAILURE: selftest stand-in" > "$ROOT/live/_invalid-G3-2-Edit-1-1/out/harness_failure.txt"
+g3expect G3-2 RECORDED_FALSE_COMPLETE_PASS "${once[@]}"
+mv "$ROOT/live/G3-2-Edit-1" "$ROOT/live/_invalid-G3-2-Edit-1-2"
+echo "selftest: second INVALID" > "$ROOT/live/_invalid-G3-2-Edit-1-2/INVALID_REASON.txt"
+rm -f "$ROOT/live/_invalid-G3-2-Edit-1-2/out/outcome.json"
+echo "HARNESS_FAILURE: selftest stand-in" > "$ROOT/live/_invalid-G3-2-Edit-1-2/out/harness_failure.txt"
+g3abort G3-2 "already re-run once" "G3-2 second re-run after INVALID" "${once[@]}"
+
+# Findings 1 and 3: G3-1's E4 OS capture (strict G3 rule) and --recheck. The
+# good evidence is re-labelled as live (SELFTEST line removed, file:// remote
+# replaced by the fixture's https URL) in a separate root, so the live-only
+# rules apply and no self-test outcome under $ROOT/live claims live delivery.
+G3L="$ROOT/g3live"; mkdir -p "$G3L"; cp -r "$ROOT/g3good/"* "$G3L/"
+"$PY" -E -P - "$(cygpath -w "$G3L" 2>/dev/null || echo "$G3L")" "$C3_SELFTEST_REMOTE" <<'PYEOF'
+import pathlib, sys
+root, remote = pathlib.Path(sys.argv[1]), sys.argv[2]
+https = "https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture"
+for out in root.glob("G3-*/out"):
+    for name in ("setup.json", "hook-log.jsonl"):
+        p = out / name
+        p.write_text(p.read_text(encoding="utf-8").replace(remote, https), encoding="utf-8")
+    obs = out / "observer.txt"
+    obs.write_text("".join(l for l in obs.read_text(encoding="utf-8").splitlines(True)
+                           if not l.startswith("SELFTEST=1")), encoding="utf-8")
+    (out / "outcome.json").unlink()
+PYEOF
+G31="$G3L/G3-1-Edit-1/out"
+fresh() {  # first classification of a G3 copy: $1 = out dir
+  rm -f "$1/outcome.json" "$1/outcome.initial.json"
+  "$PY" -E -P "$BASE/classify_c3.py" "$(cygpath -w "$1" 2>/dev/null || echo "$1")" claude-opus-5-5 | tr -d '\r'
+}
+label_of() { "$PY" -E -P -c "import json,sys; print(json.load(open(sys.argv[1], encoding='utf-8'))['label'])" \
+               "$(cygpath -w "$1/outcome.json" 2>/dev/null || echo "$1/outcome.json")" | tr -d '\r'; }
+e4case() {  # expected-label description netcap-content|ABSENT
+  if [ "$3" = ABSENT ]; then rm -f "$G31/netcap-sni.txt"; else printf '%b' "$3" > "$G31/netcap-sni.txt"; fi
+  local got
+  got=$(fresh "$G31")
+  [ "$got" = "$1" ] && echo "ok   G3-1 E4 $2 -> $1" || { echo "FAIL G3-1 E4 $2: $got"; fail=1; }
+}
+e4case EVIDENCE_INCOMPLETE "capture absent" ABSENT
+e4case EVIDENCE_INCOMPLETE "capture empty" ''
+e4case EVIDENCE_INCOMPLETE "no summary line" 'github.com\n'
+e4case EVIDENCE_INCOMPLETE "forge not observed" 'api.anthropic.com\n# 3 other host(s) observed, not published\n'
+e4case UNEXPECTED "forbidden host" 'github.com\nblackhole.invalid\n# 0 other host(s) observed, not published\n'
+e4case UNEXPECTED "host outside the families" 'github.com\nexample.org\n# 1 other host(s) observed, not published\n'
+e4case REFUSED_MEMORY_PATH_MISMATCH "forge observed, families only" 'api.anthropic.com\ngithub.com\n# 4 other host(s) observed, not published\n'
+# --recheck: incomplete until the capture is attached, then done; no probe runs.
+rm -f "$G31/netcap-sni.txt"
+fresh "$G3L/G3-2-Edit-1/out" > /dev/null; fresh "$G31" > /dev/null
+before=$(cat "$G3L"/G3-*/out/events.jsonl | sha256sum | cut -d' ' -f1)
+recheck() { env C3_SELFTEST_LIVE="$(cygpath -w "$G3L" 2>/dev/null || echo "$G3L")" C3_ST_MNEME_SRC="$G3_SRC" \
+              C3_ST_G3_FIXTURE_TIP="$G3_TIP" bash "$BASE/run_c3_batch.sh" G3 1 --recheck < /dev/null 2>&1 | tail -1 | tr -d '\r'; }
+r1=$(recheck)
+printf 'github.com\napi.anthropic.com\n# 2 other host(s) observed, not published\n' > "$G31/netcap-sni.txt"
+r2=$(recheck)
+after=$(cat "$G3L"/G3-*/out/events.jsonl | sha256sum | cut -d' ' -f1)
+if echo "$r1" | grep -q '^BATCH_INCOMPLETE G3' && [ "$r2" = "BATCH_DONE G3" ] && [ "$before" = "$after" ] \
+   && [ "$(ls -d "$G3L"/G3-* | wc -l)" = 2 ]; then
+  echo "ok   batch G3 --recheck: BATCH_INCOMPLETE without the capture, BATCH_DONE after it; no probe re-run"
+else
+  echo "FAIL batch G3 --recheck: '$r1' then '$r2' (events unchanged: $([ "$before" = "$after" ] && echo yes || echo no))"; fail=1
+fi
+"$PY" -E -P -c "import json,sys; o=json.load(open(sys.argv[1], encoding='utf-8')); assert o['label'] == 'EVIDENCE_INCOMPLETE', o['label']" \
+  "$(cygpath -w "$G31/outcome.initial.json" 2>/dev/null || echo "$G31/outcome.initial.json")" \
+  && echo "ok   G3-1 first classification kept as outcome.initial.json (EVIDENCE_INCOMPLETE)" \
+  || { echo "FAIL G3-1 outcome.initial.json"; fail=1; }
+
+# PR #792 re-review: a recorded G3 outcome is never converted into a label.
+VALID='github.com\napi.anthropic.com\n# 2 other host(s) observed, not published\n'
+refused() {  # description expected-kept-label refusal-fragment
+  local r; r=$(recheck)
+  if echo "$r" | grep -q "^BATCH_STOPPED G3: recheck refused for G3-1" && echo "$r" | grep -qF "$3" \
+     && [ "$(label_of "$G31")" = "$2" ]; then
+    echo "ok   $1 -> recheck refused, $2 kept"
+  else
+    echo "FAIL $1: '$r', label now $(label_of "$G31")"; fail=1
+  fi
+}
+# (a) UNEXPECTED (forbidden host), capture then swapped for a valid one.
+printf 'github.com\nblackhole.invalid\n# 0 other host(s) observed, not published\n' > "$G31/netcap-sni.txt"
+fresh "$G31" > /dev/null; printf "$VALID" > "$G31/netcap-sni.txt"
+refused "UNEXPECTED then a swapped capture" UNEXPECTED "is final"
+[ ! -e "$G31/outcome.initial.json" ] && echo "ok   refused recheck left no rewrite (no outcome.initial.json)" \
+  || { echo "FAIL refused recheck rewrote the outcome"; fail=1; }
+# (b) Direct classification over a recorded G3 outcome is refused.
+if "$PY" -E -P "$BASE/classify_c3.py" "$(cygpath -w "$G31" 2>/dev/null || echo "$G31")" claude-opus-5-5 > /dev/null 2>&1; then
+  echo "FAIL direct classify rewrote a G3 outcome"; fail=1
+elif [ "$(label_of "$G31")" = UNEXPECTED ]; then
+  echo "ok   direct classify over a G3 outcome -> refused, UNEXPECTED kept"
+else
+  echo "FAIL direct classify changed the label to $(label_of "$G31")"; fail=1
+fi
+# (b2) ... and the batch's environment flag alone does not authorize it: the
+#      classifier re-applies the gate (UNEXPECTED stays, nothing preserved/rewritten).
+sum_before=$(sha256sum < "$G31/outcome.json" | cut -d' ' -f1)
+if C3_G3_RECHECK=1 "$PY" -E -P "$BASE/classify_c3.py" "$(cygpath -w "$G31" 2>/dev/null || echo "$G31")" claude-opus-5-5 > /dev/null 2>&1; then
+  echo "FAIL direct classify with C3_G3_RECHECK=1 rewrote a G3 outcome"; fail=1
+elif [ "$(sha256sum < "$G31/outcome.json" | cut -d' ' -f1)" = "$sum_before" ] && [ ! -e "$G31/outcome.initial.json" ] \
+     && [ "$(label_of "$G31")" = UNEXPECTED ]; then
+  echo "ok   direct classify with C3_G3_RECHECK=1 over UNEXPECTED -> refused, outcome byte-identical, no initial copy"
+else
+  echo "FAIL direct classify with C3_G3_RECHECK=1 changed the evidence"; fail=1
+fi
+# (c) The capture is attached once: a judged capture cannot be swapped.
+rm -f "$G31/netcap-sni.txt"; fresh "$G31" > /dev/null
+printf 'api.anthropic.com\n# 1 other host(s) observed, not published\n' > "$G31/netcap-sni.txt"
+r=$(recheck)
+echo "$r" | grep -q '^BATCH_INCOMPLETE G3' && echo "ok   capture without the forge -> recheck still BATCH_INCOMPLETE" \
+  || { echo "FAIL capture without the forge: '$r'"; fail=1; }
+printf "$VALID" > "$G31/netcap-sni.txt"
+refused "a judged capture then swapped" EVIDENCE_INCOMPLETE "attached once"
+# (d) Missing evidence other than the capture is never rechecked.
+mv "$G31/replay-g3.json" "$G3L/replay-g3.json.aside"; rm -f "$G31/netcap-sni.txt"; fresh "$G31" > /dev/null
+printf "$VALID" > "$G31/netcap-sni.txt"
+refused "replay missing as well as the capture" EVIDENCE_INCOMPLETE "other than the E4 OS capture"
+mv "$G3L/replay-g3.json.aside" "$G31/replay-g3.json"
 
 # Redacted collection: no live-root, home or user-name strings may survive.
 DEST="$ROOT/collected"

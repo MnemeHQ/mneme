@@ -20,7 +20,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import matrix  # noqa: E402
 
 LIVE_ROOT = Path(os.environ.get("C3_SELFTEST_LIVE") or r"C:\dev\mneme-c3-live")
-NAME = re.compile(r"^(_golden|_seed|(?P<probe>[RPUDH]-\d)-(?P<tool>Write|Edit|MultiEdit)-(?P<rep>[1-9]\d*)"
+NAME = re.compile(r"^(_golden|_seed|(?P<probe>[RPUDH]-\d|G3-\d)-(?P<tool>Write|Edit|MultiEdit)-(?P<rep>[1-9]\d*)"
                   r"(?P<arm>-interactive)?)$")
 
 

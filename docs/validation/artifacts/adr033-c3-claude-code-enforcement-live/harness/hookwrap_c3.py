@@ -6,7 +6,10 @@ It records, without changing any decision:
   envelope's ``session_id`` and ``transcript_path``;
 - each ``live_verifier`` result: authorization, reason, branch, tip, URL;
 - each verifier Git call: argv with the endpoint, and the env key names
-  (E4, the wrapper half; the OS capture is the other half).
+  (E4, the wrapper half; the OS capture is the other half);
+- the hook's own ``find_memory`` and ``_invoke_check`` calls, through the
+  pass-through observers in ``observe.py`` (T-08 G3 charter §6 items 2, 5):
+  argument, return value or exception, and allowlisted checker payload fields.
 
 Operator fault injection (scope Q3, accepted), selected by environment set by
 the runner only:
@@ -36,7 +39,9 @@ import traceback
 try:
     SRC = os.environ["C3_MNEME_SRC"]
     LOG = os.environ["C3_LOG"]
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     sys.path.insert(0, SRC)
+    from observe import describe_find_memory, describe_invoke_check, observe  # noqa: E402
     from mneme import availability_authority as aa  # noqa: E402
     from mneme.integrations.claude_code import availability, hook  # noqa: E402
 except Exception:  # harness defect: fail closed and say so
@@ -45,6 +50,9 @@ except Exception:  # harness defect: fail closed and say so
 
 verifications = []
 git_calls = []
+# T-08 G3 (charter §6 items 2 and 5): the hook's own calls, observed as made.
+find_memory_calls = []
+check_calls = []
 
 _real_live_verifier = availability.live_verifier
 _real_run_git = aa._run_git
@@ -85,6 +93,10 @@ def _stalling_run(command, *args, **kwargs):
 aa._run_git = _recording_run_git
 availability.live_verifier = _recording_live_verifier
 subprocess.run = _stalling_run
+# The hook looks both names up as module globals at call time, so replacing the
+# module attributes observes its real calls. Pass-through only (observe.py).
+hook.find_memory = observe(hook.find_memory, find_memory_calls, describe_find_memory)
+hook._invoke_check = observe(hook._invoke_check, check_calls, describe_invoke_check)
 
 hook_stall = os.environ.get("C3_STALL_HOOK_SECONDS")
 if hook_stall:
@@ -117,6 +129,8 @@ try:
                                     if k.upper().endswith("_PROXY") or k.upper().startswith("GIT_")),
         "verifications": verifications,
         "verifier_git_calls": git_calls,
+        "find_memory_calls": find_memory_calls,
+        "check_calls": check_calls,
         "hook_module": hook.__file__,
         "seconds": round(time.time() - started, 3),
         "exit": rc,
