@@ -7,6 +7,8 @@
 #   H1b-start  | H1b-start-ctl   SessionStart                 command hook, lifecycle event
 #   H1c-stop   | H1c-stop-ctl    Stop                         command hook, lifecycle event
 # The plain name is the emitter arm; "-ctl" is the paired no-op control.
+# Under H1_PINSET=A2 (set by `run_h1.sh A2`) only the H1a and H1b arms are allowed,
+# the live root and guarded delete are A2's, and the session gets --model.
 #
 # Steps: guarded delete of <LIVE>/<arm>; setup_probe.py (workspace, hook
 # registration for the probed event only, fresh nonce); observer snapshot; one
@@ -24,19 +26,30 @@ case "$ARM" in
   H1a-edit|H1a-edit-ctl|H1a-bash|H1a-bash-ctl|H1b-start|H1b-start-ctl|H1c-stop|H1c-stop-ctl) ;;
   *) echo "ABORT: arm not in allowlist: '$ARM'"; exit 1 ;;
 esac
+case " $H1_PATHS " in
+  *" ${ARM%-ctl} "*) ;;
+  *) echo "ABORT: arm '$ARM' is not in pin set ${H1_PINSET:-H1} (paths: $H1_PATHS)"; exit 1 ;;
+esac
 [ -n "${H1_LIVE:-}" ] && { echo "ABORT: H1_LIVE is set; the live root is fixed"; exit 1; }
 if [ "${H1_SELFTEST:-}" != 1 ] && [ -n "${CLAUDECODE:-}" ]; then
   echo "ABORT: CLAUDECODE set (see preflight.sh)"; exit 1
 fi
-[ "$(cygpath -w "$LIVE")" = 'C:\dev\d5p2-h1-live' ] || { echo "ABORT: live root is not C:\\dev\\d5p2-h1-live"; exit 1; }
+[ "$(cygpath -w "$LIVE")" = "$LIVE_W_EXPECTED" ] || { echo "ABORT: live root is not $LIVE_W_EXPECTED"; exit 1; }
+if [ "${H1_PINSET:-}" = A2 ] && [ "${DISABLE_AUTOUPDATER:-}" != 1 ]; then
+  echo "ABORT: pin set A2 needs DISABLE_AUTOUPDATER=1 in this shell"; exit 1
+fi
 # The stub may only ever answer a self-test, and a self-test may only ever reach the stub.
 CB=$(command -v claude) || { echo "ABORT: claude not found"; exit 1; }
 case "$CB" in
   "$BASE/selftest/"*) [ "${H1_SELFTEST:-}" = 1 ] || { echo "ABORT: claude resolves to the self-test stub ($CB) in a live run"; exit 1; } ;;
   *) [ "${H1_SELFTEST:-}" = 1 ] && { echo "ABORT: H1_SELFTEST=1 but claude is not the stub ($CB); refusing a live session"; exit 1; } ;;
 esac
+# The pinned host version is re-checked immediately before every session: the
+# host auto-updated between two A1 attempts once (2026-10-19).
+V=$(claude --version | tr -d '\r')
+[ "$V" = "$PIN_CLAUDE_VERSION" ] || { echo "ABORT: claude '$V' != pinned '$PIN_CLAUDE_VERSION'"; exit 1; }
 P="$LIVE/$ARM"
-"$PY" -I "$BASE/safe_rmtree.py" delete "$ARM" || { echo "ABORT: guarded delete refused"; exit 1; }
+"$PY" -I "$BASE/$RMTREE" delete "$ARM" || { echo "ABORT: guarded delete refused"; exit 1; }
 [ -e "$P" ] && { echo "ABORT: $P still exists after guarded delete"; exit 1; }
 mkdir -p "$P" || { echo "ABORT: cannot create $P"; exit 1; }
 OUT="$P/out"; WS="$P/ws"
@@ -56,8 +69,11 @@ h() { [ -f "$1" ] && sha256sum < "$1" | cut -d' ' -f1 || echo absent; }
 
 {
   echo "arm=$ARM"
+  echo "pinset=${H1_PINSET:-H1}"
+  [ -n "$PIN_MODEL_FLAG" ] && echo "model_flag=$PIN_MODEL_FLAG"
+  [ "${H1_PINSET:-}" = A2 ] && echo "disable_autoupdater=$DISABLE_AUTOUPDATER"
   [ "${H1_SELFTEST:-}" = 1 ] && echo "selftest=1 (stub claude; NOT live evidence)"
-  echo "claude_version=$(claude --version | tr -d '\r')"
+  echo "claude_version=$V"
   echo "claude_bin=$CB"
   echo "harness_head=$(git -C "$BASE" rev-parse HEAD 2>/dev/null || echo unknown)"
   echo "sources=$SOURCES"
@@ -72,6 +88,7 @@ h() { [ -f "$1" ] && sha256sum < "$1" | cut -d' ' -f1 || echo absent; }
 ( cd "$WS" && env -u MNEME_MEMORY -u MNEME_HOOK_MODE -u CLAUDE_PLUGIN_OPTION_MODE \
     claude -p "$PROMPT" --output-format stream-json --verbose \
       --permission-mode acceptEdits --allowedTools $TOOLS --setting-sources "$SOURCES" \
+      ${PIN_MODEL_FLAG:+--model "$PIN_MODEL_FLAG"} \
     > "$OUT/events.jsonl" 2> "$OUT/claude.stderr.txt" )
 rc=$?
 echo "claude_exit=$rc" >> "$OUT/observer.txt"

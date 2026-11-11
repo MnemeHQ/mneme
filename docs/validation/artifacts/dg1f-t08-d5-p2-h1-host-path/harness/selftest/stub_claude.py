@@ -27,7 +27,10 @@ about Claude Code. Learning the real behavior is what the live probes are for.
   H1_STUB_STOP_REENTER=1      a Stop hook that printed anything forces one more turn
   H1_STUB_LEAK=1              the "agent" Reads ../out/nonce.txt first
   H1_STUB_NO_TRANSCRIPT=1     no session transcript file is written
-  H1_STUB_MODEL=<m>           init-event model (default: the pinned model)
+  H1_STUB_MODEL=<m>           init-event model (default: the --model argument if given, else the
+                              H1 pinned model; like the host, --model selects the session model)
+  H1_STUB_VERSION=<v>         the --version answer and init claude_code_version (default: the H1 pin;
+                              the selftest/claude shim sets it to the active pin set's version)
   H1_STUB_TRANSCRIPT_MODEL=<m> assistant message.model (default: pinned model without [..]; "none" omits it)
   H1_STUB_SM_MODE=<m>         how a hook's top-level systemMessage is treated (A1):
                    stream  (default) a stream-json system `informational` event carrying it
@@ -275,6 +278,10 @@ class Host:
 
 
 def main(argv):
+    global VERSION, MODEL
+    VERSION = env("H1_STUB_VERSION") or VERSION
+    if "--model" in argv:
+        MODEL = argv[argv.index("--model") + 1]
     if "--version" in argv:
         print(VERSION)
         return 0

@@ -10,12 +10,22 @@
 # four outcomes are verified and the summary is written. H1_DONE means the batch
 # FINISHED, whatever the labels are; it never means H1 passed. Only the gate line
 # in summary_h1.md decides H1.
+#
+# usage: run_h1.sh          the H1 pin set (all four paths, Claude Code 2.1.202)
+#        run_h1.sh A2       Amendment A2 (probe scope 4.3): H1a-edit, H1a-bash and
+#                           H1b-start only, re-pinned to Claude Code 2.1.310, in their
+#                           own root. Its summary is never the H1 gate (no Stop path).
 set -u
 set -o pipefail
 BASE=$(cd "$(dirname "$0")" && pwd)
+case "${1:-}" in
+  "") [ -z "${H1_PINSET:-}" ] || { echo "ABORT: H1_PINSET is set; pass the pin set as the argument instead"; exit 1; } ;;
+  A2) export H1_PINSET=A2 ;;
+  *) echo "ABORT: unknown pin set '$1' (only A2 is defined)"; exit 1 ;;
+esac
 . "$BASE/pins.env"
-PATHS=(H1a-edit H1a-bash H1b-start H1c-stop)
-"$PY" -I "$BASE/safe_rmtree.py" check-root || { echo "ABORT: disposable root unsafe"; exit 1; }
+read -r -a PATHS <<< "$H1_PATHS"
+"$PY" -I "$BASE/$RMTREE" check-root || { echo "ABORT: disposable root unsafe"; exit 1; }
 mkdir -p "$LIVE" || { echo "ABORT: cannot create $LIVE"; exit 1; }
 rm -f "$LIVE/H1_DONE" "$LIVE/H1_INCOMPLETE" "$LIVE/summary_h1.md" || { echo "ABORT: cannot clear batch markers"; exit 1; }
 LOGF="$LIVE/run_h1.log"
@@ -28,16 +38,18 @@ abort() {
 }
 
 bash "$BASE/preflight.sh" || abort "preflight mismatch"
+echo "[h1] pin set: ${H1_PINSET:-H1} (claude '$PIN_CLAUDE_VERSION', model '$PIN_MODEL', paths: ${PATHS[*]})"
 echo "[h1] harness HEAD: $(git -C "$BASE" rev-parse HEAD)"
 if [ -n "$(git -C "$BASE" status --porcelain -- .)" ]; then
   if [ "${H1_SELFTEST:-}" = 1 ]; then echo "[h1] self-test: harness has uncommitted changes"
   else git -C "$BASE" status --short -- .; abort "harness directory has uncommitted changes"; fi
 fi
-(cd "$BASE" && sha256sum ./*.py ./*.sh pins.env .gitignore README.md selftest/claude selftest/*.py | sed 's/^/[h1] harness sha256: /') \
+(cd "$BASE" && sha256sum ./*.py ./*.sh pins.env pins_a1.env .gitignore README.md selftest/claude selftest/*.py | sed 's/^/[h1] harness sha256: /') \
   || abort "cannot hash harness"
 
 probe() { bash "$BASE/run_h1_probe.sh" "$1" || abort "probe $1 failed (see $LIVE/$1/out/harness_failure.txt)"; }
 LIVE_W=$(cygpath -w "$LIVE")
+PATHS_CSV=$(IFS=,; echo "${PATHS[*]}")
 first=1
 for p in "${PATHS[@]}"; do
   echo "=== $p-ctl (no-op control)"
@@ -55,12 +67,19 @@ for l in open(sys.argv[1],encoding='utf-8'):
   fi
   echo "=== $p (emitter)"
   probe "$p"
-  lab=$("$PY" -I "$BASE/classify_h1.py" pair "$LIVE_W" "$p" "$PIN_MODEL" | tr -d '\r') || abort "classification of $p failed"
+  # A2 also passes the host version pin, so a version mismatch is NOT_EXECUTED.
+  if [ "${H1_PINSET:-}" = A2 ]; then
+    lab=$("$PY" -I "$BASE/classify_h1.py" pair "$LIVE_W" "$p" "$PIN_MODEL" "$PIN_CLAUDE_VERSION" | tr -d '\r') \
+      || abort "classification of $p failed"
+  else
+    lab=$("$PY" -I "$BASE/classify_h1.py" pair "$LIVE_W" "$p" "$PIN_MODEL" | tr -d '\r') \
+      || abort "classification of $p failed"
+  fi
   echo "[h1] $p: $lab"
 done
-"$PY" -I "$BASE/classify_h1.py" verify "$LIVE_W" || abort "evidence verification failed"
-"$PY" -I "$BASE/classify_h1.py" summary "$LIVE_W" summary_h1.md || abort "summary failed"
+"$PY" -I "$BASE/classify_h1.py" verify "$LIVE_W" "$PATHS_CSV" || abort "evidence verification failed"
+"$PY" -I "$BASE/classify_h1.py" summary "$LIVE_W" summary_h1.md "$PATHS_CSV" || abort "summary failed"
 [ -s "$LIVE/summary_h1.md" ] || abort "summary_h1.md missing"
 date -u +%FT%TZ > "$LIVE/H1_DONE" || abort "cannot write H1_DONE"
-echo "Batch finished (H1_DONE is not a pass). Evidence under $LIVE ; the H1 gate result is the gate line in $LIVE/summary_h1.md:"
-grep '^H1 gate' "$LIVE/summary_h1.md"
+echo "Batch finished (H1_DONE is not a pass). Evidence under $LIVE ; the result is the gate line in $LIVE/summary_h1.md:"
+grep -E '^(H1 gate|Listed-path result)' "$LIVE/summary_h1.md"

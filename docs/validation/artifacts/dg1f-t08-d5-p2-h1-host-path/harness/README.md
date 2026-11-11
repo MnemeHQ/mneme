@@ -177,3 +177,34 @@ When, and only when, the owner authorizes the H1 live batch:
 & "C:\Program Files\Git\bin\bash.exe" -l "<harness>/run_a1_headless.sh"
 & "C:\Program Files\Git\bin\bash.exe" -l "<harness>/prep_a1_interactive.sh" H1c-sm-int-ctl
 ```
+
+## Amendment A2: H1a and H1b re-pinned to Claude Code 2.1.310 (offline-validated only)
+
+**Nothing here has run live.** The live run needs a separate, explicit go-ahead. The specification is probe scope §4.3 (proposed in the same PR as this harness change).
+
+| File | Role |
+|---|---|
+| `pins.env` (A2 pin set) | Selected only by `run_h1.sh A2`, which exports `H1_PINSET=A2` (the C3 `C3_PINSET=G3` pattern). Claude Code `2.1.310 (Claude Code)`, `--model claude-opus-5-5` (`PIN_MODEL_FLAG`), paths H1a-edit, H1a-bash and H1b-start only, root `C:\dev\d5p2-h1-a2-live`, guarded delete `safe_rmtree_a2.py`. An unknown `H1_PINSET` aborts; `run_h1.sh` refuses one taken from the environment; `pins_a1.env` refuses any. Without a pin set, every H1 value is unchanged. |
+| `safe_rmtree_a2.py` | `safe_rmtree.py` with an exact delta: the A2 root, the six A2 arms, and `PROTECTED` covering the H1 and A1 live roots, both archives and `C:\dev\d5p2-h1c-a1-attempts`. |
+| `run_h1_probe.sh` | The arm must belong to the active pin set; A2 needs `DISABLE_AUTOUPDATER=1`; `claude --version` is checked against the pin immediately before **every** session; `--model` is passed when the pin set defines one; `observer.txt` records `pinset`, `model_flag` and the checked `claude_version`. |
+| `classify_h1.py` | `pair … <pin_model> [<pin_version>]`: with a version pin (A2 always passes one), an arm whose recorded `claude_version` differs, or is unrecorded, gives `NOT_EXECUTED`. `verify` and `summary` take an optional comma-separated path subset. Only an all-four summary carries the `H1 gate` line; a subset summary carries a `Listed-path result` that names the missing paths and says it is not the H1 gate. The summary now shows each path's host version. |
+| `selftest/claude`, `stub_claude.py` | The stub answers with the active pin set's version (`H1_STUB_VERSION`) and, like the host, takes its session model from `--model`. |
+
+**Offline validation (stub only, NOT evidence):**
+- `python -m pytest -q …/harness/selftest`: **138 passed** (35 in `test_a2_harness.py`). They cover:
+  - the A2 root, arms and protected trees, including refusal of every Stop and A1 arm name;
+  - path selection (default, order, refusal of unknown, duplicate or empty subsets);
+  - the subset `verify`, and a subset summary that never prints the H1 gate line;
+  - `--model` plumbing: present → `DELIVERED_TO_AGENT`, absent → `NOT_EXECUTED` under the A2 model pin;
+  - the version pin: match → pass; a mismatch in either arm, or no recorded version → `NOT_EXECUTED`; no pin → H1 behavior;
+  - shell plumbing through Git Bash: A2 and default pin values, unknown pin set, `pins_a1.env` refusing a pin set, Stop arms refused under A2, and `run_h1.sh` refusing an unknown or environment-supplied pin set.
+- **`run_h1.sh A2` was run end to end under `H1_SELFTEST=1`** in the A2 root: preflight OK, all three pairs `DELIVERED_TO_AGENT` (stub), `Listed-path result … PASS`, with every init event reporting `claude-opus-5-5` and every observer `2.1.310 (Claude Code)`. Without `DISABLE_AUTOUPDATER=1` it aborted at the preflight. `C:\dev\d5p2-h1-live` was not touched. The A2 root was emptied afterwards through `safe_rmtree_a2.py`.
+
+**Running it live (when authorized).** Use your own window, never inside Claude Code, with `claude --version` printing `2.1.310 (Claude Code)`, `PY` set in `pins.local.env`, and no `MNEME_*`, `CLAUDECODE`, `H1_SELFTEST`, `H1_LIVE` or `H1_PINSET` variables:
+
+```powershell
+$env:DISABLE_AUTOUPDATER = "1"
+& "C:\Program Files\Git\bin\bash.exe" -l "<harness>/run_h1.sh" A2
+```
+
+The evidence goes to `C:\dev\d5p2-h1-a2-live`. Collection with `collect_h1.py` and the record `docs/validation/dg1f-t08-d5-p2-host-path-h1-a2-<date>.md` form a separate evidence PR.
