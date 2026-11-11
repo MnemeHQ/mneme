@@ -18,8 +18,11 @@
 set -u
 set -o pipefail
 BASE=$(cd "$(dirname "$0")" && pwd)
+# The pin set comes only from the argument: an H1_PINSET already in the
+# environment is refused in every case, never overwritten (review of #794).
+[ -z "${H1_PINSET:-}" ] || { echo "ABORT: H1_PINSET is set in the environment; unset it and pass the pin set as the argument"; exit 1; }
 case "${1:-}" in
-  "") [ -z "${H1_PINSET:-}" ] || { echo "ABORT: H1_PINSET is set; pass the pin set as the argument instead"; exit 1; } ;;
+  "") ;;
   A2) export H1_PINSET=A2 ;;
   *) echo "ABORT: unknown pin set '$1' (only A2 is defined)"; exit 1 ;;
 esac

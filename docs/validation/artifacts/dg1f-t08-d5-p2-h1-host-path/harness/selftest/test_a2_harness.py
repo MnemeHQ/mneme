@@ -105,13 +105,14 @@ def test_selected_paths_refuses_bad_selection(csv):
         C.selected_paths(csv)
 
 
-def _write_outcomes(live, paths, version=A2_VERSION):
+def _write_outcomes(live, paths, version=A2_VERSION, versions=None):
     for p in paths:
         out = live / p / "out"
         out.mkdir(parents=True)
+        v = (versions or {}).get(p, version)
         out.joinpath("outcome.json").write_text(json.dumps({
             "path_type": C.PATHS[p]["path_type"], "label": "DELIVERED_TO_AGENT", "passes_path": True,
-            "echoed": True, "reasons": [], "observer": {"claude_version": version}}), encoding="utf-8")
+            "echoed": True, "reasons": [], "observer": {"claude_version": v}}), encoding="utf-8")
 
 
 def test_subset_verify_needs_only_listed_outcomes(tmp_path):
@@ -124,9 +125,9 @@ def test_subset_summary_never_claims_the_h1_gate(tmp_path):
     _write_outcomes(tmp_path, ["H1a-edit", "H1a-bash", "H1b-start"])
     C.cmd_summary(str(tmp_path), "summary.md", A2_PATHS)
     text = (tmp_path / "summary.md").read_text(encoding="utf-8")
-    assert "Listed-path result (every listed path passes): **PASS**" in text
+    assert "Listed-path result (every listed path passes, one host version): **PASS**" in text
     assert "**not** the H1 gate" in text and "H1c-stop" in text
-    assert "H1 gate (every path passes)" not in text
+    assert "H1 gate" not in text.split("**not** the H1 gate")[0]  # no gate line before the disclaimer
     assert A2_VERSION in text  # the host version is shown per path
 
 
@@ -134,8 +135,44 @@ def test_full_summary_keeps_the_h1_gate_line(tmp_path):
     _write_outcomes(tmp_path, list(C.PATHS), version="2.1.202 (Claude Code)")
     C.cmd_summary(str(tmp_path), "summary.md")
     text = (tmp_path / "summary.md").read_text(encoding="utf-8")
-    assert "H1 gate (every path passes): **PASS**" in text
-    assert "Listed-path result" not in text
+    assert "H1 gate (every path passes, one host version): **PASS**" in text
+    assert "Listed-path result" not in text and "Host pin not established" not in text
+
+
+# Review of #794, finding 1: a gate or listed-path PASS needs one recorded host version.
+
+def test_mixed_version_full_set_is_never_an_h1_pass(tmp_path):
+    # Every path passes, but H1a/H1b come from 2.1.310 and H1c from 2.1.202 (A2-1).
+    _write_outcomes(tmp_path, list(C.PATHS), version=A2_VERSION,
+                    versions={"H1c-stop": "2.1.202 (Claude Code)"})
+    C.cmd_summary(str(tmp_path), "summary.md")
+    text = (tmp_path / "summary.md").read_text(encoding="utf-8")
+    assert "H1 gate (every path passes, one host version): **NOT MET**" in text
+    assert "**PASS**" not in text
+    assert "mixed host versions" in text and "2.1.202 (Claude Code) (H1c-stop)" in text
+
+
+def test_unrecorded_version_in_full_set_is_never_an_h1_pass(tmp_path):
+    _write_outcomes(tmp_path, list(C.PATHS), version="2.1.202 (Claude Code)", versions={"H1a-bash": None})
+    C.cmd_summary(str(tmp_path), "summary.md")
+    text = (tmp_path / "summary.md").read_text(encoding="utf-8")
+    assert "**NOT MET**" in text and "no recorded claude_version for H1a-bash" in text
+
+
+def test_mixed_version_subset_is_never_a_listed_pass(tmp_path):
+    _write_outcomes(tmp_path, ["H1a-edit", "H1a-bash", "H1b-start"], version=A2_VERSION,
+                    versions={"H1b-start": "2.1.311 (Claude Code)"})
+    C.cmd_summary(str(tmp_path), "summary.md", A2_PATHS)
+    text = (tmp_path / "summary.md").read_text(encoding="utf-8")
+    assert "Listed-path result (every listed path passes, one host version): **NOT MET**" in text
+    assert "mixed host versions" in text
+
+
+def test_host_pin_problem_unit():
+    one = {"observer": {"claude_version": A2_VERSION}}
+    assert C.host_pin_problem({"H1a-edit": one, "H1a-bash": one}) is None
+    assert "mixed" in C.host_pin_problem({"H1a-edit": one, "H1a-bash": {"observer": {"claude_version": "x"}}})
+    assert "no recorded" in C.host_pin_problem({"H1a-edit": one, "H1a-bash": {}})
 
 
 # ---------------------------------------------------------------- model and version pins
@@ -257,7 +294,11 @@ def test_runner_refuses_unknown_pin_set_argument():
     assert r.returncode == 1 and "unknown pin set" in r.stdout, r
 
 
+# Review of #794, finding 2: an environment H1_PINSET is refused, never overwritten,
+# whether or not the argument names the same pin set.
 @needs_bash
-def test_runner_refuses_pinset_from_the_environment():
-    r = _sh("bash ./run_h1.sh", {"H1_PINSET": "A2"})
-    assert r.returncode == 1 and "pass the pin set as the argument" in r.stdout, r
+@pytest.mark.parametrize("env_value,arg", [("A2", ""), ("A2", "A2"), ("A3", "A2"), ("H1", "")])
+def test_runner_refuses_pinset_from_the_environment(env_value, arg):
+    r = _sh(f"bash ./run_h1.sh {arg}", {"H1_PINSET": env_value, "DISABLE_AUTOUPDATER": "1"})
+    assert r.returncode == 1 and "H1_PINSET is set in the environment" in r.stdout, r
+    assert "[preflight]" not in r.stdout  # refused before anything else ran

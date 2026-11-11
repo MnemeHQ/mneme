@@ -9,7 +9,8 @@ usage:
   classify_h1.py summary <live_dir> <summary.md> [paths]
   [paths] is a comma-separated subset of the path ids below (default: all four).
   Only an all-four summary carries the H1 gate line; a subset summary (Amendment
-  A2) carries a listed-path result that says it is not the H1 gate.
+  A2) carries a listed-path result that says it is not the H1 gate. Either is
+  PASS only when every selected outcome records the same host version (A2-1).
 
 Path ids and their path type (scope section 3.1):
   H1a-edit   command hook, tool event       (PreToolUse, Edit matcher)
@@ -523,6 +524,23 @@ def selected_paths(csv=None):
     return [p for p in PATHS if p in names]
 
 
+def host_pin_problem(outcomes):
+    """None when every outcome records the same non-empty host version, else the reason.
+
+    A gate or listed-path result may only combine paths probed on one pinned host
+    (probe scope 4.3, A2-1). Outcomes copied together from batches on different
+    versions, or an outcome with no recorded version, never yield PASS."""
+    versions = {p: (r.get("observer") or {}).get("claude_version") for p, r in outcomes.items()}
+    unrecorded = sorted(p for p, v in versions.items() if not v)
+    if unrecorded:
+        return f"no recorded claude_version for {', '.join(unrecorded)}"
+    distinct = sorted(set(versions.values()))
+    if len(distinct) > 1:
+        return "mixed host versions: " + "; ".join(
+            f"{v} ({', '.join(p for p in outcomes if versions[p] == v)})" for v in distinct)
+    return None
+
+
 def cmd_verify(live, csv=None):
     bad = [p for p in selected_paths(csv) if not (Path(live) / p / "out" / "outcome.json").is_file()]
     for p in bad:
@@ -540,16 +558,21 @@ def cmd_summary(live, dst, csv=None):
         host = (r.get("observer") or {}).get("claude_version")
         rows.append(f"| {p} | {r['path_type']} | {r['label']} | {r['passes_path']} | {audience} | "
                     f"{r.get('echoed')} | {host} | {'; '.join(r.get('reasons') or []) or '-'} |")
-    passes = all(r["passes_path"] for r in outcomes.values())
+    pin_problem = host_pin_problem(outcomes)
+    passes = all(r["passes_path"] for r in outcomes.values()) and pin_problem is None
     selftest = any((r.get("observer") or {}).get("selftest") for r in outcomes.values())
     banner = "**SELF-TEST (stub `claude`, not Claude Code): NOT live evidence.**\n\n" if selftest else ""
+    pin_note = f"\n**Host pin not established:** {pin_problem}. A result needs every path on one recorded " \
+        "host version (probe scope §4.3, A2-1), so it cannot be PASS.\n" if pin_problem else ""
     if paths == list(PATHS):
-        result = f"H1 gate (every path passes): **{'PASS' if passes else 'NOT MET'}**\n" + \
+        result = f"H1 gate (every path passes, one host version): **{'PASS' if passes else 'NOT MET'}**\n" + \
+            pin_note + \
             "\nOnly the gate line above decides H1. `H1_DONE` means only that the batch finished " \
             "and every outcome was written; it never means H1 passed.\n"
     else:
         missing = ", ".join(p for p in PATHS if p not in paths)
-        result = f"Listed-path result (every listed path passes): **{'PASS' if passes else 'NOT MET'}**\n" + \
+        result = f"Listed-path result (every listed path passes, one host version): " \
+            f"**{'PASS' if passes else 'NOT MET'}**\n" + pin_note + \
             f"\nThis batch covers only the listed paths, so this is **not** the H1 gate. H1 also needs " \
             f"{missing}, which this batch did not probe. `H1_DONE` means only that the batch finished " \
             "and every listed outcome was written; it never means a path passed.\n"

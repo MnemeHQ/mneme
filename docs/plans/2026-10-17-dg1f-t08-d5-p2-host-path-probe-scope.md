@@ -162,13 +162,13 @@ Each needs its own go-ahead, in that order: harness PR, then the runs.
 
 | # | Decision | Recommendation |
 |---|---|---|
-| A2-1 | Can H1a and H1b on `2.1.310` combine with H1c on another version into one H1 gate result under charter §5? | **No**, not under the charter §5 gate as written: one gate's paths share one pin. Under R-ii, if a P2-first amendment adopts it, each path is judged on its own pin. A2 decides neither. It records each path's host version in the summary. |
+| A2-1 | Can H1a and H1b on `2.1.310` combine with H1c on another version into one H1 gate result under charter §5? | **No**, not under the charter §5 gate as written: one gate's paths share one pin. Under R-ii, if a P2-first amendment adopts it, each path is judged on its own pin. A2 decides neither. It records each path's host version in the summary, and the classifier never prints a gate or listed-path `PASS` unless every included path records the same host version. |
 | A2-2 | Add `--model` to the fixed flag list | **Yes.** It follows the G3 precedent (C3 harness, `C3_PINSET=G3`). It removes the account-default drift seen in the A1 attempts, and the init model is still checked. |
-| A2-3 | Coexistence with the ADR-033 proceed note | **Note only.** On a direct write, an eventual selection notice must share the single PreToolUse `additionalContext` object with the ADR-033 C2b proceed note (`ProceedNote.consumed`). Combining the two texts does not change the wire shape, so this probe covers it. |
+| A2-3 | Coexistence with the ADR-033 proceed note | **An implementation obligation, not covered by A2.** A2 probes only the delivery of the existing `additionalContext` shape. On a direct write, an eventual selection notice must share the single PreToolUse `additionalContext` object with the ADR-033 C2b proceed note (`ProceedNote.consumed`). Whether the two are emitted correctly together is **not** established here. The implementation PR must include its own offline coexistence test: one object, both texts, no `permissionDecision`, exit code unchanged. |
 | A2-4 | Repeat count | Unchanged (D4): n = 1 per path plus its control. A re-run happens only on `INCONCLUSIVE`. |
 
 **Harness (same PR).** All changes are under `docs/validation/artifacts/dg1f-t08-d5-p2-h1-host-path/harness/`; every H1 default is unchanged.
-- `pins.env` gains the A2 pin set. It is selected only by `run_h1.sh A2`, which exports `H1_PINSET=A2`, following the C3 `C3_PINSET=G3` pattern. Any other value aborts, and `run_h1.sh` refuses `H1_PINSET` taken from the environment.
+- `pins.env` gains the A2 pin set. It is selected only by `run_h1.sh A2`, which exports `H1_PINSET=A2`, following the C3 `C3_PINSET=G3` pattern. Any other value aborts. `run_h1.sh` refuses to start whenever `H1_PINSET` is already set in the environment, with or without an argument; it never overwrites it.
 - `pins_a1.env` refuses any pin set.
 - New `safe_rmtree_a2.py`: the A2 root, the six A2 arms, and the protected trees listed above.
 - `run_h1_probe.sh`:
@@ -183,11 +183,12 @@ Each needs its own go-ahead, in that order: harness PR, then the runs.
   - `pair` takes an optional version pin;
   - `verify` and `summary` take an optional path subset;
   - only an all-four summary carries the H1 gate line;
+  - a gate or listed-path result is `PASS` only when every included path records one host version;
   - the summary shows the host version per path.
 - The self-test stub follows `--model` and the active pin set's version.
 - New `selftest/test_a2_harness.py`.
 
-**Offline validation:** 138 harness tests pass (103 existing, 35 new). The end-to-end stub self-test of `run_h1.sh A2` gave `DELIVERED_TO_AGENT` on all three paths and a listed-path result of `PASS` (stub, not evidence). It aborted at the preflight without `DISABLE_AUTOUPDATER=1`, and it never touched `C:\dev\d5p2-h1-live`. The A2 root was emptied afterwards.
+**Offline validation:** 145 harness tests pass (103 existing, 42 new, including the #794 review regressions). The end-to-end stub self-test of `run_h1.sh A2` gave `DELIVERED_TO_AGENT` on all three paths and a listed-path result of `PASS` (stub, not evidence). It aborted at the preflight without `DISABLE_AUTOUPDATER=1`, and it never touched `C:\dev\d5p2-h1-live`. The A2 root was emptied afterwards.
 
 **Run, if separately authorized.** The operator runs it from their own terminal (never inside Claude Code) with `claude --version` printing `2.1.310 (Claude Code)`, `pins.local.env` setting `PY`, and `DISABLE_AUTOUPDATER=1 bash run_h1.sh A2`. Evidence is collected with `collect_h1.py` into a separate evidence PR: `docs/validation/dg1f-t08-d5-p2-host-path-h1-a2-<date>.md`.
 
