@@ -269,6 +269,9 @@ if echo "$G3_OUT" | tail -1 | grep -q '^BATCH_DONE G3$' \
 else
   echo "FAIL batch G3"; echo "$G3_OUT" | tail -6; fail=1
 fi
+# Keep this good evidence for the E4 and --recheck cases below (the next batch
+# overwrites the live directories).
+mkdir -p "$ROOT/g3good" && cp -r "$ROOT/live/G3-1-Edit-1" "$ROOT/live/G3-2-Edit-1" "$ROOT/g3good/"
 G3_BAD=$(env C3_ST_MNEME_SRC="$G3_SRC" C3_ST_G3_FIXTURE_TIP="$G3_TIP" C3_STUB_IGNORE_HOOK=1 \
          bash "$BASE/run_c3_batch.sh" G3 < /dev/null 2>&1)
 # G3-2 exits 0 and lands either way, so a hook-ignoring host changes only G3-1.
@@ -278,6 +281,76 @@ if echo "$G3_BAD" | tail -1 | grep -q '^BATCH_STOPPED G3: G3-1' \
   echo "ok   batch G3 with a hook-ignoring host -> G3-2 unaffected, BATCH_STOPPED at G3-1"
 else
   echo "FAIL batch G3 stop: $(echo "$G3_BAD" | tail -1)"; fail=1
+fi
+
+# PR #792 review, finding 2: exactly one run, and live evidence never replaced.
+G3_REPS=$(env C3_ST_MNEME_SRC="$G3_SRC" C3_ST_G3_FIXTURE_TIP="$G3_TIP" bash "$BASE/run_c3_batch.sh" G3 2 < /dev/null 2>&1 | tail -1)
+echo "$G3_REPS" | grep -q "exactly once" && echo "ok   batch G3 with reps=2 -> refused" \
+  || { echo "FAIL batch G3 reps=2: $G3_REPS"; fail=1; }
+out=$(env C3_PINSET=G3 C3_ST_MNEME_SRC="$G3_SRC" C3_ST_G3_FIXTURE_TIP="$G3_TIP" bash "$BASE/run_c3_probe.sh" G3-2 Edit 2 2>&1); rc=$?
+[ $rc -ne 0 ] && echo "$out" | grep -q "runs exactly once" && echo "ok   G3-2 rep 2 -> refused" \
+  || { echo "FAIL G3-2 rep 2: exit $rc, $(echo "$out" | tail -1)"; fail=1; }
+once=(C3_PINSET=G3 C3_ST_G3_ENFORCE_ONCE=1)
+g3abort G3-2 "never runs twice" "G3-2 again over its own evidence (live rule)" "${once[@]}"
+mv "$ROOT/live/G3-2-Edit-1" "$ROOT/live/_invalid-G3-2-Edit-1-1"
+g3abort G3-2 "has no INVALID_REASON.txt" "G3-2 re-run without a recorded reason" "${once[@]}"
+echo "selftest: labelled run moved aside" > "$ROOT/live/_invalid-G3-2-Edit-1-1/INVALID_REASON.txt"
+g3abort G3-2 "only INVALID may be re-run" "G3-2 re-run after a labelled (not INVALID) run" "${once[@]}"
+rm -f "$ROOT/live/_invalid-G3-2-Edit-1-1/out/outcome.json"
+echo "HARNESS_FAILURE: selftest stand-in" > "$ROOT/live/_invalid-G3-2-Edit-1-1/out/harness_failure.txt"
+g3expect G3-2 RECORDED_FALSE_COMPLETE_PASS "${once[@]}"
+mv "$ROOT/live/G3-2-Edit-1" "$ROOT/live/_invalid-G3-2-Edit-1-2"
+echo "selftest: second INVALID" > "$ROOT/live/_invalid-G3-2-Edit-1-2/INVALID_REASON.txt"
+rm -f "$ROOT/live/_invalid-G3-2-Edit-1-2/out/outcome.json"
+echo "HARNESS_FAILURE: selftest stand-in" > "$ROOT/live/_invalid-G3-2-Edit-1-2/out/harness_failure.txt"
+g3abort G3-2 "already re-run once" "G3-2 second re-run after INVALID" "${once[@]}"
+
+# Findings 1 and 3: G3-1's E4 OS capture (strict G3 rule) and --recheck. The
+# good evidence is re-labelled as live (SELFTEST line removed, file:// remote
+# replaced by the fixture's https URL) in a separate root, so the live-only
+# rules apply and no self-test outcome under $ROOT/live claims live delivery.
+G3L="$ROOT/g3live"; mkdir -p "$G3L"; cp -r "$ROOT/g3good/"* "$G3L/"
+"$PY" -E -P - "$(cygpath -w "$G3L" 2>/dev/null || echo "$G3L")" "$C3_SELFTEST_REMOTE" <<'PYEOF'
+import pathlib, sys
+root, remote = pathlib.Path(sys.argv[1]), sys.argv[2]
+https = "https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture"
+for out in root.glob("G3-*/out"):
+    for name in ("setup.json", "hook-log.jsonl"):
+        p = out / name
+        p.write_text(p.read_text(encoding="utf-8").replace(remote, https), encoding="utf-8")
+    obs = out / "observer.txt"
+    obs.write_text("".join(l for l in obs.read_text(encoding="utf-8").splitlines(True)
+                           if not l.startswith("SELFTEST=1")), encoding="utf-8")
+    (out / "outcome.json").unlink()
+PYEOF
+G31="$G3L/G3-1-Edit-1/out"
+e4case() {  # expected-label description netcap-content|ABSENT
+  if [ "$3" = ABSENT ]; then rm -f "$G31/netcap-sni.txt"; else printf '%b' "$3" > "$G31/netcap-sni.txt"; fi
+  local got
+  got=$("$PY" -E -P "$BASE/classify_c3.py" "$(cygpath -w "$G31" 2>/dev/null || echo "$G31")" claude-opus-5-5 | tr -d '\r')
+  [ "$got" = "$1" ] && echo "ok   G3-1 E4 $2 -> $1" || { echo "FAIL G3-1 E4 $2: $got"; fail=1; }
+}
+e4case EVIDENCE_INCOMPLETE "capture absent" ABSENT
+e4case EVIDENCE_INCOMPLETE "capture empty" ''
+e4case EVIDENCE_INCOMPLETE "no summary line" 'github.com\n'
+e4case EVIDENCE_INCOMPLETE "forge not observed" 'api.anthropic.com\n# 3 other host(s) observed, not published\n'
+e4case UNEXPECTED "forbidden host" 'github.com\nblackhole.invalid\n# 0 other host(s) observed, not published\n'
+e4case UNEXPECTED "host outside the families" 'github.com\nexample.org\n# 1 other host(s) observed, not published\n'
+e4case REFUSED_MEMORY_PATH_MISMATCH "forge observed, families only" 'api.anthropic.com\ngithub.com\n# 4 other host(s) observed, not published\n'
+# --recheck: incomplete until the capture is attached, then done; no probe runs.
+rm -f "$G31/netcap-sni.txt" "$G31/outcome.json"
+before=$(cat "$G3L"/G3-*/out/events.jsonl | sha256sum | cut -d' ' -f1)
+recheck() { env C3_SELFTEST_LIVE="$(cygpath -w "$G3L" 2>/dev/null || echo "$G3L")" C3_ST_MNEME_SRC="$G3_SRC" \
+              C3_ST_G3_FIXTURE_TIP="$G3_TIP" bash "$BASE/run_c3_batch.sh" G3 1 --recheck < /dev/null 2>&1 | tail -1 | tr -d '\r'; }
+r1=$(recheck)
+printf 'github.com\napi.anthropic.com\n# 2 other host(s) observed, not published\n' > "$G31/netcap-sni.txt"
+r2=$(recheck)
+after=$(cat "$G3L"/G3-*/out/events.jsonl | sha256sum | cut -d' ' -f1)
+if echo "$r1" | grep -q '^BATCH_INCOMPLETE G3' && [ "$r2" = "BATCH_DONE G3" ] && [ "$before" = "$after" ] \
+   && [ "$(ls -d "$G3L"/G3-* | wc -l)" = 2 ]; then
+  echo "ok   batch G3 --recheck: BATCH_INCOMPLETE without the capture, BATCH_DONE after it; no probe re-run"
+else
+  echo "FAIL batch G3 --recheck: '$r1' then '$r2' (events unchanged: $([ "$before" = "$after" ] && echo yes || echo no))"; fail=1
 fi
 
 # Redacted collection: no live-root, home or user-name strings may survive.

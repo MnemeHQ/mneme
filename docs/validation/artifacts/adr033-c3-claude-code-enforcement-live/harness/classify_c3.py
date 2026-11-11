@@ -239,6 +239,48 @@ def expected_after_ok(plan: dict, after: str | None) -> bool:
     return True
 
 
+def g3_capture(sni: Path, origin_url: str, selftest: bool) -> tuple[str, str]:
+    """G3 E4 OS capture rule (PR #792 review): stricter than the C3 rule.
+
+    Returns ``(state, reason)``; state is ok, contradicts, missing or
+    "not required in self-test".
+
+    - absent, empty, or not in the extraction format (host lines, then exactly
+      one final "# N other host(s) observed, not published" line): missing;
+    - a forbidden host, or a published host outside matrix.G3_E4_HOST_FAMILIES:
+      contradicts;
+    - the origin's host not observed: missing, never a pass. Two of the
+      historical networked C3 captures (P-6-MultiEdit-1, R-1-Edit-2) lacked it,
+      so its absence shows a capture gap, not a verifier fault;
+    - otherwise ok.
+    The capture cannot attribute a host to a process; the verifier's exact
+    destinations are the wrapper half (E4_wrapper).
+    """
+    from urllib.parse import urlparse
+
+    if not sni.exists():
+        return ("not required in self-test" if selftest else "missing",
+                "netcap-sni.txt absent")
+    lines = [ln.strip() for ln in sni.read_text(encoding="utf-8", errors="replace").splitlines()
+             if ln.strip()]
+    comments = [ln for ln in lines if ln.startswith("#")]
+    summary = re.fullmatch(matrix.G3_E4_SUMMARY, lines[-1]) if lines else None
+    if not lines or summary is None or len(comments) != 1:
+        return "missing", "netcap-sni.txt is empty or not in the G3 extraction format"
+    hosts = sorted({ln.lower().rstrip(".") for ln in lines if not ln.startswith("#")})
+    forbidden = [h for h in hosts if any(h == f.split(":")[0] for f in matrix.FORBIDDEN_HOSTS)]
+    if forbidden:
+        return "contradicts", f"forbidden host(s) observed: {forbidden}"
+    outside = [h for h in hosts
+               if not any(h == fam or h.endswith("." + fam) for fam in matrix.G3_E4_HOST_FAMILIES)]
+    if outside:
+        return "contradicts", f"published host(s) outside the G3 families: {outside}"
+    forge = (urlparse(origin_url).hostname or "").lower()
+    if forge not in hosts:
+        return "missing", f"forge endpoint {forge!r} not observed in the capture"
+    return "ok", f"forge {forge!r} observed; published {hosts}; {summary.group(1)} other host(s) counted"
+
+
 def _complete(payload, verdict: str) -> bool:
     return (isinstance(payload, dict) and payload.get("verdict") == verdict
             and payload.get("evaluation_complete") is True)
@@ -500,7 +542,15 @@ def main() -> int:
             if not ok:
                 failures.append(f"E4: verifier endpoints {sorted(urls)}, env extras {sorted(bad_env)}")
             sni = out / "netcap-sni.txt"
-            if sni.exists():
+            if matrix.is_g3(setup["probe"]):
+                state, why = g3_capture(sni, setup["origin_url"], selftest)
+                checks["E4_os_capture"] = state
+                if state == "contradicts":
+                    failures.append(f"E4 (G3): {why}")
+                elif state == "missing":
+                    missing.append(f"E4 OS capture (G3): {why}")
+                facts["g3_e4_capture"] = why
+            elif sni.exists():
                 hosts = {line.strip().lower() for line in sni.read_text(encoding="utf-8", errors="replace").splitlines() if line.strip()}
                 ok = not any(h.split(":")[0] in hosts for h in matrix.FORBIDDEN_HOSTS)
                 checks["E4_os_capture"] = "ok" if ok else "contradicts"

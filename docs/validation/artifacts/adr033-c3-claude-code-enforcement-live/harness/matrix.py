@@ -113,6 +113,17 @@ G3_LABELS = ("REFUSED_MEMORY_PATH_MISMATCH", "RECORDED_FALSE_COMPLETE_PASS",
              "UNEXPECTED", "EVIDENCE_INCOMPLETE")
 
 
+# G3 E4 OS capture (README "G3 capture extraction"). The capture is machine-
+# wide and cannot say which process reached a host, so the verifier's exact
+# destinations come from the wrapper half (its Git argv URLs must equal the
+# origin). The published list holds every observed host in these families plus
+# any FORBIDDEN_HOSTS match; all other hosts are only counted. A published host
+# outside them means the extraction rule was not followed.
+G3_E4_HOST_FAMILIES = ("github.com", "githubusercontent.com",
+                       "anthropic.com", "claude.ai", "claude.com")
+G3_E4_SUMMARY = r"# (\d+) other host\(s\) observed, not published"
+
+
 def is_g3(probe: str) -> bool:
     return probe in G3_ROWS
 

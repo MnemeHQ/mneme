@@ -56,6 +56,8 @@ G3=$(echo "$SPEC" | "$PY" -E -P -c "import json,sys; print('yes' if json.load(sy
 # other row may run under it.
 if [ "$G3" = yes ]; then
   [ "${C3_PINSET:-}" = G3 ] || { echo "ABORT: $PROBE is a G3 row; set C3_PINSET=G3 (run_c3_batch.sh G3 does)"; exit 1; }
+  # Charter §4, O1: each G3 probe runs once; there is no repetition 2.
+  [ "$REP" = 1 ] || { echo "ABORT: $PROBE runs exactly once (rep 1); got rep '$REP' (charter §4, O1)"; exit 1; }
   # Self-test only: the negative case that the stub does not apply the local
   # file under `project` alone (charter §8).
   if [ "${C3_SELFTEST:-}" = 1 ] && [ -n "${C3_ST_G3_SOURCES:-}" ]; then SOURCES="$C3_ST_G3_SOURCES"; fi
@@ -91,7 +93,25 @@ if echo " $NEEDS " | grep -q " network_blocked "; then
 fi
 
 P="$LIVE_ROOT/$NAME"
-"$PY" -E -P "$BASE/safe_rmtree.py" delete "$NAME" || { echo "ABORT: guarded delete refused"; exit 1; }
+if [ "$G3" = yes ] && { [ "${C3_SELFTEST:-}" != 1 ] || [ "${C3_ST_G3_ENFORCE_ONCE:-}" = 1 ]; }; then
+  # Charter §6, O1: a live G3 probe runs once and its evidence is never
+  # replaced. The only re-run is for INVALID (a harness failure, no label),
+  # once, after the operator moves the failed probe directory aside as
+  # `_invalid-<name>-<n>` with a nonempty INVALID_REASON.txt (README). The
+  # self-test exercises this path with C3_ST_G3_ENFORCE_ONCE=1.
+  [ -e "$P" ] && { echo "ABORT: $NAME already has evidence at $P; a G3 probe never runs twice (charter §6)"; exit 1; }
+  n=0
+  for inv in "$LIVE_ROOT"/_invalid-"$NAME"-*; do
+    [ -e "$inv" ] || continue
+    n=$((n + 1))
+    [ -s "$inv/INVALID_REASON.txt" ] || { echo "ABORT: $inv has no INVALID_REASON.txt"; exit 1; }
+    [ -s "$inv/out/harness_failure.txt" ] && [ ! -e "$inv/out/outcome.json" ] \
+      || { echo "ABORT: $inv is not an INVALID run (it has a label, or no harness_failure.txt); only INVALID may be re-run"; exit 1; }
+  done
+  [ "$n" -le 1 ] || { echo "ABORT: $NAME was already re-run once after INVALID (charter §6)"; exit 1; }
+else
+  "$PY" -E -P "$BASE/safe_rmtree.py" delete "$NAME" || { echo "ABORT: guarded delete refused"; exit 1; }
+fi
 mkdir -p "$P/out" || { echo "ABORT: cannot create $P"; exit 1; }
 OUT="$P/out"
 die() { echo "HARNESS_FAILURE: $*" | tee -a "$OUT/harness_failure.txt"; exit 1; }

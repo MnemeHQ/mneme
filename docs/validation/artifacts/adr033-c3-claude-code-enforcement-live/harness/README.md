@@ -236,11 +236,53 @@ bash run_c3_batch.sh G3               # G3-2 then G3-1, n=1
 ```
 
 `pins.local.env` for this batch points `MNEME_SRC_*` at a clean checkout whose
-`mneme/` equals `G3_PIN_MNEME_BASE`. G3-1 needs the E4 OS capture, as R-6 did.
-The batch ends `BATCH_DONE G3` only if both rows reach their labels. Any other
-label ends `BATCH_STOPPED G3`: report it raw and do not re-run (charter §6).
-A harness failure is `INVALID` and may be re-run once after the cause is fixed
-and recorded.
+`mneme/` equals `G3_PIN_MNEME_BASE`.
+
+**Run once, never overwrite.** The batch accepts only `reps=1`, and a G3 probe
+refuses any repetition but 1. In a live run a G3 probe refuses to start if its
+directory already exists: there is no guarded delete for G3 evidence.
+
+**E4 for G3-1, attached after the run.** Capture during G3-1 as for C3 (§3,
+E4 OS capture), then write `out/netcap-sni.txt` with the **G3 extraction
+rule**:
+- one line per observed TLS server name in the families `github.com`,
+  `githubusercontent.com`, `anthropic.com`, `claude.ai` or `claude.com`
+  (the name itself or a subdomain), plus any `FORBIDDEN_HOSTS` match;
+- then exactly one final line `# N other host(s) observed, not published`,
+  with N the count of every other host.
+
+Until that file is attached, G3-1 is `EVIDENCE_INCOMPLETE` and the batch ends
+`BATCH_INCOMPLETE G3`. Then run:
+
+```bash
+bash run_c3_batch.sh G3 1 --recheck   # re-classifies; runs no probe
+```
+
+The G3 classifier is stricter than the C3 E4 rule:
+- the file must exist, be nonempty and follow the format above, or the item
+  stays missing;
+- a forbidden host, or a published host outside the families, contradicts
+  (`UNEXPECTED`);
+- the origin's host (`github.com`) must be observed, or the item stays
+  missing. It is never a pass without it. Two historical networked C3
+  captures (`P-6-MultiEdit-1`, `R-1-Edit-2`) lacked it.
+
+The capture is machine-wide and cannot say which process reached a host. The
+verifier's exact destinations are the wrapper half (`E4_wrapper`: its Git
+argv URLs must equal the origin). Other hosts are only counted, for the
+operator's privacy.
+
+**Results.** The batch ends `BATCH_DONE G3` only if both rows reach their
+labels. `UNEXPECTED` ends `BATCH_STOPPED G3`: report it raw and do not re-run
+(charter §6). A harness failure is `INVALID` (`out/harness_failure.txt`, no
+`outcome.json`). It may be re-run **once**:
+1. Fix the cause.
+2. Move the failed directory to `_invalid-<probe>-Edit-1-1` under the live
+   root, with a nonempty `INVALID_REASON.txt` inside.
+3. Re-run that probe.
+
+The runner refuses a re-run when the moved directory has a label, has no
+reason file, or a second `_invalid-…` directory exists.
 
 ## F-R2 delivery (C2b charter §17.5)
 
