@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"<PYTHON>\" -I \"<HARNESS>\\emitter.py\" sessionstart \"<LIVE>\\H1b-start\\out\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

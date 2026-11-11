@@ -1,0 +1,138 @@
+{
+  "path_id": "H1a-bash",
+  "path_type": "command_tool_event",
+  "event": "PreToolUse",
+  "developer_also": "not_observed",
+  "harness": "headless (-p, stream-json)",
+  "rules": "as-run table + R1-R4 (#551, #561)",
+  "emitter_invocations": 1,
+  "control_hook_invocations": 1,
+  "nonce_locations": [
+    {
+      "source": "events",
+      "line": 6,
+      "entry_type": "assistant",
+      "entry_subtype": null,
+      "json_path": "message.content[0].text",
+      "category": "echo"
+    },
+    {
+      "source": "events",
+      "line": 7,
+      "entry_type": "result",
+      "entry_subtype": "success",
+      "json_path": "result",
+      "category": "echo"
+    },
+    {
+      "source": "transcript",
+      "line": 20,
+      "entry_type": "attachment",
+      "entry_subtype": null,
+      "json_path": "attachment.stdout",
+      "category": "host_output"
+    },
+    {
+      "source": "transcript",
+      "line": 21,
+      "entry_type": "attachment",
+      "entry_subtype": null,
+      "json_path": "attachment.content[0]",
+      "category": "model_bound"
+    },
+    {
+      "source": "transcript",
+      "line": 21,
+      "entry_type": "attachment",
+      "entry_subtype": null,
+      "json_path": "rendered[0].content",
+      "category": "unclassified"
+    },
+    {
+      "source": "transcript",
+      "line": 24,
+      "entry_type": "api-request-blob",
+      "entry_subtype": null,
+      "json_path": "message.content[0].text",
+      "category": "unclassified"
+    },
+    {
+      "source": "transcript",
+      "line": 29,
+      "entry_type": "assistant",
+      "entry_subtype": null,
+      "json_path": "message.content[0].text",
+      "category": "echo"
+    }
+  ],
+  "transcript_collected": true,
+  "echoed": true,
+  "turns": 2,
+  "turns_control": 2,
+  "permissions": {
+    "emitter": {
+      "unmatched_denials": []
+    },
+    "control": {
+      "unmatched_denials": []
+    },
+    "comparison": {
+      "equivalent_requests": [
+        [
+          "Bash",
+          "{\"command\": \"echo probe-ran > bash_out.txt\", \"description\": \"Write probe text to output file\"}"
+        ]
+      ],
+      "mismatched_decisions": [],
+      "non_equivalent_attempts": {
+        "emitter": [],
+        "control": []
+      }
+    }
+  },
+  "host_events": {
+    "emitter_subtypes": [],
+    "control_subtypes": [],
+    "indicators": {
+      "emitter": {},
+      "control": {},
+      "mismatched": []
+    }
+  },
+  "controls": {
+    "path_type_emitter": {
+      "tool_use_present": true,
+      "tool_result_present": true,
+      "tool_result_not_error": true,
+      "not_permission_denied": true,
+      "file_as_expected": true,
+      "holds": true
+    },
+    "path_type_control_arm": {
+      "tool_use_present": true,
+      "tool_result_present": true,
+      "tool_result_not_error": true,
+      "not_permission_denied": true,
+      "file_as_expected": true,
+      "holds": true
+    },
+    "common": {
+      "permission_decisions_equal_for_equivalent_requests": true,
+      "host_indicators_equal": true,
+      "result_not_error": true,
+      "file_matches_control": true
+    }
+  },
+  "label": "INCONCLUSIVE",
+  "passes_path": false,
+  "reasons": [
+    "nonce found in locations the category table does not recognise; review needed"
+  ],
+  "observer": {
+    "claude_version": "2.1.310 (Claude Code)",
+    "pinset": "A2",
+    "model_flag": "claude-opus-5-5",
+    "selftest": null,
+    "date": "2026-11-11T17:42:20Z"
+  }
+}
