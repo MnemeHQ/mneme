@@ -44,6 +44,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -281,6 +282,37 @@ def g3_capture(sni: Path, origin_url: str, selftest: bool) -> tuple[str, str]:
     return "ok", f"forge {forge!r} observed; published {hosts}; {summary.group(1)} other host(s) counted"
 
 
+def g3_recheck_gate(out: Path) -> str:
+    """Whether `run_c3_batch.sh G3 1 --recheck` may classify this probe again.
+
+    Prints and returns ``KEEP <label>`` (already at its G3 label: left as is),
+    ``RECHECK`` (eligible), or ``REFUSE <reason>``. Eligible only when the
+    current outcome is EVIDENCE_INCOMPLETE with no failure or deviation, every
+    missing item is the G3 E4 OS capture, and that capture was absent at
+    classification. So the capture is attached once; an UNEXPECTED result, a
+    capture already judged, or any other missing evidence is never
+    reclassified, and the earlier outcome stays (PR #792 re-review).
+    """
+    path = out / "outcome.json"
+    if not path.exists():
+        return "REFUSE no outcome.json (an INVALID probe is re-run, not rechecked)"
+    outcome = json.loads(path.read_text(encoding="utf-8"))
+    want = matrix.row(outcome["probe"]).get("g3_label")
+    label = outcome.get("label")
+    if label == want:
+        return f"KEEP {label}"
+    if label != "EVIDENCE_INCOMPLETE":
+        return f"REFUSE the recorded label is {label}; it is final (charter §6)"
+    if outcome.get("failures") or outcome.get("deviations"):
+        return "REFUSE the recorded outcome has failures or deviations"
+    missing = outcome.get("missing") or []
+    if not missing or any(not m.startswith("E4 OS capture (G3)") for m in missing):
+        return f"REFUSE missing evidence other than the E4 OS capture: {missing}"
+    if (outcome.get("facts") or {}).get("g3_e4_capture") != "netcap-sni.txt absent":
+        return "REFUSE the capture was already attached and judged; it is attached once"
+    return "RECHECK"
+
+
 def _complete(payload, verdict: str) -> bool:
     return (isinstance(payload, dict) and payload.get("verdict") == verdict
             and payload.get("evaluation_complete") is True)
@@ -413,6 +445,13 @@ def classify_g3(out: Path, setup: dict, spec: dict, plan: dict, observer: str,
 def main() -> int:
     out, model_pin = Path(sys.argv[1]), sys.argv[2]
     setup = json.loads((out / "setup.json").read_text(encoding="utf-8"))
+    g3_row = matrix.is_g3(setup["probe"])
+    if g3_row and (out / "outcome.json").exists() and os.environ.get("C3_G3_RECHECK") != "1":
+        # PR #792 re-review: a G3 classification is final once written. Only
+        # `run_c3_batch.sh G3 1 --recheck`, after g3_recheck_gate allows it,
+        # may classify again (charter §6: stop and preserve).
+        raise SystemExit("classify_c3: refusing to rewrite a G3 outcome.json; "
+                         "use `run_c3_batch.sh G3 1 --recheck`")
     observer = (out / "observer.txt").read_text(encoding="utf-8", errors="replace")
     spec, plan = setup["spec"], setup["plan"]
     arm = "interactive" if "arm=interactive" in observer else "headless"
@@ -718,6 +757,9 @@ def main() -> int:
     }
     if g3 is not None:
         outcome["g3"] = g3
+    if g3_row and (out / "outcome.json").exists() and not (out / "outcome.initial.json").exists():
+        # Keep the first classification beside any recheck result.
+        (out / "outcome.initial.json").write_bytes((out / "outcome.json").read_bytes())
     (out / "outcome.json").write_text(json.dumps(outcome, indent=2) + "\n", encoding="utf-8")
     print(label)
     return 0
@@ -754,6 +796,9 @@ def pair(diag_out: Path, control_out: Path) -> int:
 
 
 if __name__ == "__main__":
+    if sys.argv[1:2] == ["--g3-recheck-gate"]:
+        print(g3_recheck_gate(Path(sys.argv[2])))
+        raise SystemExit(0)
     if sys.argv[1:2] == ["--pair"]:
         raise SystemExit(pair(Path(sys.argv[2]), Path(sys.argv[3])))
     raise SystemExit(main())

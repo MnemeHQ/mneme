@@ -258,6 +258,19 @@ Until that file is attached, G3-1 is `EVIDENCE_INCOMPLETE` and the batch ends
 bash run_c3_batch.sh G3 1 --recheck   # re-classifies; runs no probe
 ```
 
+`--recheck` re-classifies a G3 probe only when all of these hold:
+- its recorded outcome is `EVIDENCE_INCOMPLETE`;
+- every missing item is the G3 E4 capture;
+- that capture was absent when the probe was classified.
+
+A probe already at its label is kept as is. Anything else is refused
+(`BATCH_STOPPED G3: recheck refused …`) and its recorded outcome is left
+untouched: an `UNEXPECTED` result, a capture that was already attached and
+judged, or any other missing evidence. So the capture is **attached once**,
+and an earlier result can never be turned into a label. The first
+classification is kept as `out/outcome.initial.json`. `classify_c3.py` itself
+refuses to rewrite an existing G3 `outcome.json` outside that gate.
+
 The G3 classifier is stricter than the C3 E4 rule:
 - the file must exist, be nonempty and follow the format above, or the item
   stays missing;

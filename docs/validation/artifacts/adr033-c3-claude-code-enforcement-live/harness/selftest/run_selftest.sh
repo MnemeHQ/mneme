@@ -324,10 +324,16 @@ for out in root.glob("G3-*/out"):
     (out / "outcome.json").unlink()
 PYEOF
 G31="$G3L/G3-1-Edit-1/out"
+fresh() {  # first classification of a G3 copy: $1 = out dir
+  rm -f "$1/outcome.json" "$1/outcome.initial.json"
+  "$PY" -E -P "$BASE/classify_c3.py" "$(cygpath -w "$1" 2>/dev/null || echo "$1")" claude-opus-5-5 | tr -d '\r'
+}
+label_of() { "$PY" -E -P -c "import json,sys; print(json.load(open(sys.argv[1], encoding='utf-8'))['label'])" \
+               "$(cygpath -w "$1/outcome.json" 2>/dev/null || echo "$1/outcome.json")" | tr -d '\r'; }
 e4case() {  # expected-label description netcap-content|ABSENT
   if [ "$3" = ABSENT ]; then rm -f "$G31/netcap-sni.txt"; else printf '%b' "$3" > "$G31/netcap-sni.txt"; fi
   local got
-  got=$("$PY" -E -P "$BASE/classify_c3.py" "$(cygpath -w "$G31" 2>/dev/null || echo "$G31")" claude-opus-5-5 | tr -d '\r')
+  got=$(fresh "$G31")
   [ "$got" = "$1" ] && echo "ok   G3-1 E4 $2 -> $1" || { echo "FAIL G3-1 E4 $2: $got"; fail=1; }
 }
 e4case EVIDENCE_INCOMPLETE "capture absent" ABSENT
@@ -338,7 +344,8 @@ e4case UNEXPECTED "forbidden host" 'github.com\nblackhole.invalid\n# 0 other hos
 e4case UNEXPECTED "host outside the families" 'github.com\nexample.org\n# 1 other host(s) observed, not published\n'
 e4case REFUSED_MEMORY_PATH_MISMATCH "forge observed, families only" 'api.anthropic.com\ngithub.com\n# 4 other host(s) observed, not published\n'
 # --recheck: incomplete until the capture is attached, then done; no probe runs.
-rm -f "$G31/netcap-sni.txt" "$G31/outcome.json"
+rm -f "$G31/netcap-sni.txt"
+fresh "$G3L/G3-2-Edit-1/out" > /dev/null; fresh "$G31" > /dev/null
 before=$(cat "$G3L"/G3-*/out/events.jsonl | sha256sum | cut -d' ' -f1)
 recheck() { env C3_SELFTEST_LIVE="$(cygpath -w "$G3L" 2>/dev/null || echo "$G3L")" C3_ST_MNEME_SRC="$G3_SRC" \
               C3_ST_G3_FIXTURE_TIP="$G3_TIP" bash "$BASE/run_c3_batch.sh" G3 1 --recheck < /dev/null 2>&1 | tail -1 | tr -d '\r'; }
@@ -352,6 +359,49 @@ if echo "$r1" | grep -q '^BATCH_INCOMPLETE G3' && [ "$r2" = "BATCH_DONE G3" ] &&
 else
   echo "FAIL batch G3 --recheck: '$r1' then '$r2' (events unchanged: $([ "$before" = "$after" ] && echo yes || echo no))"; fail=1
 fi
+"$PY" -E -P -c "import json,sys; o=json.load(open(sys.argv[1], encoding='utf-8')); assert o['label'] == 'EVIDENCE_INCOMPLETE', o['label']" \
+  "$(cygpath -w "$G31/outcome.initial.json" 2>/dev/null || echo "$G31/outcome.initial.json")" \
+  && echo "ok   G3-1 first classification kept as outcome.initial.json (EVIDENCE_INCOMPLETE)" \
+  || { echo "FAIL G3-1 outcome.initial.json"; fail=1; }
+
+# PR #792 re-review: a recorded G3 outcome is never converted into a label.
+VALID='github.com\napi.anthropic.com\n# 2 other host(s) observed, not published\n'
+refused() {  # description expected-kept-label refusal-fragment
+  local r; r=$(recheck)
+  if echo "$r" | grep -q "^BATCH_STOPPED G3: recheck refused for G3-1" && echo "$r" | grep -qF "$3" \
+     && [ "$(label_of "$G31")" = "$2" ]; then
+    echo "ok   $1 -> recheck refused, $2 kept"
+  else
+    echo "FAIL $1: '$r', label now $(label_of "$G31")"; fail=1
+  fi
+}
+# (a) UNEXPECTED (forbidden host), capture then swapped for a valid one.
+printf 'github.com\nblackhole.invalid\n# 0 other host(s) observed, not published\n' > "$G31/netcap-sni.txt"
+fresh "$G31" > /dev/null; printf "$VALID" > "$G31/netcap-sni.txt"
+refused "UNEXPECTED then a swapped capture" UNEXPECTED "is final"
+[ ! -e "$G31/outcome.initial.json" ] && echo "ok   refused recheck left no rewrite (no outcome.initial.json)" \
+  || { echo "FAIL refused recheck rewrote the outcome"; fail=1; }
+# (b) Direct classification over a recorded G3 outcome is refused.
+if "$PY" -E -P "$BASE/classify_c3.py" "$(cygpath -w "$G31" 2>/dev/null || echo "$G31")" claude-opus-5-5 > /dev/null 2>&1; then
+  echo "FAIL direct classify rewrote a G3 outcome"; fail=1
+elif [ "$(label_of "$G31")" = UNEXPECTED ]; then
+  echo "ok   direct classify over a G3 outcome -> refused, UNEXPECTED kept"
+else
+  echo "FAIL direct classify changed the label to $(label_of "$G31")"; fail=1
+fi
+# (c) The capture is attached once: a judged capture cannot be swapped.
+rm -f "$G31/netcap-sni.txt"; fresh "$G31" > /dev/null
+printf 'api.anthropic.com\n# 1 other host(s) observed, not published\n' > "$G31/netcap-sni.txt"
+r=$(recheck)
+echo "$r" | grep -q '^BATCH_INCOMPLETE G3' && echo "ok   capture without the forge -> recheck still BATCH_INCOMPLETE" \
+  || { echo "FAIL capture without the forge: '$r'"; fail=1; }
+printf "$VALID" > "$G31/netcap-sni.txt"
+refused "a judged capture then swapped" EVIDENCE_INCOMPLETE "attached once"
+# (d) Missing evidence other than the capture is never rechecked.
+mv "$G31/replay-g3.json" "$G3L/replay-g3.json.aside"; rm -f "$G31/netcap-sni.txt"; fresh "$G31" > /dev/null
+printf "$VALID" > "$G31/netcap-sni.txt"
+refused "replay missing as well as the capture" EVIDENCE_INCOMPLETE "other than the E4 OS capture"
+mv "$G3L/replay-g3.json.aside" "$G31/replay-g3.json"
 
 # Redacted collection: no live-root, home or user-name strings may survive.
 DEST="$ROOT/collected"

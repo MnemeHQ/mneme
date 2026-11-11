@@ -24,9 +24,13 @@
 #                  reach its row's g3_label. UNEXPECTED stops the batch
 #                  (BATCH_STOPPED G3, charter §10); EVIDENCE_INCOMPLETE (G3-1
 #                  before its netcap-sni.txt is attached) ends BATCH_INCOMPLETE
-#                  G3. `G3 1 --recheck` runs no probe: it re-classifies the
-#                  existing evidence and re-applies that gate. BATCH_DONE G3
-#                  only if both rows reach their labels.
+#                  G3. `G3 1 --recheck` runs no probe. It re-classifies only a
+#                  probe whose sole missing item is the E4 capture, absent when
+#                  it was classified (attach it once), keeps a probe already at
+#                  its label, and refuses anything else (BATCH_STOPPED G3) with
+#                  the recorded outcome untouched; the first classification is
+#                  kept as outcome.initial.json. BATCH_DONE G3 only if both rows
+#                  reach their labels.
 #
 # Headless only; the interactive arm is run per probe with --interactive.
 # Aborts on the first harness failure and never marks a batch done after one.
@@ -78,8 +82,23 @@ while read -r probe tool; do
     if [ "$MODE" = --recheck ]; then
       out="$LIVE_ROOT/$probe-$tool-$rep/out"
       [ -s "$out/setup.json" ] || { echo "ABORT: no evidence for $probe $tool $rep" | tee -a "$SUMMARY"; exit 1; }
-      label=$("$PY" -E -P "$BASE/classify_c3.py" "$(cygpath -w "$out")" "$PIN_MODEL" | tr -d '\r') \
-        || { echo "ABORT: re-classification failed for $probe $tool $rep" | tee -a "$SUMMARY"; exit 1; }
+      if [ "$BATCH" = G3 ]; then
+        # PR #792 re-review: only a probe still missing just its (never-attached)
+        # E4 capture is classified again; a probe at its label is kept as is;
+        # anything else (UNEXPECTED, a judged capture, other missing evidence)
+        # is refused and its recorded outcome stays untouched.
+        gate=$("$PY" -E -P "$BASE/classify_c3.py" --g3-recheck-gate "$(cygpath -w "$out")" | tr -d '\r')
+        echo "recheck gate $probe $tool $rep: $gate" >> "$SUMMARY"
+        case "$gate" in
+          "KEEP "*) label=${gate#KEEP } ;;
+          RECHECK) label=$(C3_G3_RECHECK=1 "$PY" -E -P "$BASE/classify_c3.py" "$(cygpath -w "$out")" "$PIN_MODEL" | tr -d '\r') \
+                     || { echo "ABORT: re-classification failed for $probe $tool $rep" | tee -a "$SUMMARY"; exit 1; } ;;
+          *) echo "BATCH_STOPPED G3: recheck refused for $probe $tool $rep (${gate#REFUSE }); its recorded outcome is kept" | tee -a "$SUMMARY"; exit 1 ;;
+        esac
+      else
+        label=$("$PY" -E -P "$BASE/classify_c3.py" "$(cygpath -w "$out")" "$PIN_MODEL" | tr -d '\r') \
+          || { echo "ABORT: re-classification failed for $probe $tool $rep" | tee -a "$SUMMARY"; exit 1; }
+      fi
       line="$probe $tool $rep headless $label"
     else
       # stdin closed: a probe (and the `claude -p` inside it) must never read the
