@@ -10,6 +10,7 @@
 It follows the separate-step precedent (#551 → #552 → #553, and R4: #561 → #562 → #563): rule, then implementation, then offline reclassification, each separately approved (§7).
 
 **Anchor:** `main` @ `cf7c33c9`.
+**Revision 2 (2026-11-11):** answers the #796 review. R1 checks the hook event but not the tool, and both H1a paths share `PreToolUse`. So R5 now ties each record to a **tool-attributed anchor**: an R1-qualifying entry whose `hookName`, `toolUseID` and emitter invocation all name the path's expected tool (§3). Wrong-tool negative tests are added (§7). R1–R4 are unchanged, and nothing is reclassified.
 
 **Inputs:**
 - the accepted probe scope (#545), §3 and §6, and its Amendment A2 (§4.3, #794);
@@ -39,6 +40,7 @@ Adopting a rule changes how evidence is **read**, never what the host did.
 | Observation | All three emitter arms | Paired no-op controls |
 |---|---|---|
 | R1-qualifying `hook_additional_context` entry | **Exactly one.** `hookEvent` is the probed event, this arm's emitter invoked it, and the nonce is in `attachment.content`. `content` holds exactly one item. | **None** |
+| Tool identity of that entry | **`hookName`** is `PreToolUse:Edit`, `PreToolUse:Bash` or `SessionStart`. On H1a, **`toolUseID`** equals the `id` of the transcript `tool_use` whose `name` is the expected tool: `Edit`, or `Bash`. In H1a-edit the `Read` call has a different id. The emitter's **`hook-log.jsonl` envelope** has `hook_event_name` equal to the probed event and `tool_name` equal to the expected tool (`null` for SessionStart). For H1b, `toolUseID` is the literal `SessionStart` and there is no `tool_use`. The paired `hook_success` entry carries `hookName` `SessionStart:startup`; that is R2's entry and is not used by R5. | – |
 | That entry's `rendered` and `renderedRole` | `renderedRole: "system"`. `rendered` holds exactly one item, whose `content` **equals exactly** `<system-reminder>\n{L} hook additional context: {C}\n</system-reminder>`. `C` is the entry's `attachment.content[0]`. `L` is `PreToolUse:Edit`, `PreToolUse:Bash` or `SessionStart`: the probed event, plus `:` and the matcher's tool for tool events. | n/a |
 | `api-request-blob` entries carrying the nonce | **Exactly one**, with `message.role: "system"`. **Exactly one line** of its text contains the nonce, and that line **equals exactly** `{L} hook additional context: {C}` with the same `L` and `C`. For H1a it is the whole one-line text; for H1b it is one line of 58. | **None** carry the emitter's nonce |
 | `rendered` carrying the nonce on any other entry | **None.** Other attachment types (for example `environment`) carry `rendered` text without the nonce. | – |
@@ -53,28 +55,34 @@ Adopting a rule changes how evidence is **read**, never what the host did.
 
 **New category, `host_record`:** the host's own record or rendering of content that **another rule already classifies**. It is recorded in `nonce_locations`. It **never** counts as delivery to the agent or the developer, it is **never** sufficient for any label on its own, and it **never** masks another location. For labels, it behaves exactly like `host_output`: classified, not delivery. The label logic does not change; unclassified-first still applies.
 
-Both parts below depend on an **R1-qualifying entry**: a transcript `hook_additional_context` attachment that meets R1's three conditions:
-1. `hookEvent` equals the probed event;
-2. this arm's emitter invoked that event (`hook-log.jsonl`);
-3. the nonce is in `attachment.content`.
+`L` is the path's **expected label**: the probed event, followed by `:<tool>` when the path's spec names a tool (`PreToolUse:Edit`, `PreToolUse:Bash`), and the bare event otherwise (`SessionStart`).
 
-`L` is the probed event, followed by `:<tool>` when the path's spec names a tool (`PreToolUse:Edit`, `PreToolUse:Bash`), and the bare event otherwise (`SessionStart`).
+Both parts below depend on a **tool-attributed anchor**: a transcript `hook_additional_context` attachment that meets R1's three conditions **and** the attribution conditions 4–6. R1 itself checks the event but not the tool, and both H1a paths share `PreToolUse`, so R5 does not rely on R1 alone for attribution. A1 to A3 are R1's conditions; A4 to A6 are the tool attribution:
+1. **(A1)** `attachment.hookEvent` equals the probed event;
+2. **(A2)** this arm's emitter invoked that event (`hook-log.jsonl`);
+3. **(A3)** the nonce is in `attachment.content`;
+4. **(A4)** `attachment.hookName` equals `L` exactly;
+5. **(A5)** for a tool path, `attachment.toolUseID` equals the `id` of a `tool_use` in this arm's transcript whose `name` is the expected tool;
+6. **(A6)** for a tool path, the emitter's hook-log record that emitted the nonce has an envelope with `hook_event_name` equal to the probed event **and** `tool_name` equal to the expected tool.
 
-**R5a: `rendered` on an R1-qualifying entry.** A nonce occurrence at `rendered[i].content` is `host_record` only if **all** of these hold:
-1. the entry itself is R1-qualifying;
+For a lifecycle path (no tool in the spec), conditions 5 and 6 do not apply, and condition 4 requires `hookName` to be the bare event. An R1-qualifying entry that fails any of conditions 4–6, for example evidence from the wrong tool under the right event, is **not** an anchor. R5 never classifies a location against it.
+
+**R5a: `rendered` on an anchor.** A nonce occurrence at `rendered[i].content` is `host_record` only if **all** of these hold:
+1. the entry itself is a tool-attributed anchor;
 2. `renderedRole` is `"system"`;
 3. `rendered` and `attachment.content` have the same length;
 4. for **every** `i`, `rendered[i].content` equals exactly `<system-reminder>\n{L} hook additional context: {attachment.content[i]}\n</system-reminder>`.
 
-Otherwise it stays `unclassified`. `rendered` on any other entry type is not covered, including `hook_system_message`, `hook_success` and non-hook attachments.
+Otherwise it stays `unclassified`. `rendered` on any other entry type is not covered, including a non-anchor `hook_additional_context`, `hook_system_message`, `hook_success` and non-hook attachments.
 
 **R5b: `api-request-blob` text.** A nonce occurrence at `message.content[j].text` of a transcript entry with `type: "api-request-blob"` is `host_record` only if **all** of these hold:
 1. `message.role` is `"system"`;
-2. this arm's emitter invoked the probed event;
-3. the arm has at least one R1-qualifying entry;
-4. **every** line of that text containing the nonce equals exactly `{L} hook additional context: {C}`, where `C` is an item of an R1-qualifying entry's `attachment.content`.
+2. the arm has at least one tool-attributed anchor. That includes condition 6, the emitter's invocation for the probed event and expected tool;
+3. **every** line of that text containing the nonce equals exactly `{L} hook additional context: {C}`, where `C` is an item of a **tool-attributed anchor's** `attachment.content`.
 
-Otherwise it stays `unclassified`, including any partial match, extra text, other role, other event or tool label, or a nonce line that matches no R1 content.
+Otherwise it stays `unclassified`, including any partial match, extra text, other role, another event or tool label (such as `PreToolUse:Bash` in the Edit arm), or a nonce line that matches no anchor's content.
+
+**R1 itself is unchanged.** R1 still classifies an R1-qualifying entry from the wrong tool as `model_bound`. At label level, the classifier already counts emitter invocations only for the expected tool (`classify()`, `tool_name` filter), so a wrong-tool invocation gives "emitter not invoked" and `INCONCLUSIVE`. Whether R1 should also gain the tool conditions is a separate rule question (§9), not decided here.
 
 **What R5 does not do:**
 - **No delivery claim:** it makes no claim that the host fed either record to the model, and it adds no delivery evidence. Delivery still comes only from a `model_bound` location (R1 or the earlier table).
@@ -83,7 +91,7 @@ Otherwise it stays `unclassified`, including any partial match, extra text, othe
 - **No retroactive effect:** it changes nothing for evidence that lacks these entry types, including the H1 and A1 archives.
 
 **For:**
-- **Event matching and emitter attribution are R1's:** R5 inherits both from the R1-qualifying entry it is tied to, and R5b repeats the emitter condition.
+- **Event and tool matching and emitter attribution are explicit:** R5 does not merely inherit them from R1. The anchor must match the event (A1), the exact label (A4), the tool's own `tool_use` (A5) and the emitter invocation for that event and tool (A2, A6). The blob's label must match the expected tool too.
 - **Exact derivation:** each R5 location must be a fixed, host-added wrapping of the R1 content: the event label prefix, plus the `<system-reminder>` wrapper for `rendered`. Any other text, or a format change in a later host version, falls back to `unclassified` and a review.
 - **The distinction is kept:** `host_record` asserts neither model input (`model_bound`) nor host output to the stream consumer (`host_output`). That is the distinction the #795 review asked to preserve.
 - **Conservative error:** if either record is in fact model input, R5 under-reports agent delivery and never over-reports it. Any passing label still rests on R1 alone.
@@ -127,7 +135,14 @@ None directly. Even a projected A2 PASS would show only that the two §4 candida
 
    **Regression tests:**
    - R5a: positive → `host_record`; `renderedRole` other than `system` → unclassified; rendered text with any extra or missing character, or a length mismatch with `content` → unclassified; `rendered` on an entry with the wrong `hookEvent`, or where the emitter was not invoked → unclassified; `rendered` on `hook_system_message`, `hook_success` or a non-hook attachment → unclassified.
-   - R5b: positive → `host_record`; role `user` or other → unclassified; a nonce line with the wrong event or tool label, a prefix or suffix, or content matching no R1 entry → unclassified; a second, non-matching nonce line in the same text → unclassified; no R1-qualifying entry in the arm → unclassified (`INCONCLUSIVE`); emitter not invoked → unclassified.
+   - R5b: positive → `host_record`; role `user` or other → unclassified; a nonce line with the wrong event or tool label, a prefix or suffix, or content matching no anchor → unclassified; a second, non-matching nonce line in the same text → unclassified; no anchor in the arm → unclassified (`INCONCLUSIVE`); emitter not invoked → unclassified.
+   - **Wrong tool under the right event** (review of #796). In each case the entry still meets R1, so this shows that R1 alone is not used. Each case stays `unclassified` for both R5a and R5b, with the label `INCONCLUSIVE`:
+     - on the H1a-edit path, an R1-qualifying entry with `hookName` `PreToolUse:Bash`;
+     - on the H1a-edit path, a `toolUseID` that matches the `Read` call's `tool_use`;
+     - a `toolUseID` that matches no `tool_use`;
+     - an emitter hook-log envelope with `tool_name` `Bash`;
+     - a blob line labelled `PreToolUse:Bash` whose content matches the Edit anchor;
+     - on H1b, an anchor whose `hookName` is not exactly `SessionStart`.
    - Labels: R1 plus R5 locations and nothing else → `DELIVERED_TO_AGENT`; R5 locations plus a co-present unrecognised location → `INCONCLUSIVE`; `host_record` never yields a delivery label without R1.
    - No effect: H1 and A1 subset replays keep their labels, and every R1–R4 test passes unchanged.
 2. **Offline reclassification of the A2 archive**, with no host session, following #553 and #563:
@@ -144,12 +159,13 @@ Combining step 1 with this rule review, or with step 2, would change this sequen
 |---|---|---|
 | R5-1 | Category for the two locations | **`host_record`** (A), not `model_bound` (B) or `host_output` (C) |
 | R5-2 | Exact derivation from R1 content, versus a prefix match | **Exact** (D rejected): a format change falls back to `unclassified` and a review |
-| R5-3 | Tie R5 to an R1-qualifying entry in the same arm | **Yes**: R5 can never unlock a label without R1 |
+| R5-3 | Tie R5 to a **tool-attributed** R1-qualifying anchor in the same arm (A1–A6) | **Yes**: R5 can never unlock a label without R1, and never attributes a record to the wrong tool under the right event |
 | R5-4 | Sequence | **Separate steps** (§7); combining needs explicit owner authorization |
 
 ## 9. Not decided here
 
 - Whether either record is model input.
+- Whether R1 itself should gain the tool conditions A4–A6. R1 is unchanged here.
 - Any H1c/A1 re-pin, or the A1 interactive run.
 - H2–H6.
 - Mixed-version gate combination (A2-1).
