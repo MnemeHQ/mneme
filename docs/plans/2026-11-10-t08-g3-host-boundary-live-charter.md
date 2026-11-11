@@ -6,8 +6,17 @@ changes no runtime behavior, harness, test, ADR, Layer 1 freeze, `.mneme/`
 content, evidence record or pin. Acceptance authorizes **only the harness PR**
 (section 9, O1). The live batch and the evidence PR each need a separate owner
 go-ahead.
+**Revision 3 (2026-11-10):** answers the independent re-review:
+- the replay command gains the required `--query`;
+- section 8 gains the stub `settings.local.json` merge and the fixture-tip
+  abort;
+- the labels are made consistent with item 5 being optional;
+- the `MNEME_MEMORY` non-file case and the Windows-form path are covered;
+- the `project,local` deviation is stated;
+- the O1 citation is corrected.
+
 **Revision 2 (2026-11-10):** answers the #791 review:
-- O1 is staged per the C3 scope section 8;
+- O1 is staged, following the C3 scope's status rule;
 - selection and checker results are observed through pass-through shims on
   the hook's own calls, not through a separate wrapper lookup;
 - observed evidence is kept separate from replay.
@@ -46,9 +55,15 @@ The answer bounds G3 exactly:
 
 ## 2. Source facts (verified at the anchor)
 
-- `find_memory` (`mneme/integrations/claude_code/hook.py:202`) returns
-  `$MNEME_MEMORY` whenever it is set, before any walk. This function is
-  unchanged since the C4 pin `40ab0dd1`.
+- `find_memory` (`mneme/integrations/claude_code/hook.py:202`) checks
+  `$MNEME_MEMORY` first, whenever it is set, and does no walk:
+  - if the path is a file, it returns it;
+  - otherwise it returns `None`.
+
+  This function is unchanged since the C4 pin `40ab0dd1`. A `None` result in
+  an enrolled repository gives `MEMORY_MISSING`, not the mismatch
+  (`memory_mismatch` is false when memory is `None`). The section 4 mutation
+  therefore has to produce a path the hook's Python sees as a file.
 - `mneme check --input … --target-path T` does not require `T` to lie inside
   `policy_root(memory)`. Unscoped rules apply globally
   (`mneme/path_selectors.py:240`). A permissive foreign memory therefore yields
@@ -83,9 +98,13 @@ violates fixture decision `C3-DEC` (`FORBID_LITERAL "psycopg2"`).
 **Mutation `settings_local_foreign_memory`.** The harness applies it before
 launch and after the copy:
 1. Write `<probe>/foreign/.mneme/project_memory.json`: a valid memory for the
-   pinned build with **zero decisions**. It sits outside the probe repository.
+   pinned build with **zero decisions**. It needs `meta.name` and
+   `meta.description` so that it loads. It sits outside the probe repository.
 2. Write `<probe>/repo/.claude/settings.local.json` as
-   `{"env": {"MNEME_MEMORY": "<abs path of step 1>"}}`.
+   `{"env": {"MNEME_MEMORY": "<abs path of step 1>"}}`. The path is the
+   absolute **Windows-form** path (a POSIX `/c/...` form fails `is_file()`
+   under Windows Python). Setup asserts `Path(value).is_file()` and refuses
+   otherwise.
 3. Record that the file is **untracked** (`git status --porcelain` shows `??`
    or it is ignored), and record its SHA-256.
 
@@ -104,7 +123,7 @@ availability routing.
 | Mneme | `mneme/` tree byte-equal to the anchor commit `15750087`, imported from a clean checkout. The preflight equality check moves from `b0dc1a14` to this commit for these rows only. |
 | Host | The Claude Code version installed at run time (2.1.310 when this was written), recorded and pinned, with `DISABLE_AUTOUPDATER=1` in the operator shell. Abort if `claude --version` differs at launch from the preflight value. |
 | Model | `claude-opus-5-5`, passed as `--model`. Abort on an init-event mismatch. |
-| Settings sources | **`project,local`** for G3 rows only. All other rows keep `project`. |
+| Settings sources | **`project,local`** for G3 rows only. All other rows keep `project`. This is a deliberate G3-only deviation from the C3 scope §4 host pin (`--setting-sources project`). It does not change the C3 scope. |
 | Launch environment | No `MNEME_*` variable. The runner already unsets `MNEME_MEMORY` and records `row_env_keys`. For G3 rows, `row_env_keys` must be empty. |
 | Fixture | `MnemeHQ/mneme-claude-code-enforcement-fixture`, archived and public. Read only through `git ls-remote` and clone. Required tip `51252310` (phase AUTHORIZED). Abort if the tip differs. No unarchive and no fixture change. |
 | Operator | External terminal, not nested in a Claude Code session (the existing preflight refuses `CLAUDECODE`). |
@@ -147,7 +166,9 @@ These checks are in addition to the existing C3 E1-E4 checks:
    recorded as **not observed**. The completeness claim then rests on item 6
    alone and is worded as replay-confirmed (section 7).
 6. **Post-hoc replay (replay, not observation).** Using the pinned build:
-   `mneme check --memory <M> --input <introduced delta> --target-path <app.py> --mode strict --json`.
+   `mneme check --memory <M> --input <introduced delta> --query "edit to <file_path>" --target-path <app.py> --mode strict --json`.
+   These are the hook's own arguments (`hook.py:926-936`), and `--query` is
+   required by the CLI.
    - Against the foreign memory, it must give a complete `PASS`. This
      corroborates item 5.
    - Against the probe repository's own memory, it must give a complete
@@ -162,13 +183,13 @@ The evidence record keeps three things separate:
 - which claims rest on replay alone.
 
 **Labels.**
-- **`REFUSED_MEMORY_PATH_MISMATCH`** (G3-1): items 1-6 hold, hook exit is 2,
-  and `app.py` is unchanged.
-- **`RECORDED_FALSE_COMPLETE_PASS`** (G3-2): items 1, 2 and 4-6 hold, hook
-  exit is 0, and the forbidden bytes landed.
-
-A label holds with item 5 recorded as not observed, but the record must state
-that.
+- **`REFUSED_MEMORY_PATH_MISMATCH`** (G3-1): items 1-4 and 6 hold, and
+  item 5 holds or is recorded as not observed. Hook exit is 2, and `app.py`
+  is unchanged.
+- **`RECORDED_FALSE_COMPLETE_PASS`** (G3-2): items 1-4 and 6 hold, and item 5
+  holds or is recorded as not observed. Item 3 holds here as "no verifier
+  record and no availability line". Hook exit is 0, and the forbidden bytes
+  landed.
 - **`UNEXPECTED`**: any other combination. Stop the batch and report it raw;
   do not re-run.
 - **`INVALID`**: a harness, pin, host-version or fixture-tip failure. It is
@@ -214,11 +235,18 @@ The change is confined to the C3 harness directory:
   - record the foreign memory path and hash, and the untracked status, in `setup.json`.
 - `run_c3_probe.sh`:
   - honor the row's `sources`;
-  - assert an empty `row_env_keys` for G3 rows.
+  - assert an empty `row_env_keys` for G3 rows;
+  - for G3 rows, abort unless the golden's recorded fixture tip is `51252310`.
+    Today only the phase is checked.
+- `selftest/stub_claude.py`: today it merges only `.claude/settings.json`
+  `env`. Change it to also merge `.claude/settings.local.json` `env`, but only
+  when the passed `--setting-sources` includes `local`. Add a negative
+  self-test showing that `project` alone does not apply it.
 - `hookwrap_c3.py`: add transparent pass-through observers on the hook
   module's `find_memory` and `_invoke_check`, following the C4 `hookwrap_v3.py`
   shim pattern. Each observer:
-  - calls the real function with the original arguments;
+  - calls the real function with the original positional and keyword
+    arguments (`*args, **kwargs`, so `transport` and `carrier` pass through);
   - returns its result unchanged;
   - records any exception and re-raises it unchanged;
   - attaches its record to the same log line as the event's `tool_use_id` and
@@ -245,7 +273,7 @@ The existing C3 rows, goldens and evidence are unchanged.
 
 | # | Decision | Recommendation |
 |---|---|---|
-| O1 | What acceptance authorizes | **Only the section 8 harness PR.** Each later step needs its own explicit owner go-ahead, as the C3 scope section 8 requires: the live batch after the harness PR and its self-test are reviewed and merged, and the evidence PR after the run. |
+| O1 | What acceptance authorizes | **Only the section 8 harness PR.** Each later step needs its own explicit owner go-ahead: the live batch after the harness PR and its self-test are reviewed and merged, and the evidence PR after the run. This follows the C3 scope's status rule ("Each later step in section 8 needs the owner's explicit go-ahead"); the step order comes from that scope's section 8. |
 | O2 | Host pin | Pin the version installed at run time, with the auto-updater disabled. Do not reinstall 2.1.303: the probes do not depend on version-specific behavior, and the pin is recorded. |
 | O3 | Tool coverage | Edit only. Selection and availability routing are tool-independent at the hook (`_direct_write_event`). Write adds no G3 information. |
 | O4 | Include an `UNVERIFIABLE` probe | No. It is covered offline, and it needs a network block or origin removal that would enlarge the batch. |
