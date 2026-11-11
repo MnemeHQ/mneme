@@ -3,6 +3,7 @@
 #
 # usage: run_c3_batch.sh <R|P|U|D|H|ABSENT|REVOKED|FR2> [reps=2]
 #        run_c3_batch.sh FR2 <reps> --recheck
+#        run_c3_batch.sh G3 [reps=1]
 #
 #   R, P, U, D, H  rows of that batch needing the AUTHORIZED phase (P-3/P-4 too)
 #   FR2            C2b charter §17.5 live proof (matrix.FR2_ROWS, AUTHORIZED
@@ -16,6 +17,12 @@
 #                  re-applies that gate.
 #   ABSENT         P-6 (golden must be ABSENT)
 #   REVOKED        P-5 (golden must be REVOKED)
+#   G3             T-08 G3 charter (docs/plans/2026-11-10-t08-g3-host-boundary-
+#                  live-charter.md): G3-2 then G3-1 (matrix.G3_ROWS), n=1 by
+#                  default, under C3_PINSET=G3 (golden AUTHORIZED at the G3
+#                  fixture tip). Each probe must reach its row's g3_label; the
+#                  batch stops at the first that does not (charter §10), and
+#                  ends BATCH_DONE G3 only if both do.
 #
 # Headless only; the interactive arm is run per probe with --interactive.
 # Aborts on the first harness failure and never marks a batch done after one.
@@ -27,8 +34,17 @@ BATCH=${1:-}; REPS=${2:-2}; MODE=${3:-run}
 case "$MODE" in run) ;; --recheck) [ "$BATCH" = FR2 ] || { echo "ABORT: --recheck is for FR2 only"; exit 1; } ;;
   *) echo "ABORT: unknown option $MODE"; exit 1 ;; esac
 LIVE_ROOT="${C3_SELFTEST_LIVE:-$LIVE}"
-case "$BATCH" in R|P|U|D|H|ABSENT|REVOKED|FR2) ;; *) echo "usage: $0 <R|P|U|D|H|ABSENT|REVOKED|FR2> [reps]"; exit 1;; esac
-[ "$REPS" -ge 2 ] 2>/dev/null || { echo "ABORT: E9 needs at least 2 repetitions"; exit 1; }
+case "$BATCH" in R|P|U|D|H|ABSENT|REVOKED|FR2|G3) ;; *) echo "usage: $0 <R|P|U|D|H|ABSENT|REVOKED|FR2|G3> [reps]"; exit 1;; esac
+if [ "$BATCH" = G3 ]; then
+  # Charter §4: n=1 per probe; the G3 pin set applies to the preflight and probes.
+  REPS=${2:-1}
+  [ "$REPS" -ge 1 ] 2>/dev/null || { echo "ABORT: bad repetitions"; exit 1; }
+  export C3_PINSET=G3
+  . "$BASE/pins.env"
+else
+  [ -z "${C3_PINSET:-}" ] || { echo "ABORT: C3_PINSET is for the G3 batch only"; exit 1; }
+  [ "$REPS" -ge 2 ] 2>/dev/null || { echo "ABORT: E9 needs at least 2 repetitions"; exit 1; }
+fi
 bash "$BASE/preflight.sh" || { echo "ABORT: preflight failed"; exit 1; }
 
 ROWS=$("$PY" -E -P -c "
@@ -42,6 +58,11 @@ for probe, spec in matrix.ROWS.items():
     else: ok = probe[0] == batch and phase in ('AUTHORIZED', None)
     if ok:
         for tool in spec.get('tools', matrix.TOOLS):
+            print(probe, tool)
+# G3 rows start with 'G', so no batch letter above selects them.
+if batch == 'G3':
+    for probe in matrix.G3_ROWS:
+        for tool in matrix.row(probe)['tools']:
             print(probe, tool)" "$(cygpath -w "$BASE")" "$BATCH" | tr -d '\r')
 SUMMARY="$LIVE_ROOT/batch-$BATCH-$(date -u +%Y%m%dT%H%M%SZ).txt"
 echo "batch=$BATCH reps=$REPS mode=$MODE harness_head=$(git -C "$BASE" rev-parse HEAD)" > "$SUMMARY"
@@ -61,6 +82,15 @@ while read -r probe tool; do
       line=$(bash "$BASE/run_c3_probe.sh" "$probe" "$tool" "$rep" < /dev/null 2>&1 | tail -1 | tr -d '\r')
     fi
     echo "$line" | tee -a "$SUMMARY"
+    if [ "$BATCH" = G3 ]; then
+      want=$("$PY" -E -P -c "import sys; sys.path.insert(0, sys.argv[1]); import matrix; print(matrix.row(sys.argv[2])['g3_label'])" "$(cygpath -w "$BASE")" "$probe" | tr -d '\r')
+      case "$line" in
+        *" $want") continue ;;
+        *" UNEXPECTED"|*" EVIDENCE_INCOMPLETE"|*" NOT_OFFERED"|*" REFUSED_MEMORY_PATH_MISMATCH"|*" RECORDED_FALSE_COMPLETE_PASS")
+          echo "BATCH_STOPPED G3: $probe $tool $rep is not $want; report it raw, do not re-run (charter §6)" | tee -a "$SUMMARY"; exit 1 ;;
+        *) echo "ABORT: harness failure on $probe $tool $rep (INVALID, charter §6; see its out/harness_failure.txt)" | tee -a "$SUMMARY"; exit 1 ;;
+      esac
+    fi
     case "$line" in
       *" PASS") ;;
       *" EVIDENCE_INCOMPLETE") incomplete=$((incomplete + 1)) ;;

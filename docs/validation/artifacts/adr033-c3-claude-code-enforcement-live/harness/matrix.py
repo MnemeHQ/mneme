@@ -15,6 +15,9 @@ Fields:
             VERIFIED_ABSENT, "UNVERIFIABLE:<reason>|<reason>"
   e4        True if the row needs E4 (wrapper Git log plus OS capture)
   needs     operator preconditions checked by the runner
+  sources   --setting-sources for the row (default "project"; G3 rows only
+            use "project,local")
+  g3_label  G3 rows only: the charter §6 label the row must reach
 """
 from __future__ import annotations
 
@@ -87,7 +90,31 @@ ROWS = {
                 expect="record", verifier=None, e4=False),
     "H-2": dict(phase="AUTHORIZED", repo="clone", edit="violating", mutate=["hook_exceeds_timeout"],
                 expect="record", verifier=None, e4=False),
+    # T-08 G3 (charter docs/plans/2026-11-10-t08-g3-host-boundary-live-charter.md):
+    # an uncommitted settings.local.json env.MNEME_MEMORY redirect to a permissive
+    # foreign memory, with a violating Edit. Run with the G3 pin set
+    # (C3_PINSET=G3) and project,local settings sources, a G3-only deviation
+    # from scope §4. `g3_label` is the charter §6 label the row must reach.
+    "G3-1": dict(phase="AUTHORIZED", repo="clone", edit="violating",
+                 mutate=["settings_local_foreign_memory"],
+                 expect="refuse:MEMORY_PATH_MISMATCH", verifier="AUTHORIZED", e4=True,
+                 tools=("Edit",), sources="project,local",
+                 g3_label="REFUSED_MEMORY_PATH_MISMATCH"),
+    "G3-2": dict(phase=None, repo="unenrolled", edit="violating",
+                 mutate=["settings_local_foreign_memory"],
+                 expect="proceed", verifier=None, e4=False,
+                 tools=("Edit",), sources="project,local",
+                 g3_label="RECORDED_FALSE_COMPLETE_PASS"),
 }
+
+# Charter §10: G3-2 first, because it confirms the channel without the verifier.
+G3_ROWS = ("G3-2", "G3-1")
+G3_LABELS = ("REFUSED_MEMORY_PATH_MISMATCH", "RECORDED_FALSE_COMPLETE_PASS",
+             "UNEXPECTED", "EVIDENCE_INCOMPLETE")
+
+
+def is_g3(probe: str) -> bool:
+    return probe in G3_ROWS
 
 # C2b charter §17.5 live proof (batch FR2), all in the AUTHORIZED phase. The
 # first row is the deterministic UNVERIFIABLE proceed (origin removed:
@@ -111,6 +138,7 @@ def row(probe: str) -> dict:
     data = dict(ROWS[probe])
     data.setdefault("needs", [])
     data.setdefault("tools", TOOLS)
+    data.setdefault("sources", "project")
     return data
 
 

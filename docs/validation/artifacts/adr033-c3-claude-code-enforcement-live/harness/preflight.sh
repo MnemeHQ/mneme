@@ -26,9 +26,14 @@ else
   [ -n "${C3_SELFTEST_LIVE:-}${C3_SELFTEST_CLAUDE_HOME:-}" ] && bad "C3_SELFTEST_LIVE or C3_SELFTEST_CLAUDE_HOME is set outside self-test mode"
   v=$(claude --version | tr -d '\r')
   [ "$v" = "$PIN_CLAUDE_VERSION" ] && say "claude: $v" || bad "claude '$v' != '$PIN_CLAUDE_VERSION'"
+  if [ "${C3_PINSET:-}" = G3 ]; then
+    [ "${DISABLE_AUTOUPDATER:-}" = 1 ] && say "DISABLE_AUTOUPDATER=1 (G3 charter O2)" \
+      || bad "G3 pin set needs DISABLE_AUTOUPDATER=1 in this shell (charter O2)"
+  fi
   case "$(command -v claude)" in "$BASE/selftest/"*) bad "claude resolves to the self-test stub";; esac
 fi
 
+say "pin set: ${C3_PINSET:-C3} (mneme base $PIN_MNEME_BASE, claude '$PIN_CLAUDE_VERSION')"
 head=$(git -C "$MNEME_SRC_U" rev-parse HEAD)
 say "mneme_src HEAD: $head"
 git -C "$MNEME_SRC_U" merge-base --is-ancestor "$PIN_MNEME_BASE" "$head" \

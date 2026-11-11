@@ -12,6 +12,7 @@ taken before Claude starts (scope #592 §5.4: no agent-driven attacks).
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import shutil
 import subprocess
@@ -71,6 +72,58 @@ def rollback_one_event(original: dict, validate) -> dict:
     return behind
 
 
+G3_LOCAL = ".claude/settings.local.json"
+
+
+def sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def untracked_status(repo: Path, rel: str) -> str:
+    """Charter §4 step 3: the local settings file must be untracked or ignored."""
+    line = git("status", "--porcelain", "--ignored", "--untracked-files=all", "--", rel,
+               cwd=repo).strip()
+    status = line[:2]
+    if status not in ("??", "!!"):
+        raise SystemExit(f"G3 setup refused: {rel} is not untracked or ignored "
+                         f"(git status {line!r})")
+    return status
+
+
+def foreign_memory_settings(probe_dir: Path, repo: Path, mneme_src: str) -> dict:
+    """G3 mutation ``settings_local_foreign_memory`` (charter §4).
+
+    1. A zero-decision memory from the pinned build's own scaffold, outside the
+       probe repository.
+    2. ``.claude/settings.local.json`` with ``env.MNEME_MEMORY`` set to its
+       absolute Windows-form path. ``find_memory`` returns None for a path that
+       is not a file, which would read as MEMORY_MISSING (charter §2), so the
+       setup refuses unless the value is absolute and ``is_file()``.
+    The untracked check (step 3) runs after the project settings are written.
+    """
+    sys.path.insert(0, mneme_src)
+    from mneme.memory_store import MemoryStore
+    from mneme.setup_state import scaffold_project_memory
+
+    foreign = (probe_dir / "foreign" / ".mneme" / "project_memory.json").resolve()
+    foreign.parent.mkdir(parents=True)
+    dump(foreign, scaffold_project_memory(created_by="C3 G3 foreign memory (zero decisions)"))
+    store = MemoryStore(str(foreign))
+    store.load()
+    if store.decisions():
+        raise SystemExit("G3 setup refused: the foreign memory has decisions")
+    value = str(foreign)
+    if value.startswith("/") or not Path(value).is_absolute() or not Path(value).is_file():
+        raise SystemExit(f"G3 setup refused: MNEME_MEMORY value {value!r} is not an "
+                         "absolute Windows-form path to a file")
+    local = repo / G3_LOCAL
+    local.parent.mkdir(exist_ok=True)
+    dump(local, {"env": {"MNEME_MEMORY": value}})
+    return {"foreign_memory": value, "foreign_sha256": sha256(foreign),
+            "mneme_memory_value": value, "settings_local": str(local),
+            "settings_local_sha256": sha256(local)}
+
+
 def hook_settings(command: str, timeout: int) -> dict:
     return {"hooks": {"PreToolUse": [{
         "matcher": "Edit|Write|MultiEdit",
@@ -108,6 +161,7 @@ def main() -> int:
     timeout = 60
     settings = None
     history = None
+    g3 = None
 
     for step in spec["mutate"]:
         if step == "delete_memory":
@@ -179,6 +233,8 @@ def main() -> int:
         elif step == "hook_exceeds_timeout":
             timeout = 5
             env["C3_STALL_HOOK_SECONDS"] = "20"
+        elif step == "settings_local_foreign_memory":
+            g3 = foreign_memory_settings(probe_dir, repo, mneme_src)
         else:
             raise SystemExit(f"unknown mutation {step!r}")
 
@@ -186,6 +242,12 @@ def main() -> int:
         settings = hook_settings(command, timeout)
     (repo / ".claude").mkdir(exist_ok=True)
     dump(repo / ".claude" / "settings.json", settings)
+    if g3 is not None:
+        # Charter §4: the redirect lives only in the local file. The project
+        # file registers the hook and must carry no env of its own.
+        if "env" in settings:
+            raise SystemExit("G3 setup refused: project settings.json has an env key")
+        g3["settings_local_status"] = untracked_status(repo, G3_LOCAL)
 
     app = repo / "app.py"
     service = repo / "service.py"
@@ -199,6 +261,8 @@ def main() -> int:
     }
     if history is not None:
         record["declaration_history"] = history  # R-3: baseline vs rolled-back local ops
+    if g3 is not None:
+        record["g3"] = g3
     out = probe_dir / "setup.json"
     dump(out, record)
     print(out)

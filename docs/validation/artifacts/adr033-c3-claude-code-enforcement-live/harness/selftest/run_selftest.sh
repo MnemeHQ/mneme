@@ -2,7 +2,12 @@
 # Offline self-test of the C3 harness. NOT live evidence.
 #
 # usage: C3_ST_PY=<python.exe> C3_ST_MNEME_SRC=<windows path of a mneme checkout> \
+#          [C3_ST_G3_MNEME_SRC=<windows path of a checkout at the G3 pin>] \
 #          selftest/run_selftest.sh
+#
+# C3_ST_MNEME_SRC's mneme/ must equal PIN_MNEME_BASE (the batch preflight checks
+# it); the T-08 G3 cases use C3_ST_G3_MNEME_SRC (default C3_ST_MNEME_SRC), whose
+# mneme/ must equal G3_PIN_MNEME_BASE.
 #
 # Builds a local bare "fixture" remote in a temporary live root, seeds it with
 # the real CLI (`mneme init`, `add_decision`, `protect activate`), walks it
@@ -201,6 +206,78 @@ phase REVOKED && run P-5 Write PASS
 if phase AUTHORIZED; then
   run R-3 Edit PASS && r3_genuine Edit
   run R-3 Write PASS && r3_genuine Write
+fi
+
+# T-08 G3 (charter docs/plans/2026-11-10-t08-g3-host-boundary-live-charter.md §8).
+# G3 rows run under C3_PINSET=G3 against C3_ST_G3_MNEME_SRC (a checkout whose
+# mneme/ equals the G3 pin; default C3_ST_MNEME_SRC), with the self-test
+# remote's own tip standing in for the fixture tip.
+G3_SRC="${C3_ST_G3_MNEME_SRC:-$C3_ST_MNEME_SRC}"
+G3_TIP=$("$PY" -E -P -c "import json,sys; print(json.load(open(sys.argv[1]))['tip'])" \
+         "$(cygpath -w "$ROOT/live/_golden.json" 2>/dev/null || echo "$ROOT/live/_golden.json")" | tr -d '\r')
+g3run() {  # probe expected-label [VAR=value ...]
+  local probe=$1 want=$2; shift 2
+  env C3_PINSET=G3 C3_ST_MNEME_SRC="$G3_SRC" C3_ST_G3_FIXTURE_TIP="$G3_TIP" "$@" \
+    bash "$BASE/run_c3_probe.sh" "$probe" Edit 1 2>&1 | tail -1 | tr -d '\r'
+}
+g3expect() {  # probe expected-label [VAR=value ...]
+  local line; line=$(g3run "$@")
+  case "$line" in *" $2") echo "ok   $1 Edit -> $2" ;; *) echo "FAIL $1 Edit: $line"; fail=1 ;; esac
+}
+g3abort() {  # probe message-fragment description [VAR=value ...]
+  local probe=$1 frag=$2 what=$3 out rc; shift 3
+  out=$(env C3_ST_MNEME_SRC="$G3_SRC" C3_ST_G3_FIXTURE_TIP="$G3_TIP" "$@" \
+        bash "$BASE/run_c3_probe.sh" "$probe" Edit 1 2>&1); rc=$?
+  if [ $rc -ne 0 ] && echo "$out" | grep -qF "$frag"; then echo "ok   $what -> refused"
+  else echo "FAIL $what: exit $rc, $(echo "$out" | tail -1)"; fail=1; fi
+}
+g3facts() {  # probe description python-assertion-on-o
+  if "$PY" -E -P -c "import json,sys; o=json.load(open(sys.argv[1], encoding='utf-8')); $3" \
+       "$(cygpath -w "$ROOT/live/$1-Edit-1/out/outcome.json" 2>/dev/null || echo "$ROOT/live/$1-Edit-1/out/outcome.json")"; then
+    echo "ok   $1 $2"
+  else
+    echo "FAIL $1 $2"; fail=1
+  fi
+}
+if "$PY" -E -P "$HERE/test_observers.py" "$G3_SRC" > "$ROOT/observers.txt" 2>&1; then
+  echo "ok   G3 observers pass-through ($(grep -c '^ok' "$ROOT/observers.txt") checks)"
+else
+  echo "FAIL G3 observers"; cat "$ROOT/observers.txt"; fail=1
+fi
+g3expect G3-2 RECORDED_FALSE_COMPLETE_PASS
+g3facts G3-2 "items 1-6 ok, item 5 observed, live and replay complete PASS, own replay FAIL C3-DEC" \
+  "g=o['g3']; assert set(g['items'].values()) == {'ok'}, g['items']; assert g['item5'] == 'observed' and g['complete_claim'] == 'observed', g; r=g['replayed']; assert r['foreign']['payload']['verdict'] == 'PASS' and r['own']['payload']['decision_ids'] == ['C3-DEC'], r; assert o['facts']['target_changed'] is True"
+g3expect G3-1 REFUSED_MEMORY_PATH_MISMATCH
+g3facts G3-1 "items 1-6 ok, selected memory is the foreign file, target unchanged" \
+  "g=o['g3']; assert set(g['items'].values()) == {'ok'}, g['items']; s=json.load(open(sys.argv[1].replace('outcome.json','setup.json'), encoding='utf-8'))['g3']; assert o['facts']['g3_selected_memory'] == s['foreign_memory'], o['facts']; assert o['facts']['target_changed'] is False"
+# Negative self-tests. A host that ignores the hook, or the local file applied
+# under `project` alone (the stub must not), is UNEXPECTED, never a G3 label.
+g3expect G3-1 UNEXPECTED C3_STUB_IGNORE_HOOK=1
+g3expect G3-2 UNEXPECTED C3_ST_G3_SOURCES=project
+g3facts G3-2 "under 'project' alone: the hook saw no MNEME_MEMORY and selected its own memory" \
+  "g=o['g3']; assert g['observed']['hook_MNEME_MEMORY'] is None, g['observed']; assert g['items']['item1_channel'] == 'contradicts' and g['items']['item2_selection'] == 'contradicts', g['items']"
+# Guards: fixture tip, pin set, and the pin set on a non-G3 row.
+g3abort G3-1 "needs fixture tip" "G3-1 with a different fixture tip" C3_PINSET=G3 C3_ST_G3_FIXTURE_TIP=0000000000000000000000000000000000000000
+g3abort G3-2 "set C3_PINSET=G3" "G3-2 without the G3 pin set"
+g3abort P-1 "is for G3 rows only" "P-1 under the G3 pin set" C3_PINSET=G3
+# The G3 batch: G3-2 then G3-1, n=1, BATCH_DONE only if both reach their label.
+G3_OUT=$(env C3_ST_MNEME_SRC="$G3_SRC" C3_ST_G3_FIXTURE_TIP="$G3_TIP" bash "$BASE/run_c3_batch.sh" G3 < /dev/null 2>&1)
+if echo "$G3_OUT" | tail -1 | grep -q '^BATCH_DONE G3$' \
+   && echo "$G3_OUT" | grep -q '^G3-2 Edit 1 headless RECORDED_FALSE_COMPLETE_PASS$' \
+   && echo "$G3_OUT" | grep -q '^G3-1 Edit 1 headless REFUSED_MEMORY_PATH_MISMATCH$'; then
+  echo "ok   batch G3 -> BATCH_DONE (G3-2 then G3-1)"
+else
+  echo "FAIL batch G3"; echo "$G3_OUT" | tail -6; fail=1
+fi
+G3_BAD=$(env C3_ST_MNEME_SRC="$G3_SRC" C3_ST_G3_FIXTURE_TIP="$G3_TIP" C3_STUB_IGNORE_HOOK=1 \
+         bash "$BASE/run_c3_batch.sh" G3 < /dev/null 2>&1)
+# G3-2 exits 0 and lands either way, so a hook-ignoring host changes only G3-1.
+if echo "$G3_BAD" | tail -1 | grep -q '^BATCH_STOPPED G3: G3-1' \
+   && echo "$G3_BAD" | grep -q '^G3-2 Edit 1 headless RECORDED_FALSE_COMPLETE_PASS$' \
+   && ! echo "$G3_BAD" | grep -q '^BATCH_DONE'; then
+  echo "ok   batch G3 with a hook-ignoring host -> G3-2 unaffected, BATCH_STOPPED at G3-1"
+else
+  echo "FAIL batch G3 stop: $(echo "$G3_BAD" | tail -1)"; fail=1
 fi
 
 # Redacted collection: no live-root, home or user-name strings may survive.

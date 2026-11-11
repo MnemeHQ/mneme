@@ -59,7 +59,9 @@ it ran with. See [F-R2 delivery](#f-r2-delivery-c2b-charter-175).
 | `collect_transcript.py` | Copies the session transcript: the interactive arm's (E2 stand-in) and, with `--headless`, the `claude -p` session's (F-R2 delivery) |
 | `collect_redacted.py` | Copies evidence into the repo with paths, user and host name redacted; publishes session transcripts only as `*.selected.jsonl` (H1 rule; raw SHA-256 in the manifest); `--probes`/`--extra` select probes and batch summaries from a shared live root; fails on credential-shaped text |
 | `safe_rmtree.py` | The only recursive delete, confined to the live root |
-| `selftest/` | Offline self-test with a stub `claude` and a local `file://` remote. Not evidence |
+| `observe.py` | T-08 G3: pass-through observers that `hookwrap_c3.py` puts on the hook's own `find_memory` and `_invoke_check` calls (selected memory, live checker result). The real result is returned unchanged and exceptions are re-raised unchanged |
+| `replay_g3.py` | T-08 G3: post-hoc replay of the hook's `mneme check` against the foreign memory and the probe repository's own memory. Replay, not observation |
+| `selftest/` | Offline self-test with a stub `claude` and a local `file://` remote, plus `test_observers.py` (observer pass-through and hook parity). Not evidence |
 
 ## Procedure (operator, from an external Git Bash, never inside Claude Code)
 
@@ -73,6 +75,11 @@ MNEME_SRC_U='/c/path/to/clean/mneme/checkout'
 PY='C:\path\to\python.exe'                        # no spaces; has mneme's dependencies
 ```
 
+`PY` must not have `mneme-hq` installed, least of all as an editable install:
+that import wins over `MNEME_SRC_W`, so the hook would run some other tree.
+The preflight's hook-module check refuses it. A venv holding only the
+runtime dependencies (`anthropic`, `python-dotenv`, `PyYAML`) works.
+
 Then `bash preflight.sh` must print `OK`. If Claude Code has moved past
 `PIN_CLAUDE_VERSION`, update the pin in a reviewed commit before running;
 never run against an unpinned version.
@@ -80,8 +87,13 @@ never run against an unpinned version.
 ### 1. Self-test (offline)
 
 ```bash
-C3_ST_PY="$PY" C3_ST_MNEME_SRC="$MNEME_SRC_W" bash selftest/run_selftest.sh
+C3_ST_PY="$PY" C3_ST_MNEME_SRC="$MNEME_SRC_W" \
+  C3_ST_G3_MNEME_SRC='C:\path\to\checkout\at\G3_PIN_MNEME_BASE' bash selftest/run_selftest.sh
 ```
+
+`C3_ST_MNEME_SRC`'s `mneme/` must equal `PIN_MNEME_BASE`, and
+`C3_ST_G3_MNEME_SRC`'s must equal `G3_PIN_MNEME_BASE`, because each batch
+preflight checks its own pin. A sparse checkout of `mneme/` alone is enough.
 
 It must end with `SELFTEST OK (not live evidence)`. It includes negative
 controls: a host that ignores the hook must FAIL, and an agent that makes no
@@ -110,7 +122,7 @@ call must be a PROTOCOL_DEVIATION.
   the self-test, `model_delivered` is `stub_only` and `user_visible` is
   `not_tested`.
 
-**Row coverage (24 rows).**
+**Row coverage (24 C3 rows, plus the 2 T-08 G3 rows).**
 
 | Rows | Offline self-test | Live only |
 |---|---|---|
@@ -120,6 +132,7 @@ call must be a PROTOCOL_DEVIATION.
 | U-1, U-2, U-3 (3) | Not exercised (needs a Git-only network block) | All evidence |
 | H-2 (1) | Not exercised (host hook-timeout behavior cannot be stubbed meaningfully) | All evidence |
 | Interactive arms R-1, P-2 | Not exercised | Q2 recording and operator attestation |
+| T-08 G3: G3-1, G3-2 (batch `G3`) | Both labels with every item observed; negative cases (a hook-ignoring host, and the local file under `project` alone) are UNEXPECTED; fixture-tip and pin-set guards refuse; the batch stops at the first wrong label; observer pass-through and hook parity | Real 2.1.310 host propagation of `settings.local.json`, the HTTPS verifier path, E4 OS capture for G3-1 |
 
 ### 2. Fixture seeding (step 3a, owner go-ahead; a human merges each PR)
 
@@ -196,6 +209,38 @@ Then open one evidence-record PR per batch with the collected files, the batch
 summary, the as-run harness head, and the merge record of each fixture PR
 (E5: who merged, merge order; read with a credential the agent does not
 hold).
+
+## T-08 G3 batch (charter `docs/plans/2026-11-10-t08-g3-host-boundary-live-charter.md`)
+
+**Status: harness ready, NOT RUN.** The charter (#791) authorizes this
+harness only. The live batch and the evidence PR each need a separate owner
+go-ahead (charter O1).
+
+**What it adds.**
+
+| Piece | G3 behavior |
+|---|---|
+| Rows | G3-1 (clone, AUTHORIZED, expected `REFUSED_MEMORY_PATH_MISMATCH`) and G3-2 (unenrolled, expected `RECORDED_FALSE_COMPLETE_PASS`). Edit only, violating edit, mutation `settings_local_foreign_memory` |
+| Mutation | Writes a zero-decision foreign memory from the pinned build's scaffold, outside the repository. Writes `.claude/settings.local.json` with `env.MNEME_MEMORY` set to its absolute Windows-form path; setup refuses unless the value `is_file()`. The file must be untracked or ignored, and the project `settings.json` must carry no `env` |
+| Pin set | `C3_PINSET=G3` selects `G3_PIN_CLAUDE_VERSION`, `G3_PIN_MNEME_BASE` (`15750087`) and `G3_FIXTURE_TIP` (`5125231`). G3 rows refuse to run without it, and every other row refuses to run with it |
+| Runner | `--setting-sources project,local` (a G3-only deviation from scope §4). Aborts if the golden tip is not `G3_FIXTURE_TIP`, if `DISABLE_AUTOUPDATER` is not `1`, if `claude --version` differs from the G3 pin, or if any `MNEME_*` variable is in the launch environment. Copies `settings.local.json` into `out/` and runs `replay_g3.py` |
+| Classifier | Charter §6 items 1-6 on top of E1-E4: channel, the hook's own selection (observed), availability, host outcome, the live checker result (observed, or recorded as `not_observed`) and replay. Labels: the row's G3 label, `UNEXPECTED` or `EVIDENCE_INCOMPLETE`. `outcome.json` → `g3` keeps `observed` apart from `replayed`, and states `complete_claim` as `observed` or `replay-confirmed only` |
+
+**Run (after the owner's go-ahead for the live batch).**
+
+```bash
+export DISABLE_AUTOUPDATER=1          # in the operator shell, before preflight
+C3_PINSET=G3 bash preflight.sh        # mneme/ must equal G3_PIN_MNEME_BASE
+bash refresh_golden.sh AUTHORIZED     # the golden must be at G3_FIXTURE_TIP
+bash run_c3_batch.sh G3               # G3-2 then G3-1, n=1
+```
+
+`pins.local.env` for this batch points `MNEME_SRC_*` at a clean checkout whose
+`mneme/` equals `G3_PIN_MNEME_BASE`. G3-1 needs the E4 OS capture, as R-6 did.
+The batch ends `BATCH_DONE G3` only if both rows reach their labels. Any other
+label ends `BATCH_STOPPED G3`: report it raw and do not re-run (charter §6).
+A harness failure is `INVALID` and may be re-run once after the cause is fixed
+and recorded.
 
 ## F-R2 delivery (C2b charter §17.5)
 

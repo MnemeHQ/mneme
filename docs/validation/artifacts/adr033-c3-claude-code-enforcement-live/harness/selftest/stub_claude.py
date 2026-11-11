@@ -2,7 +2,9 @@
 
 It exercises the harness plumbing offline: it reads the probe's planned call
 from ``../setup.json``, runs the PreToolUse hook registered in the project
-``.claude/settings.json`` exactly as configured (with the settings ``env``),
+``.claude/settings.json`` exactly as configured (with the settings ``env``,
+plus ``.claude/settings.local.json`` ``env`` when ``--setting-sources``
+includes ``local``),
 applies the edit only when the hook exits 0, and prints stream-json shaped
 events. It does not model Claude Code's real behavior on hook timeouts or
 launch failures; batch H is recorded live only.
@@ -78,6 +80,13 @@ def main() -> int:
 
     settings = json.loads((repo / ".claude" / "settings.json").read_text(encoding="utf-8"))
     env = dict(os.environ, **settings.get("env", {}))
+    # T-08 G3 (charter §8): like the real host, apply the uncommitted local
+    # file's env only when the passed --setting-sources includes `local`.
+    sources = args[args.index("--setting-sources") + 1].split(",") \
+        if "--setting-sources" in args else []
+    local = repo / ".claude" / "settings.local.json"
+    if "local" in sources and local.exists():
+        env.update(json.loads(local.read_text(encoding="utf-8")).get("env", {}))
     envelope = json.dumps({"hook_event_name": "PreToolUse", "tool_name": tool,
                            "tool_input": tool_input, "tool_use_id": use_id,
                            "session_id": session, "transcript_path": str(transcript_path),
