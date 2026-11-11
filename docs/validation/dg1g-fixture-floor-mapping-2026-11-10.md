@@ -8,7 +8,9 @@
 > DG1 remain open**. This record authorizes no new test, enforcement change,
 > waiver, charter, freeze amendment or release.
 > **Updated 2026-11-10 at `d0a1b1d8`:** F13 reclassified from *blocked* to
-> *supported* after DG1B2a merged (#787); see §2 F13 and §5. Every other
+> *supported* after DG1B2a merged (#787); see §2 F13 and §5.
+> **Updated 2026-11-11 at `67f9961c`:** F10 reclassified from *partial* to
+> *supported* by a new DG1-mapped test; see §2 F10. Every other
 > classification is unchanged from the original anchor.
 > **Anchor:** `main` at `b5e0e1dd` (original record). Basis:
 > [DG1 post-C3a reconciliation](dg1-post-c3a-reconciliation-2026-11-09.md)
@@ -19,8 +21,8 @@
 
 | Classification | Count | Items |
 |---|---|---|
-| supported | 12 | §13 fixtures F1–F9, F11, F12, F13 |
-| partial | 2 | F10 (ADR-029 §6), G3 host-boundary control |
+| supported | 13 | §13 fixtures F1–F13 |
+| partial | 1 | G3 host-boundary control |
 | missing | 0 | none beyond the partials |
 | blocked | 0 | none (F13 was blocked until DG1B2a, #787) |
 | unevaluated | 2 | G1 self-authorization control (host side), G2 authorized-transition control |
@@ -64,7 +66,7 @@ representative, and the suite as a whole is the pinning evidence.
 | F7 | lifecycle exclusion with honest `lifecycle_inactive` cause | `test_dg1c_effective_resolver.py::test_ineffective_causes_follow_lifecycle_and_never_guess`, `::test_unknown_lifecycle_fails_closed`; `test_dg1f_c2_lifecycle_consolidation.py::test_5_widening_the_authority_moves_every_consumer` | yes | supported |
 | F8 | input-order invariance | `test_dg1c_effective_resolver.py::test_input_order_invariance`; `test_dg1d_change_resolution.py::test_change_set_is_input_order_invariant`; `test_dg1b1_decision_applicability.py::test_resolution_is_invariant_to_record_order`, `::test_label_set_is_order_and_duplicate_invariant` | yes | supported |
 | F9 | irrelevant-decision invariance; context-path invariance for the parity resolver | `test_dg1c_effective_resolver.py::test_irrelevant_decision_invariance`, `::test_context_invariance_for_v1_semantics`; `test_dg1b1_decision_applicability.py::test_irrelevant_context_labels_do_not_change_the_result` | yes | supported |
-| F10 | configured versus execution-observed evidence (ADR-029 §6) | no DG1-mapped test. Evidence: [#761 audit](adr029-evidence-completeness-audit-2026-11-08.md) (E-1, E-8), [Verification step 3](verification-step3-e2e-fixture-2026-11-09.md), [step 4](verification-step4-independent-review-2026-11-09.md); supplementary, main-only (`GATE_EXCLUSIONS`): `test_adr034_g2_1_harness.py::test_observed_disposition` (numeric path only) | no | **partial** |
+| F10 | configured versus execution-observed evidence (ADR-029 §6) | `test_dg1g_f10_evidence_distinction.py` (all seven tests: scenarios A–E from the DG1 side), incl. `::test_a_dg1_outputs_have_no_observation_channel`, `::test_b_excluded_applicability_drops_relevance_not_identity`, `::test_c_equal_complete_identities_do_not_imply_equal_relevance`, `::test_d_literal_evidence_has_identity_but_no_relevance`, `::test_e_observation_under_v1_never_establishes_a_claim_under_v2`. Background: [#761 audit](adr029-evidence-completeness-audit-2026-11-08.md) (E-1, E-8, §5.1), [Verification step 3](verification-step3-e2e-fixture-2026-11-09.md), [step 4](verification-step4-independent-review-2026-11-09.md); supplementary, main-only: `test_adr034_g2_1_harness.py::test_observed_disposition` | yes | supported (DG1-mapped test added 2026-11-11) |
 | F11 | canonical rule identity through enforcement; section-less fail-closed evidence | `test_dg1e_evidence_identity.py::test_runtime_rule_id_equals_persisted_rule_id`, `::test_canonical_memory_trace_carries_complete_evidence_identity`, `::test_check_json_reports_canonical_identity`, `::test_adr_dir_view_uses_canonical_rule_ids_without_version_identity`, `::test_section_less_memory_has_rule_identity_but_fails_closed`, `::test_legacy_prose_violation_identity_is_incomplete`, `::test_verdicts_do_not_depend_on_evidence_identity` | yes | supported |
 | F12 | snapshot A → B change explanations | all 14 tests in `test_dg1d_change_resolution.py`, incl. `test_dg1d_change_resolution.py::test_supersession_moves_governance_and_rules`, `::test_version_evolution_reports_version_and_rule_changes`, `::test_persisted_snapshots_report_deprecation_and_retired_rules`, `::test_resolutions_from_different_semantics_are_not_comparable`; applicability: `test_dg1b1_functional_acceptance.py::test_f10_resolve_change_reports_governed_scope_change` | yes | supported |
 | F12a | applicability fixtures (added with DG1B1) | `test_dg1b1_decision_applicability.py` (62), the twelve F1–F12 tests in `test_dg1b1_functional_acceptance.py` (from `test_dg1b1_functional_acceptance.py::test_f1_v1_decision_is_globally_eligible` to `::test_f12_runtime_projection_and_enforcement_inputs_unchanged`); three-state context `test_dg1f_c2_lifecycle_consolidation.py::test_1_unknown_context_conservatively_includes_and_never_claims_a_match`, `::test_1b_context_states_are_distinct_and_validated` | yes | supported |
@@ -79,12 +81,16 @@ Notes:
   on a waiver: DG1B2b (waiver-aware enforcement) is deferred with C1b
   ([readiness assessment](../plans/2026-11-10-dg1b2b-readiness-assessment.md),
   #788), and no authoritative surface consumes waivers.
-- **F10 gap, precisely:** the evidence distinctions (configured, execution
-  observed, relevant enforcement observed) are established and reviewed by
-  the Verification track, but no test in the DG1 suite asserts that a DG1
-  resolution or evidence identity never upgrades configured evidence to
-  observed. Closing it needs a DG1-mapped test, which this record does not
-  authorize.
+- **F10, precisely (closed 2026-11-11):** the DG1-mapped test drives the
+  real hook and in-process `mneme check` and asserts, from the DG1 side,
+  that a DG1 resolution or DG1E evidence identity never upgrades configured
+  evidence to observed: DG1 outputs have no observation field; a complete
+  identity coexists with "not relevant" for EXCLUDED, undecided and literal
+  rules; and an observation under decision version V1 does not match the
+  complete identity claimed under V2, even though the `rule_id`-keyed
+  relevance boolean is unchanged (#761 §5.1, owner ruling condition 2). It
+  pins existing behavior only. It does not add the full-identity comparison
+  to `relevant_enforcement_per_rule`, which remains a consumer obligation.
 
 ## 3. #497 governance-of-governance controls
 
@@ -111,7 +117,7 @@ and CI1, not to a DG1 implementation slice.
 1. ~~DG1B2 delivered under its own evidence gate, with F13 waiver
    fixtures.~~ DG1B2a delivered with F13 fixtures (#787). DG1B2b is deferred
    with C1b (#788), so the ADR-031 §11 sequence is still incomplete (item 4).
-2. A DG1-mapped test for F10.
+2. ~~A DG1-mapped test for F10.~~ Added 2026-11-11.
 3. A decision, with CI1 and T-08, on the host-side G1–G3 controls.
 4. The remaining ADR-031 §11 sequence complete or explicitly scoped by an
    ADR-031 decision.
@@ -121,7 +127,11 @@ BLOCKED is counted as passed.
 
 ## 6. Non-claims
 
-No DG1G, DG1F or DG1 completion is claimed. No test was added.
+No DG1G, DG1F or DG1 completion is claimed. The original record added no
+test; the 2026-11-11 update adds one test file for F10 (below).
+**2026-11-11 update:** `test_dg1g_f10_evidence_distinction.py` (7 tests)
+was added to `GATE_PATHS`; all passed locally on Windows, and a mutation
+making `EvidenceIdentity` ignore `decision_version_id` is caught.
 **2026-11-10 update:** the eight F13 test IDs were checked to exist by
 collection at `d0a1b1d8`; `test_dg1b2a_canonical_waivers.py` is in
 `GATE_PATHS` and not in `GATE_EXCLUSIONS`, and ran locally on Windows at
