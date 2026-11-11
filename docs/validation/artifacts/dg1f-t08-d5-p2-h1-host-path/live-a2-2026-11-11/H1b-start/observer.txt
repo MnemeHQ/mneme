@@ -1,0 +1,17 @@
+arm=H1b-start
+pinset=A2
+model_flag=claude-opus-5-5
+disable_autoupdater=1
+claude_version=2.1.310 (Claude Code)
+claude_bin=<CLAUDE_BIN>
+harness_head=4c1c270e6e7b0c1c27f3d124ed2f71c8a5fd681c
+sources=project
+tools=Read
+notes_before=b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060
+bash_out_before=absent
+settings_sha=1ad199b7734e1fc305388aec1841ed31056b36ea4ec2e8dd5ca0b3e6625a665a
+date=2026-11-11T17:42:39Z
+claude_exit=0
+notes_after=b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060
+bash_out_after=absent
+transcript_collected=yes
