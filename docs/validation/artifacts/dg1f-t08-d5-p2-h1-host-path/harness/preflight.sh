@@ -17,6 +17,11 @@ else
 fi
 case "$PY" in *'<'*) bad "PY is still a placeholder"; echo "[preflight] FAILED"; exit 1;; esac
 say "setting sources for every probe: $SOURCES"
+say "pin set: ${H1_PINSET:-H1} (paths: $H1_PATHS)"
+if [ "${H1_PINSET:-}" = A2 ]; then
+  [ "${DISABLE_AUTOUPDATER:-}" = 1 ] && say "DISABLE_AUTOUPDATER=1 (Amendment A2)" \
+    || bad "pin set A2 needs DISABLE_AUTOUPDATER=1 in this shell (Amendment A2)"
+fi
 
 v=$(claude --version | tr -d '\r')
 [ "$v" = "$PIN_CLAUDE_VERSION" ] && say "claude: $v" || bad "claude '$v' != '$PIN_CLAUDE_VERSION'"
@@ -43,6 +48,10 @@ d="$LIVE"; while [ "$d" != "/" ] && [ "$d" != "." ]; do
   d=$(dirname "$d")
 done
 say "live root: $LIVE"
-say "model pin (checked from the first probe's init event): $PIN_MODEL"
+if [ -n "$PIN_MODEL_FLAG" ]; then
+  say "model pin (passed as --model, checked from the first probe's init event): $PIN_MODEL"
+else
+  say "model pin (checked from the first probe's init event): $PIN_MODEL"
+fi
 [ $fail -eq 0 ] && say "OK" || say "FAILED"
 exit $fail
