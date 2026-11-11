@@ -3,8 +3,14 @@
 **Date:** 2026-11-10
 **Status:** **PROPOSED** for owner review. Documentation only. This document
 changes no runtime behavior, harness, test, ADR, Layer 1 freeze, `.mneme/`
-content, evidence record or pin. What its acceptance authorizes is set out in
-section 9 (decision O1).
+content, evidence record or pin. Acceptance authorizes **only the harness PR**
+(section 9, O1). The live batch and the evidence PR each need a separate owner
+go-ahead.
+**Revision 2 (2026-11-10):** answers the #791 review:
+- O1 is staged per the C3 scope section 8;
+- selection and checker results are observed through pass-through shims on
+  the hook's own calls, not through a separate wrapper lookup;
+- observed evidence is kept separate from replay.
 **Anchor:** `MnemeHQ/mneme` `main` @ `15750087` (#790), read-only.
 **Closes toward:** the DG1G G3 row ("host-boundary integrity", **partial**) in
 the [fixture-floor mapping](../validation/dg1g-fixture-floor-mapping-2026-11-10.md),
@@ -111,9 +117,14 @@ These checks are in addition to the existing C3 E1-E4 checks:
    - The hook log's `MNEME_MEMORY` equals the foreign path.
    - The observer's launch-environment record has no `MNEME_MEMORY`.
    - The `settings.local.json` SHA-256 is identical before launch and after the run.
-2. **Selection.** The hook log records the foreign memory as the selected
-   memory. The current wrapper logs only the `MNEME_MEMORY` value, so section 8
-   adds this field.
+2. **Selection (observed).** A pass-through observer records the **hook's own**
+   `find_memory` call during the protected Edit, and associates it with that
+   Edit's `tool_use_id` and launch ID. It records the argument, the return
+   value, and any exception, then re-raises the exception unchanged. That
+   returned value must be the foreign memory. A separate lookup made by the
+   wrapper does not count. The current C3 wrapper logs only the `MNEME_MEMORY`
+   value; section 8 adds the observer, following the C4 `hookwrap_v3.py`
+   pattern.
 3. **Availability.** For G3-1, the wrapper log records verifier `AUTHORIZED`
    at baseline `main@5125231`, plus the SS-3 mismatch line and
    `operational refusal (UNEVALUATED: MEMORY_PATH_MISMATCH)`. For G3-2, there
@@ -122,20 +133,42 @@ These checks are in addition to the existing C3 E1-E4 checks:
    and after:
    - G3-1 must leave `app.py` unchanged.
    - G3-2 must change `app.py` by exactly the forbidden replacement.
-5. **Post-hoc replay.** Using the pinned build:
-   `mneme check --memory <M> --input <introduced delta> --target-path <app.py> --mode strict --json`.
-   - Against the foreign memory, it must give a complete `PASS`.
-   - Against the probe repository's own memory, it must give a complete
-     `FAIL` with `C3-DEC`.
+5. **Live checker result (observed).** A pass-through observer records the
+   hook's own `_invoke_check` call for the protected Edit, and returns its
+   result unchanged. It records:
+   - the `--memory` argument;
+   - the child exit code;
+   - from the parsed `mneme.check/v1` payload, only `verdict`,
+     `evaluation_complete`, `mode` and the matched `decision_id`s. No proposed
+     source, triggers or rule text is recorded.
 
-   This shows the edit was in fact forbidden for its repository, and that
-   the foreign verdict was complete.
+   It must show the foreign memory, verdict `PASS` and
+   `evaluation_complete: true`. If the payload cannot be captured, item 5 is
+   recorded as **not observed**. The completeness claim then rests on item 6
+   alone and is worded as replay-confirmed (section 7).
+6. **Post-hoc replay (replay, not observation).** Using the pinned build:
+   `mneme check --memory <M> --input <introduced delta> --target-path <app.py> --mode strict --json`.
+   - Against the foreign memory, it must give a complete `PASS`. This
+     corroborates item 5.
+   - Against the probe repository's own memory, it must give a complete
+     `FAIL` with `C3-DEC`. This is the only evidence that the edit was
+     forbidden for its own repository: the live hook never evaluated that
+     memory.
+
+The evidence record keeps three things separate:
+- what was observed live: selection (item 2), the checker result (item 5),
+  availability (item 3) and the host outcome (item 4);
+- what was replayed (item 6);
+- which claims rest on replay alone.
 
 **Labels.**
-- **`REFUSED_MEMORY_PATH_MISMATCH`** (G3-1): items 1-5 hold, hook exit is 2,
+- **`REFUSED_MEMORY_PATH_MISMATCH`** (G3-1): items 1-6 hold, hook exit is 2,
   and `app.py` is unchanged.
-- **`RECORDED_FALSE_COMPLETE_PASS`** (G3-2): items 1, 2, 4 and 5 hold, hook
+- **`RECORDED_FALSE_COMPLETE_PASS`** (G3-2): items 1, 2 and 4-6 hold, hook
   exit is 0, and the forbidden bytes landed.
+
+A label holds with item 5 recorded as not observed, but the record must state
+that.
 - **`UNEXPECTED`**: any other combination. Stop the batch and report it raw;
   do not re-run.
 - **`INVALID`**: a harness, pin, host-version or fixture-tip failure. It is
@@ -151,6 +184,12 @@ If both probes match their expected labels, the G3 row may be restated as:
 > (`MEMORY_PATH_MISMATCH`). For an unenrolled target it still produces a
 > complete false PASS. Default-posture protection depends on D6/P2, which is
 > not implemented.
+
+"Complete" in that statement means the live checker's payload was observed
+with `evaluation_complete: true` (section 6 item 5). If item 5 was not
+observed, the statement must say **replay-confirmed complete** instead. In
+both cases, the claim that the edit was forbidden for the target repository
+rests on replay (item 6) and is worded that way.
 
 This batch does **not** claim:
 - any agent-controlled bypass or its absence. In particular, `bypassPermissions`,
@@ -176,16 +215,29 @@ The change is confined to the C3 harness directory:
 - `run_c3_probe.sh`:
   - honor the row's `sources`;
   - assert an empty `row_env_keys` for G3 rows.
-- `hookwrap_c3.py`: add a `selected_memory` field, taken from
-  `find_memory(_direct_write_memory_start(event))` computed read-only in the
-  wrapper process. The hook's own call and its exit code are unchanged.
-- `classify_c3.py`: evaluate items 1-5 and emit the section 6 labels.
+- `hookwrap_c3.py`: add transparent pass-through observers on the hook
+  module's `find_memory` and `_invoke_check`, following the C4 `hookwrap_v3.py`
+  shim pattern. Each observer:
+  - calls the real function with the original arguments;
+  - returns its result unchanged;
+  - records any exception and re-raises it unchanged;
+  - attaches its record to the same log line as the event's `tool_use_id` and
+    launch ID.
+
+  The wrapper makes no lookup of its own. The hook's exit code, stdout and
+  stderr are relayed unchanged. A failure to log goes to the existing sidecar
+  file, never to the hook's streams. The observers apply to every row,
+  because they are behavior-preserving; existing C3 evidence is not re-run.
+- `classify_c3.py`: evaluate items 1-6 and emit the section 6 labels. Record
+  item 5 as observed or not observed.
 - Replay: a small `replay_g3.py`, or an extension of the classifier, that runs
   the two `mneme check` calls against the pinned build.
 - `pins.env`: G3-specific Mneme base and host-version pins. Existing C3 pins
   stay unchanged for C3 rows.
 - Self-test: G3 rows run under the existing stub (`C3_SELFTEST=1`) for both
-  label paths and for the `UNEXPECTED` path.
+  label paths and for the `UNEXPECTED` path. A unit check shows that each
+  observer leaves return values, exceptions and the hook's exit code
+  unchanged.
 
 The existing C3 rows, goldens and evidence are unchanged.
 
@@ -193,18 +245,21 @@ The existing C3 rows, goldens and evidence are unchanged.
 
 | # | Decision | Recommendation |
 |---|---|---|
-| O1 | What acceptance authorizes | Accepting this charter authorizes the section 8 harness PR, the single live batch (G3-1 and G3-2, n=1) after that PR merges with its self-test green, and the evidence PR that follows. It authorizes nothing else. |
+| O1 | What acceptance authorizes | **Only the section 8 harness PR.** Each later step needs its own explicit owner go-ahead, as the C3 scope section 8 requires: the live batch after the harness PR and its self-test are reviewed and merged, and the evidence PR after the run. |
 | O2 | Host pin | Pin the version installed at run time, with the auto-updater disabled. Do not reinstall 2.1.303: the probes do not depend on version-specific behavior, and the pin is recorded. |
 | O3 | Tool coverage | Edit only. Selection and availability routing are tool-independent at the hook (`_direct_write_event`). Write adds no G3 information. |
 | O4 | Include an `UNVERIFIABLE` probe | No. It is covered offline, and it needs a network block or origin removal that would enlarge the batch. |
 
 ## 10. Sequence
 
-1. Owner review and merge of this charter (O1-O4).
-2. Harness PR (section 8), with self-test evidence.
-3. Live batch from an external terminal: preflight, then G3-2, then G3-1.
-   G3-2 runs first because it confirms the channel without the verifier.
-4. Evidence PR:
+1. Owner review and merge of this charter (O1-O4). This authorizes step 2
+   only.
+2. Harness PR (section 8), with self-test evidence. Independent review, then
+   merge.
+3. **Separate owner go-ahead**, then the live batch from an external terminal:
+   preflight, then G3-2, then G3-1. G3-2 runs first because it confirms the
+   channel without the verifier.
+4. **Separate owner go-ahead**, then the evidence PR:
    - a record under `docs/validation/` with redacted artifacts in the C3 style;
    - an update to the DG1G G3 row wording, within the section 7 ceiling;
    - a status comment on #540 and #497.
