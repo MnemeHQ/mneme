@@ -295,10 +295,79 @@ def test_runner_refuses_unknown_pin_set_argument():
 
 
 # Review of #794, finding 2: an environment H1_PINSET is refused, never overwritten,
-# whether or not the argument names the same pin set.
+# whether or not the argument names the same pin set. Second review: set-but-empty
+# counts as set.
 @needs_bash
-@pytest.mark.parametrize("env_value,arg", [("A2", ""), ("A2", "A2"), ("A3", "A2"), ("H1", "")])
+@pytest.mark.parametrize("env_value,arg", [("A2", ""), ("A2", "A2"), ("A3", "A2"), ("H1", ""),
+                                           ("", ""), ("", "A2")])
 def test_runner_refuses_pinset_from_the_environment(env_value, arg):
     r = _sh(f"bash ./run_h1.sh {arg}", {"H1_PINSET": env_value, "DISABLE_AUTOUPDATER": "1"})
     assert r.returncode == 1 and "H1_PINSET is set in the environment" in r.stdout, r
     assert "[preflight]" not in r.stdout  # refused before anything else ran
+
+
+@needs_bash
+def test_empty_pinset_is_refused_by_pins_env_and_a1():
+    for f in ("pins.env", "pins_a1.env"):
+        r = _sh(f'. ./{f}; echo reached', {"H1_PINSET": ""})
+        assert r.returncode == 1 and "reached" not in r.stdout, (f, r)
+
+
+# Second review of #794: the untracked pins.local.env may set operator paths (PY)
+# only. Each case copies pins.env into a temporary directory next to a crafted
+# pins.local.env, so the operator's real file is never touched.
+
+def _pins_in(tmp_path, local_text):
+    shutil.copy(HARNESS / "pins.env", tmp_path / "pins.env")
+    (tmp_path / "pins.local.env").write_text(local_text, encoding="utf-8", newline="\n")
+    return tmp_path
+
+
+def _source(dirpath, extra_env=None, show="PIN_CLAUDE_VERSION"):
+    env = {k: v for k, v in os.environ.items() if not k.startswith(("H1_", "MNEME_"))}
+    env.update(extra_env or {})
+    return subprocess.run([BASH, "-c", f'set -u; . ./pins.env; echo "reached {show}=${{{show}}}"'],
+                          cwd=dirpath, env=env, capture_output=True, text=True)
+
+
+@needs_bash
+def test_local_override_of_a2_host_version_is_refused(tmp_path):
+    d = _pins_in(tmp_path, "PY='/c/x/python.exe'\nPIN_CLAUDE_VERSION='2.1.999 (Claude Code)'\n")
+    r = _source(d, {"H1_PINSET": "A2"})
+    assert r.returncode == 1 and "reached" not in r.stdout, r
+    assert "pins.local.env changed pinned value(s): PIN_CLAUDE_VERSION" in r.stdout, r
+
+
+@needs_bash
+@pytest.mark.parametrize("var,value", [
+    ("PIN_MODEL", "claude-other"), ("PIN_MODEL_FLAG", ""), ("LIVE", "/c/dev/d5p2-h1-live"),
+    ("LIVE_W_EXPECTED", r"C:\dev\d5p2-h1-live"), ("RMTREE", "safe_rmtree.py"),
+    ("H1_PATHS", "H1a-edit H1a-bash H1b-start H1c-stop"), ("SOURCES", "project,local"),
+    ("A2_PIN_CLAUDE_VERSION", "2.1.999 (Claude Code)"), ("H1_PINSET", "")])
+def test_local_override_of_any_a2_pin_is_refused(tmp_path, var, value):
+    d = _pins_in(tmp_path, f"PY='/c/x/python.exe'\n{var}='{value}'\n")
+    r = _source(d, {"H1_PINSET": "A2"})
+    assert r.returncode == 1 and f"changed pinned value(s): {var}" in r.stdout, r
+
+
+@needs_bash
+def test_local_unset_of_a_pin_is_refused(tmp_path):
+    d = _pins_in(tmp_path, "PY='/c/x/python.exe'\nunset PIN_MODEL\n")
+    r = _source(d, {"H1_PINSET": "A2"}, show="PY")
+    assert r.returncode == 1 and "PIN_MODEL" in r.stdout, r
+
+
+@needs_bash
+def test_local_override_is_refused_for_the_h1_pins_too(tmp_path):
+    d = _pins_in(tmp_path, "PY='/c/x/python.exe'\nLIVE='/c/elsewhere'\n")
+    r = _source(d)
+    assert r.returncode == 1 and "changed pinned value(s): LIVE" in r.stdout, r
+
+
+@needs_bash
+def test_local_python_only_is_accepted_and_pins_hold(tmp_path):
+    d = _pins_in(tmp_path, "PY='/c/x/python.exe'\n")
+    r = _source(d, {"H1_PINSET": "A2"})
+    assert r.returncode == 0 and f"reached PIN_CLAUDE_VERSION={A2_VERSION}" in r.stdout, r
+    r = _source(d, {"H1_PINSET": "A2"}, show="PY")
+    assert "reached PY=/c/x/python.exe" in r.stdout, r

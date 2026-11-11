@@ -20,7 +20,8 @@ set -o pipefail
 BASE=$(cd "$(dirname "$0")" && pwd)
 # The pin set comes only from the argument: an H1_PINSET already in the
 # environment is refused in every case, never overwritten (review of #794).
-[ -z "${H1_PINSET:-}" ] || { echo "ABORT: H1_PINSET is set in the environment; unset it and pass the pin set as the argument"; exit 1; }
+# "Set" includes set to the empty string.
+[ -z "${H1_PINSET+set}" ] || { echo "ABORT: H1_PINSET is set in the environment; unset it and pass the pin set as the argument"; exit 1; }
 case "${1:-}" in
   "") ;;
   A2) export H1_PINSET=A2 ;;

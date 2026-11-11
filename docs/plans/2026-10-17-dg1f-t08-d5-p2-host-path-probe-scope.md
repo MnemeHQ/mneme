@@ -168,7 +168,8 @@ Each needs its own go-ahead, in that order: harness PR, then the runs.
 | A2-4 | Repeat count | Unchanged (D4): n = 1 per path plus its control. A re-run happens only on `INCONCLUSIVE`. |
 
 **Harness (same PR).** All changes are under `docs/validation/artifacts/dg1f-t08-d5-p2-h1-host-path/harness/`; every H1 default is unchanged.
-- `pins.env` gains the A2 pin set. It is selected only by `run_h1.sh A2`, which exports `H1_PINSET=A2`, following the C3 `C3_PINSET=G3` pattern. Any other value aborts. `run_h1.sh` refuses to start whenever `H1_PINSET` is already set in the environment, with or without an argument; it never overwrites it.
+- `pins.env` gains the A2 pin set. It is selected only by `run_h1.sh A2`, which exports `H1_PINSET=A2`, following the C3 `C3_PINSET=G3` pattern. Any other value aborts, and so does `H1_PINSET` set to the empty string. `run_h1.sh` refuses to start whenever `H1_PINSET` is already set in the environment (even empty), with or without an argument; it never overwrites it.
+- The untracked `pins.local.env` may set operator paths (`PY`) only. `pins.env` snapshots every pinned value before sourcing it: host version, model, model flag, live root, guarded delete, paths, settings sources and the pin set. Any change, including an unset, aborts and names the variables. This holds for both the A2 and the H1 pins.
 - `pins_a1.env` refuses any pin set.
 - New `safe_rmtree_a2.py`: the A2 root, the six A2 arms, and the protected trees listed above.
 - `run_h1_probe.sh`:
@@ -188,7 +189,7 @@ Each needs its own go-ahead, in that order: harness PR, then the runs.
 - The self-test stub follows `--model` and the active pin set's version.
 - New `selftest/test_a2_harness.py`.
 
-**Offline validation:** 145 harness tests pass (103 existing, 42 new, including the #794 review regressions). The end-to-end stub self-test of `run_h1.sh A2` gave `DELIVERED_TO_AGENT` on all three paths and a listed-path result of `PASS` (stub, not evidence). It aborted at the preflight without `DISABLE_AUTOUPDATER=1`, and it never touched `C:\dev\d5p2-h1-live`. The A2 root was emptied afterwards.
+**Offline validation:** 161 harness tests pass (103 existing, 58 new, including the regressions from both #794 review rounds). Mutation checks confirm the new guards matter: with the host-version rule disabled, its four tests fail; with the `pins.local.env` guard disabled, all 12 override tests fail. The end-to-end stub self-test of `run_h1.sh A2` gave `DELIVERED_TO_AGENT` on all three paths and a listed-path result of `PASS` (stub, not evidence). It aborted at the preflight without `DISABLE_AUTOUPDATER=1`, and it never touched `C:\dev\d5p2-h1-live`. The A2 root was emptied afterwards.
 
 **Run, if separately authorized.** The operator runs it from their own terminal (never inside Claude Code) with `claude --version` printing `2.1.310 (Claude Code)`, `pins.local.env` setting `PY`, and `DISABLE_AUTOUPDATER=1 bash run_h1.sh A2`. Evidence is collected with `collect_h1.py` into a separate evidence PR: `docs/validation/dg1f-t08-d5-p2-host-path-h1-a2-<date>.md`.
 
