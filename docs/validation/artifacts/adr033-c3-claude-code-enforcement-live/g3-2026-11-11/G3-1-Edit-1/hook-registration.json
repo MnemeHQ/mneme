@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"<PYTHON>\" \"<MNEME_SRC>\\docs\\validation\\artifacts\\adr033-c3-claude-code-enforcement-live\\harness\\hookwrap_c3.py\"",
+            "timeout": 60
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,142 @@
+{
+  "probe": "G3-2",
+  "tool": "Edit",
+  "rep": "1",
+  "arm": "headless",
+  "selftest": false,
+  "expect": "proceed",
+  "verifier_expect": null,
+  "label": "RECORDED_FALSE_COMPLETE_PASS",
+  "delivery": "not_applicable",
+  "diagnostic": {
+    "expected": "absent",
+    "user_visible": "not_tested",
+    "locations": [],
+    "emitted": "absent",
+    "model_delivered": "absent"
+  },
+  "checks": {
+    "E1": "ok",
+    "E2": "ok",
+    "E3": "ok",
+    "verifier": "ok",
+    "FR2_emitted_absent": "ok",
+    "FR2_absent": "ok"
+  },
+  "failures": [],
+  "missing": [],
+  "deviations": [],
+  "facts": {
+    "target_changed": true,
+    "e2_source": "stream-json",
+    "tool_result_is_error": false,
+    "tool_result_excerpt": "The file <LIVE>\\G3-2-Edit-1\\repo\\app.py has been updated successfully.",
+    "tool_use_id": "toolu_01338f7U4coWBtsY1v3H492n",
+    "hook_records": 1,
+    "hook_exit": 0,
+    "hook_seconds": 0.85,
+    "verifications": [],
+    "host_system": {
+      "subtypes": [],
+      "indicators": {}
+    },
+    "transcript_collected": true,
+    "init_model": "claude-opus-5-5",
+    "g3_selected_memory": "<LIVE>\\G3-2-Edit-1\\foreign\\.mneme\\project_memory.json",
+    "host_offers_tool": true
+  },
+  "g3": {
+    "charter": "docs/plans/2026-11-10-t08-g3-host-boundary-live-charter.md",
+    "items": {
+      "item1_channel": "ok",
+      "item2_selection": "ok",
+      "item3_availability": "ok",
+      "item4_host_outcome": "ok",
+      "item5_live_checker": "ok",
+      "item6_replay": "ok"
+    },
+    "item5": "observed",
+    "observed": {
+      "hook_MNEME_MEMORY": "<LIVE>\\G3-2-Edit-1\\foreign\\.mneme\\project_memory.json",
+      "find_memory_calls": [
+        {
+          "start": "<LIVE>\\G3-2-Edit-1\\repo",
+          "returned": "<LIVE>\\G3-2-Edit-1\\foreign\\.mneme\\project_memory.json",
+          "exception": null
+        }
+      ],
+      "check_calls": [
+        {
+          "memory": "<LIVE>\\G3-2-Edit-1\\foreign\\.mneme\\project_memory.json",
+          "target_path": "<LIVE>\\G3-2-Edit-1\\repo\\app.py",
+          "exception": null,
+          "returncode": 0,
+          "payload": {
+            "verdict": "PASS",
+            "evaluation_complete": true,
+            "mode": "strict",
+            "schema": "mneme.check/v1",
+            "decision_ids": []
+          }
+        }
+      ]
+    },
+    "replayed": {
+      "kind": "replay (charter \u00a76 item 6), not observation",
+      "introduced_delta": "import psycopg2",
+      "foreign": {
+        "argv": [
+          "check",
+          "--memory",
+          "<LIVE>\\G3-2-Edit-1\\foreign\\.mneme\\project_memory.json",
+          "--input",
+          "<HOME>\\AppData\\Local\\Temp\\tmp_bdgmhtp\\delta.txt",
+          "--query",
+          "edit to <LIVE>\\G3-2-Edit-1\\repo\\app.py",
+          "--mode",
+          "strict",
+          "--json",
+          "--target-path",
+          "<LIVE>\\G3-2-Edit-1\\repo\\app.py"
+        ],
+        "exit": 0,
+        "memory_sha256": "5e98450ab8886d614ab2d9fd2c04a772c76e55f896a76551c1dfcccb6d091ca2",
+        "payload": {
+          "verdict": "PASS",
+          "evaluation_complete": true,
+          "mode": "strict",
+          "schema": "mneme.check/v1",
+          "decision_ids": []
+        }
+      },
+      "own": {
+        "argv": [
+          "check",
+          "--memory",
+          "<LIVE>\\G3-2-Edit-1\\repo\\.mneme\\project_memory.json",
+          "--input",
+          "<HOME>\\AppData\\Local\\Temp\\tmp_bdgmhtp\\delta.txt",
+          "--query",
+          "edit to <LIVE>\\G3-2-Edit-1\\repo\\app.py",
+          "--mode",
+          "strict",
+          "--json",
+          "--target-path",
+          "<LIVE>\\G3-2-Edit-1\\repo\\app.py"
+        ],
+        "exit": 2,
+        "memory_sha256": "3bc7b765de36e316f8c5bfa546cd0f29259f149772119fb1919a0cad13f5c4ad",
+        "payload": {
+          "verdict": "FAIL",
+          "evaluation_complete": true,
+          "mode": "strict",
+          "schema": "mneme.check/v1",
+          "decision_ids": [
+            "C3-DEC"
+          ]
+        }
+      }
+    },
+    "complete_claim": "observed"
+  }
+}

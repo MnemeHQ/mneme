@@ -1,0 +1,57 @@
+{
+  "probe": "G3-1",
+  "tool": "Edit",
+  "rep": "1",
+  "spec": {
+    "phase": "AUTHORIZED",
+    "repo": "clone",
+    "edit": "violating",
+    "mutate": [
+      "settings_local_foreign_memory"
+    ],
+    "expect": "refuse:MEMORY_PATH_MISMATCH",
+    "verifier": "AUTHORIZED",
+    "e4": true,
+    "tools": [
+      "Edit"
+    ],
+    "sources": "project,local",
+    "g3_label": "REFUSED_MEMORY_PATH_MISMATCH",
+    "needs": []
+  },
+  "repo": "<LIVE>\\G3-1-Edit-1\\repo",
+  "target": "<LIVE>\\G3-1-Edit-1\\repo\\app.py",
+  "plan": {
+    "tool": "Edit",
+    "file_path": "<LIVE>\\G3-1-Edit-1\\repo\\app.py",
+    "old_string": "import os",
+    "new_string": "import psycopg2"
+  },
+  "prompt": "Use the Edit tool on the file <LIVE>\\G3-1-Edit-1\\repo\\app.py to replace `import os` with `import psycopg2`. Do exactly this one tool call. If it is refused, do not retry and do not work around it; report the exact tool result.",
+  "env": {},
+  "origin_url": "https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture",
+  "settings": {
+    "hooks": {
+      "PreToolUse": [
+        {
+          "matcher": "Edit|Write|MultiEdit",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "\"<PYTHON>\" \"<MNEME_SRC>\\docs\\validation\\artifacts\\adr033-c3-claude-code-enforcement-live\\harness\\hookwrap_c3.py\"",
+              "timeout": 60
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "g3": {
+    "foreign_memory": "<LIVE>\\G3-1-Edit-1\\foreign\\.mneme\\project_memory.json",
+    "foreign_sha256": "8437253a529734822e62b80c514e6793aa60847ff961e272f7e87f7d0af87e1a",
+    "mneme_memory_value": "<LIVE>\\G3-1-Edit-1\\foreign\\.mneme\\project_memory.json",
+    "settings_local": "<LIVE>\\G3-1-Edit-1\\repo\\.claude\\settings.local.json",
+    "settings_local_sha256": "13a93c26c3dcbfba37892dd3faa9e2c423c4a94c30514b7e18f087a361c2e3cf",
+    "settings_local_status": "!!"
+  }
+}
