@@ -1,6 +1,12 @@
-# DG1F T-08 D5 + P2: A2 evidence-classification rule review, R5 `host_record` (PROPOSED: rule only)
+# DG1F T-08 D5 + P2: A2 evidence-classification rule review, R5 `host_record` (ACCEPTED: rule only)
 
-**Status:** **PROPOSED**, for independent review. Docs only. It does **not** reclassify anything. Accepting it would authorize none of the following:
+**Status:** **ACCEPTED as rule R5 only**, revision 2.
+- **Review:** independent re-review ACCEPT on the reviewed head `efc93444`.
+- **Merge:** the owner merged #796 on 2026-11-11 as `70fbe524`, whose tree is identical to `efc93444`.
+
+That merge's squash title still says "propose", and this line said PROPOSED until this docs-only acceptance record. The **accepted scope** is the R5 definition in §3: category `host_record`, tool-attributed anchors A1–A6, exact derivation, and R5a and R5b. R1–R4 are unchanged.
+
+Docs only. It does **not** reclassify anything. Acceptance authorizes none of the following:
 - a classifier code change;
 - a reclassification run;
 - a re-run or live probe;
