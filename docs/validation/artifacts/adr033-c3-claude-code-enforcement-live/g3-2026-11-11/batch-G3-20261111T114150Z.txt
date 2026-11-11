@@ -1,0 +1,6 @@
+batch=G3 reps=1 mode=--recheck harness_head=dde40958d02fcddc70fb25fa471a71f259290a0c
+recheck gate G3-2 Edit 1: KEEP RECORDED_FALSE_COMPLETE_PASS
+G3-2 Edit 1 headless RECORDED_FALSE_COMPLETE_PASS
+recheck gate G3-1 Edit 1: RECHECK
+G3-1 Edit 1 headless REFUSED_MEMORY_PATH_MISMATCH
+BATCH_DONE G3

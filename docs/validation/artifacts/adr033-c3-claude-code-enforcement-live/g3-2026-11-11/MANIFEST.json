@@ -1,0 +1,245 @@
+{
+  "collector_sha256": "ad4ec7d84d860898e7477c7ec6db1fbd3868c7923796d753b810c347b8f3f0e9",
+  "files": [
+    {
+      "path": "G3-1-Edit-1/observer.txt",
+      "source_sha256": "360edf952c9e9164d93c6c814a38f72f4e00f668734724435f8b2924ccb3fbbc",
+      "published_sha256": "7285b7b18f27de0c0097405aa9529649bf29814caddf1e044287ecaa0fdc1496"
+    },
+    {
+      "path": "G3-1-Edit-1/prompt.txt",
+      "source_sha256": "a48b55e25922dc7f7ee2b4f03b2c2aa9595e159c39d63008c5b8113c5d331672",
+      "published_sha256": "758022877c6ac94e226c5d8d5bd6d1383b77320d80d6b0525e762ea1e4208b27"
+    },
+    {
+      "path": "G3-1-Edit-1/setup.json",
+      "source_sha256": "6131ad65852083f71f7522631f5ea163577f8a3134e50313e349ddf50743639c",
+      "published_sha256": "5cfbf6797823f59db6a691377976a816c43ddd829b2cdd0ae6166fbaa3fe257e"
+    },
+    {
+      "path": "G3-1-Edit-1/hook-registration.json",
+      "source_sha256": "12a5137fd35b0154ab3d5c9809db2c33d5de5f809508b69160d835f4f5501832",
+      "published_sha256": "ccc353970709553b9c1ee23c8fbfe9e3160156c22e1cbc2640d19fc135d1ac68"
+    },
+    {
+      "path": "G3-1-Edit-1/events.jsonl",
+      "source_sha256": "b0a1355d46f11f6befc22ec8165a97e39146c1c80d5800b076c24da5dd2807e1",
+      "published_sha256": "519f97d3d949c01057817d6a85ba8bdf4159534ecd4c9f990e1659894e854d30"
+    },
+    {
+      "path": "G3-1-Edit-1/hook-log.jsonl",
+      "source_sha256": "e080ba45ccc9e53ab5307b07452e734329504a55d3fa6e18ce6baf0552112f53",
+      "published_sha256": "6ffd4eb6f92ebd2ef9b47720be1a66769fc202124c7aebebdf804034abbd2f4d"
+    },
+    {
+      "path": "G3-1-Edit-1/outcome.json",
+      "source_sha256": "bb9983138f3e461e4d5ee006e6a587ae6b185cc5d720f2bee3cb6007a9fb3e24",
+      "published_sha256": "71cda7ca5908fb7c9cec822677ffaa6b0436f364ec357e8ac87f163de47c3353"
+    },
+    {
+      "path": "G3-1-Edit-1/target.before",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "G3-1-Edit-1/target.after",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "G3-1-Edit-1/netcap-sni.txt",
+      "source_sha256": "d253e22e5d46259317368a672d83607bbd1e13ca08395e4385d1249906a70f3e",
+      "published_sha256": "d253e22e5d46259317368a672d83607bbd1e13ca08395e4385d1249906a70f3e"
+    },
+    {
+      "path": "G3-1-Edit-1/transcript.selected.jsonl",
+      "source_sha256": "3fbcd23520b03bb134887a3ce3d360eee597b51a9c60f572db7275b400489933",
+      "published_sha256": "413f6477518ffbc056a9f58081ce60b48b63c35866f68174814e2b76a177b990",
+      "source_size": 192861,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 2,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 4,
+        "api-request": 2,
+        "last-prompt": 3,
+        "ai-title": 2,
+        "attachment:deferred_tools_record": 1,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "G3-1-Edit-1/settings.local.json",
+      "source_sha256": "13a93c26c3dcbfba37892dd3faa9e2c423c4a94c30514b7e18f087a361c2e3cf",
+      "published_sha256": "b3706af05d3ef0e56d714bc75d7a6a67cb4239cad17322a6348ffd86ce218370"
+    },
+    {
+      "path": "G3-1-Edit-1/replay-g3.json",
+      "source_sha256": "d7a7434f04e86e8649695a670f96ea5670fcb7b0362f4fedcf7267ed0a1d1faf",
+      "published_sha256": "a42cbadfb03f861f98fc44a39e4716b2d6464f89dc9334dab12d0caf013ca294"
+    },
+    {
+      "path": "G3-1-Edit-1/outcome.initial.json",
+      "source_sha256": "993a1131251829729132a0bdbf081e518e8fced850951c1628690367df0226a1",
+      "published_sha256": "18773f933a1c4ca167a2351472ff3cdab3fb13fde0e34b1836af586844670d94"
+    },
+    {
+      "path": "G3-2-Edit-1/observer.txt",
+      "source_sha256": "eabfdaa5817b68abe76d3eb3efb6a0a0dff17e851aaa3407a3a48279d450193c",
+      "published_sha256": "e70e292babefd201f38feb8aae9de508647ca99e0e98a2ae05241ddbf3182cda"
+    },
+    {
+      "path": "G3-2-Edit-1/prompt.txt",
+      "source_sha256": "eaa66006a546ff5ddc694c2e5701513b795945b717004195c9ee520eca543bd1",
+      "published_sha256": "4b27389ac3e49337faaa8302d3c1bda25f14816349c54d68e6b53f5c5c40ede5"
+    },
+    {
+      "path": "G3-2-Edit-1/setup.json",
+      "source_sha256": "3663a80e6ef52b8cb97c064c91fc322fca717fb361fb455909707630b1f5e9f8",
+      "published_sha256": "cd71d6cb443b3bac16d38c82734e7f79a25ed548a2d9fe0365a2c39071cd71b6"
+    },
+    {
+      "path": "G3-2-Edit-1/hook-registration.json",
+      "source_sha256": "12a5137fd35b0154ab3d5c9809db2c33d5de5f809508b69160d835f4f5501832",
+      "published_sha256": "ccc353970709553b9c1ee23c8fbfe9e3160156c22e1cbc2640d19fc135d1ac68"
+    },
+    {
+      "path": "G3-2-Edit-1/events.jsonl",
+      "source_sha256": "38bd24b7ec6459816b6673921d17b0f233f8e8e59bb3b28e614f428b200e0d96",
+      "published_sha256": "0a9e327e6bf31eea78c1cbaac992af32b03153677b02907a4b68febaf239241c"
+    },
+    {
+      "path": "G3-2-Edit-1/hook-log.jsonl",
+      "source_sha256": "d98448745d6c1628a3b711f5e5684a7130f9ec79d6505d4b9671b1b13fde4923",
+      "published_sha256": "7c78bc89fe5bed862f0b5ac9043584953cfe9578e92ce55b8975f5be60c5f3e8"
+    },
+    {
+      "path": "G3-2-Edit-1/outcome.json",
+      "source_sha256": "084960021eee8c3356cc04130f40f019f4c4c6eb7097b9b1c470adc5c6dff174",
+      "published_sha256": "07e195012774cfc387f6a7ab3b4577fe53df31c2e85cbaa44bae29437cb0cc04"
+    },
+    {
+      "path": "G3-2-Edit-1/target.before",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "G3-2-Edit-1/target.after",
+      "source_sha256": "51468832125703235352d02f0e9d325746b3ac84e7ac90f873437d9d1596c94a",
+      "published_sha256": "51468832125703235352d02f0e9d325746b3ac84e7ac90f873437d9d1596c94a"
+    },
+    {
+      "path": "G3-2-Edit-1/transcript.selected.jsonl",
+      "source_sha256": "8bcdadce62b9305ce4435d1ec55c2c80aa5fde524061ae5f5dbab320e5d460cc",
+      "published_sha256": "9de3ae7056fa92f5bc41f537eb1be6f625895df335e3e7353a92c75a03deb406",
+      "source_size": 191075,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 2,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 4,
+        "api-request": 3,
+        "last-prompt": 3,
+        "ai-title": 2,
+        "attachment:deferred_tools_record": 1,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "G3-2-Edit-1/settings.local.json",
+      "source_sha256": "f1ecb75aa1ce83992064a8dcfddac5c5d584083b2a69e1b7dc75b619360a1af4",
+      "published_sha256": "466fc19fa80f643337a27f08f980a0d3457138157bcb2b6a3d34b49aa459d606"
+    },
+    {
+      "path": "G3-2-Edit-1/replay-g3.json",
+      "source_sha256": "54fe8319838f7ddfcdce3043dfacce72e69537f40bb35188f959cdf57fa3c234",
+      "published_sha256": "d61ccdf045109ecb48d40834730dc4da2f3b0d8082af7e3209bdb6c4256eec00"
+    },
+    {
+      "path": "batch-G3-20261111T114150Z.txt",
+      "source_sha256": "723aad2b84d4601734b7cdf5d0e2f7eab165bda2f177090ae6668c3cf5ec138c",
+      "published_sha256": "723aad2b84d4601734b7cdf5d0e2f7eab165bda2f177090ae6668c3cf5ec138c"
+    },
+    {
+      "path": "run-step1.log",
+      "source_sha256": "85eb17e18da5107e8bb78f5ae14e8eaf6dada756ae39b23cec06c15ef8b5272f",
+      "published_sha256": "cc768017165d6ab9489ce382e0b3628ce624e6774f5fc91375ecb46e060d6654"
+    },
+    {
+      "path": "run-step2.log",
+      "source_sha256": "37bb77e1d28ce9a9bbcc537184504972857805fed6ad7b539ef4578f73da7d6c",
+      "published_sha256": "8fd44bf6f8d2c21cdd96f942955ecfc2bc790ee8c1da5f315df82d08106e5af3",
+      "post_collection_redaction": "<CAPTURE> (operator capture directory)"
+    },
+    {
+      "path": "run-step3.log",
+      "source_sha256": "2a841a8fa487f57ee2a70effa9923c9c92168352c2759062a7dff4ae1c39eea9",
+      "published_sha256": "cef06fee4fae326d0cc3a5763bec835814d7443acd03a525670db4af060e0bba"
+    },
+    {
+      "path": "operator-g3_step1.sh",
+      "source_sha256": "aa02f03fa4a559b0edabf5849b420362fdb097fb1ef37998038cbb269ac34280",
+      "published_sha256": "fd12d3a9821f6bce85e8cc3c86f74d76f0924a7bfb8b540773bffd15fd7ed0f1"
+    },
+    {
+      "path": "operator-g3_step2.sh",
+      "source_sha256": "0d729d9ff0854e1a75fff27a158b4644c1c59129c489e4290665a3d34fcc7825",
+      "published_sha256": "f3e6b1ac2162ac4b88e0e4118b62aaf2ea57a2c3b2d24d2ae22af411a0a3efe3",
+      "post_collection_redaction": "<CAPTURE> (operator capture directory)"
+    },
+    {
+      "path": "operator-g3_step3.sh",
+      "source_sha256": "e252c88798af9d3c1ef414b612b2122cf4c3d36d5b62ef3ad931dfaf02d27d9e",
+      "published_sha256": "724322e562ca2f1955a316fb19243409799ec2464f46483a9f138535d1b084ac"
+    },
+    {
+      "path": "operator-g3_capture.ps1",
+      "source_sha256": "9531d1ec848b4a7b9fa969a052db849f35bbf76ba22fabe29d915c0a959701bb",
+      "published_sha256": "4e85b5c91a6d4c56925c5463dfb6f9fd0ad31e9c880cff0f66d5ae02be7c2ab8",
+      "post_collection_redaction": "<CAPTURE> (operator capture directory)"
+    }
+  ],
+  "selection": {
+    "probes": [
+      "G3-*"
+    ],
+    "extra": [
+      "batch-G3-20261111T114150Z.txt",
+      "run-step1.log",
+      "run-step2.log",
+      "run-step3.log",
+      "operator-g3_step1.sh",
+      "operator-g3_step2.sh",
+      "operator-g3_step3.sh",
+      "operator-g3_capture.ps1"
+    ]
+  },
+  "post_collection": {
+    "capture_dir_redaction": {
+      "placeholder": "<CAPTURE>",
+      "files": [
+        "operator-g3_capture.ps1",
+        "operator-g3_step2.sh",
+        "run-step2.log"
+      ]
+    }
+  }
+}

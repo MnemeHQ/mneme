@@ -1,0 +1,146 @@
+{
+  "probe": "G3-1",
+  "tool": "Edit",
+  "rep": "1",
+  "arm": "headless",
+  "selftest": false,
+  "expect": "refuse:MEMORY_PATH_MISMATCH",
+  "verifier_expect": "AUTHORIZED",
+  "label": "REFUSED_MEMORY_PATH_MISMATCH",
+  "delivery": {
+    "emitted": "observed",
+    "model_delivered": "observed",
+    "user_visible": "not_tested"
+  },
+  "diagnostic": "not_applicable",
+  "checks": {
+    "E1": "ok",
+    "E2": "ok",
+    "E3": "ok",
+    "verifier": "ok",
+    "E4_wrapper": "ok",
+    "E4_os_capture": "ok"
+  },
+  "failures": [],
+  "missing": [],
+  "deviations": [],
+  "facts": {
+    "target_changed": false,
+    "e2_source": "stream-json",
+    "tool_result_is_error": true,
+    "tool_result_excerpt": "PreToolUse:Edit hook error: [\"C:\\dev\\mneme-g3-venv\\Scripts\\python.exe\" \"<MNEME_SRC>\\docs\\validation\\artifacts\\adr033-c3-claude-code-enforcement-live\\harness\\hookwrap_c3.py\"]: mneme-hook: availability AUTHORIZED; baseline=main@5125231; evaluation=TRUSTED_COMPLETE; operational refusal (UNEVALUATED: MEMORY_PATH_MISMATCH).\r\nmneme-hook: SS-3 memory path mismatch; e",
+    "tool_use_id": "toolu_0176JdPeEu6yyqV4R9RiSyMS",
+    "hook_records": 1,
+    "hook_exit": 2,
+    "hook_seconds": 2.801,
+    "verifications": [
+      {
+        "authorization": "AUTHORIZED",
+        "reason": "",
+        "detail": "",
+        "url": "https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture",
+        "branch": "main",
+        "tip": "5125231076fb5a8e537a483c84850de99c25ba57",
+        "seconds": 2.5
+      }
+    ],
+    "g3_e4_capture": "forge 'github.com' observed; published ['api.github.com', 'github.com']; 10 other host(s) counted",
+    "init_model": "claude-opus-5-5",
+    "g3_selected_memory": "<LIVE>\\G3-1-Edit-1\\foreign\\.mneme\\project_memory.json",
+    "host_offers_tool": true
+  },
+  "g3": {
+    "charter": "docs/plans/2026-11-10-t08-g3-host-boundary-live-charter.md",
+    "items": {
+      "item1_channel": "ok",
+      "item2_selection": "ok",
+      "item3_availability": "ok",
+      "item4_host_outcome": "ok",
+      "item5_live_checker": "ok",
+      "item6_replay": "ok"
+    },
+    "item5": "observed",
+    "observed": {
+      "hook_MNEME_MEMORY": "<LIVE>\\G3-1-Edit-1\\foreign\\.mneme\\project_memory.json",
+      "find_memory_calls": [
+        {
+          "start": "<LIVE>\\G3-1-Edit-1\\repo",
+          "returned": "<LIVE>\\G3-1-Edit-1\\foreign\\.mneme\\project_memory.json",
+          "exception": null
+        }
+      ],
+      "check_calls": [
+        {
+          "memory": "<LIVE>\\G3-1-Edit-1\\foreign\\.mneme\\project_memory.json",
+          "target_path": "<LIVE>\\G3-1-Edit-1\\repo\\app.py",
+          "exception": null,
+          "returncode": 0,
+          "payload": {
+            "verdict": "PASS",
+            "evaluation_complete": true,
+            "mode": "strict",
+            "schema": "mneme.check/v1",
+            "decision_ids": []
+          }
+        }
+      ]
+    },
+    "replayed": {
+      "kind": "replay (charter \u00a76 item 6), not observation",
+      "introduced_delta": "import psycopg2",
+      "foreign": {
+        "argv": [
+          "check",
+          "--memory",
+          "<LIVE>\\G3-1-Edit-1\\foreign\\.mneme\\project_memory.json",
+          "--input",
+          "<HOME>\\AppData\\Local\\Temp\\tmpz21dsbvq\\delta.txt",
+          "--query",
+          "edit to <LIVE>\\G3-1-Edit-1\\repo\\app.py",
+          "--mode",
+          "strict",
+          "--json",
+          "--target-path",
+          "<LIVE>\\G3-1-Edit-1\\repo\\app.py"
+        ],
+        "exit": 0,
+        "memory_sha256": "8437253a529734822e62b80c514e6793aa60847ff961e272f7e87f7d0af87e1a",
+        "payload": {
+          "verdict": "PASS",
+          "evaluation_complete": true,
+          "mode": "strict",
+          "schema": "mneme.check/v1",
+          "decision_ids": []
+        }
+      },
+      "own": {
+        "argv": [
+          "check",
+          "--memory",
+          "<LIVE>\\G3-1-Edit-1\\repo\\.mneme\\project_memory.json",
+          "--input",
+          "<HOME>\\AppData\\Local\\Temp\\tmpz21dsbvq\\delta.txt",
+          "--query",
+          "edit to <LIVE>\\G3-1-Edit-1\\repo\\app.py",
+          "--mode",
+          "strict",
+          "--json",
+          "--target-path",
+          "<LIVE>\\G3-1-Edit-1\\repo\\app.py"
+        ],
+        "exit": 2,
+        "memory_sha256": "3bc7b765de36e316f8c5bfa546cd0f29259f149772119fb1919a0cad13f5c4ad",
+        "payload": {
+          "verdict": "FAIL",
+          "evaluation_complete": true,
+          "mode": "strict",
+          "schema": "mneme.check/v1",
+          "decision_ids": [
+            "C3-DEC"
+          ]
+        }
+      }
+    },
+    "complete_claim": "observed"
+  }
+}

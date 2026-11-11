@@ -1,0 +1,31 @@
+probe=G3-2 tool=Edit rep=1 arm=headless
+launch_id=d49277b4-133d-4840-8349-5272b7600f1f
+date=2026-11-11T11:16:13Z
+fixture=https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture golden_phase=AUTHORIZED golden={"phase": "AUTHORIZED", "tip": "5125231076fb5a8e537a483c84850de99c25ba57", "url": "https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture", "date": "2026-11-11T11:16:08Z"}
+claude=2.1.310 (Claude Code) claude_bin=<HOME>/AppData/Roaming/npm/claude model_pin=claude-opus-5-5
+mneme_src=<MNEME_SRC> head=dde40958d02fcddc70fb25fa471a71f259290a0c mneme_dir_equals_pin=yes
+harness_head=dde40958d02fcddc70fb25fa471a71f259290a0c harness_dirty=no
+git=git version 2.47.1.windows.2 os=MINGW64_NT-10.0-26300 3.5.4-395fda67.x86_64
+setting_sources=project,local row_env_keys=
+g3=yes pinset=G3 g3_fixture_tip=5125231076fb5a8e537a483c84850de99c25ba57 disable_autoupdater=1
+network_blocked_required=no
+BEFORE target               05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea
+BEFORE app.py               05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea
+BEFORE memory               3bc7b765de36e316f8c5bfa546cd0f29259f149772119fb1919a0cad13f5c4ad
+BEFORE declaration          absent
+BEFORE project_settings     12a5137fd35b0154ab3d5c9809db2c33d5de5f809508b69160d835f4f5501832
+BEFORE project_local        f1ecb75aa1ce83992064a8dcfddac5c5d584083b2a69e1b7dc75b619360a1af4
+BEFORE user_settings        099d1e051711e5fff1230b41666a7091a2f7f7e39966eda202ad66e4645c462f
+BEFORE user_local           absent
+BEFORE managed_settings     absent
+claude_exit=0
+transcript_collected=yes
+AFTER target               51468832125703235352d02f0e9d325746b3ac84e7ac90f873437d9d1596c94a
+AFTER app.py               51468832125703235352d02f0e9d325746b3ac84e7ac90f873437d9d1596c94a
+AFTER memory               3bc7b765de36e316f8c5bfa546cd0f29259f149772119fb1919a0cad13f5c4ad
+AFTER declaration          absent
+AFTER project_settings     12a5137fd35b0154ab3d5c9809db2c33d5de5f809508b69160d835f4f5501832
+AFTER project_local        f1ecb75aa1ce83992064a8dcfddac5c5d584083b2a69e1b7dc75b619360a1af4
+AFTER user_settings        099d1e051711e5fff1230b41666a7091a2f7f7e39966eda202ad66e4645c462f
+AFTER user_local           absent
+AFTER managed_settings     absent
