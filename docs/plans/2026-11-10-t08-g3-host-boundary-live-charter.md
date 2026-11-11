@@ -274,7 +274,7 @@ The existing C3 rows, goldens and evidence are unchanged.
 | # | Decision | Recommendation |
 |---|---|---|
 | O1 | What acceptance authorizes | **Only the section 8 harness PR.** Each later step needs its own explicit owner go-ahead: the live batch after the harness PR and its self-test are reviewed and merged, and the evidence PR after the run. This follows the C3 scope's status rule ("Each later step in section 8 needs the owner's explicit go-ahead"); the step order comes from that scope's section 8. |
-| O2 | Host pin | Pin the version installed at run time, with the auto-updater disabled. Do not reinstall 2.1.303: the probes do not depend on version-specific behavior, and the pin is recorded. |
+| O2 | Host pin | Pin the version installed at run time, with the auto-updater disabled, and record it. Do not reinstall 2.1.303: no G3 question needs that particular version. The behavior under test is version-dependent, though: how `settings.local.json` propagates and whether a hook exit 2 blocks the tool. Results therefore hold **only for the pinned version** and are not evidence for any other (section 7). |
 | O3 | Tool coverage | Edit only. Selection and availability routing are tool-independent at the hook (`_direct_write_event`). Write adds no G3 information. |
 | O4 | Include an `UNVERIFIABLE` probe | No. It is covered offline, and it needs a network block or origin removal that would enlarge the batch. |
 
