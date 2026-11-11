@@ -389,6 +389,17 @@ elif [ "$(label_of "$G31")" = UNEXPECTED ]; then
 else
   echo "FAIL direct classify changed the label to $(label_of "$G31")"; fail=1
 fi
+# (b2) ... and the batch's environment flag alone does not authorize it: the
+#      classifier re-applies the gate (UNEXPECTED stays, nothing preserved/rewritten).
+sum_before=$(sha256sum < "$G31/outcome.json" | cut -d' ' -f1)
+if C3_G3_RECHECK=1 "$PY" -E -P "$BASE/classify_c3.py" "$(cygpath -w "$G31" 2>/dev/null || echo "$G31")" claude-opus-5-5 > /dev/null 2>&1; then
+  echo "FAIL direct classify with C3_G3_RECHECK=1 rewrote a G3 outcome"; fail=1
+elif [ "$(sha256sum < "$G31/outcome.json" | cut -d' ' -f1)" = "$sum_before" ] && [ ! -e "$G31/outcome.initial.json" ] \
+     && [ "$(label_of "$G31")" = UNEXPECTED ]; then
+  echo "ok   direct classify with C3_G3_RECHECK=1 over UNEXPECTED -> refused, outcome byte-identical, no initial copy"
+else
+  echo "FAIL direct classify with C3_G3_RECHECK=1 changed the evidence"; fail=1
+fi
 # (c) The capture is attached once: a judged capture cannot be swapped.
 rm -f "$G31/netcap-sni.txt"; fresh "$G31" > /dev/null
 printf 'api.anthropic.com\n# 1 other host(s) observed, not published\n' > "$G31/netcap-sni.txt"

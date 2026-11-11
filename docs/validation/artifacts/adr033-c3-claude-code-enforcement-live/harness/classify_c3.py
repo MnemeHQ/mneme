@@ -446,12 +446,17 @@ def main() -> int:
     out, model_pin = Path(sys.argv[1]), sys.argv[2]
     setup = json.loads((out / "setup.json").read_text(encoding="utf-8"))
     g3_row = matrix.is_g3(setup["probe"])
-    if g3_row and (out / "outcome.json").exists() and os.environ.get("C3_G3_RECHECK") != "1":
-        # PR #792 re-review: a G3 classification is final once written. Only
-        # `run_c3_batch.sh G3 1 --recheck`, after g3_recheck_gate allows it,
-        # may classify again (charter §6: stop and preserve).
-        raise SystemExit("classify_c3: refusing to rewrite a G3 outcome.json; "
-                         "use `run_c3_batch.sh G3 1 --recheck`")
+    if g3_row and (out / "outcome.json").exists():
+        # PR #792 re-reviews: a G3 classification is final once written. Only
+        # `run_c3_batch.sh G3 1 --recheck` may classify again, and the
+        # classifier re-applies the eligibility gate itself: the environment
+        # flag alone never authorizes an overwrite (charter §6: stop and preserve).
+        if os.environ.get("C3_G3_RECHECK") != "1":
+            raise SystemExit("classify_c3: refusing to rewrite a G3 outcome.json; "
+                             "use `run_c3_batch.sh G3 1 --recheck`")
+        gate = g3_recheck_gate(out)
+        if gate != "RECHECK":
+            raise SystemExit(f"classify_c3: refusing to rewrite a G3 outcome.json ({gate})")
     observer = (out / "observer.txt").read_text(encoding="utf-8", errors="replace")
     spec, plan = setup["spec"], setup["plan"]
     arm = "interactive" if "arm=interactive" in observer else "headless"
