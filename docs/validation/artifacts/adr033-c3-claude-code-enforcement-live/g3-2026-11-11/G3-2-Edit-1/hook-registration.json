@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"C:\\dev\\mneme-g3-venv\\Scripts\\python.exe\" \"<MNEME_SRC>\\docs\\validation\\artifacts\\adr033-c3-claude-code-enforcement-live\\harness\\hookwrap_c3.py\"",
+            "command": "\"<PYTHON>\" \"<MNEME_SRC>\\docs\\validation\\artifacts\\adr033-c3-claude-code-enforcement-live\\harness\\hookwrap_c3.py\"",
             "timeout": 60
           }
         ]

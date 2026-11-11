@@ -30,7 +30,7 @@
     "target_changed": false,
     "e2_source": "stream-json",
     "tool_result_is_error": true,
-    "tool_result_excerpt": "PreToolUse:Edit hook error: [\"C:\\dev\\mneme-g3-venv\\Scripts\\python.exe\" \"<MNEME_SRC>\\docs\\validation\\artifacts\\adr033-c3-claude-code-enforcement-live\\harness\\hookwrap_c3.py\"]: mneme-hook: availability AUTHORIZED; baseline=main@5125231; evaluation=TRUSTED_COMPLETE; operational refusal (UNEVALUATED: MEMORY_PATH_MISMATCH).\r\nmneme-hook: SS-3 memory path mismatch; e",
+    "tool_result_excerpt": "PreToolUse:Edit hook error: [\"<PYTHON>\" \"<MNEME_SRC>\\docs\\validation\\artifacts\\adr033-c3-claude-code-enforcement-live\\harness\\hookwrap_c3.py\"]: mneme-hook: availability AUTHORIZED; baseline=main@5125231; evaluation=TRUSTED_COMPLETE; operational refusal (UNEVALUATED: MEMORY_PATH_MISMATCH).\r\nmneme-hook: SS-3 memory path mismatch; e",
     "tool_use_id": "toolu_0176JdPeEu6yyqV4R9RiSyMS",
     "hook_records": 1,
     "hook_exit": 2,

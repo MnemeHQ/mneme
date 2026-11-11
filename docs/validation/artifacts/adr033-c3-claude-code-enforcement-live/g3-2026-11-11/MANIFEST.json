@@ -14,27 +14,32 @@
     {
       "path": "G3-1-Edit-1/setup.json",
       "source_sha256": "6131ad65852083f71f7522631f5ea163577f8a3134e50313e349ddf50743639c",
-      "published_sha256": "5cfbf6797823f59db6a691377976a816c43ddd829b2cdd0ae6166fbaa3fe257e"
+      "published_sha256": "75c75da144fec447ffe05df91e0d8df9c81e6c4e4f30b705dd3f533bbf00d1da",
+      "post_collection_redaction": "<PYTHON> x1"
     },
     {
       "path": "G3-1-Edit-1/hook-registration.json",
       "source_sha256": "12a5137fd35b0154ab3d5c9809db2c33d5de5f809508b69160d835f4f5501832",
-      "published_sha256": "ccc353970709553b9c1ee23c8fbfe9e3160156c22e1cbc2640d19fc135d1ac68"
+      "published_sha256": "53811acf74dd3801882ad2895097c4a77cb36acdf776763689a18a42667cb28e",
+      "post_collection_redaction": "<PYTHON> x1"
     },
     {
       "path": "G3-1-Edit-1/events.jsonl",
       "source_sha256": "b0a1355d46f11f6befc22ec8165a97e39146c1c80d5800b076c24da5dd2807e1",
-      "published_sha256": "519f97d3d949c01057817d6a85ba8bdf4159534ecd4c9f990e1659894e854d30"
+      "published_sha256": "f8e63fd14cffbac60fcd91a73aff8307aa83df68a48f139fab64c001b21bbd63",
+      "post_collection_redaction": "<PYTHON> x4, <LIVE_PROJECT> x1"
     },
     {
       "path": "G3-1-Edit-1/hook-log.jsonl",
       "source_sha256": "e080ba45ccc9e53ab5307b07452e734329504a55d3fa6e18ce6baf0552112f53",
-      "published_sha256": "6ffd4eb6f92ebd2ef9b47720be1a66769fc202124c7aebebdf804034abbd2f4d"
+      "published_sha256": "2bc329ac6be6583c516ce04a01aee7752fd60e70b89582c0819c972e132804ca",
+      "post_collection_redaction": "<LIVE_PROJECT> x1"
     },
     {
       "path": "G3-1-Edit-1/outcome.json",
       "source_sha256": "bb9983138f3e461e4d5ee006e6a587ae6b185cc5d720f2bee3cb6007a9fb3e24",
-      "published_sha256": "71cda7ca5908fb7c9cec822677ffaa6b0436f364ec357e8ac87f163de47c3353"
+      "published_sha256": "fc099d4dd5482971279d578b50583d5910a7c22a34eea799536df948c85bf8d6",
+      "post_collection_redaction": "<PYTHON> x1"
     },
     {
       "path": "G3-1-Edit-1/target.before",
@@ -54,7 +59,7 @@
     {
       "path": "G3-1-Edit-1/transcript.selected.jsonl",
       "source_sha256": "3fbcd23520b03bb134887a3ce3d360eee597b51a9c60f572db7275b400489933",
-      "published_sha256": "413f6477518ffbc056a9f58081ce60b48b63c35866f68174814e2b76a177b990",
+      "published_sha256": "e56e180a21eacb694fb3f19cdfc654526fae4e6b5b7f24926e1e19f63ad604b6",
       "source_size": 192861,
       "entries_not_published": {
         "queue-operation": 2,
@@ -75,7 +80,8 @@
         "ai-title": 2,
         "attachment:deferred_tools_record": 1,
         "cost-state": 1
-      }
+      },
+      "post_collection_redaction": "<PYTHON> x2"
     },
     {
       "path": "G3-1-Edit-1/settings.local.json",
@@ -90,7 +96,8 @@
     {
       "path": "G3-1-Edit-1/outcome.initial.json",
       "source_sha256": "993a1131251829729132a0bdbf081e518e8fced850951c1628690367df0226a1",
-      "published_sha256": "18773f933a1c4ca167a2351472ff3cdab3fb13fde0e34b1836af586844670d94"
+      "published_sha256": "156735b7e5cd6b59496ffad7e15106346c7ecc476f05e173d4d732c33aa17c0f",
+      "post_collection_redaction": "<PYTHON> x1"
     },
     {
       "path": "G3-2-Edit-1/observer.txt",
@@ -105,22 +112,26 @@
     {
       "path": "G3-2-Edit-1/setup.json",
       "source_sha256": "3663a80e6ef52b8cb97c064c91fc322fca717fb361fb455909707630b1f5e9f8",
-      "published_sha256": "cd71d6cb443b3bac16d38c82734e7f79a25ed548a2d9fe0365a2c39071cd71b6"
+      "published_sha256": "803a45a70ba53b8f1231b1ad837e73c1c26e3f6c8bf11c3c3890a47084cb0909",
+      "post_collection_redaction": "<PYTHON> x1"
     },
     {
       "path": "G3-2-Edit-1/hook-registration.json",
       "source_sha256": "12a5137fd35b0154ab3d5c9809db2c33d5de5f809508b69160d835f4f5501832",
-      "published_sha256": "ccc353970709553b9c1ee23c8fbfe9e3160156c22e1cbc2640d19fc135d1ac68"
+      "published_sha256": "53811acf74dd3801882ad2895097c4a77cb36acdf776763689a18a42667cb28e",
+      "post_collection_redaction": "<PYTHON> x1"
     },
     {
       "path": "G3-2-Edit-1/events.jsonl",
       "source_sha256": "38bd24b7ec6459816b6673921d17b0f233f8e8e59bb3b28e614f428b200e0d96",
-      "published_sha256": "0a9e327e6bf31eea78c1cbaac992af32b03153677b02907a4b68febaf239241c"
+      "published_sha256": "0c84edf09fffe39bb7c2f7a136e6796a68cfe1f21391b7fb944257a15b802e77",
+      "post_collection_redaction": "<LIVE_PROJECT> x1"
     },
     {
       "path": "G3-2-Edit-1/hook-log.jsonl",
       "source_sha256": "d98448745d6c1628a3b711f5e5684a7130f9ec79d6505d4b9671b1b13fde4923",
-      "published_sha256": "7c78bc89fe5bed862f0b5ac9043584953cfe9578e92ce55b8975f5be60c5f3e8"
+      "published_sha256": "f4e36c4e7972cb25c9cca669b95310da8bd47fd7a733fe09525e7207f07b5ef5",
+      "post_collection_redaction": "<LIVE_PROJECT> x1"
     },
     {
       "path": "G3-2-Edit-1/outcome.json",
@@ -239,6 +250,27 @@
         "operator-g3_capture.ps1",
         "operator-g3_step2.sh",
         "run-step2.log"
+      ]
+    },
+    "venv_and_project_id_redaction": {
+      "reason": "PR #793 review: venv interpreter path and Claude Code encoded project id",
+      "placeholders": {
+        "<PYTHON>": "venv interpreter",
+        "<PYTHON_VENV>": "venv directory",
+        "<LIVE_PROJECT>": "Claude Code project id encoding the live root"
+      },
+      "files": [
+        "G3-1-Edit-1/events.jsonl",
+        "G3-1-Edit-1/hook-log.jsonl",
+        "G3-1-Edit-1/hook-registration.json",
+        "G3-1-Edit-1/outcome.initial.json",
+        "G3-1-Edit-1/outcome.json",
+        "G3-1-Edit-1/setup.json",
+        "G3-1-Edit-1/transcript.selected.jsonl",
+        "G3-2-Edit-1/events.jsonl",
+        "G3-2-Edit-1/hook-log.jsonl",
+        "G3-2-Edit-1/hook-registration.json",
+        "G3-2-Edit-1/setup.json"
       ]
     }
   }

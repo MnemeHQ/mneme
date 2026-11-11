@@ -100,10 +100,17 @@ The artifacts are in
 How the published files relate to the raw evidence:
 
 - **Transcripts are not published raw.** Each is published only as `*.selected.jsonl` (user and assistant entries plus `hook_*` attachments). The manifest counts the entry types not published.
-- **Redaction:** the live root becomes `<LIVE>`, the home directory `<HOME>`, the Mneme source tree `<MNEME_SRC>` and the host name `<HOST>`.
-- **One post-collection redaction:** the operator capture directory becomes `<CAPTURE>` in three files (`operator-g3_capture.ps1`, `operator-g3_step2.sh`, `run-step2.log`). It is recorded per entry and under `post_collection` in `MANIFEST.json`, with updated published hashes.
+- **Redaction by the collector:** the live root becomes `<LIVE>`, the home directory `<HOME>`, the Mneme source tree `<MNEME_SRC>` and the host name `<HOST>`.
+- **Two post-collection redactions,** each recorded per entry (`post_collection_redaction`) and under `post_collection` in `MANIFEST.json`. Every entry keeps its original `source_sha256`, and the published hash of each changed file was recomputed.
+  1. The operator capture directory becomes `<CAPTURE>` in three files (`operator-g3_capture.ps1`, `operator-g3_step2.sh`, `run-step2.log`).
+  2. After the PR #793 review: the venv interpreter path becomes `<PYTHON>` in 12 places, and Claude Code's encoded project directory for the live root (`C--…`) becomes `<LIVE_PROJECT>` in 4. Together these touch 11 files across both probes: `events.jsonl`, `hook-log.jsonl`, `hook-registration.json`, `setup.json`, G3-1's `outcome.json`, `outcome.initial.json` and `transcript.selected.jsonl`. Every changed JSON and JSONL file still parses.
 - **Integrity:** all 34 manifest entries match the published files.
-- **Leak sweep:** an independent sweep of all published files, covering every separator variant of the live root, home, source tree, capture directory, scratchpad and venv, the user and host names, and credential-shaped strings, found nothing.
+- **Leak sweep.** The first sweep, run before the review, reported clean, but it was faulty: its backslash patterns did not survive being passed through the shell, so it missed the JSON-escaped paths above. The sweep was rewritten as a script and re-run on the final set. It checks every local path (live root, home, source tree, capture directory, venv, scratchpad) in each of these forms:
+  - literal Windows, JSON-escaped, forward slash and MSYS;
+  - URL-encoded;
+  - Claude Code's encoded project id.
+
+  It also checks the user and host names and credential-shaped strings. A built-in self-check confirms that each form's pattern matches a sample of itself. It found **0 hits in 35 files**. The already-merged C3 records contain the same kind of encoded project id; they are not changed here.
 - **Not published:** the raw capture (`.etl`, `.pcapng`), `claude.stderr`, the raw transcripts and `pins.local.env`. They stay with the operator.
 
 ## 7. Next steps (not authorized here)
