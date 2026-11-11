@@ -31,7 +31,10 @@ the table does not recognise is `unclassified`; it never counts as delivery.
 Rules R1-R3 (accepted in docs/plans/2026-10-17-dg1f-t08-d5-p2-h1-classifier-rules.md,
 #551) are implemented in categorise() (R1, R2) and host_events() (R3). Rule R4
 (accepted in docs/plans/2026-10-19-dg1f-t08-d5-p2-a1-hook-system-message-rule.md,
-#561) is implemented in categorise().
+#561) is implemented in categorise(). Rule R5 (accepted in
+docs/plans/2026-11-11-dg1f-t08-d5-p2-a2-r5-host-record-rule.md, #796/#797) is
+implemented in r5_anchors() and categorise(): category host_record, tied to
+tool-attributed anchors A1-A6.
 Extending the table is a reviewed change, and because raw evidence is kept,
 the classifier can be re-run on existing evidence without a new probe.
 """
@@ -48,7 +51,7 @@ PATHS = {
     "H1b-start": {"path_type": "command_lifecycle_event", "event": "SessionStart", "tool": None},
     "H1c-stop": {"path_type": "command_lifecycle_event", "event": "Stop", "tool": None},
 }
-RULES_ID = "as-run table + R1-R4 (#551, #561)"  # recorded in every outcome
+RULES_ID = "as-run table + R1-R5 (#551, #561, #796)"  # recorded in every outcome
 PASSING = ("DELIVERED_TO_AGENT", "DELIVERED_TO_USER_ONLY", "EVIDENCE_REUSED")
 EDIT_EXPECTED = b"beta\n"
 BASH_FILE, BASH_EXPECTED = "bash_out.txt", b"probe-ran\n"  # exact bytes, not a prefix
@@ -267,7 +270,98 @@ def walk(obj, path=""):
         yield path, obj
 
 
-def categorise(source, entry, path, probed_event=None, invoked_events=()):
+R5_CONTEXT = " hook additional context: "
+_R5_BLOB_TEXT = re.compile(r"message\.content\[(\d+)\]\.text")
+
+
+def expected_label(event, tool):
+    """R5's L: the probed event, plus ':<tool>' on a tool path."""
+    return f"{event}:{tool}" if tool else event
+
+
+def r5_wrap(label, content):
+    """The exact host rendering R5a accepts for one hook_additional_context item."""
+    return f"<system-reminder>\n{label}{R5_CONTEXT}{content}\n</system-reminder>"
+
+
+def r5_anchors(arm, nonce, event, tool):
+    """Tool-attributed anchors (R5, A1-A6), as {transcript line: content items}.
+
+    An anchor is a transcript hook_additional_context attachment that meets R1's
+    conditions and names the expected tool:
+      A1 hookEvent is the probed event;
+      A2 this arm's emitter emitted the nonce for that event (hook-log.jsonl);
+      A3 the nonce is in attachment.content;
+      A4 hookName equals the expected label exactly;
+      A5 (tool path) toolUseID is the id of this arm's tool_use for the expected tool;
+      A6 (tool path) the emitting hook-log envelope names that event AND tool.
+    R1 itself is unchanged: an R1 entry that is not an anchor stays model_bound under
+    R1, but R5 never classifies a record against it."""
+    if not nonce or event is None:
+        return {}
+    label = expected_label(event, tool)
+    emitted = [h for h in arm["hooks"] if nonce in (h.get("emitted") or "")
+               and (h.get("envelope") or {}).get("hook_event_name") == event]           # A2
+    if tool:
+        emitted = [h for h in emitted if (h.get("envelope") or {}).get("tool_name") == tool]  # A6
+    if not emitted:
+        return {}
+    tool_ids = set()
+    if tool:
+        for _, e in arm["transcript"]:
+            if e.get("type") == "assistant":
+                for c in content_items(e):
+                    if c.get("type") == "tool_use" and c.get("name") == tool and c.get("id"):
+                        tool_ids.add(c["id"])
+    anchors = {}
+    for line_no, e in arm["transcript"]:
+        att = e.get("attachment") or {}
+        if e.get("type") != "attachment" or att.get("type") != "hook_additional_context":
+            continue
+        content = att.get("content")
+        if not isinstance(content, list) or not all(isinstance(c, str) for c in content):
+            continue
+        if (att.get("hookEvent") == event                                   # A1
+                and any(nonce in c for c in content)                         # A3
+                and att.get("hookName") == label                             # A4
+                and (not tool or att.get("toolUseID") in tool_ids)):         # A5
+            anchors[line_no] = list(content)
+    return anchors
+
+
+def _r5a_rendered(entry, line_no, r5):
+    """R5a: the anchor's own rendered copy, renderedRole system, exact wrapping."""
+    if not r5:
+        return False
+    label, anchors, _ = r5
+    content = anchors.get(line_no)
+    rendered = entry.get("rendered")
+    return (content is not None and entry.get("renderedRole") == "system"
+            and isinstance(rendered, list) and len(rendered) == len(content)
+            and all(isinstance(r, dict) and r.get("content") == r5_wrap(label, c)
+                    for r, c in zip(rendered, content)))
+
+
+def _r5b_blob(entry, path, r5):
+    """R5b: role system, an anchor exists, and every nonce line is an exact anchor line."""
+    if not r5:
+        return False
+    label, anchors, nonce = r5
+    m = _R5_BLOB_TEXT.fullmatch(path)
+    msg = entry.get("message") or {}
+    items = msg.get("content")
+    if not (m and anchors and msg.get("role") == "system" and isinstance(items, list)):
+        return False
+    j = int(m.group(1))
+    text = items[j].get("text") if j < len(items) and isinstance(items[j], dict) else None
+    if not isinstance(text, str):
+        return False
+    allowed = {f"{label}{R5_CONTEXT}{c}" for cs in anchors.values() for c in cs}
+    lines = [ln for ln in text.split("\n") if nonce in ln]
+    return bool(lines) and all(ln in allowed for ln in lines)
+
+
+def categorise(source, entry, path, probed_event=None, invoked_events=(), line_no=None, r5=None):
     """CATEGORY RULES. Return one of:
     model_bound    text the host placed in the model's input (user-role text, or a tool_result),
                    or (R1) a transcript `hook_additional_context` attachment for the probed
@@ -279,12 +373,22 @@ def categorise(source, entry, path, probed_event=None, invoked_events=()):
                    or (R4) a transcript `hook_system_message` attachment for the probed
                    event that the emitter invoked, with the token in `attachment.content`
                    (never delivery to the agent or the developer)
+    host_record    (R5) the host's own record of content an anchor carries: (R5a) the
+                   anchor's `rendered[i].content` when renderedRole is system and it equals
+                   r5_wrap(L, content[i]) exactly; (R5b) an `api-request-blob` text with
+                   role system whose every nonce line is exactly "L hook additional
+                   context: C" for an anchor item C. Recorded; never delivery, never
+                   sufficient alone, never masking (R1 still decides delivery)
     unclassified   anything else (never counted as delivery)
     """
     t = entry.get("type")
+    if source == "transcript" and t == "api-request-blob":  # R5b
+        return "host_record" if _r5b_blob(entry, path, r5) else "unclassified"
     if source == "transcript" and t == "attachment":
         att = entry.get("attachment") or {}
         kind = att.get("type")
+        if kind == "hook_additional_context" and path.startswith("rendered["):  # R5a
+            return "host_record" if _r5a_rendered(entry, line_no, r5) else "unclassified"
         # R1 and R4 share the same three narrow conditions.
         narrow = (probed_event is not None and att.get("hookEvent") == probed_event
                   and probed_event in invoked_events
@@ -307,13 +411,16 @@ def categorise(source, entry, path, probed_event=None, invoked_events=()):
     return "unclassified"
 
 
-def nonce_locations(arm, nonce, probed_event=None):
+def nonce_locations(arm, nonce, probed_event=None, probed_tool=None):
     locs = []
     if not nonce:
         return locs
     # R1 condition (2): events for which this arm's emitter actually emitted the nonce.
     invoked = {(h.get("envelope") or {}).get("hook_event_name") for h in arm["hooks"]
                if nonce in (h.get("emitted") or "")}
+    # R5: tool-attributed anchors for the probed event and tool (A1-A6).
+    r5 = (expected_label(probed_event, probed_tool), r5_anchors(arm, nonce, probed_event, probed_tool),
+          nonce) if probed_event is not None else None
     for source in ("events", "transcript"):
         for line_no, entry in arm[source]:
             for path, s in walk(entry):
@@ -321,7 +428,8 @@ def nonce_locations(arm, nonce, probed_event=None):
                     locs.append({
                         "source": source, "line": line_no, "entry_type": entry.get("type"),
                         "entry_subtype": entry.get("subtype"), "json_path": path,
-                        "category": categorise(source, entry, path, probed_event, invoked),
+                        "category": categorise(source, entry, path, probed_event, invoked,
+                                               line_no=line_no, r5=r5),
                     })
     return locs
 
@@ -414,8 +522,8 @@ def classify(emit, ctl, path_id, pin_model, pin_version=None):
         return done("NOT_EXECUTED")
 
     # Evidence.
-    locs = nonce_locations(emit, emit["nonce"], spec["event"])
-    ctl_locs = nonce_locations(ctl, emit["nonce"], spec["event"])
+    locs = nonce_locations(emit, emit["nonce"], spec["event"], spec["tool"])
+    ctl_locs = nonce_locations(ctl, emit["nonce"], spec["event"], spec["tool"])
     cats = {l["category"] for l in locs}
     rec["nonce_locations"] = locs
     rec["transcript_collected"] = emit["transcript_collected"]

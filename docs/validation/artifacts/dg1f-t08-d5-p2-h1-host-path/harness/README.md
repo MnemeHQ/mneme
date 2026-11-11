@@ -73,6 +73,31 @@ H1 passes only if all four path ids pass (scope §6 gate rule). `summary_h1.md` 
 
 **R4 (accepted in [`docs/plans/2026-10-19-dg1f-t08-d5-p2-a1-hook-system-message-rule.md`](../../../../plans/2026-10-19-dg1f-t08-d5-p2-a1-hook-system-message-rule.md), #561).** A transcript `attachment` with `attachment.type: "hook_system_message"` is `host_output` only when all three of R1's narrow conditions hold: `hookEvent` equals the probed event, this arm's emitter invoked that event, and the nonce is in `attachment.content`. Otherwise it stays `unclassified`. R4 **never** counts as delivery to the agent or the developer, and it never masks another location: unclassified-first is unchanged. It was added for the shape Claude Code 2.1.202 recorded for the Stop `systemMessage` in the A1-headless run (#560), whose as-run outcome stands. Reclassifying that run is a separately authorized step. The H1 batch evidence contains no `hook_system_message` entry, so R4 changes no H1 label.
 
+**R5 (accepted in [`docs/plans/2026-11-11-dg1f-t08-d5-p2-a2-r5-host-record-rule.md`](../../../../plans/2026-11-11-dg1f-t08-d5-p2-a2-r5-host-record-rule.md), #796/#797).** This rule adds a category, `host_record`: the host's own record of content an anchor carries. It is recorded; it is never delivery, never sufficient alone, and never masks.
+
+- **Anchor** (`r5_anchors()`): a tool-attributed R1 entry that meets six conditions:
+  - A1: `hookEvent` is the probed event;
+  - A2: this arm's emitter emitted the nonce for it;
+  - A3: the nonce is in `attachment.content`;
+  - A4: `hookName` is exactly `L` (`PreToolUse:Edit`, `PreToolUse:Bash` or the bare lifecycle event);
+  - A5, tool paths: `toolUseID` is this arm's `tool_use` for the expected tool;
+  - A6, tool paths: the emitting hook-log envelope names the event and the tool.
+- **R5a:** the anchor's `rendered[i].content`, with `renderedRole` `system`, equal exactly to `<system-reminder>
+{L} hook additional context: {content[i]}
+</system-reminder>`.
+- **R5b:** an `api-request-blob` with role `system`, in an arm that has an anchor, where every nonce line equals exactly `{L} hook additional context: {C}` for some anchor item `C`.
+- **Everything else stays `unclassified`.** That includes wrong-tool evidence under the right event.
+
+R1 to R4 are unchanged: R1 still decides delivery, and R2 still covers every location of a `hook_success` entry. The stub's `H1_STUB_DELIVERY=hook_r5` mode writes the Claude Code 2.1.310 shape recorded in #795. `selftest/test_r5_classifier.py` covers:
+- the positives;
+- the R5a and R5b negatives;
+- the wrong-tool cases;
+- label interactions;
+- an anchor unit test;
+- H1 and A1 published-subset replays, which keep their labels.
+
+Reclassifying the A2 evidence is a separately authorized step.
+
 **Known consequence of the strict host-event rule.** If Claude Code emits a hook-output `system` event only when a hook prints something, the emitter and no-op arms will differ in event subtypes, and the probe will be `INCONCLUSIVE`. That is the conservative outcome by design (owner decision, 2026-10-17). The raw evidence is kept, so a reviewed rule change can re-classify without re-running.
 
 **`H1_DONE` is not a pass.** `run_h1.sh` writes `H1_DONE` when the batch has finished and every outcome has been written and verified, whatever the labels are. Only the gate line in `summary_h1.md`, derived from the classified outcomes, decides whether H1 passed. The summary says this too.
