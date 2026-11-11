@@ -104,7 +104,20 @@ The classifier does not compare these, and none is attributed to the emitter.
 - any other host version or model;
 - that Mneme emits these outcomes, since nothing is implemented.
 
-**For review (not decided here).** By the #549 → #551 → #552 → #553 precedent, the next step would be a reviewed rule for the two new locations (R5). As proposed, the rule definition and its classifier change would go in **one PR**, reviewed together. It would be followed by an offline reclassification of the archived raw evidence, published alongside the unchanged as-run outcomes with an append-only addendum. No re-run is needed: the raw evidence is archived and the classifier is deterministic. Projecting the effect of any R5 is not a result.
+**For review (not decided here).** The #549 → #551 → #552 → #553 precedent used three separately approved steps:
+1. a rule definition;
+2. its classifier implementation;
+3. an offline reclassification of the archived raw evidence, published alongside the unchanged as-run outcomes with an append-only addendum.
+
+A rule for the two new locations (R5) would follow the same steps. Putting the R5 rule and its implementation in one PR would **change** that sequence. It is not the precedent, and it would need explicit owner authorization.
+
+**Requirements for any R5 definition:** A nonce in a `rendered` field or an `api-request-blob` is **not, by itself,** evidence of delivery. Any R5 must keep all of these:
+- event matching: the probed event (and tool);
+- emitter attribution: this arm's emitter invoked that event, and the nonce is in the named field;
+- the unclassified-first safeguard: a new rule never masks another unrecognised location;
+- the distinction between recorded model input and host output.
+
+**Reclassification:** it must verify the archive against its sums, and check every omitted entry for nonce occurrences. A re-run is not justified by these unrecognised fields alone, if completeness validation confirms the archive is sufficient. Projecting the effect of any R5 is not a result.
 
 ## 7. Artifacts
 
