@@ -134,3 +134,84 @@ A rule for the two new locations (R5) would follow the same steps. Putting the R
 - the encoded live-root project directory becomes `<LIVE_PROJECT>`;
 - session ids become `<SESSION>` and UUIDs `<UUID>`;
 - tool-use ids become per-arm pseudonyms.
+
+## 8. Addendum: offline reclassification under R1–R5 (2026-11-13)
+
+> Sections 1–7 above are the as-run record and are **unchanged**. The as-run `outcome.json` files are unchanged too, and the as-run labels (`INCONCLUSIVE` ×3, listed-path result `NOT MET`) stay as historical fact. This addendum records the separately authorized **offline** reclassification under rules R1–R5: step 2 of the [R5 rule note](../plans/2026-11-11-dg1f-t08-d5-p2-a2-r5-host-record-rule.md) §7. R5 was accepted in #796/#797 (erratum #799) and implemented in #798 (merge `b92eaf05`). The owner authorized this step on 2026-11-13. **No host session ran, and nothing was re-run.**
+
+### 8.1 Archive and integrity
+
+- **Archive.** This step used the archive made after the run (§7): `C:\dev\d5p2-h1-a2-archive\2026-11-11`, 74 files, with `2026-11-11.SHA256SUMS` beside it (SHA-256 `bbd4c5e5…21089e34`). Before any tool read it for this step, all 74 files verified, there were no unlisted files, and the original live root `C:\dev\d5p2-h1-a2-live` verified against the same listing.
+- **Manifest check.** All **21** raw files that this record's `MANIFEST.json` hashes match its SHA-256s and sizes. They are `events.jsonl`, `transcript.jsonl` and `claude.stderr.txt` for each of the six arms, plus the batch files `summary_h1.md`, `run_h1.log` and `H1_DONE`.
+- **The tool stops before classifying.** Given a copy of the checksum list with one hash altered, it aborted ("integrity check failed; nothing classified") and wrote no output.
+- **Before and after.** The tool repeats the integrity check after classifying and refuses to write the summary if the archive or its checksum list changed. Both were unchanged (`integrity_after` in `reclassification.json`). After the run, the archive again verified (74 files, all read-only) and so did the live root.
+
+### 8.2 Procedure
+
+[`harness/reclassify_a2.py`](artifacts/dg1f-t08-d5-p2-h1-host-path/harness/reclassify_a2.py) (SHA-256 `665cc361…ebac5d20`) follows #553 and #563. It reuses the #553 integrity and subset-replay helpers unchanged (`reclassify_h1.py`, `1dbbfdd4…def0f89b`). It ran the merged classifier from `b92eaf05` (`classify_h1.py` `27cd5c42…bf137f44`, rules id `as-run table + R1-R5 (#551, #561, #796)`) with the A2 pins: Claude Code `2.1.310 (Claude Code)` and model `claude-opus-5-5`. The order was:
+
+1. **Integrity**, as in §8.1. No problems were found.
+2. **Authoritative run:** `classify()` on the archived **raw** evidence for each path and its control. Each arm is read from the archive but keyed to the live-root location it was recorded at. The classifier masks an arm's workspace by that location (`masked()`), and the recorded tool inputs name the live-root workspace (see §8.4).
+3. **Omitted-material completeness check.** Every raw `events.jsonl` and `transcript.jsonl` entry of all six arms was diffed against what this record's collector publishes for it. That is `collect_h1.select_events` for events, and `collect_a2.select_transcript_a2` (`b16ce8e4…40d51167`) for the transcript, which covers `hook_*` entries with `rendered` and the nonce-line `api-request-blob` excerpts. Each entry is whole, trimmed or dropped. Each control arm was scanned for its own nonce **and** the paired emitter's nonce. Each arm's `claude.stderr.txt` was scanned too. An omitted hit would be published as its location only (source, line, entry type, JSON paths, counts), never the entry, because unpublished 2.1.310 entries can carry environment details.
+4. **Subset replay:** the same classifier on the published selected evidence. This is supporting only: it depends on step 3 and is **not** an independent reproduction.
+
+**Outputs.** `outcome.r1r5.json` per path (redacted, from the raw run), next to each unchanged `outcome.json`, and [`reclassification.json`](artifacts/dg1f-t08-d5-p2-h1-host-path/live-a2-2026-11-11/reclassification.json). The collector's redaction, including `<LIVE_PROJECT>`, and its leak scan applied to all of them.
+
+**Tests.** The new [`selftest/test_reclassify_a2_completeness.py`](artifacts/dg1f-t08-d5-p2-h1-host-path/harness/selftest/test_reclassify_a2_completeness.py) uses synthetic data only. It covers:
+- published `rendered` and excerpt lines do not count as omitted;
+- `rendered` on a non-hook attachment is detected;
+- a blob field outside the excerpted text lines is detected;
+- the paired emitter's nonce in a control arm is detected;
+- dropped events and stderr are detected;
+- recorded-location masking;
+- the as-run diff.
+
+Four mutants of the tool were each caught by these tests: the H1 selection used in place of the A2 selection, stderr left out, the paired nonce ignored, and the published count ignored. The tool was restored and hash-verified afterwards.
+
+### 8.3 Results
+
+| Path | As-run (§2) | R1–R5, raw (authoritative) | R1–R5, subset replay |
+|---|---|---|---|
+| H1a-edit | INCONCLUSIVE | **DELIVERED_TO_AGENT** | DELIVERED_TO_AGENT |
+| H1a-bash | INCONCLUSIVE | **DELIVERED_TO_AGENT** | DELIVERED_TO_AGENT |
+| H1b-start | INCONCLUSIVE | **DELIVERED_TO_AGENT** | DELIVERED_TO_AGENT |
+| **Listed-path result** (one host version) | NOT MET | **PASS** | — |
+
+**The change from the as-run outcome is exactly what R5 accounts for.** On each path:
+- the two locations of §4 go from `unclassified` to `host_record`: the `rendered[0].content` of the R1 entry (R5a) and the `api-request-blob` `message.content[0].text` (R5b);
+- the label, `passes_path` and the reason list change, and the reason list is now empty;
+- `rules` changes.
+
+Every other field is identical, and the set of nonce locations is unchanged.
+
+- **Delivery comes from R1, not from R5.** Each path's `DELIVERED_TO_AGENT` rests on the R1 `model_bound` location (`attachment.content[0]` of the probed event's `hook_additional_context` entry). `host_record` is never delivery and never sufficient alone. The other locations are `host_output` (`hook_success` stdout, and on H1b the SessionStart hook output) and `echo` (the model's reply and the result).
+- **No co-present unrecognised location:** no path has an `unclassified` location left, so the unclassified-first safeguard does not apply.
+- **Controls and non-interference** hold as in §3, on both arms of every path. That covers the file and command results matching the control, equal permission decisions for equivalent requests, equal host indicators and no error result.
+- **Host pin:** every outcome records `2.1.310 (Claude Code)`, so there is no mixed-version problem (`host_pin_problem` is `null`).
+- **Completeness: 0 omitted nonce occurrences** across all six arms:
+  - events: 38 entries (6 whole, 32 trimmed, 0 dropped);
+  - transcript: 182 entries (0 whole, 35 trimmed, 147 dropped);
+  - each `claude.stderr.txt` is 192 bytes, one line, with 0 occurrences of either nonce.
+- The raw run and the subset replay agree on every path.
+
+**What the listed-path PASS means:** on Claude Code `2.1.310` with `claude-opus-5-5`, headless, n = 1 per path, the emitter's `additionalContext` for PreToolUse (Edit and Bash) and SessionStart reached the model at the R1 location. No unrecognised location was left, and there was no host interference. **It is not the H1 gate.**
+
+**H1 gate: still NOT MET.**
+- H1c is not in A2, and H1c/A1 is still pinned to `2.1.202`.
+- Whether results from different host versions may be combined is not decided (A2-1).
+
+G3 stays partial. DG1G and DG1 stay open.
+
+### 8.4 Finding for the reviewer: workspace masking when classifying from an archive
+
+The first run of this tool keyed each arm to its **archive** location. On H1a-edit, the identical Read and Edit requests in the two arms then did not mask to `<WS>`, and were recorded as two "non-equivalent attempts" per arm instead of two equivalent requests. The label was unaffected, because only decisions on equivalent requests are compared. Those outputs were deleted, the tool was changed to key arms to their recorded location (`load_recorded`, with a regression test), and the run was repeated. The published outputs come from that repeat.
+
+**The same artifact is in the accepted #553 output.** In [`live-2026-10-17/H1a-edit/outcome.r1r3.json`](artifacts/dg1f-t08-d5-p2-h1-host-path/live-2026-10-17/H1a-edit/outcome.r1r3.json), `permissions.comparison` lists 0 equivalent requests and 2 non-equivalent attempts per arm, where the as-run `outcome.json` lists 2 equivalent requests. Its label cannot depend on this, for the same reason. H1a-bash and the A1 output are not affected. This addendum does not change the accepted #553 record. Whether to correct it is for the reviewer.
+
+### 8.5 Not established by this addendum
+
+- **The H1 gate.** H1c on an accepted pin is still outstanding.
+- **Developer (UI) visibility.**
+- **Independent inspection of the raw files.** The integrity and completeness results come from the operator-side tool run. A reviewer can check them only through the published hashes, the tool source and the subset replay.
+- **Any other host version, model or mode, and repeatability** (n = 1).
+- **Anything else outside this run:** H2–H6, a P2-first charter, the `[layer1-freeze]` amendment, implementation, or the shipped Stop-hook behaviour (#550).

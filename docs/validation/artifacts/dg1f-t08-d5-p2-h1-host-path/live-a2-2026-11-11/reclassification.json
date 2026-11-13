@@ -1,0 +1,532 @@
+{
+  "rules": "as-run table + R1-R5 (#551, #561, #796)",
+  "pins": {
+    "claude_version": "2.1.310 (Claude Code)",
+    "model": "claude-opus-5-5"
+  },
+  "classifier_sha256": {
+    "classify_h1.py": "27cd5c42857d6bba833a468ddb4f252fa66cef33fca8de6bc5b2b7cebf137f44"
+  },
+  "reclassify_tool_sha256": {
+    "reclassify_a2.py": "665cc36118c7a8fee61861d475083c9de10c272e43dcd32dd9ff53f2ebac5d20",
+    "reclassify_h1.py (helpers)": "1dbbfdd4209d14afcaa8351e2fe82ebd4461dc62d89dc9d3e676563ddef0f89b",
+    "collect_a2.py (selection)": "b16ce8e443e96234f6065b41275ddf1e858fb9f91ba19926f709b43240d51167",
+    "collect_h1.py (selection)": "64445c3c073e3e0d1c14ce6a651b4b5e9dd66c51110769d26c1305829570b25c"
+  },
+  "integrity": {
+    "archive_files_listed": 74,
+    "archive_sums_sha256": "bbd4c5e51b393cc425a7ce24a80cc7ae72b8547e7091f17270cc4db521089e34",
+    "manifest_raw_files_checked": 21,
+    "problems": []
+  },
+  "paths": {
+    "H1a-edit": {
+      "label_as_run": "INCONCLUSIVE",
+      "label_r1r5_raw": "DELIVERED_TO_AGENT",
+      "label_r1r5_subset": "DELIVERED_TO_AGENT",
+      "raw_and_subset_agree": true,
+      "reasons_r1r5_raw": [],
+      "reasons_r1r5_subset": [],
+      "passes_path_r1r5_raw": true,
+      "nonce_categories_r1r5_raw": [
+        [
+          "attachment.content[0]",
+          "model_bound"
+        ],
+        [
+          "attachment.stdout",
+          "host_output"
+        ],
+        [
+          "message.content[0].text",
+          "echo"
+        ],
+        [
+          "message.content[0].text",
+          "host_record"
+        ],
+        [
+          "rendered[0].content",
+          "host_record"
+        ],
+        [
+          "result",
+          "echo"
+        ]
+      ],
+      "changes_from_as_run": {
+        "top_level_keys": [
+          "label",
+          "passes_path",
+          "reasons",
+          "rules"
+        ],
+        "nonce_location_categories": [
+          {
+            "source": "transcript",
+            "line": 27,
+            "json_path": "rendered[0].content",
+            "as_run": "unclassified",
+            "r1r5": "host_record"
+          },
+          {
+            "source": "transcript",
+            "line": 30,
+            "json_path": "message.content[0].text",
+            "as_run": "unclassified",
+            "r1r5": "host_record"
+          }
+        ],
+        "location_set_unchanged": true
+      },
+      "completeness": {
+        "H1a-edit": {
+          "nonces_scanned": 1,
+          "entries": {
+            "events": {
+              "whole": 0,
+              "trimmed": 8,
+              "dropped": 0,
+              "by_type": {
+                "system:init:trimmed": 1,
+                "assistant:None:trimmed": 4,
+                "user:None:trimmed": 2,
+                "result:success:trimmed": 1
+              }
+            },
+            "transcript": {
+              "whole": 0,
+              "trimmed": 10,
+              "dropped": 27,
+              "by_type": {
+                "queue-operation:None:dropped": 2,
+                "user:None:trimmed": 3,
+                "attachment:environment:dropped": 1,
+                "attachment:model:dropped": 1,
+                "attachment:deferred_tools_delta:dropped": 1,
+                "attachment:agent_listing_delta:dropped": 1,
+                "attachment:skill_listing:dropped": 1,
+                "atis-latch:None:dropped": 3,
+                "attachment:session_context:dropped": 1,
+                "attachment:date:dropped": 1,
+                "attachment:remote_session_change:dropped": 1,
+                "attachment:prompt_snapshot:dropped": 2,
+                "api-request-shape:None:dropped": 1,
+                "api-request-blob:None:dropped": 3,
+                "api-request:None:dropped": 3,
+                "last-prompt:None:dropped": 3,
+                "assistant:None:trimmed": 4,
+                "attachment:hook_success:trimmed": 1,
+                "attachment:hook_additional_context:trimmed": 1,
+                "api-request-blob:None:trimmed": 1,
+                "attachment:deferred_tools_record:dropped": 1,
+                "cost-state:None:dropped": 1
+              }
+            }
+          },
+          "omitted_hits": [],
+          "hits_total": 0,
+          "stderr": {
+            "bytes": 192,
+            "lines": 1,
+            "nonce_occurrences": 0
+          }
+        },
+        "H1a-edit-ctl": {
+          "nonces_scanned": 2,
+          "entries": {
+            "events": {
+              "whole": 0,
+              "trimmed": 7,
+              "dropped": 0,
+              "by_type": {
+                "system:init:trimmed": 1,
+                "assistant:None:trimmed": 3,
+                "user:None:trimmed": 2,
+                "result:success:trimmed": 1
+              }
+            },
+            "transcript": {
+              "whole": 0,
+              "trimmed": 6,
+              "dropped": 29,
+              "by_type": {
+                "queue-operation:None:dropped": 2,
+                "user:None:trimmed": 3,
+                "attachment:environment:dropped": 1,
+                "attachment:model:dropped": 1,
+                "attachment:deferred_tools_delta:dropped": 2,
+                "attachment:agent_listing_delta:dropped": 1,
+                "attachment:skill_listing:dropped": 1,
+                "atis-latch:None:dropped": 3,
+                "attachment:session_context:dropped": 1,
+                "attachment:date:dropped": 1,
+                "attachment:remote_session_change:dropped": 1,
+                "attachment:prompt_snapshot:dropped": 2,
+                "api-request-shape:None:dropped": 1,
+                "api-request-blob:None:dropped": 4,
+                "api-request:None:dropped": 3,
+                "last-prompt:None:dropped": 3,
+                "assistant:None:trimmed": 3,
+                "attachment:deferred_tools_record:dropped": 1,
+                "cost-state:None:dropped": 1
+              }
+            }
+          },
+          "omitted_hits": [],
+          "hits_total": 0,
+          "stderr": {
+            "bytes": 192,
+            "lines": 1,
+            "nonce_occurrences": 0
+          }
+        }
+      },
+      "omitted_material_nonce_hits": 0
+    },
+    "H1a-bash": {
+      "label_as_run": "INCONCLUSIVE",
+      "label_r1r5_raw": "DELIVERED_TO_AGENT",
+      "label_r1r5_subset": "DELIVERED_TO_AGENT",
+      "raw_and_subset_agree": true,
+      "reasons_r1r5_raw": [],
+      "reasons_r1r5_subset": [],
+      "passes_path_r1r5_raw": true,
+      "nonce_categories_r1r5_raw": [
+        [
+          "attachment.content[0]",
+          "model_bound"
+        ],
+        [
+          "attachment.stdout",
+          "host_output"
+        ],
+        [
+          "message.content[0].text",
+          "echo"
+        ],
+        [
+          "message.content[0].text",
+          "host_record"
+        ],
+        [
+          "rendered[0].content",
+          "host_record"
+        ],
+        [
+          "result",
+          "echo"
+        ]
+      ],
+      "changes_from_as_run": {
+        "top_level_keys": [
+          "label",
+          "passes_path",
+          "reasons",
+          "rules"
+        ],
+        "nonce_location_categories": [
+          {
+            "source": "transcript",
+            "line": 21,
+            "json_path": "rendered[0].content",
+            "as_run": "unclassified",
+            "r1r5": "host_record"
+          },
+          {
+            "source": "transcript",
+            "line": 24,
+            "json_path": "message.content[0].text",
+            "as_run": "unclassified",
+            "r1r5": "host_record"
+          }
+        ],
+        "location_set_unchanged": true
+      },
+      "completeness": {
+        "H1a-bash": {
+          "nonces_scanned": 1,
+          "entries": {
+            "events": {
+              "whole": 2,
+              "trimmed": 6,
+              "dropped": 0,
+              "by_type": {
+                "system:init:trimmed": 1,
+                "assistant:None:trimmed": 3,
+                "user:None:trimmed": 1,
+                "system:thinking_tokens:whole": 2,
+                "result:success:trimmed": 1
+              }
+            },
+            "transcript": {
+              "whole": 0,
+              "trimmed": 8,
+              "dropped": 24,
+              "by_type": {
+                "queue-operation:None:dropped": 2,
+                "user:None:trimmed": 2,
+                "attachment:environment:dropped": 1,
+                "attachment:model:dropped": 1,
+                "attachment:deferred_tools_delta:dropped": 1,
+                "attachment:agent_listing_delta:dropped": 1,
+                "attachment:skill_listing:dropped": 1,
+                "atis-latch:None:dropped": 3,
+                "attachment:session_context:dropped": 1,
+                "attachment:date:dropped": 1,
+                "attachment:remote_session_change:dropped": 1,
+                "attachment:prompt_snapshot:dropped": 2,
+                "api-request-shape:None:dropped": 1,
+                "api-request-blob:None:dropped": 2,
+                "api-request:None:dropped": 2,
+                "last-prompt:None:dropped": 3,
+                "assistant:None:trimmed": 3,
+                "attachment:hook_success:trimmed": 1,
+                "attachment:hook_additional_context:trimmed": 1,
+                "api-request-blob:None:trimmed": 1,
+                "cost-state:None:dropped": 1
+              }
+            }
+          },
+          "omitted_hits": [],
+          "hits_total": 0,
+          "stderr": {
+            "bytes": 192,
+            "lines": 1,
+            "nonce_occurrences": 0
+          }
+        },
+        "H1a-bash-ctl": {
+          "nonces_scanned": 2,
+          "entries": {
+            "events": {
+              "whole": 0,
+              "trimmed": 5,
+              "dropped": 0,
+              "by_type": {
+                "system:init:trimmed": 1,
+                "assistant:None:trimmed": 2,
+                "user:None:trimmed": 1,
+                "result:success:trimmed": 1
+              }
+            },
+            "transcript": {
+              "whole": 0,
+              "trimmed": 4,
+              "dropped": 24,
+              "by_type": {
+                "queue-operation:None:dropped": 2,
+                "user:None:trimmed": 2,
+                "attachment:environment:dropped": 1,
+                "attachment:model:dropped": 1,
+                "attachment:deferred_tools_delta:dropped": 1,
+                "attachment:agent_listing_delta:dropped": 1,
+                "attachment:skill_listing:dropped": 1,
+                "atis-latch:None:dropped": 3,
+                "attachment:session_context:dropped": 1,
+                "attachment:date:dropped": 1,
+                "attachment:remote_session_change:dropped": 1,
+                "attachment:prompt_snapshot:dropped": 2,
+                "api-request-shape:None:dropped": 1,
+                "api-request-blob:None:dropped": 2,
+                "api-request:None:dropped": 2,
+                "last-prompt:None:dropped": 3,
+                "assistant:None:trimmed": 2,
+                "cost-state:None:dropped": 1
+              }
+            }
+          },
+          "omitted_hits": [],
+          "hits_total": 0,
+          "stderr": {
+            "bytes": 192,
+            "lines": 1,
+            "nonce_occurrences": 0
+          }
+        }
+      },
+      "omitted_material_nonce_hits": 0
+    },
+    "H1b-start": {
+      "label_as_run": "INCONCLUSIVE",
+      "label_r1r5_raw": "DELIVERED_TO_AGENT",
+      "label_r1r5_subset": "DELIVERED_TO_AGENT",
+      "raw_and_subset_agree": true,
+      "reasons_r1r5_raw": [],
+      "reasons_r1r5_subset": [],
+      "passes_path_r1r5_raw": true,
+      "nonce_categories_r1r5_raw": [
+        [
+          "attachment.content[0]",
+          "model_bound"
+        ],
+        [
+          "attachment.stdout",
+          "host_output"
+        ],
+        [
+          "message.content[0].text",
+          "echo"
+        ],
+        [
+          "message.content[0].text",
+          "host_record"
+        ],
+        [
+          "output",
+          "host_output"
+        ],
+        [
+          "rendered[0].content",
+          "host_record"
+        ],
+        [
+          "result",
+          "echo"
+        ],
+        [
+          "stdout",
+          "host_output"
+        ]
+      ],
+      "changes_from_as_run": {
+        "top_level_keys": [
+          "label",
+          "passes_path",
+          "reasons",
+          "rules"
+        ],
+        "nonce_location_categories": [
+          {
+            "source": "transcript",
+            "line": 3,
+            "json_path": "rendered[0].content",
+            "as_run": "unclassified",
+            "r1r5": "host_record"
+          },
+          {
+            "source": "transcript",
+            "line": 17,
+            "json_path": "message.content[0].text",
+            "as_run": "unclassified",
+            "r1r5": "host_record"
+          }
+        ],
+        "location_set_unchanged": true
+      },
+      "completeness": {
+        "H1b-start": {
+          "nonces_scanned": 1,
+          "entries": {
+            "events": {
+              "whole": 2,
+              "trimmed": 3,
+              "dropped": 0,
+              "by_type": {
+                "system:hook_started:whole": 1,
+                "system:hook_response:whole": 1,
+                "system:init:trimmed": 1,
+                "assistant:None:trimmed": 1,
+                "result:success:trimmed": 1
+              }
+            },
+            "transcript": {
+              "whole": 0,
+              "trimmed": 5,
+              "dropped": 21,
+              "by_type": {
+                "queue-operation:None:dropped": 2,
+                "attachment:hook_success:trimmed": 1,
+                "attachment:hook_additional_context:trimmed": 1,
+                "user:None:trimmed": 1,
+                "attachment:environment:dropped": 1,
+                "attachment:model:dropped": 1,
+                "attachment:deferred_tools_delta:dropped": 1,
+                "attachment:agent_listing_delta:dropped": 1,
+                "attachment:skill_listing:dropped": 1,
+                "atis-latch:None:dropped": 3,
+                "attachment:session_context:dropped": 1,
+                "attachment:date:dropped": 1,
+                "attachment:remote_session_change:dropped": 1,
+                "attachment:prompt_snapshot:dropped": 2,
+                "api-request-shape:None:dropped": 1,
+                "api-request-blob:None:dropped": 1,
+                "api-request-blob:None:trimmed": 1,
+                "api-request:None:dropped": 1,
+                "last-prompt:None:dropped": 2,
+                "assistant:None:trimmed": 1,
+                "cost-state:None:dropped": 1
+              }
+            }
+          },
+          "omitted_hits": [],
+          "hits_total": 0,
+          "stderr": {
+            "bytes": 192,
+            "lines": 1,
+            "nonce_occurrences": 0
+          }
+        },
+        "H1b-start-ctl": {
+          "nonces_scanned": 2,
+          "entries": {
+            "events": {
+              "whole": 2,
+              "trimmed": 3,
+              "dropped": 0,
+              "by_type": {
+                "system:hook_started:whole": 1,
+                "system:hook_response:whole": 1,
+                "system:init:trimmed": 1,
+                "assistant:None:trimmed": 1,
+                "result:success:trimmed": 1
+              }
+            },
+            "transcript": {
+              "whole": 0,
+              "trimmed": 2,
+              "dropped": 22,
+              "by_type": {
+                "queue-operation:None:dropped": 2,
+                "user:None:trimmed": 1,
+                "attachment:environment:dropped": 1,
+                "attachment:model:dropped": 1,
+                "attachment:deferred_tools_delta:dropped": 1,
+                "attachment:agent_listing_delta:dropped": 1,
+                "attachment:skill_listing:dropped": 1,
+                "atis-latch:None:dropped": 3,
+                "attachment:session_context:dropped": 1,
+                "attachment:date:dropped": 1,
+                "attachment:remote_session_change:dropped": 1,
+                "attachment:prompt_snapshot:dropped": 2,
+                "api-request-shape:None:dropped": 1,
+                "api-request-blob:None:dropped": 2,
+                "api-request:None:dropped": 1,
+                "last-prompt:None:dropped": 2,
+                "assistant:None:trimmed": 1,
+                "cost-state:None:dropped": 1
+              }
+            }
+          },
+          "omitted_hits": [],
+          "hits_total": 0,
+          "stderr": {
+            "bytes": 192,
+            "lines": 1,
+            "nonce_occurrences": 0
+          }
+        }
+      },
+      "omitted_material_nonce_hits": 0
+    }
+  },
+  "host_pin_problem": null,
+  "listed_path_result_r1r5_raw": "PASS",
+  "listed_path_note": "A2 covers H1a-edit, H1a-bash and H1b-start only. The listed-path result is not the H1 gate: H1 also needs H1c, which A2 did not probe.",
+  "h1_gate": "NOT MET (H1c is not in A2; H1c/A1 is pinned to 2.1.202; mixed-version combination undecided, A2-1)",
+  "subset_note": "Subset replay is a supporting check against the published subset only; it depends on the raw completeness check and is not an independent reproduction.",
+  "integrity_after": {
+    "problems": [],
+    "archive_sums_unchanged": true
+  }
+}
