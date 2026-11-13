@@ -1,0 +1,173 @@
+{
+  "corrects": "#553 live-2026-10-17 outcome.r1r3.json (workspace masking); accepted files unchanged",
+  "rules": "as-run table + R1-R3 (#551)",
+  "pinned_classifier_sha256": "bd883ca3795099f042bc783f8d0fe2c3460af659b953fb1cdfe0c17c77fd6082",
+  "tool_sha256": {
+    "correct_h1_masking.py": "20f8ba6b2f49a1305ef8e93d681e38f1acb8c7d508546d1016dc1d247e242983",
+    "reclassify_h1.py (helpers)": "1dbbfdd4209d14afcaa8351e2fe82ebd4461dc62d89dc9d3e676563ddef0f89b",
+    "reclassify_a2.py (publish)": "79dca960293e599dacac2c7a06961a700dcf250795450d0475e63d2803a55a0f",
+    "collect_h1.py (redaction)": "64445c3c073e3e0d1c14ce6a651b4b5e9dd66c51110769d26c1305829570b25c"
+  },
+  "integrity": {
+    "archive_files_listed": 97,
+    "archive_sums_sha256": "f50f122154e19f557a0972292be0c4069774e70b4687a159ab4698e223189a87",
+    "manifest_raw_files_checked": 24,
+    "problems": []
+  },
+  "paths": {
+    "H1a-edit": {
+      "reproduces_accepted_byte_identical": true,
+      "corrected_differs": true,
+      "differing_fields": [
+        "permissions.comparison.equivalent_requests",
+        "permissions.comparison.non_equivalent_attempts.control",
+        "permissions.comparison.non_equivalent_attempts.emitter"
+      ],
+      "label_accepted": "DELIVERED_TO_AGENT",
+      "label_corrected": "DELIVERED_TO_AGENT",
+      "passes_path_accepted": true,
+      "passes_path_corrected": true,
+      "permissions": {
+        "as_run": {
+          "equivalent_requests": 2,
+          "mismatched_decisions": 0,
+          "non_equivalent_attempts": {
+            "control": 0,
+            "emitter": 0
+          }
+        },
+        "accepted_r1r3": {
+          "equivalent_requests": 0,
+          "mismatched_decisions": 0,
+          "non_equivalent_attempts": {
+            "control": 2,
+            "emitter": 2
+          }
+        },
+        "corrected_r1r3": {
+          "equivalent_requests": 2,
+          "mismatched_decisions": 0,
+          "non_equivalent_attempts": {
+            "control": 0,
+            "emitter": 0
+          }
+        }
+      },
+      "corrected_permissions_equal_as_run": true
+    },
+    "H1a-bash": {
+      "reproduces_accepted_byte_identical": true,
+      "corrected_differs": false,
+      "differing_fields": [],
+      "label_accepted": "DELIVERED_TO_AGENT",
+      "label_corrected": "DELIVERED_TO_AGENT",
+      "passes_path_accepted": true,
+      "passes_path_corrected": true,
+      "permissions": {
+        "as_run": {
+          "equivalent_requests": 1,
+          "mismatched_decisions": 0,
+          "non_equivalent_attempts": {
+            "control": 0,
+            "emitter": 0
+          }
+        },
+        "accepted_r1r3": {
+          "equivalent_requests": 1,
+          "mismatched_decisions": 0,
+          "non_equivalent_attempts": {
+            "control": 0,
+            "emitter": 0
+          }
+        },
+        "corrected_r1r3": {
+          "equivalent_requests": 1,
+          "mismatched_decisions": 0,
+          "non_equivalent_attempts": {
+            "control": 0,
+            "emitter": 0
+          }
+        }
+      },
+      "corrected_permissions_equal_as_run": true
+    },
+    "H1b-start": {
+      "reproduces_accepted_byte_identical": true,
+      "corrected_differs": false,
+      "differing_fields": [],
+      "label_accepted": "DELIVERED_TO_AGENT",
+      "label_corrected": "DELIVERED_TO_AGENT",
+      "passes_path_accepted": true,
+      "passes_path_corrected": true,
+      "permissions": {
+        "as_run": {
+          "equivalent_requests": 0,
+          "mismatched_decisions": 0,
+          "non_equivalent_attempts": {
+            "control": 0,
+            "emitter": 0
+          }
+        },
+        "accepted_r1r3": {
+          "equivalent_requests": 0,
+          "mismatched_decisions": 0,
+          "non_equivalent_attempts": {
+            "control": 0,
+            "emitter": 0
+          }
+        },
+        "corrected_r1r3": {
+          "equivalent_requests": 0,
+          "mismatched_decisions": 0,
+          "non_equivalent_attempts": {
+            "control": 0,
+            "emitter": 0
+          }
+        }
+      },
+      "corrected_permissions_equal_as_run": true
+    },
+    "H1c-stop": {
+      "reproduces_accepted_byte_identical": true,
+      "corrected_differs": false,
+      "differing_fields": [],
+      "label_accepted": "DELIVERED_WITH_SIDE_EFFECT",
+      "label_corrected": "DELIVERED_WITH_SIDE_EFFECT",
+      "passes_path_accepted": false,
+      "passes_path_corrected": false,
+      "permissions": {
+        "as_run": {
+          "equivalent_requests": 0,
+          "mismatched_decisions": 0,
+          "non_equivalent_attempts": {
+            "control": 0,
+            "emitter": 0
+          }
+        },
+        "accepted_r1r3": {
+          "equivalent_requests": 0,
+          "mismatched_decisions": 0,
+          "non_equivalent_attempts": {
+            "control": 0,
+            "emitter": 0
+          }
+        },
+        "corrected_r1r3": {
+          "equivalent_requests": 0,
+          "mismatched_decisions": 0,
+          "non_equivalent_attempts": {
+            "control": 0,
+            "emitter": 0
+          }
+        }
+      },
+      "corrected_permissions_equal_as_run": true
+    }
+  },
+  "labels_unchanged": true,
+  "h1_gate_r1r3_corrected": "NOT MET",
+  "integrity_after": {
+    "problems": [],
+    "archive_sums_unchanged": true
+  }
+}
