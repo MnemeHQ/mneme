@@ -3,7 +3,7 @@
   "rules": "as-run table + R1-R3 (#551)",
   "pinned_classifier_sha256": "bd883ca3795099f042bc783f8d0fe2c3460af659b953fb1cdfe0c17c77fd6082",
   "tool_sha256": {
-    "correct_h1_masking.py": "20f8ba6b2f49a1305ef8e93d681e38f1acb8c7d508546d1016dc1d247e242983",
+    "correct_h1_masking.py": "f4cb02b78fb9283e07936588d83dc74dcac183e17279da7739d1e9597a88d20c",
     "reclassify_h1.py (helpers)": "1dbbfdd4209d14afcaa8351e2fe82ebd4461dc62d89dc9d3e676563ddef0f89b",
     "reclassify_a2.py (publish)": "79dca960293e599dacac2c7a06961a700dcf250795450d0475e63d2803a55a0f",
     "collect_h1.py (redaction)": "64445c3c073e3e0d1c14ce6a651b4b5e9dd66c51110769d26c1305829570b25c"
@@ -163,6 +163,16 @@
       },
       "corrected_permissions_equal_as_run": true
     }
+  },
+  "scope_check": {
+    "allowed_changes": {
+      "H1a-edit": [
+        "permissions.comparison.equivalent_requests",
+        "permissions.comparison.non_equivalent_attempts.control",
+        "permissions.comparison.non_equivalent_attempts.emitter"
+      ]
+    },
+    "problems": []
   },
   "labels_unchanged": true,
   "h1_gate_r1r3_corrected": "NOT MET",

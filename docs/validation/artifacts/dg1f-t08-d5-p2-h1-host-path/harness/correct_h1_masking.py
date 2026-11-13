@@ -24,6 +24,12 @@ evidence:
 2. Correction: arms read from the archive but keyed to the live-root location the
    run recorded (C:\\dev\\d5p2-h1-live). Only the keying differs from step 1.
 
+Scope guard (independent review of #801). Before anything is published, the
+correction must stay within the masking repair: only H1a-edit may change, and only
+in the three permissions.comparison fields (ALLOWED_CHANGES); no label or
+passes_path may change; and a changed path's corrected permissions must equal its
+as-run permissions. Any violation aborts with nothing published.
+
 Integrity follows #553 (reclassify_h1.verify: archive sums, unlisted files, the
 manifest's raw files), and the helper hash must equal the recorded
 `reclassify_tool_sha256`. Publication is fail-closed (reclassify_a2.publish): outputs
@@ -94,6 +100,33 @@ def diff_paths(a, b, prefix=""):
     return [] if a == b else [prefix]
 
 
+# The only change this correction may make (independent review of #801).
+ALLOWED_CHANGES = {"H1a-edit": {"permissions.comparison.equivalent_requests",
+                                "permissions.comparison.non_equivalent_attempts.control",
+                                "permissions.comparison.non_equivalent_attempts.emitter"}}
+
+
+def scope_problems(paths):
+    """Fail-closed scope check: every reason the correction exceeds the masking repair.
+
+    - a path outside ALLOWED_CHANGES must not change at all;
+    - H1a-edit may change only the three permissions.comparison fields;
+    - no label or passes_path may change;
+    - a changed path's corrected permissions must equal its as-run permissions."""
+    problems = []
+    for p, v in paths.items():
+        extra = sorted(set(v["differing_fields"]) - ALLOWED_CHANGES.get(p, set()))
+        if extra:
+            problems.append(f"{p}: unexpected changed fields {extra}")
+        if v["label_corrected"] != v["label_accepted"]:
+            problems.append(f"{p}: label changed {v['label_accepted']} -> {v['label_corrected']}")
+        if v["passes_path_corrected"] != v["passes_path_accepted"]:
+            problems.append(f"{p}: passes_path changed")
+        if v["corrected_differs"] and not v["corrected_permissions_equal_as_run"]:
+            problems.append(f"{p}: corrected permissions do not equal the as-run permissions")
+    return problems
+
+
 def perm_summary(o):
     c = (o.get("permissions") or {}).get("comparison") or {}
     nea = c.get("non_equivalent_attempts") or {}
@@ -153,6 +186,12 @@ def main(argv):
         }
         if changed:
             files[pub / p / "outcome.r1r3.corrected.json"] = corr
+    scope = scope_problems(summary["paths"])
+    if scope:
+        print(json.dumps(scope, indent=2))
+        raise SystemExit("correction exceeds the masking repair; nothing published")
+    summary["scope_check"] = {"allowed_changes": {p: sorted(f) for p, f in ALLOWED_CHANGES.items()},
+                              "problems": scope}
     labels_same = all(v["label_accepted"] == v["label_corrected"] for v in summary["paths"].values())
     summary["labels_unchanged"] = labels_same
     summary["h1_gate_r1r3_corrected"] = ("PASS" if all(v["passes_path_corrected"] for v in summary["paths"].values())

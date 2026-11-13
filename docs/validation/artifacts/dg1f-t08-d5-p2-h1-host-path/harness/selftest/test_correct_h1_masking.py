@@ -56,14 +56,24 @@ def test_diff_paths_and_perm_summary():
                                  "non_equivalent_attempts": {"control": 0, "emitter": 0}}
 
 
-def _outcome(eq):
-    return {"label": "DELIVERED_TO_AGENT", "passes_path": True,
-            "permissions": {"comparison": {"equivalent_requests": [["Read", "<WS>"]] * eq,
-                                           "mismatched_decisions": [],
-                                           "non_equivalent_attempts": {"emitter": [], "control": []}}}}
+def _outcome(eq, nea=0, **extra):
+    o = {"label": "DELIVERED_TO_AGENT", "passes_path": True, "reasons": [],
+         "permissions": {"comparison": {"equivalent_requests": [["Read", "<WS>"]] * eq,
+                                        "mismatched_decisions": [],
+                                        "non_equivalent_attempts": {"emitter": [{"r": 1}] * nea,
+                                                                    "control": [{"r": 1}] * nea}}}}
+    o.update(extra)
+    return o
 
 
-def _fixture(tmp_path, monkeypatch, repro_ok=True, helper_ok=True, fail_on_verify_call=None):
+ACCEPTED_EDIT = _outcome(0, nea=2)   # as #553 published it
+CORRECTED_EDIT = _outcome(2)         # equals the as-run permissions
+
+
+def _fixture(tmp_path, monkeypatch, repro_ok=True, helper_ok=True, fail_on_verify_call=None,
+             corrected=None, as_run_edit=None):
+    """`corrected` overrides the corrected outcome per path; `as_run_edit` the H1a-edit as-run outcome."""
+    corrected = dict({"H1a-edit": CORRECTED_EDIT}, **(corrected or {}))
     pub = tmp_path / "pub"
     pub.mkdir()
     pinned = tmp_path / "pinned.py"
@@ -73,11 +83,12 @@ def _fixture(tmp_path, monkeypatch, repro_ok=True, helper_ok=True, fail_on_verif
         "reclassify_tool_sha256": helper if helper_ok else "f" * 64,
         "classifier_sha256": "pinned-hash"}), encoding="utf-8")
     (pub / "MANIFEST.json").write_text("{}", encoding="utf-8")
-    accepted = {p: _outcome(0) for p in M.R.PATHS}
+    accepted = {p: (ACCEPTED_EDIT if p == "H1a-edit" else _outcome(0)) for p in M.R.PATHS}
     for p in M.R.PATHS:
         (pub / p).mkdir()
         (pub / p / "outcome.r1r3.json").write_text(json.dumps(accepted[p], indent=2) + "\n", encoding="utf-8")
-        (pub / p / "outcome.json").write_text(json.dumps(_outcome(2 if p == "H1a-edit" else 0)), encoding="utf-8")
+        as_run = (as_run_edit or CORRECTED_EDIT) if p == "H1a-edit" else _outcome(0)
+        (pub / p / "outcome.json").write_text(json.dumps(as_run), encoding="utf-8")
     calls = []
 
     def verify(*_a):
@@ -88,8 +99,8 @@ def _fixture(tmp_path, monkeypatch, repro_ok=True, helper_ok=True, fail_on_verif
     def outcome_text(Cp, archive, p, root, red, red_live):
         if root is None:  # reproduction of #553
             o = accepted[p] if repro_ok else dict(accepted[p], label="OTHER")
-        else:             # corrected keying: only H1a-edit changes
-            o = _outcome(2) if p == "H1a-edit" else accepted[p]
+        else:             # corrected keying
+            o = corrected.get(p, accepted[p])
         return json.dumps(o, indent=2) + "\n"
 
     monkeypatch.setattr(M.R, "verify", verify)
@@ -109,13 +120,40 @@ def test_main_publishes_correction_only_for_changed_path(tmp_path, monkeypatch):
     assert _new_files(pub) == ["H1a-edit/outcome.r1r3.corrected.json", "masking-correction.json"]
     s = json.loads((pub / "masking-correction.json").read_text(encoding="utf-8"))
     e = s["paths"]["H1a-edit"]
-    assert e["corrected_differs"] and e["differing_fields"] == ["permissions.comparison.equivalent_requests"]
+    assert e["corrected_differs"] and set(e["differing_fields"]) == M.ALLOWED_CHANGES["H1a-edit"]
     assert e["permissions"]["accepted_r1r3"]["equivalent_requests"] == 0
     assert e["permissions"]["corrected_r1r3"]["equivalent_requests"] == 2
     assert e["corrected_permissions_equal_as_run"] and s["labels_unchanged"]
+    assert s["scope_check"]["problems"] == []
     assert not s["paths"]["H1a-bash"]["corrected_differs"]
     # The accepted files are never modified.
-    assert json.loads((pub / "H1a-edit" / "outcome.r1r3.json").read_text(encoding="utf-8")) == _outcome(0)
+    assert json.loads((pub / "H1a-edit" / "outcome.r1r3.json").read_text(encoding="utf-8")) == ACCEPTED_EDIT
+
+
+@pytest.mark.parametrize("case", [
+    {"corrected": {"H1a-edit": dict(CORRECTED_EDIT, label="NOT_DELIVERED")}},           # label change
+    {"corrected": {"H1a-edit": dict(CORRECTED_EDIT, passes_path=False)}},               # passing flag change
+    {"corrected": {"H1a-edit": dict(CORRECTED_EDIT, reasons=["something new"])}},       # field outside scope
+    {"corrected": {"H1a-bash": _outcome(1)}},                                            # another path changes
+    {"corrected": {"H1c-stop": _outcome(0, label="DELIVERED_WITH_SIDE_EFFECT")}},       # label change elsewhere
+    {"as_run_edit": _outcome(1)},                                                        # corrected != as-run
+], ids=["label", "passes_path", "extra-field", "other-path", "other-label", "not-as-run"])
+def test_main_publishes_nothing_when_correction_exceeds_scope(tmp_path, monkeypatch, case):
+    pub, run = _fixture(tmp_path, monkeypatch, **case)
+    with pytest.raises(SystemExit, match="exceeds the masking repair"):
+        run()
+    assert _new_files(pub) == []
+
+
+def test_scope_problems_lists_every_violation():
+    v = {"differing_fields": ["label", "permissions.comparison.equivalent_requests"], "label_accepted": "A",
+         "label_corrected": "B", "passes_path_accepted": True, "passes_path_corrected": False,
+         "corrected_differs": True, "corrected_permissions_equal_as_run": False}
+    probs = M.scope_problems({"H1a-bash": v})
+    assert len(probs) == 4 and "unexpected changed fields" in probs[0]
+    ok = dict(v, differing_fields=sorted(M.ALLOWED_CHANGES["H1a-edit"]), label_corrected="A",
+              passes_path_corrected=True, corrected_permissions_equal_as_run=True)
+    assert M.scope_problems({"H1a-edit": ok}) == []
 
 
 def test_main_refuses_when_reproduction_differs(tmp_path, monkeypatch):
