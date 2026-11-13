@@ -6,6 +6,11 @@
 
 That merge's squash title still says "propose", and this line said PROPOSED until this docs-only acceptance record. The **accepted scope** is the R5 definition in §3: category `host_record`, tool-attributed anchors A1–A6, exact derivation, and R5a and R5b. R1–R4 are unchanged.
 
+**Erratum (2026-11-13; label wording only, confirmed in the #798 implementation review).** The R5 rule and its categories are unchanged. Three statements about labels in §3 and §7 are corrected in place:
+- **"Emitter not invoked" is a precondition.** When the hook log does not show the emitter's invocation for the path's event and tool, the existing classifier gives `NOT_EXECUTED`, not `INCONCLUSIVE`. This includes a wrong-tool `tool_name` in the hook log, and an emitter that emitted nothing.
+- **The other wrong-tool cases are `INCONCLUSIVE`**, through unclassified-first, as stated. Either way, R5's locations stay `unclassified` and no case yields a passing label. Classifier semantics are not changed.
+- **`rendered` on a `hook_success` entry** is not covered by R5. It is categorised `host_output` by R2, which applies to every location of a `hook_success` entry. It is never `host_record`.
+
 Docs only. It does **not** reclassify anything. Acceptance authorizes none of the following:
 - a classifier code change;
 - a reclassification run;
@@ -79,7 +84,7 @@ For a lifecycle path (no tool in the spec), conditions 5 and 6 do not apply, and
 3. `rendered` and `attachment.content` have the same length;
 4. for **every** `i`, `rendered[i].content` equals exactly `<system-reminder>\n{L} hook additional context: {attachment.content[i]}\n</system-reminder>`.
 
-Otherwise it stays `unclassified`. `rendered` on any other entry type is not covered, including a non-anchor `hook_additional_context`, `hook_system_message`, `hook_success` and non-hook attachments.
+Otherwise it stays `unclassified`. `rendered` on any other entry type is not covered by R5, including a non-anchor `hook_additional_context`, `hook_system_message`, `hook_success` and non-hook attachments. Every location of a `hook_success` entry, `rendered` included, remains `host_output` under R2 (erratum).
 
 **R5b: `api-request-blob` text.** A nonce occurrence at `message.content[j].text` of a transcript entry with `type: "api-request-blob"` is `host_record` only if **all** of these hold:
 1. `message.role` is `"system"`;
@@ -88,7 +93,7 @@ Otherwise it stays `unclassified`. `rendered` on any other entry type is not cov
 
 Otherwise it stays `unclassified`, including any partial match, extra text, other role, another event or tool label (such as `PreToolUse:Bash` in the Edit arm), or a nonce line that matches no anchor's content.
 
-**R1 itself is unchanged.** R1 still classifies an R1-qualifying entry from the wrong tool as `model_bound`. At label level, the classifier already counts emitter invocations only for the expected tool (`classify()`, `tool_name` filter), so a wrong-tool invocation gives "emitter not invoked" and `INCONCLUSIVE`. Whether R1 should also gain the tool conditions is a separate rule question (§9), not decided here.
+**R1 itself is unchanged.** R1 still classifies an R1-qualifying entry from the wrong tool as `model_bound`. At label level, the classifier already counts emitter invocations only for the expected tool (`classify()`, `tool_name` filter), so a wrong-tool invocation gives "emitter not invoked". That is a precondition, and its label is `NOT_EXECUTED` (erratum; this note previously said `INCONCLUSIVE`). Whether R1 should also gain the tool conditions is a separate rule question (§9), not decided here.
 
 **What R5 does not do:**
 - **No delivery claim:** it makes no claim that the host fed either record to the model, and it adds no delivery evidence. Delivery still comes only from a `model_bound` location (R1 or the earlier table).
@@ -142,7 +147,7 @@ None directly. Even a projected A2 PASS would show only that the two §4 candida
    **Regression tests:**
    - R5a: positive → `host_record`; `renderedRole` other than `system` → unclassified; rendered text with any extra or missing character, or a length mismatch with `content` → unclassified; `rendered` on an entry with the wrong `hookEvent`, or where the emitter was not invoked → unclassified; `rendered` on `hook_system_message`, `hook_success` or a non-hook attachment → unclassified.
    - R5b: positive → `host_record`; role `user` or other → unclassified; a nonce line with the wrong event or tool label, a prefix or suffix, or content matching no anchor → unclassified; a second, non-matching nonce line in the same text → unclassified; no anchor in the arm → unclassified (`INCONCLUSIVE`); emitter not invoked → unclassified.
-   - **Wrong tool under the right event** (review of #796). In each case the entry still meets R1, so this shows that R1 alone is not used. Each case stays `unclassified` for both R5a and R5b, with the label `INCONCLUSIVE`:
+   - **Wrong tool under the right event** (review of #796). In each case the entry still meets R1, so this shows that R1 alone is not used. Each case stays `unclassified` for both R5a and R5b. The label is `INCONCLUSIVE`, except where the existing "emitter not invoked" precondition applies (the hook-log `tool_name` case), which is `NOT_EXECUTED` (erratum). No case yields a passing label:
      - on the H1a-edit path, an R1-qualifying entry with `hookName` `PreToolUse:Bash`;
      - on the H1a-edit path, a `toolUseID` that matches the `Read` call's `tool_use`;
      - a `toolUseID` that matches no `tool_use`;
