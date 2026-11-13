@@ -371,8 +371,8 @@ def test_r4_hook_system_message_for_probed_event_is_host_output(tmp_path):
     assert {l["category"] for l in r["nonce_locations"]} == {"host_output"}  # R2 + R4
     assert r["label"] == "NOT_DELIVERED", r
     assert r["a1"]["host_interference"] == []
-    assert r["rules"] == A1.C.RULES_ID == "as-run table + R1-R4 (#551, #561)"
-    assert r["a1"]["rules"] == "A1 (#555) on as-run table + R1-R4 (#551, #561)"
+    assert r["rules"] == A1.C.RULES_ID == "as-run table + R1-R5 (#551, #561, #796)"
+    assert r["a1"]["rules"] == "A1 (#555) on as-run table + R1-R5 (#551, #561, #796)"
 
 
 def test_r4_wrong_hook_event_stays_unclassified(tmp_path):

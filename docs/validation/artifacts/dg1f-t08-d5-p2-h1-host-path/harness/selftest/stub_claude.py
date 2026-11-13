@@ -19,6 +19,9 @@ about Claude Code. Learning the real behavior is what the live probes are for.
                    hook_attachment  transcript `hook_success` (raw stdout) + `hook_additional_context`
                                 (content = [ctx]), the shape Claude Code 2.1.202 recorded in #549
                    hook_success_only  only the `hook_success` attachment (raw stdout)
+                   hook_r5      the Claude Code 2.1.310 shape recorded in #795: `hook_success`
+                                (hookName) + `hook_additional_context` with hookName, toolUseID,
+                                rendered/renderedRole, + an `api-request-blob` (role system)
   H1_STUB_ECHO=1              the "model" repeats any delivered MNEME-PROBE- token
   H1_STUB_ECHO_FORCE=1        the "model" repeats the token even if nothing was delivered
   H1_STUB_BLOCK=1             a PreToolUse hook that printed anything stops the tool
@@ -128,7 +131,7 @@ class Host:
                     ctxs.append(ctx)
         return ctxs
 
-    def deliver(self, ctx, event):
+    def deliver(self, ctx, event, tool_name=None, tool_id=None):
         if env("H1_STUB_DUAL") == "1":
             self.transcript.append({"type": "attachment", "attachment": {"type": "hook_context", "content": ctx}})
         mode = self.mode
@@ -150,6 +153,23 @@ class Host:
                     "type": "hook_additional_context", "hookEvent": env("H1_STUB_HAC_EVENT") or event,
                     "content": [ctx]}})
                 self.delivered.append(ctx)
+        elif mode == "hook_r5":
+            label = f"{event}:{tool_name}" if tool_name else event
+            raw = json.dumps({"hookSpecificOutput": {"hookEventName": event, "additionalContext": ctx}})
+            self.transcript.append({"type": "attachment", "attachment": {
+                "type": "hook_success", "hookEvent": event,
+                "hookName": label if tool_name else f"{event}:startup",
+                "toolUseID": tool_id or event, "stdout": raw, "exitCode": 0, "content": ""}})
+            self.transcript.append({
+                "type": "attachment",
+                "attachment": {"type": "hook_additional_context", "hookEvent": event,
+                               "hookName": label, "toolUseID": tool_id or event, "content": [ctx]},
+                "rendered": [{"content": f"<system-reminder>\n{label} hook additional context: {ctx}\n</system-reminder>"}],
+                "renderedRole": "system"})
+            self.transcript.append({"type": "api-request-blob", "hash": "stub", "message": {
+                "role": "system", "content": [{"type": "text",
+                                                 "text": f"{label} hook additional context: {ctx}"}]}})
+            self.delivered.append(ctx)
         elif mode == "host_event":
             self.emit({"type": "system", "subtype": "hook_response", "hook_event_name": event, "output": ctx},
                       to_transcript=False)
@@ -162,7 +182,7 @@ class Host:
             self.emit({"type": "assistant", "message": {"role": "assistant", "content": [
                 {"type": "tool_use", "id": tid, "name": name, "input": inp}]}})
             for c in self.run_hooks("PreToolUse", {"tool_name": name, "tool_input": inp}):
-                self.deliver(c, "PreToolUse")
+                self.deliver(c, "PreToolUse", name, tid)
             self.emit({"type": "user", "message": {"role": "user", "content": [
                 {"type": "tool_result", "tool_use_id": tid, "content": "permission denied", "is_error": True}]}})
             self.denials.append({"tool_name": name, "tool_use_id": tid, "tool_input": inp})
@@ -184,7 +204,7 @@ class Host:
              "is_error": blocked or failed}]}})
         if self.mode != "tool_result":
             for c in ctxs:
-                self.deliver(c, "PreToolUse")
+                self.deliver(c, "PreToolUse", name, tid)
         self.turns += 1
 
     def run(self):
