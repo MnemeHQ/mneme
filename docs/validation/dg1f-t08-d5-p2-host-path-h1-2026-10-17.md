@@ -163,3 +163,62 @@ The reclassification was re-run from the same verified archive:
 - the as-run outcomes are unchanged.
 
 `reclassification.json` now carries the per-entry counts and the revised tool hash.
+
+### 7.6 Correction: workspace masking in the H1a-edit R1–R3 outcome (2026-11-13)
+
+> **PROPOSED, for independent review. Append-only.** §7.1–§7.5 and every accepted file stay as they were, including `live-2026-10-17/H1a-edit/outcome.r1r3.json` and `reclassification.json`. No host session ran, nothing was re-run on a host, and no label changes.
+
+**The finding.** It was found during the A2 reclassification (#800, that record's §8.4) and confirmed on its independent review. `reclassify_h1.py` loaded each arm from the **archive** path. The classifier masks an arm's workspace by that arm's own location (`masked()` uses `arm["out"].parent / "ws"`), but the recorded tool inputs name the **live-root** workspace, `C:\dev\d5p2-h1-live\<arm>\ws`.
+
+On H1a-edit, the identical Read and Edit requests of the two arms therefore did not mask to `<WS>`. The accepted outcome lists **0 equivalent requests** and 2 non-equivalent attempts per arm, where the as-run `outcome.json` lists 2 equivalent requests. Every recorded decision was `executed`, so the label could not depend on this. But with no matched requests, the check that the two arms got equal permission decisions was vacuous on that path.
+
+**Procedure.** The new tool, [`harness/correct_h1_masking.py`](artifacts/dg1f-t08-d5-p2-h1-host-path/harness/correct_h1_masking.py) (SHA-256 `f4cb02b7…9a88d20c`), runs the **pinned #553 classifier** twice per path on the archived raw evidence:
+- **Classifier:** `classify_h1.py` from `5300799e`, SHA-256 `bd883ca3…7fd6082`, as recorded in `reclassification.json`. The tool refuses any other hash. It can be extracted with `git show 5300799e:docs/validation/artifacts/dg1f-t08-d5-p2-h1-host-path/harness/classify_h1.py`.
+- **Helpers and redaction:** the #553 helpers (`reclassify_h1.py` `1dbbfdd4…def0f89b`, which the tool also checks against the recorded hash) and the #553 redaction.
+
+1. **Integrity.** The archive `C:\dev\d5p2-h1-archive\2026-10-17` verified against `2026-10-17.SHA256SUMS` (`f50f1221…89a87`): 97 files, no unlisted file, and all 24 manifest raw files matching. It verified again after classification, again immediately before publication, and again after the run.
+2. **Reproduction.** Arms are keyed to the archive path, exactly as #553 did. **All four paths reproduce the accepted `outcome.r1r3.json` byte for byte.** A difference would have aborted the run with nothing published, because the change could then not be attributed to the keying alone.
+3. **Correction.** Arms are read from the archive but keyed to the live-root location the run recorded. That keying is the only difference from step 2.
+
+**Scope guard.** This was added after the independent review of the first version of this PR. Before anything is published, the correction must stay within the masking repair:
+- only H1a-edit may change, and only in the three `permissions.comparison` fields (`equivalent_requests` and the emitter and control `non_equivalent_attempts`);
+- no other path may change;
+- no label or `passes_path` may change;
+- a changed path's corrected permissions must equal its as-run permissions.
+
+Any violation aborts the run with nothing published. The run passed this check (`scope_check` in `masking-correction.json`). The corrected outcome is byte-identical to the one from the first version, before the guard was added.
+
+**Publication** is fail-closed, using the #800 `publish` (`reclassify_a2.py` `79dca960…03a55a0f`):
+- outputs are redacted and leak-scanned in staging;
+- a failed check publishes nothing;
+- the final per-file copy is not an atomic transaction.
+
+**Results.** These are recorded in [`live-2026-10-17/masking-correction.json`](artifacts/dg1f-t08-d5-p2-h1-host-path/live-2026-10-17/masking-correction.json).
+
+| Path | Reproduces accepted | Corrected differs | Permission comparison: accepted → corrected | Label (unchanged) |
+|---|---|---|---|---|
+| H1a-edit | yes | **yes** | 0 equivalent, 2 + 2 non-equivalent → **2 equivalent, 0 non-equivalent, 0 mismatched** | DELIVERED_TO_AGENT |
+| H1a-bash | yes | no | 1 equivalent, 0 mismatched | DELIVERED_TO_AGENT |
+| H1b-start | yes | no | none | DELIVERED_TO_AGENT |
+| H1c-stop | yes | no | none | DELIVERED_WITH_SIDE_EFFECT |
+
+- **H1a-edit:** only `permissions.comparison` changes, in three fields: `equivalent_requests` and the emitter and control `non_equivalent_attempts`. The corrected permissions block equals the as-run one. The label, `passes_path`, reasons and every other field are identical.
+- **The other three paths are unaffected**, so no corrected file is published for them.
+- **The H1 gate under R1–R3 is still NOT MET**, because of H1c (§7.3).
+- **The corrected H1a-edit outcome** is published beside the accepted file as [`live-2026-10-17/H1a-edit/outcome.r1r3.corrected.json`](artifacts/dg1f-t08-d5-p2-h1-host-path/live-2026-10-17/H1a-edit/outcome.r1r3.corrected.json). Where the two differ, the corrected file is the one to cite for H1a-edit's permission comparison.
+
+**Tests.** The new [`selftest/test_correct_h1_masking.py`](artifacts/dg1f-t08-d5-p2-h1-host-path/harness/selftest/test_correct_h1_masking.py) started with 10 synthetic tests. They cover:
+- refusing a classifier with the wrong hash;
+- recorded-location masking;
+- the field diff;
+- refusing to publish when the reproduction differs or the helpers differ from #553;
+- publishing a correction only for paths that changed, and never modifying an accepted file;
+- an integrity failure before classification, after it, or immediately before the copy publishing nothing;
+- refusing to overwrite.
+
+Seven further negative tests cover the scope guard: a label change, a `passes_path` change, a field outside the allowed three, a change on another path, a label change on another path, and corrected permissions that differ from the as-run ones, plus a check that every violation is listed. That brings the file to 17 tests. Twelve mutants of the tool were each caught, five of them disabling a part of the scope guard. The tool was restored and hash-verified afterwards. The full harness suite passes 234.
+
+**Not affected.**
+- **The A1 output (#563)** cannot be affected. `outcome_a1_headless.r1r4.json` and the as-run outcome both record no permission requests in either arm: 0 equivalent requests and 0 non-equivalent attempts.
+- **The #800 outputs** were keyed to the recorded location from the start (`load_recorded`). Their permission comparisons equal the as-run ones on all three paths.
+- **Not established here:** anything beyond this masking correction. The raw-archive checks are operator-attested, as in §7.1.
