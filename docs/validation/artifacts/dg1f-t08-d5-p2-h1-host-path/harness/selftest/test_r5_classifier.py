@@ -144,6 +144,28 @@ def test_r5a_rendered_not_exact(tmp_path, edit):
     _r5a_negative(tmp_path, m)
 
 
+@pytest.mark.parametrize("where", ["metadata", "renderedRole"])
+def test_r5a_only_rendered_content_path_is_covered(tmp_path, where):
+    # Review of #798: on an otherwise valid anchor, a nonce at any path other than
+    # rendered[i].content (here rendered[0].metadata, or renderedRole) is not R5a.
+    # It stays unclassified and blocks a passing label (unclassified-first).
+    def m(tr, hl, n):
+        e = _hac(tr)
+        if where == "metadata":
+            e["rendered"][0]["metadata"] = n
+        else:
+            e["renderedRole"] = f"system {n}"
+    r = _run(tmp_path, "H1a-edit", m)
+    by_path = {l["json_path"]: l["category"] for l in r["nonce_locations"]
+               if l["json_path"].startswith("rendered")}
+    if where == "metadata":
+        assert by_path == {"rendered[0].content": "host_record", "rendered[0].metadata": "unclassified"}, by_path
+    else:
+        # renderedRole is no longer "system", so the content copy fails R5a too.
+        assert by_path == {"rendered[0].content": "unclassified", "renderedRole": "unclassified"}, by_path
+    assert r["label"] == "INCONCLUSIVE", r
+
+
 def test_r5a_rendered_length_mismatch(tmp_path):
     _r5a_negative(tmp_path, lambda tr, hl, n: _hac(tr)["rendered"].append({"content": "extra"}))
 

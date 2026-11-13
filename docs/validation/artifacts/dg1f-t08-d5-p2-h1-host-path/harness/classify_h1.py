@@ -272,6 +272,9 @@ def walk(obj, path=""):
 
 R5_CONTEXT = " hook additional context: "
 _R5_BLOB_TEXT = re.compile(r"message\.content\[(\d+)\]\.text")
+# R5a covers ONLY a nonce at rendered[i].content; any other path under `rendered`
+# (for example rendered[0].metadata) stays unclassified (review of #798).
+_R5_RENDERED_CONTENT = re.compile(r"rendered\[\d+\]\.content")
 
 
 def expected_label(event, tool):
@@ -387,8 +390,9 @@ def categorise(source, entry, path, probed_event=None, invoked_events=(), line_n
     if source == "transcript" and t == "attachment":
         att = entry.get("attachment") or {}
         kind = att.get("type")
-        if kind == "hook_additional_context" and path.startswith("rendered["):  # R5a
-            return "host_record" if _r5a_rendered(entry, line_no, r5) else "unclassified"
+        if kind == "hook_additional_context" and path.startswith("rendered"):  # R5a
+            ok = bool(_R5_RENDERED_CONTENT.fullmatch(path)) and _r5a_rendered(entry, line_no, r5)
+            return "host_record" if ok else "unclassified"
         # R1 and R4 share the same three narrow conditions.
         narrow = (probed_event is not None and att.get("hookEvent") == probed_event
                   and probed_event in invoked_events

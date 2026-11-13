@@ -82,7 +82,7 @@ H1 passes only if all four path ids pass (scope §6 gate rule). `summary_h1.md` 
   - A4: `hookName` is exactly `L` (`PreToolUse:Edit`, `PreToolUse:Bash` or the bare lifecycle event);
   - A5, tool paths: `toolUseID` is this arm's `tool_use` for the expected tool;
   - A6, tool paths: the emitting hook-log envelope names the event and the tool.
-- **R5a:** the anchor's `rendered[i].content`, with `renderedRole` `system`, equal exactly to `<system-reminder>
+- **R5a:** the anchor's `rendered[i].content`, with `renderedRole` `system`, equal exactly to `<system-reminder> Only that exact path is covered: a nonce at any other path under `rendered`, such as `rendered[0].metadata`, stays `unclassified` (review of #798).
 {L} hook additional context: {content[i]}
 </system-reminder>`.
 - **R5b:** an `api-request-blob` with role `system`, in an arm that has an anchor, where every nonce line equals exactly `{L} hook additional context: {C}` for some anchor item `C`.
