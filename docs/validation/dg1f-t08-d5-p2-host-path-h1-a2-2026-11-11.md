@@ -144,18 +144,21 @@ A rule for the two new locations (R5) would follow the same steps. Putting the R
 - **Archive.** This step used the archive made after the run (§7): `C:\dev\d5p2-h1-a2-archive\2026-11-11`, 74 files, with `2026-11-11.SHA256SUMS` beside it (SHA-256 `bbd4c5e5…21089e34`). Before any tool read it for this step, all 74 files verified, there were no unlisted files, and the original live root `C:\dev\d5p2-h1-a2-live` verified against the same listing.
 - **Manifest check.** All **21** raw files that this record's `MANIFEST.json` hashes match its SHA-256s and sizes. They are `events.jsonl`, `transcript.jsonl` and `claude.stderr.txt` for each of the six arms, plus the batch files `summary_h1.md`, `run_h1.log` and `H1_DONE`.
 - **The tool stops before classifying.** Given a copy of the checksum list with one hash altered, it aborted ("integrity check failed; nothing classified") and wrote no output.
-- **Before and after.** The tool repeats the integrity check after classifying and refuses to write the summary if the archive or its checksum list changed. Both were unchanged (`integrity_after` in `reclassification.json`). After the run, the archive again verified (74 files, all read-only) and so did the live root.
+- **Before and after.** The tool repeats the integrity check after classifying, and again immediately before publishing. If the archive or its checksum list changed, it publishes nothing (§8.2, step 5). Both were unchanged (`integrity_after` in `reclassification.json`). After the run, the archive again verified (74 files, all read-only) and so did the live root.
 
 ### 8.2 Procedure
 
-[`harness/reclassify_a2.py`](artifacts/dg1f-t08-d5-p2-h1-host-path/harness/reclassify_a2.py) (SHA-256 `665cc361…ebac5d20`) follows #553 and #563. It reuses the #553 integrity and subset-replay helpers unchanged (`reclassify_h1.py`, `1dbbfdd4…def0f89b`). It ran the merged classifier from `b92eaf05` (`classify_h1.py` `27cd5c42…bf137f44`, rules id `as-run table + R1-R5 (#551, #561, #796)`) with the A2 pins: Claude Code `2.1.310 (Claude Code)` and model `claude-opus-5-5`. The order was:
+[`harness/reclassify_a2.py`](artifacts/dg1f-t08-d5-p2-h1-host-path/harness/reclassify_a2.py) (SHA-256 `79dca960…03a55a0f`) follows #553 and #563. It reuses the #553 integrity and subset-replay helpers unchanged (`reclassify_h1.py`, `1dbbfdd4…def0f89b`). It ran the merged classifier from `b92eaf05` (`classify_h1.py` `27cd5c42…bf137f44`, rules id `as-run table + R1-R5 (#551, #561, #796)`) with the A2 pins: Claude Code `2.1.310 (Claude Code)` and model `claude-opus-5-5`. The order was:
 
 1. **Integrity**, as in §8.1. No problems were found.
 2. **Authoritative run:** `classify()` on the archived **raw** evidence for each path and its control. Each arm is read from the archive but keyed to the live-root location it was recorded at. The classifier masks an arm's workspace by that location (`masked()`), and the recorded tool inputs name the live-root workspace (see §8.4).
 3. **Omitted-material completeness check.** Every raw `events.jsonl` and `transcript.jsonl` entry of all six arms was diffed against what this record's collector publishes for it. That is `collect_h1.select_events` for events, and `collect_a2.select_transcript_a2` (`b16ce8e4…40d51167`) for the transcript, which covers `hook_*` entries with `rendered` and the nonce-line `api-request-blob` excerpts. Each entry is whole, trimmed or dropped. Each control arm was scanned for its own nonce **and** the paired emitter's nonce. Each arm's `claude.stderr.txt` was scanned too. An omitted hit would be published as its location only (source, line, entry type, JSON paths, counts), never the entry, because unpublished 2.1.310 entries can carry environment details.
 4. **Subset replay:** the same classifier on the published selected evidence. This is supporting only: it depends on step 3 and is **not** an independent reproduction.
+5. **Fail-closed publication.** These two rules were added after the independent review of the first version of this PR.
+   - **Omitted evidence blocks PASS.** Any omitted nonce occurrence from step 3, stderr included, makes that path's result and the listed-path result `PENDING_REVIEW`, whatever the classifier labels say. In that case only `reclassification.json` is published, with the hits given as locations, the per-path `outcome.r1r5.json` files are withheld, and the tool exits 3.
+   - **Nothing is published before every check passes.** Outputs are redacted and leak-scanned into a staging directory. The archive is re-verified after classification and again immediately before the staged files are copied into place. A failure at any point leaves the published directory untouched.
 
-**Outputs.** `outcome.r1r5.json` per path (redacted, from the raw run), next to each unchanged `outcome.json`, and [`reclassification.json`](artifacts/dg1f-t08-d5-p2-h1-host-path/live-a2-2026-11-11/reclassification.json). The collector's redaction, including `<LIVE_PROJECT>`, and its leak scan applied to all of them.
+**Outputs.** `outcome.r1r5.json` per path (redacted, from the raw run), next to each unchanged `outcome.json`, and [`reclassification.json`](artifacts/dg1f-t08-d5-p2-h1-host-path/live-a2-2026-11-11/reclassification.json). The collector's redaction, including `<LIVE_PROJECT>`, and its leak scan applied to all of them. The outputs were regenerated with the corrected tool. The three `outcome.r1r5.json` files are byte-identical to those from the first version. `reclassification.json` differs only in the tool hash and the new `result_r1r5_raw` and `publication` fields.
 
 **Tests.** The new [`selftest/test_reclassify_a2_completeness.py`](artifacts/dg1f-t08-d5-p2-h1-host-path/harness/selftest/test_reclassify_a2_completeness.py) uses synthetic data only. It covers:
 - published `rendered` and excerpt lines do not count as omitted;
@@ -164,9 +167,27 @@ A rule for the two new locations (R5) would follow the same steps. Putting the R
 - the paired emitter's nonce in a control arm is detected;
 - dropped events and stderr are detected;
 - recorded-location masking;
-- the as-run diff.
+- the as-run diff;
+- a nonce only in stderr gives `PENDING_REVIEW`, not PASS (the review's example);
+- the listed-path result in each case: pass, failing label, pin problem, omitted hits;
+- a failing pre-publication check, or a leak in a later file, publishes nothing, and an existing output is never overwritten;
+- end to end through `main()`, with classification stubbed:
+  - an integrity failure after classification, or immediately before the copy, publishes nothing;
+  - an omitted hit publishes only `reclassification.json` (`PENDING_REVIEW`) and returns 3;
+  - a clean run publishes all four files.
 
-Four mutants of the tool were each caught by these tests: the H1 selection used in place of the A2 selection, stderr left out, the paired nonce ignored, and the published count ignored. The tool was restored and hash-verified afterwards.
+Ten mutants of the tool were each caught by these tests:
+- the H1 selection used in place of the A2 selection;
+- stderr left out;
+- the paired nonce ignored;
+- the published count ignored;
+- the listed-path or per-path result ignoring omitted hits;
+- outcome files published while pending;
+- the pre-publication check ignored;
+- direct writes in place of staging;
+- the after-run check not enforced.
+
+The tool was restored and hash-verified afterwards. The full harness suite passes 217. With a checksum list in which one hash was altered, the corrected tool again aborted before classifying and wrote nothing.
 
 ### 8.3 Results
 
@@ -188,7 +209,7 @@ Every other field is identical, and the set of nonce locations is unchanged.
 - **No co-present unrecognised location:** no path has an `unclassified` location left, so the unclassified-first safeguard does not apply.
 - **Controls and non-interference** hold as in §3, on both arms of every path. That covers the file and command results matching the control, equal permission decisions for equivalent requests, equal host indicators and no error result.
 - **Host pin:** every outcome records `2.1.310 (Claude Code)`, so there is no mixed-version problem (`host_pin_problem` is `null`).
-- **Completeness: 0 omitted nonce occurrences** across all six arms:
+- **Completeness: 0 omitted nonce occurrences** across all six arms, so no result is `PENDING_REVIEW` and nothing was withheld:
   - events: 38 entries (6 whole, 32 trimmed, 0 dropped);
   - transcript: 182 entries (0 whole, 35 trimmed, 147 dropped);
   - each `claude.stderr.txt` is 192 bytes, one line, with 0 occurrences of either nonce.
@@ -206,7 +227,7 @@ G3 stays partial. DG1G and DG1 stay open.
 
 The first run of this tool keyed each arm to its **archive** location. On H1a-edit, the identical Read and Edit requests in the two arms then did not mask to `<WS>`, and were recorded as two "non-equivalent attempts" per arm instead of two equivalent requests. The label was unaffected, because only decisions on equivalent requests are compared. Those outputs were deleted, the tool was changed to key arms to their recorded location (`load_recorded`, with a regression test), and the run was repeated. The published outputs come from that repeat.
 
-**The same artifact is in the accepted #553 output.** In [`live-2026-10-17/H1a-edit/outcome.r1r3.json`](artifacts/dg1f-t08-d5-p2-h1-host-path/live-2026-10-17/H1a-edit/outcome.r1r3.json), `permissions.comparison` lists 0 equivalent requests and 2 non-equivalent attempts per arm, where the as-run `outcome.json` lists 2 equivalent requests. Its label cannot depend on this, for the same reason. H1a-bash and the A1 output are not affected. This addendum does not change the accepted #553 record. Whether to correct it is for the reviewer.
+**The same artifact is in the accepted #553 output.** In [`live-2026-10-17/H1a-edit/outcome.r1r3.json`](artifacts/dg1f-t08-d5-p2-h1-host-path/live-2026-10-17/H1a-edit/outcome.r1r3.json), `permissions.comparison` lists 0 equivalent requests and 2 non-equivalent attempts per arm, where the as-run `outcome.json` lists 2 equivalent requests. Its label cannot depend on this, for the same reason. H1a-bash and the A1 output are not affected. This addendum does not change the accepted #553 record. The independent review confirmed the discrepancy. The recorded decisions there were all `executed`, so the label holds, but with zero matched requests the equality check was vacuous. The review asked for a separate append-only correction after this PR, not a repair here.
 
 ### 8.5 Not established by this addendum
 
