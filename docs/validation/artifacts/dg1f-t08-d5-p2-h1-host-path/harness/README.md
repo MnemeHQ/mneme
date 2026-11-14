@@ -280,3 +280,29 @@ $env:DISABLE_AUTOUPDATER = "1"
 ```
 
 Then follow the printed steps for the control arm, then for `H1c-sm-int`, then the capture reviews, `classify_a1.py interactive` and `combine`. The evidence goes to `C:\dev\d5p2-h1c-a3-live`. The record `docs/validation/dg1f-t08-d5-p2-host-path-h1c-a3-<date>.md` goes in a separate evidence PR.
+
+## Finished-batch guard: kept evidence is never touched
+
+`guard_finished.sh` is sourced by every runner and probe and runs **before the script's first write**. It changes nothing; it only refuses:
+
+| Script | Refuses when |
+|---|---|
+| `run_h1.sh`, `run_h1_probe.sh` | the root holds `H1_DONE` or `summary_h1.md` |
+| `run_a1_headless.sh`, `run_a1_probe.sh` | the root holds `A1_HEADLESS_DONE` or `outcome_a1_headless.json` |
+| `prep_a1_interactive.sh`, `finish_a1_interactive.sh` | the root holds `outcome_a1_interactive.json` or `outcome_a1.json`, **or** the arm is already finished (its `observer.txt` records `recording_sha256`) |
+
+The interactive steps deliberately ignore the headless markers, because the interactive pair follows the headless pair in the same root. An unfinished batch (`H1_INCOMPLETE`, `A1_HEADLESS_INCOMPLETE`) may still be re-run.
+
+**To start a new batch in a root that holds a finished one:** archive the root (copy plus SHA-256 listing), then empty it (`safe_rmtree*.py delete <arm>` per arm, and remove the batch files). There is no override flag.
+
+`finish_a1_interactive.sh` now validates `observation.json` **before** writing anything. An incomplete observation leaves the arm unfinished, and `finish` can be re-run once the observation is filled in.
+
+**Why.** On 2026-11-13 a mutation check of #802 disabled a pin-set guard. The shell test then ran `run_h1.sh A2` against the kept A2 root, which deleted `H1_DONE` and `summary_h1.md` and overwrote `run_h1.log` before aborting at the preflight. The files were restored from `C:\dev\d5p2-h1-a2-archive\2026-11-11`, and the root again verifies 74/74.
+
+**Rule for mutation checks:** never mutate a runner while running tests that execute it. Those tests use the real, fixed roots, so a disabled guard can let the runner write. `selftest/test_finished_batch_guard.py` executes no runner: it exercises the helper only on temporary directories and checks each call site's position from the source. Mutate the guard only against that file.
+
+**Offline validation:**
+- `python -m pytest -q …/harness/selftest`: **293 passed** (16 in `test_finished_batch_guard.py`).
+- **Mutation checks:** 12 mutants, all caught, run against that file only. They covered the helper exiting, the helper matching the arm, the helper writing, each removed or late call site, prep keying on the headless markers, and `finish` validating after writing.
+- **Replaying the incident:** `run_h1.sh A2`, `run_h1.sh` and `run_a1_headless.sh` against the kept A2, H1 and A1 roots each refused with `nothing was changed`.
+- **Evidence trees:** the H1, A1, A2 and A3 roots, the archives and the A1 attempts were byte-identical before and after.
