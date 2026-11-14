@@ -11,6 +11,8 @@
 
 **Amendment A2 (PROPOSED, 2026-11-11):** re-pins **H1a and H1b** to Claude Code `2.1.310` with `--model claude-opus-5-5`, in a separate disposable root, after the owner chose reporting level R-ii (re-probe Claude Code first) in the D6/P2 assessment (§4.3). Candidate shapes, controls, labels and rules are unchanged. H1c stays on the A1 track. Nothing runs without a separate go-ahead.
 
+**Amendment A3 (PROPOSED, 2026-11-13):** re-pins the **H1c A1 track** (Stop top-level `systemMessage`, headless and interactive) to Claude Code `2.1.310` with `--model claude-opus-5-5`, the host and model of A2, in a separate disposable root (§4.4). Both runs are repeated on that pin, and H1c is judged on one host version. Shape, controls, labels and rules are unchanged. Nothing runs without a separate go-ahead.
+
 **Revision 3 (2026-10-17):** answers the #545 re-review. The emitter mechanism and the side-effect control are now specific to each **path type**: command hook on a tool event, command hook on a lifecycle event, in-process callback, and middleware (§3.1). The nonce, evidence, audience and non-interference requirements stay common. No gate, decision or D5/P2 semantics change.
 **Parent:** charter §5 (gate rule) and §12 step 3. The format follows the D6 scopes [#519](2026-10-15-dg1f-t08-d6-mneme-memory-live-scope.md) and [#527](2026-10-16-dg1f-t08-d6-c4-local-settings-scope.md).
 
@@ -198,6 +200,116 @@ Each needs its own go-ahead, in that order: harness PR, then the runs.
 - re-pinning A1/H1c;
 - H2–H6;
 - any change under `mneme/`;
+- a P2-first or D5 + P2 charter amendment;
+- the `[layer1-freeze]` amendment;
+- implementation.
+
+### 4.4 Amendment A3: H1c (A1 track) re-pinned to Claude Code 2.1.310 (PROPOSED)
+
+**Status: PROPOSED**, for independent review. It is reviewed together with its harness change in the same PR, following A2. Acceptance would authorize **no** live run, evidence PR, H1 gate record, runtime change, charter amendment or `[layer1-freeze]` amendment.
+
+**Why.**
+- **H1c is the only H1 path without a usable result.**
+  - The A1 headless run on `2.1.202` gave `NOT_DELIVERED` with no host interference under R1–R4 (#560, #563).
+  - The A1 interactive run never completed. The host auto-updated to `2.1.303` between the two attempts, and both attempts are preserved and unusable (§4.3).
+  - H1c passes under A1 only when **both** runs support a passing label (§4.2), so H1c has no result.
+- **H1a and H1b now have a result on `2.1.310`.** A2 (#795), reclassified under R1–R5 (#800), gives `DELIVERED_TO_AGENT` on all three paths: a listed-path `PASS` that is not the H1 gate.
+- **A2-1 still applies.** Under charter §5, one gate's paths share one pin. With H1c on the same host and model as A2, the H1 gate can be computed on one host version without deciding A2-1.
+- **Owner instruction, 2026-11-13:** "Start H1c Stop-path validation", after the #801 review named H1c as the remaining H1 blocker.
+
+**Change** (everything not listed is unchanged; A1's own pins stay as they are and select nothing new):
+
+| Item | A1 (§4.2, unchanged) | A3 |
+|---|---|---|
+| Host | Claude Code `2.1.202` | Claude Code `2.1.310 (Claude Code)`, as A2. `DISABLE_AUTOUPDATER=1` is required in every shell that prepares, runs or finishes an arm, and in the operator's interactive window. The version is checked immediately before every headless session, before an interactive arm is prepared, and again when it is finished. A mismatch aborts. |
+| Model | init model as observed (`claude-opus-4-8[1m]`) | `--model claude-opus-5-5` on every session, headless and interactive. The headless init event must report exactly that model, and every interactive transcript model must equal it (the existing A1 rule). |
+| Runs | headless pair, then an interactive pair (control first) | Unchanged: **both** runs are repeated on the A3 pin. The `2.1.202` headless result is not reused (A3-2). |
+| Shape, controls, labels | §4.2 | Unchanged: top-level `systemMessage`, exit 0, and a paired no-op control in each run. The criteria are those of the §4.2 table. |
+| Classifier rules | R1–R4 (#563) | The merged table, now R1–R5 (#798), unchanged. R5 needs an R1-qualifying `hook_additional_context` anchor. On a lifecycle path such as Stop, that anchor carries the bare event as `hookName`, and the tool conditions A5 and A6 do not apply. The A1 shape (top-level `systemMessage`) produces no such anchor, so R5 does not classify its records (A3-5). |
+| Version pin in the classifier | Interactive only | **Headless too:** an arm whose recorded `claude_version` differs from the pin, or is unrecorded, gives `NOT_EXECUTED`. **`combine` judges H1c on one host version:** both headless arms' recorded versions and the interactive pin must be present and equal, otherwise `NOT_EXECUTED`. |
+| Interactive operator steps | §4.2 | Hardened from the 2026-10-19 attempts. Everything happens in **one** window: set `DISABLE_AUTOUPDATER`, check `claude --version`, start the session with `--model`, and stop if the session is not signed in. The prompt is sent **once**, there is never `/model` or `/login` in the session, there is at least 30 seconds of counted idle time, and then `/exit`. |
+| Disposable root | `C:\dev\d5p2-h1c-a1-live` | `C:\dev\d5p2-h1c-a3-live`. Its guarded delete refuses the H1, A1 and A2 roots, every archive and the preserved A1 attempts. |
+| Result | H1c under A1 | H1c under A1 **on `2.1.310`**, from `classify_a1.py combine`. It is still not the H1 gate. |
+
+**After A3, if separately authorized.** The H1 gate on `2.1.310` would combine:
+- A2's three R1–R5 outcomes (#800);
+- A3's combined H1c outcome.
+
+That is a separate gate-record step, and it uses only outcomes that record the same host version. It is not part of this PR.
+
+**What 2.1.310 may change for Stop.** On `2.1.310` the host added a `rendered` copy to `hook_additional_context` attachments and a new `api-request-blob` entry (#795, R5). The Stop `systemMessage` may gain similar records.
+- **Not pre-decided here.** A new nonce location is `unclassified`, so the run is `INCONCLUSIVE` and needs a reviewed rule (the #551 → #552 → #553 and R5 precedent). The raw evidence allows offline reclassification.
+- **An api-request-blob.** If the `systemMessage` appears in one, that is a candidate model-bound location for review, not delivery by default.
+- **The A1 known collision still stands.** If the notice appears as a stream `system` event in the emitter arm only, the strict host-event rule makes the headless run `INCONCLUSIVE`.
+
+**Decisions for the reviewer:**
+
+| # | Decision | Recommendation |
+|---|---|---|
+| A3-1 | The pin for H1c: `2.1.310` (A3), or reinstalling `2.1.202` to finish A1 on its original pin | **`2.1.310`.** It matches A2, G3 (#793) and the host this machine runs, so H1 can be gated on one current pin. Returning to `2.1.202` would mean downgrading the operator's host, and the H1 gate would then rest on an outdated host. The cost is re-running the A1 headless pair, which takes a few minutes. |
+| A3-2 | Reuse the `2.1.202` headless result? | **No.** `combine` now requires one host version, so the headless pair is re-run on `2.1.310`. The `2.1.202` result stays as history (#563). |
+| A3-3 | Interactive capture method | **Unchanged:** an operator-run screen recording plus a named independent capture review (`capture_review.json`), bound by SHA-256 to the recording and the frames. No automated terminal capture is proposed. |
+| A3-4 | Repeat count | Unchanged (D4): n = 1 per run, plus its control. A run is repeated only on `INCONCLUSIVE`. An arm refused before its session (pin, version or flag) is prepared again and is never counted. |
+| A3-5 | R5 and the Stop path | **R5 is unchanged, and it can apply to a Stop (lifecycle) path, but not to the A1 shape.** The accepted rule allows lifecycle anchors: an R1-qualifying `hook_additional_context` entry whose `hookName` is the bare event, with A5 and A6 not applying. A Stop `hookSpecificOutput.additionalContext` (the original H1c shape) could therefore anchor R5. The A1 top-level `systemMessage` produces no `hook_additional_context` entry, so R5 does **not** classify its records. A new `2.1.310` location for that `systemMessage` goes through its own rule review, as A3 says above. Neither the classifier nor the accepted rule changes here. |
+
+**Harness (same PR).** All changes are under `docs/validation/artifacts/dg1f-t08-d5-p2-h1-host-path/harness/`. Every A1 and H1 pin value is unchanged. Three A1 behaviors become stricter, and each can only refuse:
+- the host version is checked before every headless session;
+- `finish` refuses without writing;
+- `combine` requires one recorded host version.
+
+- **`pins_a1.env` gains the A3 pin set.** It is selected only by `A1_PINSET=A3`, which the A1 entry points set from their argument:
+  - `run_a1_headless.sh A3`;
+  - `prep_a1_interactive.sh A3 <arm>`;
+  - `finish_a1_interactive.sh A3 <arm> <recording>`.
+
+  An inherited `A1_PINSET` (even empty) is refused by every entry point and by `run_h1.sh`, and an unknown value aborts. `A1_PINSET` joins the `pins.env` snapshot, so `pins.local.env` can neither set nor clear it.
+- **New `safe_rmtree_a3.py`:** the A3 root, the four A1 arm names, and the protected trees listed above.
+- **`run_a1_probe.sh`:**
+  - the root and guarded delete come from the pin set;
+  - A3 requires `DISABLE_AUTOUPDATER=1`;
+  - the host version is checked immediately before every session;
+  - `--model` is passed when the pin set defines one;
+  - the observer records the pin set, the model flag and the checked version.
+- **`run_a1_headless.sh`:** pin-set selection, and the version pin is passed to the headless classifier under A3.
+- **`prep_a1_interactive.sh` and `finish_a1_interactive.sh`:**
+  - pin-set selection and the A3 root;
+  - the A3 operator steps;
+  - `finish` refuses an arm prepared under another pin set;
+  - its version check now refuses **without writing into the arm**;
+  - it prints the exact classify commands for the active pins.
+- **`preflight.sh` and the self-test stub** read the A1 pins under an A1 pin set. The preflight checks `DISABLE_AUTOUPDATER` for A3.
+- **`classify_a1.py`:**
+  - `headless … <pin_model> [<pin_version>]`, which records both arms' host versions;
+  - `combine` checks the host version first and fails closed.
+- **New `selftest/test_a3_harness.py`.** In `test_a1_harness.py`, the headless fixture now records the host version, as the runner always does.
+
+**Offline validation:**
+- **Tests:** 277 harness tests pass (234 existing, 43 new).
+- **Mutation checks:** each of 12 mutants is caught: the pins, the snapshot, the `combine` version check, the headless version pin, the inherited pin-set refusals, the auto-updater checks in the probe, preflight and `finish`, the protected trees and `--model`. A thirteenth mutant, a broken preflight line continuation, is caught by a strengthened preflight test.
+- **End-to-end stub self-test** of `run_a1_headless.sh A3`, plus the interactive prep and finish for one arm:
+  - the preflight reported pin set A3, `DISABLE_AUTOUPDATER=1` and `2.1.310`;
+  - the observers recorded `pinset=A3`, the `claude-opus-5-5` model flag and `2.1.310`, and the init event reported `claude-opus-5-5`;
+  - a stub host version of `2.1.311` at finish was refused, with nothing written.
+
+  The A3 root was emptied afterwards through `safe_rmtree_a3.py`.
+- **Self-test incident (fixed in this PR):** one `finish` call made without `A3` targeted the A1 root.
+  - It wrote a new `harness_failure.txt` into the leftover attempt-2 control arm, through the old failure path.
+  - The file was removed. The arm's file set and hashes match the preserved `2026-10-19-ctl-attempt2` copy, and nothing else in the A1 root or archive changed.
+  - `finish` now refuses on its version check without writing.
+
+**Run, if separately authorized.** The operator runs it from their own windows, never inside Claude Code, with `PY` set in `pins.local.env` and `DISABLE_AUTOUPDATER=1`:
+1. `run_a1_headless.sh A3`.
+2. The interactive pair, control first: `prep_a1_interactive.sh A3 <arm>`, the recorded session as printed, then `finish_a1_interactive.sh A3 <arm> <recording>`.
+3. A named reviewer completes `capture_review.json` for both arms.
+4. `classify_a1.py interactive` and `combine`, as printed by `finish`.
+
+Evidence goes into a separate PR: `docs/validation/dg1f-t08-d5-p2-host-path-h1c-a3-<date>.md`.
+
+**Not authorized by A3:**
+- the live runs or the evidence PR;
+- the H1 gate record;
+- H2–H6;
+- any change under `mneme/`, including `_emit_stop_feedback` (#550);
 - a P2-first or D5 + P2 charter amendment;
 - the `[layer1-freeze]` amendment;
 - implementation.

@@ -1,7 +1,7 @@
 """Classify the H1c Amendment A1 runs (Stop top-level systemMessage; probe scope 4.2).
 
 usage:
-  classify_a1.py headless    <live> <pin_model>   -> <live>/outcome_a1_headless.json
+  classify_a1.py headless    <live> <pin_model> [<pin_version>] -> <live>/outcome_a1_headless.json
   classify_a1.py interactive <live> <pin_version> <pin_model> -> <live>/outcome_a1_interactive.json
   classify_a1.py combine     <live>               -> <live>/outcome_a1.json (the H1c result under A1)
 
@@ -37,6 +37,11 @@ Rules (probe scope 4.2, accepted in #555):
   recorded, never delivery (classify_h1 table, unchanged).
 - A model-bound nonce location (classify_h1 table, including R1) is agent delivery.
 
+Amendment A3 (probe scope 4.4): headless takes an optional host version pin (a
+mismatch in either arm is NOT_EXECUTED), and `combine` requires every headless arm's
+recorded version and the interactive pin to be present and equal (else NOT_EXECUTED),
+so H1c is always judged on one host version.
+
 Known collision (reported, not decided here): if the host surfaces the systemMessage
 as a stream-json `system` event that appears in the emitter arm only, the strict
 host-event subtype rule (unchanged) makes the headless run INCONCLUSIVE. Any rule
@@ -70,10 +75,12 @@ def _observer(out):
 
 
 # ---------------------------------------------------------------- headless
-def headless(live, pin_model):
+def headless(live, pin_model, pin_version=None):
+    """With `pin_version` (Amendment A3), each arm's recorded claude_version must equal
+    it, else NOT_EXECUTED (classify_h1's version pin, as in Amendment A2)."""
     emit = C.load_arm(Path(live) / "H1c-sm" / "out")
     ctl = C.load_arm(Path(live) / "H1c-sm-ctl" / "out")
-    r = C.classify(emit, ctl, "H1c-sm", pin_model)
+    r = C.classify(emit, ctl, "H1c-sm", pin_model, pin_version)
     controls = r.get("controls") or {}
     pe, common = controls.get("path_type_emitter") or {}, controls.get("common") or {}
     interference = []
@@ -87,8 +94,28 @@ def headless(live, pin_model):
         interference.append("host indicator differs")
     if pe and pe.get("result_success") is False:
         interference.append("no normal result event")
-    r["a1"] = {"run": "headless", "rules": A1_ID, "host_interference": interference}
+    r["a1"] = {"run": "headless", "rules": A1_ID, "host_interference": interference,
+               "pin_version": pin_version,
+               "claude_versions": {"emitter": emit["observer"].get("claude_version"),
+                                   "control": ctl["observer"].get("claude_version")}}
     return r
+
+
+def host_version_problem(h, i):
+    """Why the headless and interactive runs cannot be combined as one pin, or None.
+
+    Amendment A3: H1c is judged on ONE host version. Every headless arm's recorded
+    version and the interactive pin (which classify_a1 interactive enforced against
+    both interactive observers) must be present and equal."""
+    hv = (h.get("a1") or {}).get("claude_versions") or {}
+    iv = (i.get("pins") or {}).get("claude_version")
+    seen = {"headless emitter": hv.get("emitter"), "headless control": hv.get("control"), "interactive": iv}
+    missing = sorted(k for k, v in seen.items() if not v)
+    if missing:
+        return "host version unrecorded: " + ", ".join(missing)
+    if len(set(seen.values())) != 1:
+        return "host versions differ: " + ", ".join(f"{k} {v!r}" for k, v in seen.items())
+    return None
 
 
 # ---------------------------------------------------------------- interactive
@@ -314,6 +341,14 @@ def interactive(live, pin_version, pin_model):
 def combine(h, i):
     rec = {"path_id": "H1c", "rules": A1_ID, "headless_label": h.get("label"),
            "interactive_label": i.get("label"), "reasons": []}
+    # One host version across both runs (Amendment A3); checked first, fail-closed.
+    vp = host_version_problem(h, i)
+    rec["host_version"] = None if vp else (i.get("pins") or {}).get("claude_version")
+    if vp:
+        rec["reasons"].append(vp)
+        rec["label"] = "NOT_EXECUTED"
+        rec["h1c_passes_under_a1"] = False
+        return rec
     for name, r in (("headless", h), ("interactive", i)):
         if r.get("label") in ("NOT_EXECUTED", "INCONCLUSIVE"):
             rec["reasons"].append(f"{name} run is {r['label']}")
@@ -339,8 +374,8 @@ def _write(live, name, obj):
 
 if __name__ == "__main__":
     a = sys.argv[1:]
-    if len(a) == 3 and a[0] == "headless":
-        _write(a[1], "outcome_a1_headless.json", headless(a[1], a[2]))
+    if len(a) in (3, 4) and a[0] == "headless":
+        _write(a[1], "outcome_a1_headless.json", headless(a[1], a[2], a[3] if len(a) == 4 else None))
     elif len(a) == 4 and a[0] == "interactive":
         _write(a[1], "outcome_a1_interactive.json", interactive(a[1], a[2], a[3]))
     elif len(a) == 2 and a[0] == "combine":

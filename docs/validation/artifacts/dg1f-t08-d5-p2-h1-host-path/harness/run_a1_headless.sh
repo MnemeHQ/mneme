@@ -4,11 +4,24 @@
 # Run from the operator's own terminal, never nested in Claude Code. Fail closed:
 # any failure writes A1_HEADLESS_INCOMPLETE and exits 1. A1_HEADLESS_DONE means
 # only that the pair finished; the result is in outcome_a1_headless.json.
+#
+# usage: run_a1_headless.sh       the A1 pins (Claude Code 2.1.202)
+#        run_a1_headless.sh A3    Amendment A3 (probe scope 4.4): Claude Code 2.1.310,
+#                                 --model claude-opus-5-5, its own root; needs
+#                                 DISABLE_AUTOUPDATER=1 in this shell.
 set -u
 set -o pipefail
 BASE=$(cd "$(dirname "$0")" && pwd)
+# The pin set comes only from the argument; an A1_PINSET already in the environment
+# is refused, never overwritten (set-but-empty counts), as run_h1.sh does for H1_PINSET.
+[ -z "${A1_PINSET+set}" ] || { echo "ABORT: A1_PINSET is set in the environment; unset it and pass the pin set as the argument"; exit 1; }
+case "${1:-}" in
+  "") ;;
+  A3) export A1_PINSET=A3 ;;
+  *) echo "ABORT: unknown pin set '$1' (only A3 is defined)"; exit 1 ;;
+esac
 . "$BASE/pins_a1.env"
-"$PY" -I "$BASE/safe_rmtree_a1.py" check-root || { echo "ABORT: disposable root unsafe"; exit 1; }
+"$PY" -I "$BASE/$A1_RMTREE" check-root || { echo "ABORT: disposable root unsafe"; exit 1; }
 mkdir -p "$LIVE" || { echo "ABORT: cannot create $LIVE"; exit 1; }
 rm -f "$LIVE/A1_HEADLESS_DONE" "$LIVE/A1_HEADLESS_INCOMPLETE" || { echo "ABORT: cannot clear markers"; exit 1; }
 exec > >(tee "$LIVE/run_a1_headless.log") 2>&1
@@ -22,6 +35,7 @@ d="$LIVE"; while [ "$d" != "/" ] && [ "$d" != "." ]; do
   [ -e "$d/.claude/settings.json" ] && [ "$d" != "$LIVE" ] && abort "ancestor $d has .claude/settings.json"
   d=$(dirname "$d")
 done
+echo "[a1] pin set: ${A1_PINSET:-A1} (claude '$PIN_CLAUDE_VERSION', model '$PIN_MODEL', root $A1_LIVE_W)"
 echo "[a1] harness HEAD: $(git -C "$BASE" rev-parse HEAD)"
 if [ -n "$(git -C "$BASE" status --porcelain -- .)" ]; then
   if [ "${H1_SELFTEST:-}" = 1 ]; then echo "[a1] self-test: harness has uncommitted changes"
@@ -42,7 +56,13 @@ for l in open(sys.argv[1],encoding='utf-8'):
     if e.get('type')=='system' and e.get('subtype')=='init': print(e.get('model')); break" \
   "$(cygpath -w "$LIVE/H1c-sm-ctl/out/events.jsonl")" | tr -d '\r') || abort "cannot read init model"
 [ "$m" = "$PIN_MODEL" ] || abort "init model '$m' != pinned '$PIN_MODEL'"
-lab=$("$PY" -I "$BASE/classify_a1.py" headless "$(cygpath -w "$LIVE")" "$PIN_MODEL" | tr -d '\r') || abort "classification failed"
+# A3 also passes the host version pin, so a version mismatch is NOT_EXECUTED.
+if [ "${A1_PINSET:-}" = A3 ]; then
+  lab=$("$PY" -I "$BASE/classify_a1.py" headless "$(cygpath -w "$LIVE")" "$PIN_MODEL" "$PIN_CLAUDE_VERSION" | tr -d '\r') \
+    || abort "classification failed"
+else
+  lab=$("$PY" -I "$BASE/classify_a1.py" headless "$(cygpath -w "$LIVE")" "$PIN_MODEL" | tr -d '\r') || abort "classification failed"
+fi
 echo "[a1] headless: $lab"
 date -u +%FT%TZ > "$LIVE/A1_HEADLESS_DONE" || abort "cannot write A1_HEADLESS_DONE"
 echo "Headless pair finished (A1_HEADLESS_DONE is not a pass). Result: $LIVE/outcome_a1_headless.json"
