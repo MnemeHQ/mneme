@@ -22,6 +22,9 @@ case "${1:-}" in
 esac
 . "$BASE/pins_a1.env"
 "$PY" -I "$BASE/$A1_RMTREE" check-root || { echo "ABORT: disposable root unsafe"; exit 1; }
+# Kept evidence is never touched: refuse a finished batch before anything is written.
+. "$BASE/guard_finished.sh"
+refuse_finished_batch "$LIVE" A1_HEADLESS_DONE outcome_a1_headless.json
 mkdir -p "$LIVE" || { echo "ABORT: cannot create $LIVE"; exit 1; }
 rm -f "$LIVE/A1_HEADLESS_DONE" "$LIVE/A1_HEADLESS_INCOMPLETE" || { echo "ABORT: cannot clear markers"; exit 1; }
 exec > >(tee "$LIVE/run_a1_headless.log") 2>&1

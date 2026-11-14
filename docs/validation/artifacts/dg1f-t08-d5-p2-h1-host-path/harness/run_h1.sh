@@ -31,6 +31,9 @@ esac
 . "$BASE/pins.env"
 read -r -a PATHS <<< "$H1_PATHS"
 "$PY" -I "$BASE/$RMTREE" check-root || { echo "ABORT: disposable root unsafe"; exit 1; }
+# Kept evidence is never touched: refuse a finished batch before anything is written.
+. "$BASE/guard_finished.sh"
+refuse_finished_batch "$LIVE" H1_DONE summary_h1.md
 mkdir -p "$LIVE" || { echo "ABORT: cannot create $LIVE"; exit 1; }
 rm -f "$LIVE/H1_DONE" "$LIVE/H1_INCOMPLETE" "$LIVE/summary_h1.md" || { echo "ABORT: cannot clear batch markers"; exit 1; }
 LOGF="$LIVE/run_h1.log"

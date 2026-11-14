@@ -47,6 +47,9 @@ esac
 # host auto-updated between two A1 attempts once (2026-10-19).
 V=$(claude --version | tr -d '\r')
 [ "$V" = "$PIN_CLAUDE_VERSION" ] || { echo "ABORT: claude '$V' != pinned '$PIN_CLAUDE_VERSION'"; exit 1; }
+# Kept evidence is never touched: refuse a finished batch before anything is written.
+. "$BASE/guard_finished.sh"
+refuse_finished_batch "$LIVE" A1_HEADLESS_DONE outcome_a1_headless.json
 P="$LIVE/$ARM"
 "$PY" -I "$BASE/$A1_RMTREE" delete "$ARM" || { echo "ABORT: guarded delete refused"; exit 1; }
 [ -e "$P" ] && { echo "ABORT: $P still exists after guarded delete"; exit 1; }

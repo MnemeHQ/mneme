@@ -14,8 +14,12 @@ BASE=$(cd "$(dirname "$0")" && pwd)
 [ -z "${A1_PINSET+set}" ] || { echo "ABORT: A1_PINSET is set in the environment; unset it and pass A3 as the first argument"; exit 1; }
 if [ "${1:-}" = A3 ]; then export A1_PINSET=A3; shift; fi
 . "$BASE/pins_a1.env"
+# Kept evidence is never touched: refuse a finished batch before anything is written.
+. "$BASE/guard_finished.sh"
+refuse_finished_batch "$LIVE" outcome_a1_interactive.json outcome_a1.json
 ARM=${1:-}; REC=${2:-}
 case "$ARM" in H1c-sm-int|H1c-sm-int-ctl) ;; *) echo "ABORT: arm must be H1c-sm-int or H1c-sm-int-ctl"; exit 1 ;; esac
+refuse_finished_arm "$LIVE/$ARM"
 if [ "${A1_PINSET:-}" = A3 ] && [ "${DISABLE_AUTOUPDATER:-}" != 1 ]; then
   echo "ABORT: pin set A3 needs DISABLE_AUTOUPDATER=1 in this shell"; exit 1
 fi
@@ -31,14 +35,25 @@ V=$(claude --version | tr -d '\r')
 P0=$(sed -n 's/^claude_version=//p' "$OUT/observer.txt" | head -1)
 [ "$V" = "$PIN_CLAUDE_VERSION" ] && [ "$P0" = "$PIN_CLAUDE_VERSION" ] \
   || { echo "ABORT: claude version changed or unpinned (prep '$P0', now '$V', pin '$PIN_CLAUDE_VERSION'); nothing written"; exit 1; }
+# observation.json is validated BEFORE anything is written: the recording hash marks
+# the arm finished (refuse_finished_arm), so an incomplete observation must leave the
+# arm unfinished and finish re-runnable once it is filled in.
+"$PY" -I -c "
+import json,sys
+o=json.load(open(sys.argv[1],encoding='utf-8'))
+bad=[k for k in ('notice_visible','returned_to_input_prompt','unexpected_prompt') if not isinstance(o.get(k),bool)]
+if bad: sys.exit('observation.json: fill in booleans: '+', '.join(bad))
+print('observation.json ok')" "$(cygpath -w "$OUT/observation.json")" \
+  || { echo "ABORT: observation.json incomplete; fill it in and run finish again (nothing written)"; exit 1; }
 die() { echo "HARNESS_FAILURE: $*" | tee -a "$OUT/harness_failure.txt"; exit 1; }
 h() { [ -f "$1" ] && sha256sum < "$1" | cut -d' ' -f1 || echo absent; }
-{
-  echo "recording_sha256=$(h "$REC")"
-  echo "recording_bytes=$(wc -c < "$REC" | tr -d ' ')"
-  echo "finished=$(date -u +%FT%TZ)"
-  echo "notes_after=$(h "$WS/notes.txt")"
-} >> "$OUT/observer.txt" || die "cannot extend observer.txt"
+# The recording hash in observer.txt marks the arm FINISHED (refuse_finished_arm), so
+# it is written LAST, in one append, only after the transcript copy and the capture
+# review template have succeeded (review of #803). Any earlier failure leaves the arm
+# unfinished, and finish can be re-run once the cause is fixed.
+REC_SHA=$(h "$REC")
+REC_BYTES=$(wc -c < "$REC" | tr -d ' ') || die "cannot size the recording"
+NOTES_AFTER=$(h "$WS/notes.txt")
 TP=$("$PY" -I -c "
 import json,sys
 tp=None
@@ -46,30 +61,21 @@ try:
     for l in open(sys.argv[1],encoding='utf-8'):
         tp = tp or (json.loads(l).get('envelope') or {}).get('transcript_path')
 except FileNotFoundError: pass
-print(tp or '')" "$(cygpath -w "$OUT/hook-log.jsonl")" | tr -d '\r')
+print(tp or '')" "$(cygpath -w "$OUT/hook-log.jsonl")" | tr -d '\r') || die "cannot read hook-log.jsonl"
 if [ -n "$TP" ] && [ -f "$(cygpath -u "$TP")" ]; then
   cp "$(cygpath -u "$TP")" "$OUT/transcript.jsonl" || die "cannot copy transcript"
-  echo "transcript_collected=yes" >> "$OUT/observer.txt"
+  TC=yes
 else
-  echo "transcript_collected=no" >> "$OUT/observer.txt"
+  TC=no
 fi
-"$PY" -I -c "
-import json,sys
-o=json.load(open(sys.argv[1],encoding='utf-8'))
-bad=[k for k in ('notice_visible','returned_to_input_prompt','unexpected_prompt') if not isinstance(o.get(k),bool)]
-if bad: sys.exit('observation.json: fill in booleans: '+', '.join(bad))
-print('observation.json ok')" "$(cygpath -w "$OUT/observation.json")" || die "observation.json incomplete"
 # Evidence-review template (review of #556): pre-filled with this arm's recording and
 # frame hashes; a reviewer other than the classifier must fill in shows_nonce per frame,
 # notice_visible and reviewer, from the RECORDING, and save it as capture_review.json.
-"$PY" -I - "$(cygpath -w "$OUT")" <<'PYEOF' || die "cannot write capture review template"
+# The recording hash is passed in (not read back from observer.txt), and the template
+# is written atomically (temporary file, then replace).
+"$PY" -I - "$(cygpath -w "$OUT")" "$REC_SHA" <<'PYEOF' || die "cannot write capture review template"
 import hashlib, json, os, sys
-out = sys.argv[1]
-obs = {}
-for line in open(os.path.join(out, "observer.txt"), encoding="utf-8"):
-    if "=" in line:
-        k, v = line.rstrip("\n").split("=", 1)
-        obs.setdefault(k, v)
+out, rec_sha = sys.argv[1], sys.argv[2]
 o = json.load(open(os.path.join(out, "observation.json"), encoding="utf-8"))
 frames = []
 for f in o.get("frames") or []:
@@ -77,10 +83,19 @@ for f in o.get("frames") or []:
     if os.path.isfile(p):
         frames.append({"file": f["file"], "t": f.get("t"),
                        "sha256": hashlib.sha256(open(p, "rb").read()).hexdigest(), "shows_nonce": None})
+tmp = os.path.join(out, "capture_review.template.json.tmp")
 json.dump({"_instructions": "Review the recording and each frame; set shows_nonce per frame and notice_visible, name the reviewer, then save as capture_review.json.",
-           "reviewer": "", "recording_sha256": obs.get("recording_sha256"), "notice_visible": None,
-           "frames": frames}, open(os.path.join(out, "capture_review.template.json"), "w", encoding="utf-8"), indent=2)
+           "reviewer": "", "recording_sha256": rec_sha, "notice_visible": None,
+           "frames": frames}, open(tmp, "w", encoding="utf-8"), indent=2)
+os.replace(tmp, os.path.join(out, "capture_review.template.json"))
 PYEOF
+{
+  echo "recording_sha256=$REC_SHA"
+  echo "recording_bytes=$REC_BYTES"
+  echo "finished=$(date -u +%FT%TZ)"
+  echo "notes_after=$NOTES_AFTER"
+  echo "transcript_collected=$TC"
+} >> "$OUT/observer.txt" || die "cannot extend observer.txt"
 echo "Finished $ARM. Capture review template: $(cygpath -w "$OUT/capture_review.template.json")"
 echo "After both arms are finished and both capture reviews are saved, classify with the active pins:"
 echo "  \"$PY\" -I \"$(cygpath -w "$BASE/classify_a1.py")\" interactive \"$(cygpath -w "$LIVE")\" \"$PIN_CLAUDE_VERSION\" \"$PIN_MODEL\""
