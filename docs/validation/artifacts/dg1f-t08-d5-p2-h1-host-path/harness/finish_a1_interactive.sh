@@ -14,8 +14,12 @@ BASE=$(cd "$(dirname "$0")" && pwd)
 [ -z "${A1_PINSET+set}" ] || { echo "ABORT: A1_PINSET is set in the environment; unset it and pass A3 as the first argument"; exit 1; }
 if [ "${1:-}" = A3 ]; then export A1_PINSET=A3; shift; fi
 . "$BASE/pins_a1.env"
+# Kept evidence is never touched: refuse a finished batch before anything is written.
+. "$BASE/guard_finished.sh"
+refuse_finished_batch "$LIVE" outcome_a1_interactive.json outcome_a1.json
 ARM=${1:-}; REC=${2:-}
 case "$ARM" in H1c-sm-int|H1c-sm-int-ctl) ;; *) echo "ABORT: arm must be H1c-sm-int or H1c-sm-int-ctl"; exit 1 ;; esac
+refuse_finished_arm "$LIVE/$ARM"
 if [ "${A1_PINSET:-}" = A3 ] && [ "${DISABLE_AUTOUPDATER:-}" != 1 ]; then
   echo "ABORT: pin set A3 needs DISABLE_AUTOUPDATER=1 in this shell"; exit 1
 fi
@@ -31,6 +35,16 @@ V=$(claude --version | tr -d '\r')
 P0=$(sed -n 's/^claude_version=//p' "$OUT/observer.txt" | head -1)
 [ "$V" = "$PIN_CLAUDE_VERSION" ] && [ "$P0" = "$PIN_CLAUDE_VERSION" ] \
   || { echo "ABORT: claude version changed or unpinned (prep '$P0', now '$V', pin '$PIN_CLAUDE_VERSION'); nothing written"; exit 1; }
+# observation.json is validated BEFORE anything is written: the recording hash marks
+# the arm finished (refuse_finished_arm), so an incomplete observation must leave the
+# arm unfinished and finish re-runnable once it is filled in.
+"$PY" -I -c "
+import json,sys
+o=json.load(open(sys.argv[1],encoding='utf-8'))
+bad=[k for k in ('notice_visible','returned_to_input_prompt','unexpected_prompt') if not isinstance(o.get(k),bool)]
+if bad: sys.exit('observation.json: fill in booleans: '+', '.join(bad))
+print('observation.json ok')" "$(cygpath -w "$OUT/observation.json")" \
+  || { echo "ABORT: observation.json incomplete; fill it in and run finish again (nothing written)"; exit 1; }
 die() { echo "HARNESS_FAILURE: $*" | tee -a "$OUT/harness_failure.txt"; exit 1; }
 h() { [ -f "$1" ] && sha256sum < "$1" | cut -d' ' -f1 || echo absent; }
 {
@@ -53,12 +67,6 @@ if [ -n "$TP" ] && [ -f "$(cygpath -u "$TP")" ]; then
 else
   echo "transcript_collected=no" >> "$OUT/observer.txt"
 fi
-"$PY" -I -c "
-import json,sys
-o=json.load(open(sys.argv[1],encoding='utf-8'))
-bad=[k for k in ('notice_visible','returned_to_input_prompt','unexpected_prompt') if not isinstance(o.get(k),bool)]
-if bad: sys.exit('observation.json: fill in booleans: '+', '.join(bad))
-print('observation.json ok')" "$(cygpath -w "$OUT/observation.json")" || die "observation.json incomplete"
 # Evidence-review template (review of #556): pre-filled with this arm's recording and
 # frame hashes; a reviewer other than the classifier must fill in shows_nonce per frame,
 # notice_visible and reviewer, from the RECORDING, and save it as capture_review.json.

@@ -17,8 +17,12 @@ BASE=$(cd "$(dirname "$0")" && pwd)
 [ -z "${A1_PINSET+set}" ] || { echo "ABORT: A1_PINSET is set in the environment; unset it and pass A3 as the first argument"; exit 1; }
 if [ "${1:-}" = A3 ]; then export A1_PINSET=A3; shift; fi
 . "$BASE/pins_a1.env"
+# Kept evidence is never touched: refuse a finished batch before anything is written.
+. "$BASE/guard_finished.sh"
+refuse_finished_batch "$LIVE" outcome_a1_interactive.json outcome_a1.json
 ARM=${1:-}
 case "$ARM" in H1c-sm-int|H1c-sm-int-ctl) ;; *) echo "ABORT: arm must be H1c-sm-int or H1c-sm-int-ctl"; exit 1 ;; esac
+refuse_finished_arm "$LIVE/$ARM"
 [ -n "${H1_LIVE:-}" ] && { echo "ABORT: H1_LIVE is set; the live root is fixed"; exit 1; }
 if [ "${H1_SELFTEST:-}" != 1 ] && [ -n "${CLAUDECODE:-}" ]; then echo "ABORT: CLAUDECODE set (run from your own terminal)"; exit 1; fi
 [ "$(cygpath -w "$LIVE")" = "$A1_LIVE_W" ] || { echo "ABORT: live root is not $A1_LIVE_W"; exit 1; }
