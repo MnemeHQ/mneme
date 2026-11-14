@@ -1,24 +1,37 @@
 #!/usr/bin/env bash
 # H1c Amendment A1, INTERACTIVE arm completion (probe scope 4.2).
-# usage: finish_a1_interactive.sh <arm> <recording_path>
+# usage: finish_a1_interactive.sh [A3] <arm> <recording_path>
 # Records the recording's SHA-256 and size (the recording itself stays local),
 # copies the session transcript named by the hook envelope, snapshots the
 # workspace, and validates observation.json. After both interactive arms are
 # finished, run: classify_a1.py interactive <live> <pin_version> <pin_model>, then
-# classify_a1.py combine <live>.
+# classify_a1.py combine <live> (the exact commands are printed at the end).
 set -u
 set -o pipefail
 BASE=$(cd "$(dirname "$0")" && pwd)
+# The pin set comes only from an optional first argument "A3" (Amendment A3, probe
+# scope 4.4); an A1_PINSET already in the environment is refused, never overwritten.
+[ -z "${A1_PINSET+set}" ] || { echo "ABORT: A1_PINSET is set in the environment; unset it and pass A3 as the first argument"; exit 1; }
+if [ "${1:-}" = A3 ]; then export A1_PINSET=A3; shift; fi
 . "$BASE/pins_a1.env"
 ARM=${1:-}; REC=${2:-}
 case "$ARM" in H1c-sm-int|H1c-sm-int-ctl) ;; *) echo "ABORT: arm must be H1c-sm-int or H1c-sm-int-ctl"; exit 1 ;; esac
+if [ "${A1_PINSET:-}" = A3 ] && [ "${DISABLE_AUTOUPDATER:-}" != 1 ]; then
+  echo "ABORT: pin set A3 needs DISABLE_AUTOUPDATER=1 in this shell"; exit 1
+fi
 OUT="$LIVE/$ARM/out"; WS="$LIVE/$ARM/ws"
 [ -d "$OUT" ] || { echo "ABORT: $ARM was not prepared"; exit 1; }
+# The arm must have been prepared under the same pin set.
+PS0=$(sed -n 's/^pinset=//p' "$OUT/observer.txt" | head -1)
+[ "${PS0:-A1}" = "${A1_PINSET:-A1}" ] || { echo "ABORT: $ARM was prepared under pin set '${PS0:-A1}', not '${A1_PINSET:-A1}'"; exit 1; }
 [ -n "$REC" ] && [ -f "$REC" ] || { echo "ABORT: recording file not found: $REC"; exit 1; }
-die() { echo "HARNESS_FAILURE: $*" | tee -a "$OUT/harness_failure.txt"; exit 1; }
+# The pin checks refuse WITHOUT writing into the arm (Amendment A3): a finish run
+# against the wrong root or an older arm must leave that arm's files untouched.
 V=$(claude --version | tr -d '\r')
 P0=$(sed -n 's/^claude_version=//p' "$OUT/observer.txt" | head -1)
-[ "$V" = "$PIN_CLAUDE_VERSION" ] && [ "$P0" = "$PIN_CLAUDE_VERSION" ] || die "claude version changed or unpinned (prep '$P0', now '$V', pin '$PIN_CLAUDE_VERSION')"
+[ "$V" = "$PIN_CLAUDE_VERSION" ] && [ "$P0" = "$PIN_CLAUDE_VERSION" ] \
+  || { echo "ABORT: claude version changed or unpinned (prep '$P0', now '$V', pin '$PIN_CLAUDE_VERSION'); nothing written"; exit 1; }
+die() { echo "HARNESS_FAILURE: $*" | tee -a "$OUT/harness_failure.txt"; exit 1; }
 h() { [ -f "$1" ] && sha256sum < "$1" | cut -d' ' -f1 || echo absent; }
 {
   echo "recording_sha256=$(h "$REC")"
@@ -69,3 +82,6 @@ json.dump({"_instructions": "Review the recording and each frame; set shows_nonc
            "frames": frames}, open(os.path.join(out, "capture_review.template.json"), "w", encoding="utf-8"), indent=2)
 PYEOF
 echo "Finished $ARM. Capture review template: $(cygpath -w "$OUT/capture_review.template.json")"
+echo "After both arms are finished and both capture reviews are saved, classify with the active pins:"
+echo "  \"$PY\" -I \"$(cygpath -w "$BASE/classify_a1.py")\" interactive \"$(cygpath -w "$LIVE")\" \"$PIN_CLAUDE_VERSION\" \"$PIN_MODEL\""
+echo "  \"$PY\" -I \"$(cygpath -w "$BASE/classify_a1.py")\" combine \"$(cygpath -w "$LIVE")\""

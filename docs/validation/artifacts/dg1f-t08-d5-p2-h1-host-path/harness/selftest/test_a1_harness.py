@@ -48,10 +48,12 @@ def _arm(live, arm, knobs):
     return pdir / "out"
 
 
-def _headless(tmp_path, knobs=None, ctl_knobs=None):
+def _headless(tmp_path, knobs=None, ctl_knobs=None, version=PIN_VERSION):
     live = tmp_path / "live"
-    _arm(live, "H1c-sm-ctl", ctl_knobs or {})
-    _arm(live, "H1c-sm", knobs or {})
+    for arm, k in (("H1c-sm-ctl", ctl_knobs), ("H1c-sm", knobs)):
+        out = _arm(live, arm, k or {})
+        if version is not None:  # run_a1_probe.sh always records the host version (A3 combine needs it)
+            (out / "observer.txt").write_text(f"arm={arm}\nclaude_version={version}\n", encoding="utf-8")
     return A1.headless(live, PIN)
 
 

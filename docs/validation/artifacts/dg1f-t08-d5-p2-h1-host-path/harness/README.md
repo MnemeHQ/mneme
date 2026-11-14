@@ -233,3 +233,50 @@ $env:DISABLE_AUTOUPDATER = "1"
 ```
 
 The evidence goes to `C:\dev\d5p2-h1-a2-live`. Collection with `collect_h1.py` and the record `docs/validation/dg1f-t08-d5-p2-host-path-h1-a2-<date>.md` form a separate evidence PR.
+
+## Amendment A3: H1c (A1 track) re-pinned to Claude Code 2.1.310 (offline-validated only)
+
+**Nothing here has run live.** The live runs need a separate, explicit go-ahead. The specification is probe scope §4.4 (proposed in the same PR as this harness change).
+
+| File | Role |
+|---|---|
+| `pins_a1.env` (A3 pin set) | Selected only by `A1_PINSET=A3`, which the A1 entry points set from their first argument `A3`. Claude Code `2.1.310 (Claude Code)`, `--model claude-opus-5-5` (`PIN_MODEL_FLAG`), root `C:\dev\d5p2-h1c-a3-live` (`A1_LIVE_W`), guarded delete `safe_rmtree_a3.py` (`A1_RMTREE`). An unknown or empty `A1_PINSET` aborts. Without it every A1 value is unchanged. `A1_PINSET` is in the `pins.env` snapshot, so `pins.local.env` can neither set nor clear it. |
+| `safe_rmtree_a3.py` | `safe_rmtree_a1.py` with an exact delta: the A3 root, and `PROTECTED` covering the H1, A1 and A2 roots, every archive and `C:\dev\d5p2-h1c-a1-attempts`. Same four arm names. |
+| `run_a1_headless.sh [A3]` | Pin-set selection from the argument only. An inherited `A1_PINSET` is refused, even empty. Under A3 the headless classifier gets the version pin. |
+| `run_a1_probe.sh` | The root and guarded delete come from the pin set. A3 needs `DISABLE_AUTOUPDATER=1`. `claude --version` is checked immediately before **every** session (A1 too, since a mismatch only aborts). `--model` is passed when the pin set defines one. `observer.txt` records `pinset`, `model_flag`, `disable_autoupdater` and the checked `claude_version`. |
+| `prep_a1_interactive.sh [A3] <arm>` | Pin-set selection, the A3 root and `DISABLE_AUTOUPDATER`. It records `pinset` and `model_flag`. Under A3 it prints hardened operator steps for one window: auto-updater off, version check, `--model`, stop if signed out, the prompt sent once, no `/model` or `/login`, at least 30 s idle, `/exit`. |
+| `finish_a1_interactive.sh [A3] <arm> <recording>` | Pin-set selection and `DISABLE_AUTOUPDATER` under A3. It refuses an arm prepared under another pin set. The version check refuses **without writing into the arm**. It prints the exact `classify_a1.py interactive` and `combine` commands for the active pins. |
+| `classify_a1.py` | `headless <live> <pin_model> [<pin_version>]`: with a version pin, an arm whose recorded version differs, or is unrecorded, gives `NOT_EXECUTED`. Both arms' versions are recorded under `a1.claude_versions`. `combine` first requires both headless versions and the interactive pin to be present and equal (`NOT_EXECUTED` otherwise), and records `host_version`. |
+| `preflight.sh`, `selftest/claude` | Under an A1 pin set they read `pins_a1.env`. The preflight reports the pin set and checks `DISABLE_AUTOUPDATER` for A3. `run_h1.sh` refuses an inherited `A1_PINSET`. |
+
+**Offline validation (stub only, NOT evidence):**
+- `python -m pytest -q …/harness/selftest`: **277 passed** (43 in `test_a3_harness.py`). They cover:
+  - the A3 root, arms and protected trees;
+  - the headless version pin: match, mismatch in either arm, unrecorded, and no pin (A1 behavior);
+  - `combine` on one version, and `NOT_EXECUTED` for mixed versions (including A1 headless plus A3 interactive) or an unrecorded version, checked before any passing label;
+  - the A3 and default A1 pin values, and unknown or empty `A1_PINSET`;
+  - `pins.local.env` unable to set, export or clear `A1_PINSET`;
+  - every entry point and `run_h1.sh` refusing an inherited `A1_PINSET`;
+  - `DISABLE_AUTOUPDATER` required by the probe, prep, finish and preflight under A3, with the preflight's success line checked exactly;
+  - `--model` in the probe.
+
+  The `test_a1_harness.py` headless fixture now records the host version, as the runner does.
+- **Mutation checks:** all 12 A3 mutants were caught, plus a broken preflight line continuation (a real bug found in the stub self-test and fixed).
+- **`run_a1_headless.sh A3` was run end to end under `H1_SELFTEST=1`**, together with `prep_a1_interactive.sh A3` and `finish_a1_interactive.sh A3` for the control arm, all in the A3 root:
+  - the preflight reported pin set A3, `DISABLE_AUTOUPDATER=1` and `2.1.310`;
+  - the observers recorded `pinset=A3`, `model_flag=claude-opus-5-5` and `2.1.310`, and the init event reported `claude-opus-5-5`;
+  - the stub's default `stream` mode reproduced the known A1 collision (`INCONCLUSIVE`);
+  - a stub version of `2.1.311` at finish was refused with nothing written.
+
+  The A3 root was emptied afterwards through `safe_rmtree_a3.py`.
+- **Incident during the self-test (fixed):** one `finish_a1_interactive.sh` call was made **without** `A3`, so it targeted the A1 root. The leftover attempt-2 control arm there received a new `harness_failure.txt` from the old failure path. The file was removed. That arm's file set and hashes match the preserved `2026-10-19-ctl-attempt2` copy, and nothing else in the A1 root or archive changed. `finish` now refuses on the version check without writing.
+
+**Running it live (when authorized).** Use your own windows, never inside Claude Code, with `claude --version` printing `2.1.310 (Claude Code)`, `PY` set in `pins.local.env`, and no `MNEME_*`, `CLAUDECODE`, `H1_SELFTEST`, `H1_LIVE`, `H1_PINSET` or `A1_PINSET` variables:
+
+```powershell
+$env:DISABLE_AUTOUPDATER = "1"
+& "C:\Program Files\Git\bin\bash.exe" -l "<harness>/run_a1_headless.sh" A3
+& "C:\Program Files\Git\bin\bash.exe" -l "<harness>/prep_a1_interactive.sh" A3 H1c-sm-int-ctl
+```
+
+Then follow the printed steps for the control arm, then for `H1c-sm-int`, then the capture reviews, `classify_a1.py interactive` and `combine`. The evidence goes to `C:\dev\d5p2-h1c-a3-live`. The record `docs/validation/dg1f-t08-d5-p2-host-path-h1c-a3-<date>.md` goes in a separate evidence PR.

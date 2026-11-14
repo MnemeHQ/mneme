@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Self-test stub shim. NOT Claude Code. Put this directory first on PATH only
 # together with H1_SELFTEST=1; the runners refuse any other combination.
-# It answers with the active pin set's version (H1_PINSET, as the runners set it).
+# It answers with the active pin set's version (H1_PINSET or A1_PINSET, as the runners set it).
 H=$(cd "$(dirname "$0")/.." && pwd)
-. "$H/pins.env"
+if [ -n "${A1_PINSET+set}" ]; then . "$H/pins_a1.env"; else . "$H/pins.env"; fi
 export H1_STUB_VERSION="${H1_STUB_VERSION:-$PIN_CLAUDE_VERSION}"
 exec "$PY" -I "$H/selftest/stub_claude.py" "$@"
