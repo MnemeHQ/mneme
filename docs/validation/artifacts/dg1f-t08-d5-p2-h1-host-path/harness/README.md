@@ -295,14 +295,20 @@ The interactive steps deliberately ignore the headless markers, because the inte
 
 **To start a new batch in a root that holds a finished one:** archive the root (copy plus SHA-256 listing), then empty it (`safe_rmtree*.py delete <arm>` per arm, and remove the batch files). There is no override flag.
 
-`finish_a1_interactive.sh` now validates `observation.json` **before** writing anything. An incomplete observation leaves the arm unfinished, and `finish` can be re-run once the observation is filled in.
+`finish_a1_interactive.sh` validates `observation.json` **before** writing anything. It then copies the transcript and writes the capture-review template, written atomically with the recording hash passed in rather than read back. Only after both succeed does it append the finished marker (`recording_sha256`, `recording_bytes`, `finished`, `notes_after`, `transcript_collected`) to `observer.txt`, in one block. A failure at any earlier step (review of #803) leaves the arm unfinished, and `finish` can be re-run once the cause is fixed.
 
 **Why.** On 2026-11-13 a mutation check of #802 disabled a pin-set guard. The shell test then ran `run_h1.sh A2` against the kept A2 root, which deleted `H1_DONE` and `summary_h1.md` and overwrote `run_h1.log` before aborting at the preflight. The files were restored from `C:\dev\d5p2-h1-a2-archive\2026-11-11`, and the root again verifies 74/74.
 
-**Rule for mutation checks:** never mutate a runner while running tests that execute it. Those tests use the real, fixed roots, so a disabled guard can let the runner write. `selftest/test_finished_batch_guard.py` executes no runner: it exercises the helper only on temporary directories and checks each call site's position from the source. Mutate the guard only against that file.
+**Rule for mutation checks:** never mutate a runner while running tests that execute it against the real, fixed roots, because a disabled guard can let the runner write. `selftest/test_finished_batch_guard.py` never touches a real root:
+- it exercises the helper only on temporary directories;
+- it checks each call site's position from the source;
+- it runs `finish` only inside a temporary copy of the harness whose A1 root is rewritten to a temporary directory, after asserting that rewrite.
+
+Mutate the guard only against that file.
 
 **Offline validation:**
-- `python -m pytest -q …/harness/selftest`: **293 passed** (16 in `test_finished_batch_guard.py`).
-- **Mutation checks:** 12 mutants, all caught, run against that file only. They covered the helper exiting, the helper matching the arm, the helper writing, each removed or late call site, prep keying on the headless markers, and `finish` validating after writing.
+- `python -m pytest -q …/harness/selftest`: **296 passed** (19 in `test_finished_batch_guard.py`).
+- **Mutation checks:** 13 mutants, all caught, run against that file only. They covered the helper exiting, the helper matching the arm, the helper writing, each removed or late call site, prep keying on the headless markers, `finish` validating after writing, and `finish` marking the arm finished before the template.
+- **Retry (review of #803), sandboxed:** a `finish` whose template generation fails (a malformed `frames` entry), or whose transcript copy fails, leaves `observer.txt` unchanged and the arm retryable. After the cause is fixed, `finish` completes with exactly one `recording_sha256`, and the template is bound to it. A further `finish` is refused and changes nothing. Against the pre-fix `finish`, both failure tests fail.
 - **Replaying the incident:** `run_h1.sh A2`, `run_h1.sh` and `run_a1_headless.sh` against the kept A2, H1 and A1 roots each refused with `nothing was changed`.
 - **Evidence trees:** the H1, A1, A2 and A3 roots, the archives and the A1 attempts were byte-identical before and after.
