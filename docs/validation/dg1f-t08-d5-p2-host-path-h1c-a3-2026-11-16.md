@@ -6,7 +6,7 @@
 > finished-batch guard of #803 (merge `c9480c11`).
 >
 > **Results as classified during the run:**
-> - **Interactive: `DELIVERED_TO_USER_ONLY`**, a passing label under D5 §5.1 (developer **or** agent).
+> - **Interactive: `DELIVERED_TO_USER_ONLY`** as run, which is a passing label under D5 §5.1 (developer **or** agent). **It is not an accepted, protocol-compliant pass.** The capture was screenshots, not the continuous recording §4.2 requires, and that substitution needs a reviewed evidence decision (§2.1).
 > - **Headless: `INCONCLUSIVE`.**
 > - **Combined H1c under A1: `INCONCLUSIVE`**, on one host version (`2.1.310 (Claude Code)`).
 >
@@ -14,7 +14,7 @@
 >
 > **The only reason the headless run is `INCONCLUSIVE`** is the collision A1 (§4.2) and A3 (§4.4) both predicted: on 2.1.310, the Stop `systemMessage` is also surfaced as a stream-json `system` event with subtype `informational`, in the emitter arm only. The unchanged strict host-event rule counts that as an unexplained difference between the arms (§4).
 >
-> **No host interference was observed in either run**, and **the notice never reached the model** (§3, §4).
+> **No host interference was observed in either run** (§3). **No model-bound nonce location was observed, and the model did not echo the nonce**, so agent delivery was not established (§4).
 >
 > **H1 gate: still NOT MET.** H1c has no passing combined label until a reviewed rule covers the stream event, the archived headless pair is reclassified, and a separate gate record combines H1c with A2's three paths (#800).
 
@@ -40,10 +40,7 @@
 | Interactive | `H1c-sm-int` | prepared 18:55:31, session 18:55 (local 13:55), finished 19:02:04 |
 
 **Recorded deviations and handling, for the reviewer:**
-1. **Screenshots instead of a screen recording (owner decision, 2026-11-16).**
-   - §4.2 asks for a recording from launch until the session has been idle at the prompt for at least 30 seconds. The owner decided that "a screenshot is enough".
-   - Each interactive arm's capture is therefore the operator's own screenshot of the session window, and its SHA-256 is the arm's `recording_sha256`: control `9f88e1c2…`, emitter `63278d67…`.
-   - The idle time is shown by the reply's "done" time against the taskbar clock in the screenshot: 1:53 PM against 13:54 for the control, and 1:55 PM against 13:58 for the emitter.
+1. **Screenshots instead of a screen recording (owner decision, 2026-11-16).** §4.2 asks for a recording from launch until the session has been idle at the prompt for at least 30 seconds. The owner decided that "a screenshot is enough". Each interactive arm's capture is therefore the operator's own screenshot of the session window, and its SHA-256 is the arm's `recording_sha256`: control `9f88e1c2…`, emitter `63278d67…`. §2.1 sets out what this does and does not support.
 2. **The interactive prep instructions did not print in the operator's window.** The cause is unknown.
    - Preparation itself completed in full: workspace, nonce, hook registration, observer and template.
    - The operator steps were given in the chat instead, with the same content.
@@ -53,6 +50,11 @@
    - The reviewer is not the classifier. The agent wrote the files and ran the classifier, but did not decide what the captures show.
 4. **The arms were finished by the agent** (`finish_a1_interactive.sh A3`) after the operator had closed each session with `/exit`. Each transcript shows exactly one prompt, then `/exit`.
 5. **A stray `S` is visible in the input box** in all three screenshots. It was never sent: each transcript holds one prompt.
+6. **The screenshot crops are not published (owner decision, 2026-11-16, review of #804).**
+   - The pinned ADR-033 C4 trusted gate evaluates every changed regular file and cannot evaluate binary files. The first version of this PR committed six PNG crops, and the gate returned `UNEVALUATED`, which fails under the `closed` posture.
+   - The owner chose to keep the crops local rather than change the accepted gate policy.
+   - §4.2 asks for redacted still frames to be published, so this is a deviation, recorded with deviation 1.
+   - The crops are byte-identical to those in the first version. §7 says what each shows, and MANIFEST.json binds each by SHA-256.
 
 ## 2. Results (as classified during the run)
 
@@ -61,6 +63,40 @@
 | Headless (`H1c-sm` vs `H1c-sm-ctl`) | `INCONCLUSIVE` | reason: `unexplained host-event difference between arms (emitter ['informational'], control [])`; `host_interference: []` |
 | Interactive (`H1c-sm-int` vs `H1c-sm-int-ctl`) | **`DELIVERED_TO_USER_ONLY`** | `capture_review: confirmed`, Stop invocations 1 and 1, no reasons |
 | **Combined H1c (A1)** | **`INCONCLUSIVE`** | `headless run is INCONCLUSIVE`; `host_version: 2.1.310 (Claude Code)`; `h1c_passes_under_a1: false` |
+
+The as-run outcome files are published unchanged.
+
+### 2.1 Status of the interactive label: as run, not yet accepted (review of #804)
+
+`DELIVERED_TO_USER_ONLY` is what `classify_a1.py` produced. The classifier checks:
+- the capture hashes;
+- that the listed frames exist;
+- the reviewer's declarations.
+
+It does **not** check that the capture was a continuous recording.
+
+**What the screenshots support:**
+- the notice `Stop says: MNEME-PROBE-ac6914cfa1176045 …` is visible to the developer in the emitter session;
+- no `MNEME-PROBE-` token appears in the control's two screenshots;
+- each session is back at its input prompt when the screenshot was taken.
+
+**What they do not support** is the continuous observation a recording gives: everything that happened on screen between launch and the idle period.
+
+**The reviewer's point about the clock times is correct.** The control's reply ("done 1:53 PM") and its later screenshot (taskbar 13:54) do not by themselves show 30 seconds; the two could be seconds apart across a minute boundary. The emitter's (1:55 PM against 13:58) do.
+
+**Host-recorded idle time.** The session transcripts, not the screenshots, show how long each session stayed open after the reply:
+
+| Arm | Last assistant message | Stop hook | `/exit` | Reply → `/exit` |
+|---|---|---|---|---|
+| control | 18:53:12.7Z | 18:53:13.0Z | 18:55:18.1Z | 125 s |
+| emitter | 18:55:50.5Z | 18:55:50.7Z | 19:01:51.7Z | 361 s |
+
+Between the reply and `/exit`, each transcript holds only host bookkeeping entries (and, in the emitter, the Stop hook's `hook_success` and `hook_system_message`). It holds no user input. This shows each session stayed open and idle for well over 30 seconds. It is a host record, not an observation of the screen.
+
+**Disposition requested:** a reviewed evidence decision on whether the screenshots, together with the host-recorded idle time and the capture review, satisfy §4.2 for this run. Until that decision:
+- the interactive label stands as an as-run classifier output;
+- it is not claimed as an independently accepted, protocol-compliant pass;
+- H1c is `INCONCLUSIVE` in any case (§2).
 
 ## 3. Non-interference
 
@@ -72,7 +108,7 @@
 
 **Interactive.** Both arms:
 - had one Stop invocation each, with no re-entry;
-- returned to the input prompt and stayed idle there for at least 30 seconds (§1);
+- were back at the input prompt in the screenshots, and stayed open with no user input for over 30 seconds before `/exit` (125 s and 361 s, from the transcripts; §2.1);
 - showed no unexpected prompt.
 
 **Evidence only, as §3 step 4 says:**
@@ -92,10 +128,9 @@ Every raw entry of all four arms was checked for both nonces. Only these hold on
 | `H1c-sm-int` | the host UI (screenshot): `Stop says: MNEME-PROBE-ac6914cfa1176045 This is a Mneme H1 channel-probe notice. …` under the reply | developer delivery (capture review) |
 | controls | none | — |
 
-- **No model-bound location.**
-  - The nonce is in no user, assistant or tool content.
-  - It is in no `api-request-blob`: neither emitter arm has a blob containing it. On 2.1.310 those blobs record what was sent to the model (#795), so the Stop `systemMessage` was not part of the model request.
-  - The model did not echo it in any arm.
+- **No model-bound nonce location was observed, and the model did not echo the nonce, so agent delivery was not established.**
+  - The nonce is in no user, assistant or tool content of any arm.
+  - No `api-request-blob` contains it. This is recorded as an observation only. Under the accepted R5 semantics these blobs are not shown to be complete records of what reached the model, so their silence is **not** proof that the notice never reached it (review of #804).
 - **Why the headless run is `INCONCLUSIVE`.**
   - The informational event is categorised (`host_output`), but the strict host-event subtype rule (unchanged) independently flags any event subtype present in one arm only.
   - It is fully attributable to the probed hook:
@@ -111,12 +146,14 @@ Every raw entry of all four arms was checked for both nonces. Only these hold on
 
 ## 6. What this run establishes, and what it does not
 
-**It establishes**, on Claude Code `2.1.310` with `claude-opus-5-5`, n = 1 per run:
-- **The developer sees the notice:** a Stop command hook's top-level `systemMessage` is shown to the developer in an interactive session (`Stop says: …`, under the reply) and is absent from the paired control (capture-reviewed).
-- **The agent does not:** the notice does not reach the model in either mode.
-- **No host interference in either mode:** no forced continuation or re-entry, which the original `additionalContext` shape caused (#549), no blocked or retried turn, and a normal end.
+**It provides evidence**, on Claude Code `2.1.310` with `claude-opus-5-5`, n = 1 per run, that:
+- **The developer sees the notice.** A Stop command hook's top-level `systemMessage` is shown to the developer in an interactive session (`Stop says: …`, under the reply) and is absent from the paired control. This is capture-reviewed from screenshots, subject to the disposition in §2.1.
+- **Agent delivery was not established.** No model-bound nonce location was observed in either mode, and the model never echoed the nonce (§4).
+- **No host interference in either mode.** There was no forced continuation or re-entry (the original `additionalContext` shape caused one, #549), no blocked or retried turn, and a normal end.
 
 **It does not establish:**
+- **An accepted, protocol-compliant pass for the interactive run.** The screenshot substitution needs a reviewed evidence decision (§2.1).
+- **That the notice could never reach the model.** Absence was observed, not proven (§4).
 - **A passing combined H1c label.** That needs the stream-event rule and an offline reclassification of the archived headless pair.
 - **The H1 gate.** That needs a separate gate record over H1a, H1b (A2, #800) and H1c on one host version.
 - **Repeatability** (n = 1), other host versions, models or terminals.
@@ -125,11 +162,23 @@ Every raw entry of all four arms was checked for both nonces. Only these hold on
 ## 7. Artifacts
 
 - **Harness:** `harness/collect_a3.py` (new; added after the run, so it is not in the as-run hashes). It reuses `collect_h1.py` (redaction and leak scan) and `collect_a2.py` (`select_transcript_a2`) unchanged.
-- **Published evidence:** [`live-a3-2026-11-16/`](artifacts/dg1f-t08-d5-p2-h1-host-path/live-a3-2026-11-16/), 42 redacted text files and 6 frame crops:
+- **Published evidence:** [`live-a3-2026-11-16/`](artifacts/dg1f-t08-d5-p2-h1-host-path/live-a3-2026-11-16/), 42 redacted text files and no binary files:
   - per arm: the observer, prompt, probe, hook registration, hook log, nonce, and the selected events and transcript;
   - for the interactive arms: the observation, capture review and template;
   - the three outcomes as classified, the run log, and `MANIFEST.json`.
-- **Frames.** Each screenshot is published as two PNG crops, the terminal and the taskbar clock. The operator's user folder is masked in both control terminal crops. MANIFEST.json records each original frame's SHA-256 (the one the capture review is bound to), the crop and mask boxes, and each crop's SHA-256. The originals are not published, because they show the operator's desktop.
+- **Frames: not published (deviation 6).**
+  - Each screenshot is cropped to the terminal and to the taskbar clock. The operator's user folder is masked in both control terminal crops.
+  - The crops are kept locally in `C:\dev\d5p2-h1c-a3-captures\crops-2026-11-16`. The collector refuses a crops folder inside the repository.
+  - MANIFEST.json records each original frame's SHA-256 (the one the capture review is bound to), the crop and mask boxes, and each local crop's SHA-256 (`published: false`).
+  - What the crops show:
+    - control `f1`/`f2`: the launch command with `--model claude-opus-5-5`, the session header `Claude Code v2.1.310 · Opus 5.5`, the prompt, the reply `OK` / `NO-PROBE-TOKEN`, no notice, and the input prompt; clock 13:53 and 13:54;
+    - emitter `f1`: the same, plus the `Stop says: MNEME-PROBE-ac6914cfa1176045 This is a Mneme H1 channel-probe notice. It carries no instruction and requires no action.` line under the reply; clock 13:58.
+- **Operator-attested, not independently verifiable from GitHub:**
+  - the raw-archive integrity checks;
+  - the completeness check that every nonce-bearing raw entry is published;
+  - the screenshots and crops themselves, including the visual check that the masks cover the user folder.
+
+  A reviewer can verify the published text artifacts, the manifests and the collector source, but cannot inspect the original screenshots.
 - **Not published:** the raw `events.jsonl`, `transcript.jsonl` and `claude.stderr.txt`, and the captures. MANIFEST.json records their SHA-256 and size.
 - **Leak scans:** the collector's leak scan passed, and so did a second sweep (paths, emails, tool IDs, UUIDs, encoded project folders) with 0 findings.
 - **Archive.** `C:\dev\d5p2-h1c-a3-archive\2026-11-16`: 56 files (the live root plus the two captures under `_captures/`), read-only, with listing `2026-11-16.SHA256SUMS` (SHA-256 `17c73d1a…249f74f`). The live root verified against it after collection. Keep the live root, `C:\dev\d5p2-h1c-a3-captures` and the archive.

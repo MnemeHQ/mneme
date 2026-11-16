@@ -1,6 +1,6 @@
 """Copy Amendment A3 live evidence into the repository, selected and redacted.
 
-usage: collect_a3.py <live_root> <dest_dir> <python_exe> <claude_bin>
+usage: collect_a3.py <live_root> <dest_dir> <python_exe> <claude_bin> <local_crops_dir>
 
 Added AFTER the A3 live run (2026-11-16). It is not part of the as-run harness
 hashed in run_a1_headless.log, and it never re-classifies: outcome_a1_headless.json,
@@ -16,11 +16,14 @@ A3-specific additions:
   1. The interactive arms also publish observation.json, capture_review.json and
      capture_review.template.json (redacted like every other file).
   2. Screenshot frames (owner decision 2026-11-16: screenshots instead of a screen
-     recording) are NOT published as captured: they show the operator's desktop.
-     Each is published as two cropped PNGs, the terminal area and the taskbar clock,
-     with fixed mask boxes over the operator's user folder in the terminal crop.
+     recording) are NEVER published: the originals show the operator's desktop, and
+     the pinned ADR-033 C4 trusted gate cannot evaluate binary files (owner decision
+     2026-11-16, review of #804: keep the crops local rather than change gate
+     policy). Each frame is cropped to the terminal area and the taskbar clock, with
+     fixed mask boxes over the operator's user folder in the terminal crop, and the
+     crops are written to <local_crops_dir>, which must be OUTSIDE the repository.
      MANIFEST.json records each original frame's SHA-256 (the one the capture review
-     is bound to), the crop and mask boxes, and each published crop's SHA-256.
+     is bound to), the crop and mask boxes, and each local crop's SHA-256.
   3. Claude Code's encoded project directory for the live root
      (`C--dev-d5p2-h1c-a3-live`) becomes <LIVE_PROJECT>.
 
@@ -61,7 +64,7 @@ def sha(b):
     return hashlib.sha256(b).hexdigest()
 
 
-def publish_frames(src, arm, dest, entry):
+def crop_frames(src, arm, crops, entry):
     from PIL import Image, ImageDraw  # only needed when frames exist
     obs = json.loads((src / "observation.json").read_text(encoding="utf-8"))
     entry["frames"] = []
@@ -74,7 +77,7 @@ def publish_frames(src, arm, dest, entry):
         im = Image.open(io.BytesIO(raw)).convert("RGB")
         stem = Path(f["file"]).stem
         rec = {"file": f["file"], "t": f.get("t"), "original_sha256": sha(raw), "original_bytes": len(raw),
-               "original_size": list(im.size), "published": {}}
+               "original_size": list(im.size), "published": False, "local_crops": {}}
         for part in ("term", "clock"):
             crop = im.crop(spec[part])
             if part == "term":
@@ -83,17 +86,23 @@ def publish_frames(src, arm, dest, entry):
                     d.rectangle(box, fill=(0, 0, 0))
             buf = io.BytesIO()
             crop.save(buf, format="PNG")
-            out = dest / arm / "frames" / f"{stem}.{part}.png"
+            out = crops / arm / f"{stem}.{part}.png"
             out.parent.mkdir(parents=True, exist_ok=True)
+            if out.exists():
+                raise SystemExit(f"local crop exists, refusing to overwrite: {out}")
             out.write_bytes(buf.getvalue())
-            rec["published"][f"frames/{stem}.{part}.png"] = {"sha256": sha(buf.getvalue()), "crop": list(spec[part]),
-                                                             "mask": [list(b) for b in spec["mask"]] if part == "term" else []}
+            rec["local_crops"][f"<LOCAL_CROPS>/{arm}/{stem}.{part}.png"] = {
+                "sha256": sha(buf.getvalue()), "crop": list(spec[part]),
+                "mask": [list(b) for b in spec["mask"]] if part == "term" else []}
         entry["frames"].append(rec)
 
 
 def main(argv):
-    live, dest, py, cbin = Path(argv[1]), Path(argv[2]), argv[3], argv[4]
+    live, dest, py, cbin, crops = Path(argv[1]), Path(argv[2]), argv[3], argv[4], Path(argv[5]).resolve()
     harness = Path(__file__).resolve().parent
+    repo = harness.parents[4]
+    if crops == repo or repo in crops.parents:
+        raise SystemExit(f"local crops directory must be outside the repository: {crops}")
     red = c.Redactor(live, harness, py, cbin)
     red.subs = [(LIVE_PROJECT, "<LIVE_PROJECT>")] + red.subs
     if dest.exists():
@@ -133,7 +142,7 @@ def main(argv):
         for name in c.RAW:
             entry["raw_not_published"][name] = c.sha_size(src / name)
         if arm in INTERACTIVE:
-            publish_frames(src, arm, dest, entry)
+            crop_frames(src, arm, crops, entry)
         manifest["arms"][arm] = entry
     for name in BATCH:
         p = live / name
@@ -155,7 +164,7 @@ def main(argv):
                              "reclassified": False}
     body = json.dumps(manifest, indent=2) + "\n"
     c.write_text(dest / "MANIFEST.json", body.replace(str(dest), "<DEST>"), red, published)
-    print(f"collected {len(published)} text files (plus cropped frames) into {dest}")
+    print(f"collected {len(published)} text files into {dest}; frame crops kept locally in {crops}")
     return 0
 
 

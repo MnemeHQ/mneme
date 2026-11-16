@@ -145,8 +145,9 @@
             2000,
             954
           ],
-          "published": {
-            "frames/f1.term.png": {
+          "published": false,
+          "local_crops": {
+            "<LOCAL_CROPS>/H1c-sm-int-ctl/f1.term.png": {
               "sha256": "a8a7e7cf32567a95943a6059d61b97efbcb9082d1b49c317c3a1f4436f80e860",
               "crop": [
                 48,
@@ -163,7 +164,7 @@
                 ]
               ]
             },
-            "frames/f1.clock.png": {
+            "<LOCAL_CROPS>/H1c-sm-int-ctl/f1.clock.png": {
               "sha256": "cb22ddbada08e907b4a924515e87b8cd825832684e179b5ca07e8cd176810656",
               "crop": [
                 1880,
@@ -184,8 +185,9 @@
             2000,
             1111
           ],
-          "published": {
-            "frames/f2.term.png": {
+          "published": false,
+          "local_crops": {
+            "<LOCAL_CROPS>/H1c-sm-int-ctl/f2.term.png": {
               "sha256": "c1ffa49522e8245b1dbc2091daad02f7876c913272d45aecd2a1c1136e345284",
               "crop": [
                 33,
@@ -202,7 +204,7 @@
                 ]
               ]
             },
-            "frames/f2.clock.png": {
+            "<LOCAL_CROPS>/H1c-sm-int-ctl/f2.clock.png": {
               "sha256": "6906a8f2b62da93017975a05b92550672d7999abe4802fb30838be00f5c2652a",
               "crop": [
                 1875,
@@ -271,8 +273,9 @@
             2000,
             1087
           ],
-          "published": {
-            "frames/f1.term.png": {
+          "published": false,
+          "local_crops": {
+            "<LOCAL_CROPS>/H1c-sm-int/f1.term.png": {
               "sha256": "b3eb2618b826e8a20d2b14af3052ef8c922f4fc2a640f6ef44336dd8953fca26",
               "crop": [
                 45,
@@ -282,7 +285,7 @@
               ],
               "mask": []
             },
-            "frames/f1.clock.png": {
+            "<LOCAL_CROPS>/H1c-sm-int/f1.clock.png": {
               "sha256": "5036faf69af6396cc4b67eca6d2eec151c83258f9d4e23f794d4414db4e82713",
               "crop": [
                 1895,
@@ -326,7 +329,7 @@
   },
   "collector": {
     "file": "harness/collect_a3.py",
-    "sha256": "54fa7c38e91e8b272735ad5399c6ab55e5f41d1b2c12bb5b862ddad23d32f1ce",
+    "sha256": "a8e4c2e5954b9c1c0f280639cd1ed2c80e65ee3bd48705553efd158e637ca6aa",
     "reuses": [
       "harness/collect_h1.py",
       "harness/collect_a2.py (select_transcript_a2)"
