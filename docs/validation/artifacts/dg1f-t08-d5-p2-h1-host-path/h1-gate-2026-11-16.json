@@ -1,0 +1,41 @@
+{
+  "gate": "H1",
+  "result": "PASS",
+  "problems": [],
+  "host_version": "2.1.310 (Claude Code)",
+  "paths": [
+    {
+      "path": "H1a-edit",
+      "file": "live-a2-2026-11-11/H1a-edit/outcome.r1r5.json",
+      "sha256": "5e7e8f844009e6fdf6691058568f3597a179dace6fac30029c0b456335b80526",
+      "label": "DELIVERED_TO_AGENT",
+      "rules": "as-run table + R1-R5 (#551, #561, #796)",
+      "host_version": "2.1.310 (Claude Code)"
+    },
+    {
+      "path": "H1a-bash",
+      "file": "live-a2-2026-11-11/H1a-bash/outcome.r1r5.json",
+      "sha256": "9b3caad9e019ded77f44657b17f4762bbfc03cb27ca4f1dd1aa9d00fc4c6b431",
+      "label": "DELIVERED_TO_AGENT",
+      "rules": "as-run table + R1-R5 (#551, #561, #796)",
+      "host_version": "2.1.310 (Claude Code)"
+    },
+    {
+      "path": "H1b-start",
+      "file": "live-a2-2026-11-11/H1b-start/outcome.r1r5.json",
+      "sha256": "5b303f4a6cfcfd2284bf526b63e535d7ab38cbd4bff44711bba1278b931df3da",
+      "label": "DELIVERED_TO_AGENT",
+      "rules": "as-run table + R1-R5 (#551, #561, #796)",
+      "host_version": "2.1.310 (Claude Code)"
+    },
+    {
+      "path": "H1c",
+      "file": "live-a3-2026-11-16/outcome_a1.r1r6.json",
+      "sha256": "d26d80be032e969d7590c9e5bcc672f1ea55da31dbae0bd839b4f0322fd75643",
+      "label": "DELIVERED_TO_USER_ONLY",
+      "rules": "A1 (#555) on as-run table + R1-R6 (#551, #561, #796, #805)",
+      "host_version": "2.1.310 (Claude Code)"
+    }
+  ],
+  "rule": "every path DELIVERED_TO_AGENT, DELIVERED_TO_USER_ONLY or EVIDENCE_REUSED, on one host version"
+}
