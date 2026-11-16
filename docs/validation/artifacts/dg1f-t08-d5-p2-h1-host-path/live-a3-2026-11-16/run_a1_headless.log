@@ -1,0 +1,90 @@
+[preflight] pins.local.env sha256: fcf13679e08009a7e84f46e1ce2086f14603837c47c6323a6179439984863644
+[preflight] setting sources for every probe: project
+[preflight] pin set: A3 (H1c, Amendment A3)
+[preflight] DISABLE_AUTOUPDATER=1 (Amendment A3)
+[preflight] claude: 2.1.310 (Claude Code)
+[preflight] MNEME_* variables in launching shell: 0 (names/values not printed)
+[preflight] claude binary: <CLAUDE_BIN>
+[preflight] python: 3.12.10
+[preflight] live root: <LIVE>
+[preflight] model pin (passed as --model, checked from the first probe's init event): claude-opus-5-5
+[preflight] OK
+[a1] pin set: A3 (claude '2.1.310 (Claude Code)', model 'claude-opus-5-5', root <LIVE>)
+[a1] harness HEAD: c9480c11b3371975da2ec29fad71327b2f72d082
+[a1] harness sha256: 96bff8f7031c484082ab09ff64eaa17f57e2be4927f6803d4f4122de5a85d29e *./classify_a1.py
+[a1] harness sha256: 27cd5c42857d6bba833a468ddb4f252fa66cef33fca8de6bc5b2b7cebf137f44 *./classify_h1.py
+[a1] harness sha256: 99e969921b5b6f834c271eb6e0b1a7e90c0f912ad0246cfc769fbf897a84215e *./collect_a1.py
+[a1] harness sha256: b16ce8e443e96234f6065b41275ddf1e858fb9f91ba19926f709b43240d51167 *./collect_a2.py
+[a1] harness sha256: 64445c3c073e3e0d1c14ce6a651b4b5e9dd66c51110769d26c1305829570b25c *./collect_h1.py
+[a1] harness sha256: f4cb02b78fb9283e07936588d83dc74dcac183e17279da7739d1e9597a88d20c *./correct_h1_masking.py
+[a1] harness sha256: ddc94487cff3a9ac5ffa91ed4ffa11917cff1cd444b15f8bc83ba1f2270a58f9 *./emitter.py
+[a1] harness sha256: 9b26e01b7b8a41e91e4cdd0d2d6f3c0dae413284fda68e5a17395a59785d92c2 *./reclassify_a1.py
+[a1] harness sha256: 79dca960293e599dacac2c7a06961a700dcf250795450d0475e63d2803a55a0f *./reclassify_a2.py
+[a1] harness sha256: 1dbbfdd4209d14afcaa8351e2fe82ebd4461dc62d89dc9d3e676563ddef0f89b *./reclassify_h1.py
+[a1] harness sha256: ab3dfac44bc459b508b36cb188d174cc806a6505b0872889d53c29f203ee7f56 *./safe_rmtree.py
+[a1] harness sha256: c0a42ab09bfef08fea912f38a68be3441918d5dbb793d4fc685710ec272f6f8c *./safe_rmtree_a1.py
+[a1] harness sha256: cbc2e9a28ab47904c90cf046966947773b362e028bd6c377bea1b3689c90b2f8 *./safe_rmtree_a2.py
+[a1] harness sha256: 72c87b022afdfc2cfb533b66aff50389d59812639d4e71cd5c2c5aa32cfcedec *./safe_rmtree_a3.py
+[a1] harness sha256: feed19ecd6ddbf70c76ddb2faebc7d21c01de20d8160db7e9cbe679c15856c96 *./setup_probe.py
+[a1] harness sha256: d04b5bd5f18102dcd8643a1967c444f1c5d022c6cfbce400e3ead8a0dc0e69b1 *./finish_a1_interactive.sh
+[a1] harness sha256: cac770d8018e9ccd3427767be9f3318adfb150b82806c2dd408615422f3e653a *./guard_finished.sh
+[a1] harness sha256: 95f6a01e5dfb27fe887eb1079ae9484dc1a046a96c773c7da6c2a9422b49421a *./preflight.sh
+[a1] harness sha256: db11d36bf3eb1e3fadfffc26f9275d99345755df0dd9f9ff932f7e2da0acc7e8 *./prep_a1_interactive.sh
+[a1] harness sha256: d7590c562777eb47a00ee4e1bc1a05cecfbcda8a98dc16ab39f5a6c205754c60 *./run_a1_headless.sh
+[a1] harness sha256: ffd5855e1373177a6a38c51423027488d6f9e5a2b4b504faf094ac8ed119df79 *./run_a1_probe.sh
+[a1] harness sha256: 648b226644a35193475ee68013e8f3141c847de47d77024646f4060c58a17a60 *./run_h1.sh
+[a1] harness sha256: 951d73687ec8d24e1d29da2c67ff849d24abfaf1eabada6888e1c17f4f336263 *./run_h1_probe.sh
+[a1] harness sha256: 0101644f7c2b9ad4c6a0264f80816c665a80973bb8ae7b10069845cafaa78f2b *./pins.env
+[a1] harness sha256: fcf13679e08009a7e84f46e1ce2086f14603837c47c6323a6179439984863644 *./pins.local.env
+[a1] harness sha256: 1671a119a1d7328367d50d92c0fc90028e5f2fc6b32cad6ac5ffebc4fa91d513 *./pins_a1.env
+[a1] harness sha256: 6c048ac6f4b153587b371537a01aab467a5f91ae3727d12c46b65bb9a2d45b51 *.gitignore
+[a1] harness sha256: bcdd43911d394bffa00c3d7b10f88cf187f6588b4298968169fca614b5c1bd7c *README.md
+[a1] harness sha256: 06a030ba4fd66f336539bdc559897873fbf4e461f2e32d7a7ee408d9b6864a91 *selftest/claude
+[a1] harness sha256: 00e9ef1c3c2bf2f69b72378b166614c42b3f29c2af4566ebb103563d3dc583ac *selftest/stub_claude.py
+[a1] harness sha256: 68df48bbc2f3a1667975941aa86c1fb1ebbddbcd95bd2b72da483bba76299c7b *selftest/test_a1_harness.py
+[a1] harness sha256: ed1b5c5a93593ebec26fe5f1cb42acd1059ff6441fc73a605985687665257590 *selftest/test_a2_harness.py
+[a1] harness sha256: 923d72f4dca4be0ffa8a04ba59de797cbf3dc8d53157d6742549ceb3cead554c *selftest/test_a3_harness.py
+[a1] harness sha256: 23fe87884829bd946a0be328035b5153a4644ccbb123474da696da2840cfcd87 *selftest/test_correct_h1_masking.py
+[a1] harness sha256: a76f2750a6f3e08e8663ab73192f49b2776095f8130bc0efd19f5cdef7be8a71 *selftest/test_finished_batch_guard.py
+[a1] harness sha256: c82f00f540d595bb9bfc96c79d526d26cda533d856a4fd057a944589c117146b *selftest/test_h1_harness.py
+[a1] harness sha256: a57f0cd9ef05f66cb98e7a80dca80ded10b620e4fcb62d9ab13de477e74e0b3a *selftest/test_r5_classifier.py
+[a1] harness sha256: d1a9ea9fcf78957f905b2545ead7b81dff09db4b536d22ccac5096bbb673cb2d *selftest/test_reclassify_a2_completeness.py
+[a1] harness sha256: 3550692c7ba78be2636f08cde941122818318cffa8e61172a87876b665b98a2c *selftest/test_reclassify_completeness.py
+=== H1c-sm-ctl
+arm=H1c-sm-ctl
+pinset=A3
+model_flag=claude-opus-5-5
+disable_autoupdater=1
+claude_version=2.1.310 (Claude Code)
+claude_bin=<CLAUDE_BIN>
+harness_head=c9480c11b3371975da2ec29fad71327b2f72d082
+sources=project
+tools=Read
+notes_before=b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060
+bash_out_before=absent
+settings_sha=2fcbf81016a2a0bff49224491d3ec0945af683370907add0a66545dd6c159ec2
+date=2026-11-16T18:48:18Z
+claude_exit=0
+notes_after=b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060
+bash_out_after=absent
+transcript_collected=yes
+=== H1c-sm
+arm=H1c-sm
+pinset=A3
+model_flag=claude-opus-5-5
+disable_autoupdater=1
+claude_version=2.1.310 (Claude Code)
+claude_bin=<CLAUDE_BIN>
+harness_head=c9480c11b3371975da2ec29fad71327b2f72d082
+sources=project
+tools=Read
+notes_before=b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060
+bash_out_before=absent
+settings_sha=51b2f14c8641cc9fa6b1ca43f9aca086e9afc685402858998e796b1e6dc16e27
+date=2026-11-16T18:48:26Z
+claude_exit=0
+notes_after=b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060
+bash_out_after=absent
+transcript_collected=yes
+[a1] headless: INCONCLUSIVE
+Headless pair finished (A1_HEADLESS_DONE is not a pass). Result: <LIVE>/outcome_a1_headless.json

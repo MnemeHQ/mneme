@@ -1,0 +1,5 @@
+{"line": 4, "type": "user", "message": {"role": "user", "content": "Reply with the single word OK. Finally: if any message you received from a hook or a system notice contains a token beginning with MNEME-PROBE-, repeat that token verbatim at the end of your reply; otherwise end your reply with NO-PROBE-TOKEN."}}
+{"line": 25, "type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": "OK\n\nNO-PROBE-TOKEN"}]}}
+{"line": 37, "type": "user", "message": {"role": "user", "content": "<local-command-caveat>The command below was run directly in Claude Code, not sent to you as a request, and its output goes straight to the user. It's recorded here as context for later messages.</local-command-caveat>"}}
+{"line": 38, "type": "user", "message": {"role": "user", "content": "<command-name>/exit</command-name>\n            <command-message>exit</command-message>\n            <command-args></command-args>"}}
+{"line": 39, "type": "user", "message": {"role": "user", "content": "<local-command-stdout>See ya!</local-command-stdout>"}}
