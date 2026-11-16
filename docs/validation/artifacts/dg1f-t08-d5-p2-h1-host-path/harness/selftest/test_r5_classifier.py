@@ -105,7 +105,7 @@ def test_r5_positive_is_host_record_and_r1_still_decides(tmp_path, path_id):
     assert _cat(r, "api-request-blob", "message.content[") == {"host_record"}
     assert _cat(r, "attachment", "attachment.content") == {"model_bound"}  # R1, unchanged
     assert "unclassified" not in {l["category"] for l in r["nonce_locations"]}
-    assert r["rules"] == C.RULES_ID == "as-run table + R1-R5 (#551, #561, #796)"
+    assert r["rules"] == C.RULES_ID == "as-run table + R1-R6 (#551, #561, #796, #805)"
 
 
 def test_without_r5_the_same_shape_is_inconclusive(tmp_path, monkeypatch):

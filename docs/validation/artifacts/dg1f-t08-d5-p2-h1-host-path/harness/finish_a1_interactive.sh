@@ -14,15 +14,15 @@ BASE=$(cd "$(dirname "$0")" && pwd)
 [ -z "${A1_PINSET+set}" ] || { echo "ABORT: A1_PINSET is set in the environment; unset it and pass A3 as the first argument"; exit 1; }
 if [ "${1:-}" = A3 ]; then export A1_PINSET=A3; shift; fi
 . "$BASE/pins_a1.env"
-# Kept evidence is never touched: refuse a finished batch before anything is written.
-. "$BASE/guard_finished.sh"
-refuse_finished_batch "$LIVE" outcome_a1_interactive.json outcome_a1.json
 ARM=${1:-}; REC=${2:-}
 case "$ARM" in H1c-sm-int|H1c-sm-int-ctl) ;; *) echo "ABORT: arm must be H1c-sm-int or H1c-sm-int-ctl"; exit 1 ;; esac
-refuse_finished_arm "$LIVE/$ARM"
 if [ "${A1_PINSET:-}" = A3 ] && [ "${DISABLE_AUTOUPDATER:-}" != 1 ]; then
   echo "ABORT: pin set A3 needs DISABLE_AUTOUPDATER=1 in this shell"; exit 1
 fi
+# Kept evidence is never touched: refuse a finished batch before anything is written.
+. "$BASE/guard_finished.sh"
+refuse_finished_batch "$LIVE" outcome_a1_interactive.json outcome_a1.json
+refuse_finished_arm "$LIVE/$ARM"
 OUT="$LIVE/$ARM/out"; WS="$LIVE/$ARM/ws"
 [ -d "$OUT" ] || { echo "ABORT: $ARM was not prepared"; exit 1; }
 # The arm must have been prepared under the same pin set.
