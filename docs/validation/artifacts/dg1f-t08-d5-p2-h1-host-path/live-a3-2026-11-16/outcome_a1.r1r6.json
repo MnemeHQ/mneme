@@ -1,0 +1,10 @@
+{
+  "path_id": "H1c",
+  "rules": "A1 (#555) on as-run table + R1-R6 (#551, #561, #796, #805)",
+  "headless_label": "NOT_DELIVERED",
+  "interactive_label": "DELIVERED_TO_USER_ONLY",
+  "reasons": [],
+  "host_version": "2.1.310 (Claude Code)",
+  "label": "DELIVERED_TO_USER_ONLY",
+  "h1c_passes_under_a1": true
+}

@@ -187,3 +187,52 @@ Every raw entry of all four arms was checked for both nonces. Only these hold on
 1. A rule review for the stream `system:informational` event attributable to the probed hook.
 2. Its implementation, then an offline reclassification of the archived headless pair and a new combine.
 3. The H1 gate record.
+
+## 8. Addendum: offline reclassification of the headless pair under R1–R6 (2026-11-16)
+
+> §1–§7 above are the as-run record and are **unchanged**, as are the as-run `outcome_a1_headless.json`, `outcome_a1_interactive.json` and `outcome_a1.json`. This addendum records the separately authorized **offline** reclassification under rule R6 (accepted in #805, `ca02b3f2`; implemented in #806, `457ab70c`). **No host session ran, and nothing was re-run.**
+
+### 8.1 Procedure
+
+[`harness/reclassify_a3.py`](artifacts/dg1f-t08-d5-p2-h1-host-path/harness/reclassify_a3.py) (SHA-256 `e1fcd7d9…eea01506e4`) reuses the #800 integrity, completeness and fail-closed publication helpers (`reclassify_a2.py`) unchanged:
+
+1. **Integrity.** The archive `C:\dev\d5p2-h1c-a3-archive\2026-11-16` verified against `2026-11-16.SHA256SUMS` (`17c73d1a…`): 56 files, none unlisted, and every raw and batch file recorded in MANIFEST.json matched. It verified again after classification, again immediately before publication, and again after the run.
+2. **Authoritative run.** `classify_a1.headless()` (rules `as-run table + R1-R6 (#551, #561, #796, #805)`) ran on the archived **raw** headless pair with the A3 pins. Each arm was keyed to its recorded live-root location, so workspace masking matches the as-run classification.
+3. **Combine.** `classify_a1.combine()` paired that outcome with the **unchanged** as-run interactive outcome. R6 does not touch the interactive classifier.
+4. **Omitted-material completeness check.** For both headless arms, every raw event, transcript entry and stderr line was compared with what `collect_a3.py` publishes, for each arm's own nonce and the emitter's. **0 omitted occurrences.**
+5. **Subset replay** of the published headless subset. This is supporting only.
+
+**Outputs.** These are published beside the unchanged as-run files:
+- [`outcome_a1_headless.r1r6.json`](artifacts/dg1f-t08-d5-p2-h1-host-path/live-a3-2026-11-16/outcome_a1_headless.r1r6.json)
+- [`outcome_a1.r1r6.json`](artifacts/dg1f-t08-d5-p2-h1-host-path/live-a3-2026-11-16/outcome_a1.r1r6.json)
+- [`reclassification.json`](artifacts/dg1f-t08-d5-p2-h1-host-path/live-a3-2026-11-16/reclassification.json)
+
+All three are redacted and leak-scanned, with 0 findings.
+
+### 8.2 Results
+
+| Run | As run (§2) | R1–R6, raw (authoritative) | R1–R6, subset replay |
+|---|---|---|---|
+| Headless | `INCONCLUSIVE` | **`NOT_DELIVERED`** | `INCONCLUSIVE` (see below) |
+| Interactive | `DELIVERED_TO_USER_ONLY` | unchanged, not reclassified | – |
+| **Combined H1c** | `INCONCLUSIVE` | **`DELIVERED_TO_USER_ONLY`** as classified (`h1c_passes_under_a1: true`, one host version `2.1.310`) | – |
+
+- **What R6 excluded.** Exactly the emitter's `system:informational` echo (event index 3; `host_events.r6_excluded`) was left out of the subtype comparison. The indicator scan still covered it and found nothing.
+- **What changed against the as-run headless outcome:**
+  - `label` and `reasons` (now empty);
+  - `rules` and `a1.rules`;
+  - `host_events`, where the emitter subtypes are now empty and `r6_excluded` is added;
+  - `side_effect_observed`, which was `null` as run, because classification stopped at the INCONCLUSIVE reason, and is now `false`, because the controls hold.
+
+  The set of nonce locations is unchanged.
+- **Why the subset replay differs, which is reported and not reconciled.**
+  - The published echo has five fields, because the collector's redaction drops `uuid`. R6's S1 requires the exact six-field shape, so R6 correctly does not fire on the published subset.
+  - A subset replay therefore cannot reproduce this exclusion by design; only the raw run can. That is why the raw run is authoritative.
+  - The subset's sole reason is the as-run one (the one-sided `informational` subtype).
+
+### 8.3 Status
+
+- **The combined H1c label `DELIVERED_TO_USER_ONLY` is as classified.** It counts as an accepted H1c pass only if the separate **screenshot evidence decision** (§2.1) accepts the interactive capture.
+- **H1 gate: still NOT MET** until that decision and a separate H1 gate record. With A2 under R1–R5 (#800), all four H1 paths would then be on one host version, `2.1.310`.
+- **Not established here:** the screenshot decision, the H1 gate, repeatability (n = 1), or any other host version.
+- **Operator-attested:** the archive checks and the completeness check. The published outcomes, the tool source and the subset replay are reviewable from GitHub.
