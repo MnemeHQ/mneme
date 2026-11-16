@@ -232,6 +232,8 @@ All three are redacted and leak-scanned, with 0 findings.
 
 ### 8.3 Status
 
+**Owner decision, 2026-11-16:** the screenshot captures, host-recorded idle intervals and capture review are accepted as sufficient evidence for this specific A3 interactive run, despite the deviation from the continuous-recording requirement. This resolves the disposition requested in §2.1. The historical outcomes are unchanged.
+
 - **The combined H1c label `DELIVERED_TO_USER_ONLY` is as classified.** It counts as an accepted H1c pass only if the separate **screenshot evidence decision** (§2.1) accepts the interactive capture.
 - **H1 gate: still NOT MET** until that decision and a separate H1 gate record. With A2 under R1–R5 (#800), all four H1 paths would then be on one host version, `2.1.310`.
 - **Not established here:** the screenshot decision, the H1 gate, repeatability (n = 1), or any other host version.
