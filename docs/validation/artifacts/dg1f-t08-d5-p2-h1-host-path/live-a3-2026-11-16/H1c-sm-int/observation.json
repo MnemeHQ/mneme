@@ -1,0 +1,14 @@
+{
+  "_instructions": "Fill in after the session, from what you saw and the recording. Booleans must be true or false; do not leave null.",
+  "notice_visible": true,
+  "notice_text_seen": "Stop says: MNEME-PROBE-ac6914cfa1176045 This is a Mneme H1 channel-probe notice. It carries no instruction and requires no action.",
+  "returned_to_input_prompt": true,
+  "unexpected_prompt": false,
+  "notes": "Owner decision 2026-11-16 (deviation from A1 4.2, recorded): a screenshot of the session window instead of a screen recording; it is the bound capture (taskbar clock 13:58, reply done 1:55 PM, so idle at the input prompt for over 30 s). Observation transcribed by the agent from the operator's screenshot. Reply: 'OK' / 'NO-PROBE-TOKEN'; under it the host shows 'Stop says: <nonce> ...'. A stray 'S' visible in the input box was never sent.",
+  "frames": [
+    {
+      "t": "13:58 (taskbar clock)",
+      "file": "frames/f1.webp"
+    }
+  ]
+}

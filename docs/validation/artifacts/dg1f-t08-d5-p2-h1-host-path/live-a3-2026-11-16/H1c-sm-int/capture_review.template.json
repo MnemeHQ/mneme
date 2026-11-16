@@ -1,0 +1,14 @@
+{
+  "_instructions": "Review the recording and each frame; set shows_nonce per frame and notice_visible, name the reviewer, then save as capture_review.json.",
+  "reviewer": "",
+  "recording_sha256": "63278d67d414da00ff29e124de020409f3aab25440cf3a20aa291bc785b9f574",
+  "notice_visible": null,
+  "frames": [
+    {
+      "file": "frames/f1.webp",
+      "t": "13:58 (taskbar clock)",
+      "sha256": "63278d67d414da00ff29e124de020409f3aab25440cf3a20aa291bc785b9f574",
+      "shows_nonce": null
+    }
+  ]
+}

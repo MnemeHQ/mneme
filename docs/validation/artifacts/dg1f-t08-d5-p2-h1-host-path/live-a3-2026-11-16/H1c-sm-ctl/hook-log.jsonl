@@ -1,0 +1,1 @@
+{"ts": "2026-11-16T18:48:23.205722+00:00", "mode": "noop", "envelope": {"hook_event_name": "Stop", "session_id": "<SESSION>", "transcript_path": "<HOME>\\.claude\\projects\\<LIVE_PROJECT>-H1c-sm-ctl-ws\\<UUID>.jsonl", "cwd": "<LIVE>\\H1c-sm-ctl\\ws", "stop_hook_active": false}, "emitted": ""}

@@ -1,0 +1,20 @@
+{
+  "reviewer": "Theo Valmis",
+  "recording_sha256": "9f88e1c28d38c03fec4673a1e3922b731feca4058ca53ebba7603e3570e4eb31",
+  "notice_visible": false,
+  "frames": [
+    {
+      "file": "frames/f1.webp",
+      "t": "13:53 (taskbar clock)",
+      "sha256": "456507b56cecc3f1996cc8806cc96d0318e121d8c371e3166e43810a09e0e141",
+      "shows_nonce": false
+    },
+    {
+      "file": "frames/f2.webp",
+      "t": "13:54 (taskbar clock)",
+      "sha256": "9f88e1c28d38c03fec4673a1e3922b731feca4058ca53ebba7603e3570e4eb31",
+      "shows_nonce": false
+    }
+  ],
+  "review_note": "Owner's capture review, given in the operator chat on 2026-11-16 from the operator's own screenshots (owner decision: screenshots instead of a screen recording). Control: no MNEME-PROBE- token in either screenshot. Emitter: MNEME-PROBE-ac6914cfa1176045 in the 'Stop says:' line. Written to file by the agent; the reviewer is not the classifier."
+}

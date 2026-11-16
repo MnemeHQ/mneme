@@ -1,0 +1,62 @@
+{
+  "path_id": "H1c-sm-int",
+  "run": "interactive",
+  "rules": "A1 (#555) on as-run table + R1-R5 (#551, #561, #796)",
+  "reasons": [],
+  "pins": {
+    "claude_version": "2.1.310 (Claude Code)",
+    "model": "claude-opus-5-5"
+  },
+  "stop_invocations": {
+    "emitter": 1,
+    "control": 1
+  },
+  "frames_verified": [
+    {
+      "t": "13:58 (taskbar clock)",
+      "file": "frames/f1.webp",
+      "sha256": "63278d67d414da00ff29e124de020409f3aab25440cf3a20aa291bc785b9f574"
+    }
+  ],
+  "control_frames_verified": [
+    {
+      "t": "13:53 (taskbar clock)",
+      "file": "frames/f1.webp",
+      "sha256": "456507b56cecc3f1996cc8806cc96d0318e121d8c371e3166e43810a09e0e141"
+    },
+    {
+      "t": "13:54 (taskbar clock)",
+      "file": "frames/f2.webp",
+      "sha256": "9f88e1c28d38c03fec4673a1e3922b731feca4058ca53ebba7603e3570e4eb31"
+    }
+  ],
+  "nonce_locations": [
+    {
+      "source": "transcript",
+      "line": 32,
+      "entry_type": "attachment",
+      "entry_subtype": null,
+      "json_path": "attachment.stdout",
+      "category": "host_output"
+    },
+    {
+      "source": "transcript",
+      "line": 33,
+      "entry_type": "attachment",
+      "entry_subtype": null,
+      "json_path": "attachment.content",
+      "category": "host_output"
+    }
+  ],
+  "host_interference": [],
+  "developer_visible": true,
+  "evidence_only": {
+    "assistant_entries": {
+      "emitter": 1,
+      "control": 1
+    }
+  },
+  "capture_review": "confirmed",
+  "label": "DELIVERED_TO_USER_ONLY",
+  "passes_run": true
+}
