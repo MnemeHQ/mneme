@@ -199,3 +199,20 @@ def test_published_subsets_keep_their_labels_and_r6_never_fires(pub, path_id, mo
     r = C.classify(emit, ctl, path_id, model, version)
     assert r["label"] == label, r.get("reasons")
     assert "r6_excluded" in r["host_events"] and r["host_events"]["r6_excluded"] is None
+
+
+def test_published_a1_headless_subset_keeps_not_delivered_and_r6_never_fires():
+    # Review of #806: the A1 headless run (2026-10-19, Claude Code 2.1.202) is a Stop path
+    # too, so R6's S2 path condition holds there; it must still never fire, and the
+    # accepted R1-R4 label NOT_DELIVERED must not change.
+    A1 = _load("classify_a1")  # registers the H1c-sm path in its own classifier instance
+    pub = ART / "live-a1-headless-2026-10-19"
+    emit, ctl = RH.subset_arm(pub, "H1c-sm"), RH.subset_arm(pub, "H1c-sm-ctl")
+    spec = A1.C.PATHS["H1c-sm"]
+    assert spec["event"] == "Stop"
+    for arm, is_emit in ((emit, True), (ctl, False)):
+        assert A1.C.r6_stop_echo(arm, spec, is_emit) is None
+    r = A1.C.classify(emit, ctl, "H1c-sm", "claude-opus-4-8[1m]")
+    assert r["label"] == "NOT_DELIVERED", r.get("reasons")
+    assert r["host_events"]["r6_excluded"] is None
+    assert json.loads((pub / "outcome_a1_headless.r1r4.json").read_text(encoding="utf-8"))["label"] == "NOT_DELIVERED"
