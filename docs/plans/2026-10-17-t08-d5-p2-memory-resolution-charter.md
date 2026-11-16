@@ -198,14 +198,14 @@ Why it can go first:
 
 ### 5.2.2 Interim selection contract
 
-`M_W` is the memory today's walk finds: the nearest `.mneme/project_memory.json` at or above the consumer's unchanged start, with **no** Git-marker check. That is today's `find_memory` walk without its env branch. `M_X` is the non-empty `MNEME_MEMORY` value. Paths are compared after `resolve()`. "Exists" means `is_file()`, exactly today's test (A2-3).
+`M_W` is the memory today's walk finds: the nearest `.mneme/project_memory.json` at or above the consumer's unchanged start, with **no** Git-marker check. That is today's `find_memory` walk without its env branch. `M_X` is the non-empty `MNEME_MEMORY` value. Paths are compared after `resolve()`. An override is **usable** only if it is an existing regular file (`is_file()`, today's test) that the process can open for reading. Otherwise it is treated as missing (A2-3).
 
 | Row (§3.3 numbering) | Walk result | `M_X` | Selected | `reason` |
 |---|---|---|---|---|
 | 1 | `M_W` found | unset, or equal to `M_W` | `M_W` | `DISCOVERED` |
-| 2 | `M_W` found | set, and different or missing | `M_W` | `OVERRIDE_IGNORED` |
-| 6 | no `M_W` | an existing file | `M_X` | `OVERRIDE_FILLS_ABSENCE` |
-| 7 | no `M_W` | set but missing | none | `OVERRIDE_MISSING` |
+| 2 | `M_W` found | set, and different or not usable | `M_W` | `OVERRIDE_IGNORED` |
+| 6 | no `M_W` | usable | `M_X` | `OVERRIDE_FILLS_ABSENCE` |
+| 7 | no `M_W` | set but missing or unreadable | none | `OVERRIDE_MISSING` |
 | 8 | no `M_W` | unset | none | `NO_MEMORY_ON_PATH` |
 
 - **Rows 3, 4 and 5 cannot occur**, because they need a boundary. Their reason codes are reserved for Phase 2 and are never emitted in P2-first. The row numbers and reason codes are §3.3's, so Phase 2 extends the contract rather than renaming it.
@@ -226,7 +226,17 @@ What P2-first removes: env-based replacement (V5, V5-own) and env-based masking 
 
 ### 5.2.4 Reporting at level R-ii (I4-P2F, replacing I4 for P2-first only)
 
-1. **Every consumer carries the structured reason.** Every §4 consumer records `reason`, `source` and `walk` wherever it has a structured result or trace: for example the Codex gate `SKIP` reason, the Agent SDK and Hermes traces, and LangChain through its internal SDK. **A structured reason is not host visibility**, and no document, release note or UI may describe it as such (§5 rule).
+1. **Every consumer computes the selection; it is recorded only where a non-wire record already exists.** Every §4 consumer calls the resolver and gets `reason`, `source` and `walk`. Where they are recorded was checked against `main` at `0118d91f`:
+   - **Agent SDK and LangChain:** recorded as additive keys (`selection_reason`, `selection_source`, `walk`) in the existing `trace` records (`agent_sdk/adapter.py:135`, `_record` via `_gate` and `context_for_task`). LangChain inherits them through its internal SDK. The trace is an in-process list the embedding program may read. It is not hook output.
+   - **Every other consumer has no such record,** so the selection is held in-process only:
+     - Claude Code: exit 0 with no output when nothing is selected (`hook.py:1125-1126`, `:711-712`). Its H1 notices are item 2.
+     - The Codex gate: `GateResult` is internal, and `SKIP` prints nothing (`codex_cli/hook.py:10`).
+     - The Codex stop audit returns `None` or 0 (`stop_audit.py:88-90`, `:137-139`).
+     - Kiro returns 0 (`kiro/hook.py:298-300`).
+     - Antigravity emits `{}` (`antigravity/adapter.py:242-247`).
+     - Hermes returns `GateResult.reason` to its embedding host (`hermes/adapter.py:277-281`), so changing it would be host-facing.
+   - **No new log, file, field or sink is created.** Existing `reason` strings (for example `"no project memory"`) and the fields of `GateResult` and `ContextInjection` stay byte-identical in every consumer.
+   - **Stated plainly:** outside the Agent SDK and LangChain, and outside the H1 paths, rows 2 and 7 leave no observable record. Row 2 still selects the walked memory there; only the report is absent. This is narrower than "structured reasons in every consumer" as the owner phrased R-ii on 2026-11-11, and A2-6 asks for it to be accepted as R-ii's meaning here. **A structured reason is not host visibility**, and no document, release note or UI may describe it as such (§5 rule).
 2. **Host-visible notices only on probed paths, in the probed shape, on the probed pin.** Rows 2 and 7 are reported host-visibly only on the H1 paths, which passed on Claude Code `2.1.310 (Claude Code)` with `claude-opus-5-5` (#808). The shape-binding rule (probe scope §3 step 5) applies:
 
    | Path | Shape | Recorded audience |
@@ -236,7 +246,7 @@ What P2-first removes: env-based replacement (V5, V5-own) and env-based masking 
    | H1c Stop | top-level `systemMessage`, exit 0, no `hookSpecificOutput`, no `decision` (§5.1) | developer only (`DELIVERED_TO_USER_ONLY`) |
 
    The visibility claim is bound to that version. Other Claude Code versions receive the same shape, and documentation calls it **unverified** there.
-3. **No new host-facing output on unprobed paths.** The Codex gate and stop audit, Kiro, Antigravity, the Agent SDK, LangChain and Hermes emit **no selection notice and no new field** in their hook output, wire JSON or exit codes, for any row. They differ from today only in which memory they select. Reason: an unprobed shape can change host behavior. The original H1c Stop shape made the host continue the session (#549). These paths are recorded as **not host-visible** until their own probe passes.
+3. **No new host-facing output on unprobed paths.** The Codex gate and stop audit, Kiro, Antigravity, the Agent SDK, LangChain and Hermes emit **no selection notice and no new field** in their hook output, wire JSON, returned result objects or exit codes, for any row. The only addition is item 1's trace keys. They differ from today only in which memory they select. Reason: an unprobed shape can change host behavior. The original H1c Stop shape made the host continue the session (#549). These paths are recorded as **not host-visible** until their own probe passes.
 4. **ADR-033 coexistence.** On H1a direct write, the notice shares the single PreToolUse `additionalContext` object with the C2b proceed note (`ProceedNote.consumed`), as probe-scope A2-3 requires.
 5. **Unchanged:** exit codes and blocking (ADR-021; no row blocks); row 2 reported on every PreToolUse event (C5).
 
@@ -262,12 +272,13 @@ A separate `[layer1-freeze]` P2-first amendment PR, under Amendment Procedure §
 
 The implementation PR carries a subset of §7, plus P2-first cases:
 - §7.2 precedence matrix for rows 1, 2, 6, 7 and 8, including relative, symlinked and differently-cased (Windows) override paths;
+- the override classes of A2-3: missing, a directory, unreadable (open fails), and malformed (opens, fails to parse). The first three give row 7 (or row 2); malformed gives row 6 and today's malformed-memory outcome, unchanged;
 - §7.5 consumer parity across all eleven consumers, including the `walk` field;
 - §7.6 flips: V4 to row 2 or row 7, whichever applies; V5 and V5-own to row 2;
 - **case 2:** an ancestor memory plus a different override selects the ancestor (row 2). Pinned so that Phase 2's change to row 3 or 5 is a reviewable flip;
 - **planted marker plus override** (`A/.mneme`, `A/src/.git`, `MNEME_MEMORY` = B): selects A's memory, row 2. Today B is selected;
 - §7.7 unchanged tests, §7.9 latency;
-- §7.8 channel shape on the H1 paths, plus an assertion that every unprobed path emits no selection notice and no new field;
+- §7.8 channel shape on the H1 paths, plus a per-consumer assertion that, for every row, hook output, exit code, `GateResult` and `ContextInjection` are identical to what the same selected memory produces today, and only the Agent SDK trace gains the item-1 keys;
 - the ADR-033 coexistence test (§5.2.4 item 4), with the C2a and C2b suites green and unmodified.
 
 The full canonical suite must run. The §6 characterization test is **not** a P2-first prerequisite: its layouts are B1 cases, and the one whose selection P2-first changes (planted marker plus override) is covered above. §6 stays a Phase 2 step.
@@ -299,10 +310,11 @@ Each step needs the previous one merged and its own go-ahead. Phase 2 then conti
 |---|---|---|
 | A2-1 | Relax I4 and Q2 §10's host-visible requirement to I4-P2F for P2-first | **Yes.** It is the owner's chosen level (R-ii). P2-first leaves no governed edit ungoverned (§5.2.1), and visibility is claimed only where it was proven. |
 | A2-2 | Adopt `M_W` (today's unbounded walk) as the interim contract | **Yes.** The variant that computes `R` without stopping, so an ancestor memory loses to the override, was rejected on 2026-11-11: a planted `.git` would reopen the substitution. |
-| A2-3 | Missing vs. unreadable override | **`is_file()`, exactly as today.** The resolver never opens the file. An existing but malformed `M_X` is selected under row 6 and follows today's malformed-memory path unchanged (ADR-021; CI1.4 §7 condition 4). Under row 2 it is ignored anyway. |
-| A2-4 | Accept case 2 (ancestor memory beats the override) for the interim | **Yes**, as documented in §5.2.3. It ends in Phase 2. |
+| A2-3 | Missing, unreadable and malformed overrides | **Follow Q2 rule 3.** *Missing* (`is_file()` false, including a directory) and *unreadable* (exists, but opening it for reading fails, for example a permission error) are both "not usable": row 7 (`OVERRIDE_MISSING`, Q2's "override missing") with no `M_W`, row 2 with one. The resolver tests readability by opening the file in binary mode and closing it, without reading or parsing it. The test runs only when no `M_W` exists, because row 2 ignores the override either way. *Malformed* (opens, but fails to decode, parse or validate) is **not** a selection outcome. It is selected under row 6 and follows today's malformed-memory path unchanged (ADR-021; CI1.4 §7 condition 4). A file that becomes unreadable after selection also takes today's load-failure path. The earlier draft (`342bc929`) used `is_file()` alone, which conflicts with Q2 rule 3. |
+| A2-4 | Accept case 2 (ancestor memory beats the override) for the interim | **Yes**, as documented in §5.2.3. It ends in Phase 2. The reviewer is asked to accept or reject this risk explicitly. |
+| A2-7 | Confirm Phase 2 keeps every original prerequisite | **Yes.** B1, I3 and rows 3–5 still need all of H1–H6 with every listed output path (§5), the §6 characterization test and their own freeze amendment (§5.2.5). A2 relaxes nothing for Phase 2. |
 | A2-5 | Leave `boundary` and `shadowed` unpopulated, with a `walk` marker | **Yes.** It keeps a later G3-B root binding from reading an absent boundary as a real one. |
-| A2-6 | No new output on unprobed paths | **Yes.** The H1c history shows an unprobed shape can change host behavior. |
+| A2-6 | No new output on unprobed paths, and the reason recorded only in the Agent SDK/LangChain trace (§5.2.4 item 1) | **Yes.** The H1c history shows an unprobed shape can change host behavior. Hermes's `reason` reaches its host, so it cannot carry the selection either. The cost is that rows 2 and 7 leave no record on Codex, Kiro, Antigravity, Hermes or the non-H1 Claude Code rows. Accepting this also accepts the narrower reading of R-ii in item 1. |
 
 ## 6. Characterization test first (D5 §7.4)
 
