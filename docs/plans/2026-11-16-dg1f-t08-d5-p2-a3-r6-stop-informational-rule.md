@@ -9,9 +9,9 @@
 
 It follows the separate-step precedent (#551 → #552 → #553; R4: #561 → #562 → #563; R5: #796 → #798 → #800): rule, then implementation, then offline reclassification, each separately approved (§7).
 
-**Depends on:** the A3 live evidence record (#804, PROPOSED at the time of writing, head `766b9570`). This note should not be reviewed for acceptance before #804 is accepted, because it reads that record's artifacts.
+**Depends on:** the A3 live evidence record (#804, ACCEPTED as evidence only and merged as `eef7f774`; reviewed head `f8d8834c`). It reads that record's artifacts.
 
-**Anchor:** `main` @ `c9480c11`, plus #804 @ `766b9570` for the evidence.
+**Anchor:** `main` @ `eef7f774`, which includes #804.
 
 **Inputs:**
 - the accepted probe scope (#545), §3, and its Amendments A1 (§4.2, #555) and A3 (§4.4, #802);
@@ -46,9 +46,9 @@ Adopting a rule changes how evidence is **read**, never what the host did.
 | Hook log | **exactly one** record; `hook_event_name: Stop`, `stop_hook_active: false`, mode `stop-systemmessage` | exactly one record, mode `noop`, emitted nothing |
 | Position | after the last `assistant` event, immediately before `result` | – |
 | Indicator keys (`decision`, `blocked`, `retry`, `continue`, `stopReason`, …) in that event | **None** | – |
-| Nonce elsewhere | transcript `hook_success` `stdout` (R2) and `hook_system_message` `content` (R4), both `host_output`. In no `api-request-blob`; not echoed | none |
+| Nonce elsewhere | transcript `hook_success` `stdout` (R2) and `hook_system_message` `content` (R4), both `host_output`. No model-bound location observed, and not echoed. No `api-request-blob` contains it (an observation only, not proof of absence; #804 §4) | none |
 
-**Interactive arms (for context, not covered by R6).** The interactive run is already labelled `DELIVERED_TO_USER_ONLY` (capture-reviewed). Its evidence is the UI capture and transcript, not stream events, so R6 does not touch it.
+**Interactive arms (for context, not covered by R6).** The interactive run is labelled `DELIVERED_TO_USER_ONLY` **as run** (capture-reviewed). Per #804 §2.1 it is **not yet an accepted, protocol-compliant pass**: the capture was screenshots, not the continuous recording A1 §4.2 requires, and that needs a separate, reviewed evidence decision. Its evidence is the UI capture and transcript, not stream events, so R6 does not touch it.
 
 **What is not known.** No host documentation was consulted for the `informational` subtype beyond A1's note that it may be an `SDKInformationalMessage`. The `Stop says: ` prefix was observed for one event type (Stop), on one host version, n = 1. Whether other hook events use the same shape (for example `SessionStart says: …`) is not known and not covered.
 
@@ -106,14 +106,14 @@ This section projects the effect so the reviewer can judge the rule. **It is not
 |---|---|---|---|
 | A3 headless (`H1c-sm`) | `INCONCLUSIVE` | likely `NOT_DELIVERED` | The only reason is removed. No model-bound location, no echo, transcript collected, controls hold, no interference. `NOT_DELIVERED` is the expected headless result for a notice meant for the developer only. |
 | A3 interactive (`H1c-sm-int`) | `DELIVERED_TO_USER_ONLY` | unchanged | R6 does not touch the interactive classifier. |
-| **A3 combined H1c (A1)** | `INCONCLUSIVE` | likely **`DELIVERED_TO_USER_ONLY`** (`h1c_passes_under_a1: true`) | `combine()`: one host version, neither run `INCONCLUSIVE`/`NOT_EXECUTED`, no interference, interactive `DELIVERED_TO_USER_ONLY`. That label is in `PASSING` and meets D5 §5.1. |
+| **A3 combined H1c (A1)** | `INCONCLUSIVE` | likely **`DELIVERED_TO_USER_ONLY`** (`h1c_passes_under_a1: true`) **as classified**. It is accepted only if the screenshot evidence decision (#804 §2.1) accepts the interactive capture | `combine()`: one host version, neither run `INCONCLUSIVE`/`NOT_EXECUTED`, no interference, interactive `DELIVERED_TO_USER_ONLY`. That label is in `PASSING` and meets D5 §5.1. |
 | H1 2026-10-17, A1 2026-10-19, A2 2026-11-11 | unchanged | unchanged | None has an `informational` event. |
 
 ## 6. Effect on the open gates
 
 None directly. If the projection holds after an authorized reclassification, all three H1 paths would have passing labels on **one host version**, `2.1.310`:
 - H1a-edit, H1a-bash and H1b-start: `DELIVERED_TO_AGENT` (A2 under R1–R5, #800);
-- H1c: `DELIVERED_TO_USER_ONLY` (A3 under R1–R6, projected).
+- H1c: `DELIVERED_TO_USER_ONLY` (A3 under R1–R6, projected). This also needs the separate screenshot evidence decision on the interactive capture (#804 §2.1); R6 does not decide it.
 
 **H1 stays NOT MET** until a separate H1 gate record combines them. No mixed-version combination is needed (A2-1 does not arise). H2–H6, the `[layer1-freeze]` amendment, P2-first, G3, DG1G and DG1 are unaffected.
 
@@ -155,6 +155,7 @@ Combining any two of these steps needs explicit owner authorization.
 ## 9. Not decided here
 
 - The host's internal meaning of `informational`.
+- The screenshot evidence decision for the A3 interactive capture (#804 §2.1). Whether the combined H1c label can count as a pass depends on it as well as on R6.
 - Whether other hook events surface a `systemMessage` on the stream, and any rule for them.
 - The H1 gate record, H2–H6.
 - Repeatability (n = 1) or other host versions.
