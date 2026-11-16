@@ -58,7 +58,7 @@ Adopting a rule changes how evidence is **read**, never what the host did.
 
 **Rule.** In `host_events()`, one stream-json event is left out of the strict subtype comparison between arms if, and only if, **all** of these hold:
 
-1. **(S1) Shape.** `type` is `"system"`, `subtype` is `"informational"`, and `level` is `"notice"`.
+1. **(S1) Shape.** `type` is `"system"`, `subtype` is `"informational"` and `level` is `"notice"`. **The event's field set is exactly** `type`, `subtype`, `content`, `level`, `session_id`, `uuid`: no field missing and no extra field, the set observed in §2. An event with any other field set is compared, even an added field the indicator scan does not recognise, so a changed event shape falls back to `INCONCLUSIVE` and a review (review of #805).
 2. **(S2) Path and arm.** The path's spec event is `Stop` (H1c), and the arm is the **emitter** arm. In a control arm R6 never applies, so any `informational` event there is still compared.
 3. **(S3) Emitter attribution.** The arm's hook log has **exactly one** `Stop` record, with `stop_hook_active` false, whose `emitted` text parses as a JSON object with a string `systemMessage`, called `S`.
 4. **(S4) Exact derivation.** `content` equals exactly `"Stop says: " + S`. No prefix match, no trimming, no case folding.
@@ -127,6 +127,7 @@ None directly. If the projection holds after an authorized reclassification, all
    **Regression tests** (`selftest/test_r6_classifier.py`):
    - positive: the A3 shape → excluded; subtypes compare equal;
    - S1: `level` other than `notice`, or another subtype → compared (`INCONCLUSIVE`);
+   - S1 field set: the A3 shape plus one extra field (for example `"source": "hook"`), or with one of the six fields missing → compared (`INCONCLUSIVE`);
    - S2: the same event in a **control** arm → compared (`INCONCLUSIVE`); the same event on an H1a or H1b path → compared;
    - S3: zero Stop records; two Stop records; `stop_hook_active` true; `emitted` not JSON, not an object, or without a string `systemMessage` → compared;
    - S4: one extra or missing character, a different prefix (`Stop said: `, `SessionStart says: `), or another nonce → compared;
