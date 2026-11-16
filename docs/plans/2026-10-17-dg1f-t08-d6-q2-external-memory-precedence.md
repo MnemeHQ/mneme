@@ -3,6 +3,8 @@
 **Date:** 2026-10-17
 **Status:** **ACCEPTED as the D6 precedence definition (P2) only** (owner approval, 2026-10-17, following an independent-review ACCEPT on `972712c9`). Architecture assessment, docs only. Acceptance does not authorize implementation, tests, experiments, C5/C6, ADR or Layer 1 freeze amendments, ADR-033 changes, or changes to C1–C4 evidence, pins or worktrees.
 **Revision 2 (2026-10-17):** answers the #538 review. It narrows P2's guarantee to correct boundary resolution and start points (§5, §8), ties rule 2 to D5 §5.4 with an added override constraint (§5, §7), and adds §5.4 to the implementation prerequisites (§10). The P2 rule itself is unchanged.
+**Amendment A1 (PROPOSED, 2026-11-16):** pointer only. It records that the shared charter's [Amendment A2](2026-10-17-t08-d5-p2-memory-resolution-charter.md) (§5.2 there, P2-first) would relax §10's "same host-visible channel as D5 §5.1" prerequisite for the P2-first phase only, to reporting level R-ii. P2, the §5 rules and the D5 row of §10 are unchanged. It is reviewed together with that amendment.
+
 **Source anchor:** `MnemeHQ/mneme` `main` at `28211f8b`, read-only.
 **Inputs:**
 - [D5 repository-boundary contract](2026-10-17-dg1f-t08-d5-repository-boundary-contract.md) (ACCEPTED, definition only);

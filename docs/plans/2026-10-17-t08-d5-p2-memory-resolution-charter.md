@@ -8,6 +8,8 @@
 
 **Amendment A1 (ACCEPTED, 2026-10-17; owner approval following an independent-review ACCEPT on `19734ac8`):** implements the accepted [H1c Stop-path decision](2026-10-17-dg1f-t08-d5-p2-h1c-stop-path-decision.md) (#554, O1). It changes **only** Claude Code Stop's candidate channel in §5, from `hookSpecificOutput.additionalContext` to top-level `systemMessage`. It is coordinated with the probe-scope Amendment A1 and is reviewed together with it. D5's developer-or-agent visibility rule, the gate rule, every other channel, implementation and the Layer 1 freeze are unchanged (§5.1).
 
+**Amendment A2 (PROPOSED, 2026-11-16):** adds a **P2-first interim phase** (§5.2). It lands the D6/Q2 P2 precedence rule on today's unbounded walk, across every consumer at once, with reporting level R-ii: a structured reason in every consumer, and host-visible notices only on the H1 paths that passed on Claude Code `2.1.310` (#808). Its gate is H1 only. B1, I3, §3.3 rows 3–5 and the H1–H6 gate become Phase 2, unchanged. Acceptance would authorize no code, test, live run or `[layer1-freeze]` amendment.
+
 **Revision 3 (2026-10-17):** records the provenance of the D5 §5.1 owner approval (§3.4, C2, and the D5 contract), and splits H1–H6 into per-output-path probe requirements (§5).
 - C2 is applied through an owner-approved refinement of D5 §5.1, recorded in the D5 contract itself (§3.4).
 - The C4 wrapper limit is stated (§3.1).
@@ -173,6 +175,134 @@ A Stop notice that reaches only the developer is acceptable, as it already is on
 - the `[layer1-freeze]` amendment.
 
 **Gate status.** H1 remains **NOT MET** until H1c passes under the A1 shape, or until a D5 amendment for Stop is accepted (decision note O2, the fallback).
+
+## 5.2 Amendment A2: P2-first interim phase (PROPOSED)
+
+**Status: PROPOSED** (2026-11-16), for independent review. Acceptance would change this charter's sequence and gate for **one interim phase only**. It would authorize **no** code, test, live run, `[layer1-freeze]` amendment or runtime change. Each of those keeps its own PR and its own go-ahead (§5.2.8).
+
+**Owner direction.**
+- **2026-11-11:** in the owner's working session on the D6/P2 assessment, the owner chose reporting level **R-ii** for a proposed P2-first phase, in the words "Re-probe Claude Code first". The re-probe is done: H1 passed on Claude Code `2.1.310` ([H1 gate record](../validation/dg1f-t08-d5-p2-host-path-h1-gate-2026-11-16.md), #808).
+- **2026-11-16:** the owner asked for this amendment ("Yes, draft it").
+
+Neither statement accepts the amendment. Acceptance follows independent review.
+
+### 5.2.1 What P2-first is
+
+P2-first is a **distinct interim contract**, not "D5 postponed". It lands the [D6/Q2](2026-10-17-dg1f-t08-d6-q2-external-memory-precedence.md) P2 precedence rule on **today's unbounded walk**, across every §4 consumer at once, before the D5 B1 stop rule exists. The rest of this charter (B1, I3, all eight §3.3 rows, the H1–H6 gate) becomes **Phase 2**, unchanged.
+
+Why it can go first:
+- **The defect it fixes is a precedence defect, not a boundary defect.** Today `find_memory` returns the `MNEME_MEMORY` path whenever the variable is set, and returns nothing when that file is missing (`hook.py:202-206`). Those are V5/V5-own (replacement) and V4 (masking), reachable through committed settings (Q2 §3, C2). The G3-2 case (#793) is the same defect: the repository's own memory **is** found by today's walk, and only the env-first order is wrong. P2 rule 1 fixes it without a boundary.
+- **No edit that today's walk governs becomes ungoverned.** D5 §5.1 makes a verified host-visible channel the price of B1, because B1 turns governed edits (L4, L5, L6) into skips. P2-first never stops a walk earlier than today. Rows 1 and 2 select the memory the walk finds; rows 6, 7 and 8 occur only where today's walk finds none. A **different** memory can govern than today (§5.2.3), but no edit loses its memory.
+- **Planted Git markers have nothing to act on.** Markers are not honored, so the D5 §5.4 planted-marker case, and the Q2 rule-2 substitution it would enable, cannot occur.
+- **The ordering risk Q2 names does not arise.** Q2 §10 warns against a window in which "the boundary exists but the override can still replace `M_R`". P2-first is the opposite order: precedence first, boundary later.
+
+### 5.2.2 Interim selection contract
+
+`M_W` is the memory today's walk finds: the nearest `.mneme/project_memory.json` at or above the consumer's unchanged start, with **no** Git-marker check. That is today's `find_memory` walk without its env branch. `M_X` is the non-empty `MNEME_MEMORY` value. Paths are compared after `resolve()`. "Exists" means `is_file()`, exactly today's test (A2-3).
+
+| Row (§3.3 numbering) | Walk result | `M_X` | Selected | `reason` |
+|---|---|---|---|---|
+| 1 | `M_W` found | unset, or equal to `M_W` | `M_W` | `DISCOVERED` |
+| 2 | `M_W` found | set, and different or missing | `M_W` | `OVERRIDE_IGNORED` |
+| 6 | no `M_W` | an existing file | `M_X` | `OVERRIDE_FILLS_ABSENCE` |
+| 7 | no `M_W` | set but missing | none | `OVERRIDE_MISSING` |
+| 8 | no `M_W` | unset | none | `NO_MEMORY_ON_PATH` |
+
+- **Rows 3, 4 and 5 cannot occur**, because they need a boundary. Their reason codes are reserved for Phase 2 and are never emitted in P2-first. The row numbers and reason codes are §3.3's, so Phase 2 extends the contract rather than renaming it.
+- **Resolver shape.** The §3.1 resolver and `MemorySelection` land in P2-first with `path`, `source` and `reason`. `boundary` and `shadowed` are **not populated** (both `None`), and a field `walk: "unbounded"` records why, so no consumer can read an absent boundary as "no Git repository" (A2-5). Phase 2 populates both and sets `walk: "b1"`.
+- **`find_memory`** stays the thin wrapper of §3.1 (C4). Its semantics change to this table only.
+- **§3.4 tiers apply:** rows 2 and 7 are anomalous; row 6 is informational; row 8 is plain absence (structured non-PASS, no per-event notice, per the D5 §5.1 refinement).
+- **Unchanged:** start points (I5); explicit constructor and CLI memory paths (Q2 O3); D4 nearest-wins.
+
+### 5.2.3 Costs, stated plainly
+
+The independent review of the 2026-11-11 assessment required that P2-first make **no** blanket "never weakens" claim. P2-first can select a more permissive memory than today in these cases:
+- **Row 2 with a stricter override.** An operator or committed setting that points `MNEME_MEMORY` at a stricter memory now gets the walked memory instead. This is Q2's accepted P2 cost (Q2 §6), and it is the point of P2: ambient configuration cannot replace a repository's own memory.
+- **Case 2: an ancestor memory beats the override.** Without B1, `M_W` can sit **above** the repository: a parent-directory memory (L6), or the outer checkout's memory seen from a worktree (L4) or a submodule (L5). In P2-first that ancestor wins under row 1 or row 2, and the override is ignored. In Phase 2 the same layout becomes row 3 (an override equal to the shadowed memory applies) or row 5 (refused). A user who relies on `MNEME_MEMORY` to govern a nested repository below an ancestor memory loses that override during P2-first. `OVERRIDE_IGNORED` is reported host-visibly on the H1 paths only (§5.2.4).
+- **Planted memory files (V3/V6)** stay nearest-wins, as today and as in Phase 2 (D4, out of scope).
+- **Start points are not unified** (D1/D2/D7), as in §4.
+
+What P2-first removes: env-based replacement (V5, V5-own) and env-based masking (V4) of a memory the walk finds, whichever channel sets the variable (C1, C2, C4). What it does not remove: a repository-controlled memory file still governs, as today.
+
+### 5.2.4 Reporting at level R-ii (I4-P2F, replacing I4 for P2-first only)
+
+1. **Every consumer carries the structured reason.** Every §4 consumer records `reason`, `source` and `walk` wherever it has a structured result or trace: for example the Codex gate `SKIP` reason, the Agent SDK and Hermes traces, and LangChain through its internal SDK. **A structured reason is not host visibility**, and no document, release note or UI may describe it as such (§5 rule).
+2. **Host-visible notices only on probed paths, in the probed shape, on the probed pin.** Rows 2 and 7 are reported host-visibly only on the H1 paths, which passed on Claude Code `2.1.310 (Claude Code)` with `claude-opus-5-5` (#808). The shape-binding rule (probe scope §3 step 5) applies:
+
+   | Path | Shape | Recorded audience |
+   |---|---|---|
+   | H1a PreToolUse (direct write, Bash) | exit 0, `hookSpecificOutput.additionalContext`, no `permissionDecision` | agent (`DELIVERED_TO_AGENT`) |
+   | H1b SessionStart | `hookSpecificOutput.additionalContext` | agent (`DELIVERED_TO_AGENT`) |
+   | H1c Stop | top-level `systemMessage`, exit 0, no `hookSpecificOutput`, no `decision` (§5.1) | developer only (`DELIVERED_TO_USER_ONLY`) |
+
+   The visibility claim is bound to that version. Other Claude Code versions receive the same shape, and documentation calls it **unverified** there.
+3. **No new host-facing output on unprobed paths.** The Codex gate and stop audit, Kiro, Antigravity, the Agent SDK, LangChain and Hermes emit **no selection notice and no new field** in their hook output, wire JSON or exit codes, for any row. They differ from today only in which memory they select. Reason: an unprobed shape can change host behavior. The original H1c Stop shape made the host continue the session (#549). These paths are recorded as **not host-visible** until their own probe passes.
+4. **ADR-033 coexistence.** On H1a direct write, the notice shares the single PreToolUse `additionalContext` object with the C2b proceed note (`ProceedNote.consumed`), as probe-scope A2-3 requires.
+5. **Unchanged:** exit codes and blocking (ADR-021; no row blocks); row 2 reported on every PreToolUse event (C5).
+
+### 5.2.5 Gate for P2-first
+
+- **The P2-first gate is H1 only, and H1 has PASSED** (#808). All four H1 paths share one pin (`2.1.310`), so the probe-scope A2-1 question (combining pins) does not arise.
+- **H2–H6 are not prerequisites for P2-first.** Each one that passes later extends I4-P2F rule 2 to that host's paths, through a small reviewed change (channel plus offline shape test), without a new charter amendment.
+- **Q2 §10's P2 prerequisites, as they apply to P2-first:**
+  - "The same host-visible channel as D5 §5.1" is **relaxed** to I4-P2F: host-visible on the H1 paths, structured-only elsewhere. This is the substance of R-ii and the main point the reviewer is asked to accept (A2-1). Q2 carries a pointer amendment recording it (Q2 Amendment A1).
+  - "The D5 §5.4 planted-marker outcome including the rule-2 case" is vacuous in P2-first, because no marker is honored. It binds again in Phase 2, through I3.
+- **Phase 2 is unchanged.** B1, I3 and rows 3–5 still need all of H1–H6 (§5), the §6 characterization test and their own freeze amendment. The §5 clause "if any host gate cannot be met … D5 must be revisited explicitly" still applies to Phase 2. D5 itself (§5.1, §8) is not amended.
+
+### 5.2.6 Freeze amendment and tests (P2-first)
+
+A separate `[layer1-freeze]` P2-first amendment PR, under Amendment Procedure §3(b), must:
+- **authorize only:** the shared resolver on today's walk; the five §5.2.2 rows; I4-P2F reporting on the H1 paths; the migration of every §4 consumer at once, with start points unchanged; `find_memory` kept as a wrapper with the new precedence;
+- **supersede, for `MNEME_MEMORY` precedence and the H1 notices only:**
+  - T-08 slice-1 preserved item 3 ("`MNEME_MEMORY` precedence is unchanged: when set, it wins exactly as today");
+  - the "`MNEME_MEMORY` precedence" clause of the C2a and C2b preserved item 4;
+  - preserved item 6 (Bash, SessionStart and Stop selection and behavior), for those two points only.
+  The walk, the parent-directory fallback and nested-memory behavior stay preserved;
+- **leave unauthorized** everything else in §10, including B1, I3 and rows 3–5.
+
+The implementation PR carries a subset of §7, plus P2-first cases:
+- §7.2 precedence matrix for rows 1, 2, 6, 7 and 8, including relative, symlinked and differently-cased (Windows) override paths;
+- §7.5 consumer parity across all eleven consumers, including the `walk` field;
+- §7.6 flips: V4 to row 2 or row 7, whichever applies; V5 and V5-own to row 2;
+- **case 2:** an ancestor memory plus a different override selects the ancestor (row 2). Pinned so that Phase 2's change to row 3 or 5 is a reviewable flip;
+- **planted marker plus override** (`A/.mneme`, `A/src/.git`, `MNEME_MEMORY` = B): selects A's memory, row 2. Today B is selected;
+- §7.7 unchanged tests, §7.9 latency;
+- §7.8 channel shape on the H1 paths, plus an assertion that every unprobed path emits no selection notice and no new field;
+- the ADR-033 coexistence test (§5.2.4 item 4), with the C2a and C2b suites green and unmodified.
+
+The full canonical suite must run. The §6 characterization test is **not** a P2-first prerequisite: its layouts are B1 cases, and the one whose selection P2-first changes (planted marker plus override) is covered above. §6 stays a Phase 2 step.
+
+### 5.2.7 Sequence (P2-first)
+
+1. This amendment, accepted.
+2. The P2-first `[layer1-freeze]` amendment PR (§5.2.6).
+3. The implementation PR, with the §5.2.6 tests and a full-suite run, squash-merged under ADR-022.
+4. The P2-first live evidence PR, on Claude Code `2.1.310`, using harness-planted state only: the §8 C2 re-run (expect the repository memory to govern and `OVERRIDE_IGNORED` to be visible) and planted marker plus override (expect A's memory, row 2).
+5. A G3 re-assessment record: G3 stays partial until P2 exists (#793), and this step records what P2-first changes.
+
+Each step needs the previous one merged and its own go-ahead. Phase 2 then continues with §12 steps 2–6, unchanged. The H2–H6 probes proceed by adoption and, as each passes, also extend I4-P2F.
+
+### 5.2.8 Not authorized by A2
+
+- code, tests, live runs or the P2-first freeze amendment;
+- B1, I3, rows 3–5 or the §6 characterization test;
+- any change to D5, to D5 §5.1's visibility rule for Phase 2, or to the H1–H6 gate for Phase 2;
+- any host-visible claim beyond the three H1 rows on `2.1.310`;
+- G3/G3-B authority, ADR-033, or any fail-closed or availability behavior;
+- DG2 federation, C5/C6;
+- DG1 deferred B2b and C1b, which still need a trusted-context design;
+- the C2/C3a release, which stays on hold.
+
+### 5.2.9 Decisions requested of the reviewer
+
+| # | Decision | Recommendation |
+|---|---|---|
+| A2-1 | Relax I4 and Q2 §10's host-visible requirement to I4-P2F for P2-first | **Yes.** It is the owner's chosen level (R-ii). P2-first leaves no governed edit ungoverned (§5.2.1), and visibility is claimed only where it was proven. |
+| A2-2 | Adopt `M_W` (today's unbounded walk) as the interim contract | **Yes.** The variant that computes `R` without stopping, so an ancestor memory loses to the override, was rejected on 2026-11-11: a planted `.git` would reopen the substitution. |
+| A2-3 | Missing vs. unreadable override | **`is_file()`, exactly as today.** The resolver never opens the file. An existing but malformed `M_X` is selected under row 6 and follows today's malformed-memory path unchanged (ADR-021; CI1.4 §7 condition 4). Under row 2 it is ignored anyway. |
+| A2-4 | Accept case 2 (ancestor memory beats the override) for the interim | **Yes**, as documented in §5.2.3. It ends in Phase 2. |
+| A2-5 | Leave `boundary` and `shadowed` unpopulated, with a `walk` marker | **Yes.** It keeps a later G3-B root binding from reading an absent boundary as a real one. |
+| A2-6 | No new output on unprobed paths | **Yes.** The H1c history shows an unprobed shape can change host behavior. |
 
 ## 6. Characterization test first (D5 §7.4)
 
