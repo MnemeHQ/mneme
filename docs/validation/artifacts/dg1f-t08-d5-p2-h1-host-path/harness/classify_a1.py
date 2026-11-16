@@ -42,7 +42,10 @@ mismatch in either arm is NOT_EXECUTED), and `combine` requires every headless a
 recorded version and the interactive pin to be present and equal (else NOT_EXECUTED),
 so H1c is always judged on one host version.
 
-Known collision (reported, not decided here): if the host surfaces the systemMessage
+Known collision, now covered by rule R6 (#805, implemented in classify_h1.host_events):
+the host's stream echo of the emitter's Stop systemMessage ("Stop says: <S>") is left out
+of the subtype comparison only when S1-S6 hold. The historical note follows.
+Original note: if the host surfaces the systemMessage
 as a stream-json `system` event that appears in the emitter arm only, the strict
 host-event subtype rule (unchanged) makes the headless run INCONCLUSIVE. Any rule
 change for that case needs its own review; raw evidence allows reclassification.

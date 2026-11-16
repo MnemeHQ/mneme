@@ -51,7 +51,7 @@ PATHS = {
     "H1b-start": {"path_type": "command_lifecycle_event", "event": "SessionStart", "tool": None},
     "H1c-stop": {"path_type": "command_lifecycle_event", "event": "Stop", "tool": None},
 }
-RULES_ID = "as-run table + R1-R5 (#551, #561, #796)"  # recorded in every outcome
+RULES_ID = "as-run table + R1-R6 (#551, #561, #796, #805)"  # recorded in every outcome
 PASSING = ("DELIVERED_TO_AGENT", "DELIVERED_TO_USER_ONLY", "EVIDENCE_REUSED")
 EDIT_EXPECTED = b"beta\n"
 BASH_FILE, BASH_EXPECTED = "bash_out.txt", b"probe-ran\n"  # exact bytes, not a prefix
@@ -224,15 +224,63 @@ INDICATOR_KEYS = ("decision", "permissionDecision", "permission_decision", "bloc
                   "retry", "continue", "stopReason", "stop_reason")
 
 
-def host_events(arm, nonce):
+# R6 (#805, accepted rule only; implemented here): the exact field set of the host's
+# stream echo of a Stop hook's top-level systemMessage, as observed on Claude Code
+# 2.1.310 (A3, #804). Any other field set is compared (S1).
+R6_FIELDS = frozenset({"type", "subtype", "content", "level", "session_id", "uuid"})
+R6_PREFIX = "Stop says: "
+
+
+def r6_stop_echo(arm, spec, emitter):
+    """Index into arm["events"] of the ONE event R6 leaves out of the subtype comparison,
+    or None. Every condition must hold; anything else keeps the event compared.
+
+    S1 shape: type system, subtype informational, level notice, field set exactly R6_FIELDS.
+    S2 path and arm: the path's event is Stop, and this is the emitter arm.
+    S3 attribution: exactly one Stop hook record, stop_hook_active false, whose emitted
+       text is a JSON object with a string systemMessage S.
+    S4 derivation: content == "Stop says: " + S exactly.
+    S5 uniqueness: exactly one event meets S1 and S4.
+    S6 position: after the last assistant event and before the first result event."""
+    if not emitter or spec.get("event") != "Stop":                                   # S2
+        return None
+    stops = hook_calls(arm, "Stop")
+    if len(stops) != 1 or (stops[0].get("envelope") or {}).get("stop_hook_active") is not False:  # S3
+        return None
+    try:
+        emitted = json.loads(stops[0].get("emitted") or "")
+    except ValueError:
+        return None
+    if not isinstance(emitted, dict) or not isinstance(emitted.get("systemMessage"), str):
+        return None
+    want = R6_PREFIX + emitted["systemMessage"]
+    events = [e for _, e in arm["events"]]
+    hits = [i for i, e in enumerate(events)
+            if e.get("type") == "system" and e.get("subtype") == "informational"
+            and e.get("level") == "notice" and set(e) == R6_FIELDS                   # S1
+            and e.get("content") == want]                                            # S4
+    if len(hits) != 1:                                                               # S5
+        return None
+    i = hits[0]
+    assistants = [j for j, e in enumerate(events) if e.get("type") == "assistant"]
+    results = [j for j, e in enumerate(events) if e.get("type") == "result"]
+    if not assistants or not results or not (assistants[-1] < i < results[0]):        # S6
+        return None
+    return i
+
+
+def host_events(arm, nonce, spec=None, emitter=False):
     """Every stream-json `system` event except init, NONCE OR NOT (strict rule).
-    Returns (sorted subtypes, {(subtype, indicator key): sorted masked values})."""
+    Returns (sorted subtypes, {(subtype, indicator key): sorted masked values}, R6 index).
+    R3 leaves thinking_tokens out of the subtype comparison; R6 leaves out at most one
+    event (r6_stop_echo). The indicator scan still covers every event, excluded or not."""
     subs, indicators = [], {}
-    for _, e in arm["events"]:
+    r6 = r6_stop_echo(arm, spec or {}, emitter)
+    for idx, (_, e) in enumerate(arm["events"]):
         if e.get("type") != "system" or e.get("subtype") == "init":
             continue
         sub = str(e.get("subtype"))
-        if sub not in EXCLUDED_FROM_SUBTYPE_COMPARISON:
+        if sub not in EXCLUDED_FROM_SUBTYPE_COMPARISON and idx != r6:
             subs.append(sub)
         stack = [e]
         while stack:
@@ -244,7 +292,7 @@ def host_events(arm, nonce):
                     stack.append(v)
             elif isinstance(o, list):
                 stack.extend(o)
-    return sorted(subs), {k: sorted(v) for k, v in indicators.items()}
+    return sorted(subs), {k: sorted(v) for k, v in indicators.items()}, r6
 
 
 def hook_calls(arm, event):
@@ -543,8 +591,8 @@ def classify(emit, ctl, path_id, pin_model, pin_version=None):
     rec["permissions"] = {"emitter": perm_e and {"unmatched_denials": perm_e["unmatched_denials"]},
                           "control": perm_c and {"unmatched_denials": perm_c["unmatched_denials"]},
                           "comparison": perm_cmp}
-    subs_e, ind_e = host_events(emit, nonce)
-    subs_c, ind_c = host_events(ctl, nonce)
+    subs_e, ind_e, r6_e = host_events(emit, nonce, spec, emitter=True)
+    subs_c, ind_c, r6_c = host_events(ctl, nonce, spec, emitter=False)
     ind_shared = sorted(set(ind_e) & set(ind_c))
     ind_mismatch = [{"event_subtype": k[0], "field": k[1], "emitter": ind_e[k], "control": ind_c[k]}
                     for k in ind_shared if ind_e[k] != ind_c[k]]
@@ -552,7 +600,12 @@ def classify(emit, ctl, path_id, pin_model, pin_version=None):
     rec["host_events"] = {"emitter_subtypes": subs_e, "control_subtypes": subs_c,
                           "indicators": {"emitter": {f"{a}.{b}": v for (a, b), v in ind_e.items()},
                                          "control": {f"{a}.{b}": v for (a, b), v in ind_c.items()},
-                                         "mismatched": ind_mismatch}}
+                                         "mismatched": ind_mismatch},
+                          # R6 (#805): the emitter-arm Stop systemMessage stream echo left out
+                          # of the subtype comparison (still scanned for indicators), if any.
+                          "r6_excluded": None if r6_e is None else {
+                              "arm": "emitter", "event_index": r6_e,
+                              "subtype": str(emit["events"][r6_e][1].get("subtype"))}}
     common = {
         # Only decisions for EQUIVALENT requests are attributed to the host; requests
         # one arm made alone are model-chosen and only recorded (review of #546).
