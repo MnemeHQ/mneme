@@ -9,10 +9,17 @@ It authorizes **no** code, test, freeze amendment, live run or runtime change (�
 
 **Anchor:** `main` @ `191c0aca`.
 
-**Revision 2 (2026-11-16):** answers the independent review of `fc77eca1` (REQUEST CHANGES, F1–F7). Changes:
+**Revision 3 (2026-11-16):** answers the re-review of `966fff4b` (ACCEPT WITH CHANGES, N1–N5). Changes:
+- O4's "before P2-first" claim is corrected: today, cause D needs two steps (N1);
+- the A2-RT acceptance record and cross-references are added (N2);
+- the ADR-033 erratum is made consistent (N3);
+- the wording of the new line is fixed and covers a non-file at the path (N4);
+- two nits are corrected (N5).
+
+**Revision 2 (2026-11-16):** answered the independent review of `fc77eca1` (REQUEST CHANGES, F1–F7). Changes:
 - the authorization route is rebuilt: an A2 charter amendment and an ADR-033 erratum revision, both carried in this PR and both accepted before the freeze amendment (F1, F2);
 - the freeze supersession is completed (F3);
-- the claim "today the line is correct" is withdrawn, because it is already wrong today in one layout. The recommendation moves from O2 to O4 (F4);
+- the claim "today the line is correct" is withdrawn, because it is already wrong today in causes B and D. The recommendation moves from O2 to O4 (F4);
 - the O3 analysis is corrected (F5);
 - the verification scope and the test matrix are widened (F6), plus factual nits (F7).
 
@@ -92,7 +99,7 @@ Under the recommended option (O4) the invariant is **not load-bearing**. O4 is c
   - The tests that compare full stderr (`test_availability_c2a.py:274`, `:447`, `:457`; `test_availability_c2b_am1.py:105`) run with no declaration or under `AUTHORIZATION_UNVERIFIABLE`. There, no remediation line prints.
 - **Where the text is quoted:**
   - the ADR-033 erratum;
-  - the D5+P2 charter §5.2.3, abbreviated (it goes stale under O4 and is left as a historical description);
+  - the D5+P2 charter §5.2.3, abbreviated. It stays accurate under O4, which keeps the old line for cause A;
   - historical validation artifacts, which are evidence of past runs and are not changed.
 - **Out of scope:** under `AUTHORIZATION_UNVERIFIABLE` the check can still run against an ancestor memory when the declared one is missing. That is existing SS-3 "not bound" behavior, not a remediation question.
 
@@ -108,7 +115,7 @@ Under the recommended option (O4) the invariant is **not load-bearing**. O4 is c
 Proposed text:
 
 ```text
-restore .mneme/project_memory.json from the baseline branch; while it is missing, another memory is selected
+restore .mneme/project_memory.json from the baseline branch, replacing anything else at that path; while it is not a file, another memory is selected
 ```
 
 - **Correct after P2-first** (by §2). **Wrong before P2-first in cause A**, where the declared memory exists.
@@ -132,23 +139,24 @@ When the category is `MEMORY_PATH_MISMATCH`, test whether the declared memory (`
 - **not a file** (causes B, C and D):
 
   ```text
-  restore .mneme/project_memory.json from the baseline branch; while it is missing, another memory is selected
+  restore .mneme/project_memory.json from the baseline branch, replacing anything else at that path; while it is not a file, another memory is selected
   ```
 
 - **a file** (cause A): the existing line, unchanged.
 
 Properties:
-- **Correct in every cause, before and after P2-first.** It does not depend on the §2 invariant. After P2-first the second branch is unreachable (by §2) but harmless.
-- **No atomicity constraint.** Landing it with the P2-first implementation is a scheduling choice, not a correctness requirement.
+- **After P2-first, correct in every cause.** Following the line once clears the mismatch in causes B, C and D. The second branch is unreachable (by §2) but harmless.
+- **Before P2-first, an improvement, but not a one-step fix in cause D.** The override still wins before P2-first. Restoring the declared memory therefore leaves `MEMORY_PATH_MISMATCH` in place, and the old "unset" line then appears for the second step. That is why O4 lands with the P2-first implementation (§8), not before.
+- **It does not depend on the §2 invariant** for its output in any single refusal.
+- **Transient race:** if the declared memory appears between the memory walk and the emit-time check, the old line prints once. This is harmless.
+- **Does not apply under `AUTHORIZATION_UNVERIFIABLE`:** no category is produced there, so no remediation line prints (`availability.py:189`).
 - **Cost:** one extra filesystem test, only on an `AUTHORIZED` mismatch refusal that already refuses. Category, exit code, routing order, the SS-3 line and the proceed sentence are unchanged.
-- **Constraints met:** ASCII, no paths beyond the existing constant, no submitted content (C2b §8; ADR-033 §7). The exact wording of the new line is open to the reviewer, provided:
-  - it names restoring the declared memory as the fix;
-  - it does not tell the operator to unset `MNEME_MEMORY`;
-  - it stays one line.
+- **Constraints met:** ASCII, no paths beyond the existing constant, no submitted content (C2b §8; ADR-033 §7).
+- **Exact wording is fixed** by this decision, as quoted above. It names restoring the declared memory as the fix and says to replace anything else at that path, for example a directory or a broken symlink. It does not tell the operator to unset `MNEME_MEMORY`, and it stays one line. The freeze amendment and the implementation use this exact string.
 
 ## 5. Recommendation
 
-**O4.** It is correct in every cause, including the two that are already wrong on `main` today (B and D). It does not depend on the §2 invariant. It changes one diagnostic line on one refusal and nothing else.
+**O4.** After P2-first it is correct in every cause. Before P2-first it already improves causes B and D, which are wrong on `main` today. It does not depend on the §2 invariant. It changes one diagnostic line on one refusal and nothing else.
 
 - **O2** is rejected because it is wrong before P2-first and so must land atomically with it.
 - **O3** is rejected because it needs a C2b charter amendment and changes recorded reason codes.
