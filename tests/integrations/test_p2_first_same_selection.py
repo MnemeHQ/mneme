@@ -31,9 +31,10 @@ MEMORY = {"meta": {"name": "same-selection", "description": "fixture", "version"
 # The foreign memory forbids a marker the repository memory allows, so a
 # consumer that wrongly applied the override would produce a different verdict
 # even where its --memory argument is not recorded (Kiro runs the real check).
-FOREIGN = {**MEMORY, "decisions": [{
-    "id": "foreign_001", "decision": "Foreign rule", "rationale": "differs",
-    "scope": ["storage"], "constraints": [], "anti_patterns": ["foreign_only_marker"]}]}
+FOREIGN = {**MEMORY, "items": [], "decisions": [{
+    "id": "foreign_001", "decision": "Never write the foreign-only marker.", "rationale": "differs",
+    "scope": ["storage"], "constraints": [], "anti_patterns": [],
+    "rules": [{"type": "FORBID_LITERAL", "value": "foreign_only_marker"}]}]}
 NOTICE = "OVERRIDE_IGNORED"
 
 
@@ -183,7 +184,17 @@ def test_kiro(monkeypatch, layout):
 
     r1, r2 = _both(monkeypatch, layout, run)
     assert r1 == r2
-    assert r1[0] == 0, "the repository memory allows the marker; the foreign one forbids it"
+    assert r1[0] == 0, "the repository memory allows the marker"
+
+    # Guard: the foreign memory really denies this write when it is the one
+    # selected (row 6), so an override-first regression would change row 2.
+    plain = layout["base"] / "plain"
+    plain.mkdir()
+    guard = raw.replace(json.dumps(str(layout["repo"]))[1:-1], json.dumps(str(plain))[1:-1])
+    monkeypatch.setenv("MNEME_MEMORY", str(layout["foreign"]))
+    out, err = io.StringIO(), io.StringIO()
+    rc = kiro.main(stdin=io.StringIO(guard), stderr=err, stdout=out)
+    assert rc == 2 and "foreign_001" in err.getvalue(), (rc, out.getvalue(), err.getvalue())
 
 
 def test_antigravity(monkeypatch, layout):
