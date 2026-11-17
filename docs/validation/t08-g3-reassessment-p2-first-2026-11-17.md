@@ -160,7 +160,7 @@ inferred.
 
 **The override still governs where nothing is walked.**
 - **Row 6: a remaining wrong-source PASS route.** With no memory on the walk, `MNEME_MEMORY` still selects any existing file (`OVERRIDE_FILLS_ABSENCE`).
-  - **Unenrolled repositories:** if the repository's memory is deleted or absent, a foreign permissive memory still yields a complete PASS. This is the G3-2 shape without a walked memory, and it falls inside G3's definition ("missing local declaration … never an authoritative PASS").
+  - **Unenrolled repositories:** if the repository's memory is deleted or absent, a foreign permissive memory still yields a complete PASS (by mechanism and `tests/integrations/test_memory_selection.py`; not observed live under P2-first). This is the G3-2 shape without a walked memory, and it falls inside G3's definition ("missing local declaration … never an authoritative PASS").
   - **Enrolled repositories:** only `AUTHORIZED` refuses (SS-3, `test_h7`). `UNVERIFIABLE` is reported but not refused (`test_h12`), and `REVOKED` and `VERIFIED_ABSENT` proceed.
 - **Row 7:** a missing override with no walked memory selects nothing (`OVERRIDE_MISSING`). The H1a notice reports it, but nothing governs.
 
