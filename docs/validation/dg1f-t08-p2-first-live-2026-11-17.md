@@ -15,7 +15,8 @@
 
 | Item | Value |
 |---|---|
-| Host | **Claude Code `2.1.310 (Claude Code)`** on Windows 11, `DISABLE_AUTOUPDATER=1`. Run by the operator from their own PowerShell (not nested in Claude Code). |
+| Host | **Claude Code `2.1.310 (Claude Code)`** on Windows 11, `DISABLE_AUTOUPDATER=1`. Run by the operator from their own terminal, as the README directs (PowerShell launching Git Bash). Only "not nested" is enforced: the preflight refuses when `CLAUDECODE` is set. |
+| Invocation | `claude -p … --model claude-opus-5-5 --setting-sources project --permission-mode acceptEdits [--add-dir <repo_a>] --allowedTools Read Edit --output-format stream-json` (`run_p2f_probe.sh`). `--add-dir` is used in the r4 topology only. |
 | Model | `--model claude-opus-5-5`; the init event reports **`claude-opus-5-5`** in all seven probes. |
 | Setting sources | **`project`** only, for every probe (charter §5.2.4 item 2). |
 | Permission mode | **`acceptEdits`** |
@@ -78,8 +79,8 @@ unchanged) as the probe expected. It does not mean the target changed.
 ### 2.1 Checks common to all seven probes
 
 Read from `classification_p2f.json`, `observer.txt` and `hook-log.jsonl`:
-- **Hook view:** exactly one PreToolUse `Edit` hook record for the target. The hook module was loaded from the pinned source. The hook saw exactly the configured `MNEME_MEMORY` (none for R0), with `is_file` `false` for v4 and `true` for v5, and no other `MNEME_*` variable. `CLAUDE*` variables appear by name only.
-- **Snapshots:** repo A's memory (`aae2456a…`), repo B's memory (`c8e101a5…`), both repositories' settings, B's `app.py` and both repositories' git `HEAD` are unchanged by every probe. No `settings.local.json` existed before or after. The `env` was committed in the session repository before the session.
+- **Hook view:** exactly one PreToolUse `Edit` hook record for the target. The hook module was loaded from the pinned source. The hook saw exactly the configured `MNEME_MEMORY` (none for R0), with `is_file` `false` for v4 and `true` for v5, and no other `MNEME_*` variable. `CLAUDE*` variables appear by name only, except `CLAUDE_PROJECT_DIR`, whose value is published redacted (`<LIVE>/…`).
+- **Snapshots:** repo A's memory (`aae2456a…`), repo B's memory (`c8e101a5…`), both repositories' settings, B's `app.py` and both repositories' git `HEAD` are unchanged by every probe. No `settings.local.json` existed before or after. In the six override probes, the `env` was committed in the session repository before the session; R0 has no settings `env`.
 - **Host:** the only tools used were `Read` and `Edit`. Each refused probe has an `Edit` `tool_result` with `is_error: true` and one `permission_denials` entry. `P2F-V5-notice` has none. `claude` exited 0 in every probe.
 - **Pins:** host version, init-event model, setting sources and the `mneme/` tree equal the pins in every probe.
 
