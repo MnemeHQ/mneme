@@ -32,7 +32,9 @@ def variants(p):
     win = p.replace("/", "\\")
     fwd = win.replace("\\", "/")
     unix = "/" + fwd[0].lower() + fwd[2:] if re.match(r"^[A-Za-z]:", fwd) else fwd
-    return {win, win.replace("\\", "\\\\"), fwd, unix}
+    # Evidence-PR fix: the OVERRIDE_IGNORED notice is JSON inside a JSON string in
+    # hook-log.jsonl, so its Windows paths arrive doubly escaped (4 backslashes).
+    return {win, win.replace("\\", "\\\\"), win.replace("\\", "\\\\\\\\"), fwd, unix}
 
 
 SUBS = []
