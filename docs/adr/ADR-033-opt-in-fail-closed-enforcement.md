@@ -16,7 +16,7 @@ authority, implementation charter or Layer 1 amendment.
 **Erratum:** 2026-11-16, `MNEME_MEMORY` precedence under T-08 P2-first (§4.1);
 revised 2026-11-16 for the `MEMORY_PATH_MISMATCH` remediation text.
 In effect from the squash merge of the P2-first implementation, PR
-[#815](https://github.com/MnemeHQ/mneme/pull/815); see
+[#815](https://github.com/MnemeHQ/mneme/pull/815), squash commit `59309fe7`; see
 [Erratum](#erratum-2026-11-16-mneme_memory-precedence-under-t-08-p2-first)
 **Deciders:** Theo Valmis
 **Charter:** none yet. The earlier bundled C0 charter was removed as stale. A
@@ -227,7 +227,7 @@ amendment.
   precedence in `find_memory`; an override pointing at other memory (T-08 V5)
   is handled only by the mismatch rule above, and only when authorization is
   verified. (These two clauses about `MNEME_MEMORY` are superseded from the
-  squash merge of the T-08 P2-first implementation, PR #815: see the
+  squash merge of the T-08 P2-first implementation, PR #815, `59309fe7`: see the
   [2026-11-16 erratum](#erratum-2026-11-16-mneme_memory-precedence-under-t-08-p2-first).)
   Other hook seams (Bash, SessionStart, Stop) still select from
   `cwd` and stay outside this contract until their T-08 slices land.
