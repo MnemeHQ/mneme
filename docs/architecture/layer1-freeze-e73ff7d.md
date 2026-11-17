@@ -2279,7 +2279,7 @@ named above.
 
 > This authorizes a **bounded precedence correction** across the existing
 > memory-selection consumers, plus the H1 host notices and one remediation
-> line. It does **not** authorize any of the following:
+> text. It does **not** authorize any of the following:
 > - the D5 B1 stop rule, the I3 guard or charter §3.3 rows 3–5;
 > - any other host notice;
 > - any change to discovery start points;
@@ -2292,15 +2292,16 @@ named above.
   **today's unbounded walk**, so a memory the walk finds always beats
   `MNEME_MEMORY`, and the override only fills an absence;
 - every existing consumer migrates to it at once;
-- rows 2 and 7 are reported on the three Claude Code paths that passed H1;
-- the `MEMORY_PATH_MISMATCH` remediation line is chosen at emit time.
+- rows 2 and 7 are reported on the Claude Code H1 paths (H1a direct write and
+  Bash, H1b, H1c);
+- the `MEMORY_PATH_MISMATCH` remediation text is chosen at emit time.
 
 **Sections referenced:**
 - the Freeze Anchor **Status** clause ("No behavioral change to retrieval or
   enforcement without an explicit charter amendment");
 - the preserved items superseded below (T-08 slice 1, C2a, C2b, C2b
   Amendment 1);
-- the T-08 slice-1 "Not authorized" item D6;
+- the T-08 slice-1 "Not authorized" items D6 and D7;
 - the Amendment Procedure below.
 
 **Rationale (Amendment Procedure §3(b)).** The charter amendments were
@@ -2309,7 +2310,7 @@ named above.
   **Amendment A2** (P2-first, §5.2): PR
   [#809](https://github.com/MnemeHQ/mneme/pull/809), squash `84ee88b7`. The
   owner accepted it at reviewed head `818a1dea`.
-- **Amendment A2-RT** (the remediation line), with the
+- **Amendment A2-RT** (the remediation text), with the
   [remediation-text decision](../plans/2026-11-16-dg1f-t08-d5-p2-first-remediation-text-decision.md)
   (option O4): PR [#811](https://github.com/MnemeHQ/mneme/pull/811), squash
   `150c37b4`. The owner accepted it at reviewed head `27f62b98`.
@@ -2327,10 +2328,16 @@ The amendments rest on:
   claims rest on.
 
 The [ADR-033 erratum](../adr/ADR-033-opt-in-fail-closed-enforcement.md#erratum-2026-11-16-mneme_memory-precedence-under-t-08-p2-first)
-(#810, revised in #811) records the ADR-level consequences. The T-08 slice-1
-amendment listed "D6 `MNEME_MEMORY` precedence" as needing its own charter
-and its own `[layer1-freeze]` amendment, and this is that amendment. No
-behavior change is retroactively justified.
+(#810, revised in #811) records the ADR-level consequences.
+
+The T-08 slice-1 amendment listed two items as needing their own charter and
+their own `[layer1-freeze]` amendment:
+- **D6**, `MNEME_MEMORY` precedence. This amendment is that one.
+- **D7**, other integrations that select memory from `cwd` or a project
+  directory. This amendment covers them for **precedence only**. Their
+  start-point scoping stays unauthorized.
+
+No behavior change is retroactively justified.
 
 **Governing authority:**
 - accepted ADR-021 (fail-open), ADR-017, ADR-020, ADR-023, ADR-029, ADR-030,
@@ -2364,7 +2371,8 @@ behavior change is retroactively justified.
    - **Override handling:**
      - `M_X` is tested with `is_file()` only, and the resolver never opens it.
        An unreadable or malformed existing override is selected under row 6
-       and takes today's load-failure path.
+       when no memory is walked (under row 2 it is ignored), and then takes
+       today's load-failure path.
      - Equality is tested after `resolve()`.
      - The returned path keeps today's form: `Path(M_X)` as given when the
        override is selected (row 6, or row 1 with an equal override), and the
@@ -2391,16 +2399,19 @@ behavior change is retroactively justified.
    `kiro/hook.py:298`; `antigravity/adapter.py:242`;
    `agent_sdk/adapter.py:351`; and `hermes/adapter.py:260`. Explicit
    constructor and CLI memory paths are unchanged.
-4. **Selection recording** (charter §5.2.4 item 1).
+4. **Selection recording** (charter §5.2.4 items 1 and 4; decision A2-6).
    - **The Agent SDK and LangChain** gain the trace keys `selection_reason`,
      `selection_source` and `walk` on every trace record that follows a
      selection. That includes records written through `_record` and through
      `_record_annotation_gap`. Records written with no selection carry none.
-   - **No other consumer** gains any record, field, log, file or sink.
-     Existing `reason` strings and the fields of `GateResult` and
-     `ContextInjection` stay byte-identical.
+   - **For every consumer, including the Agent SDK and LangChain,** there is
+     no selection notice and no new field in hook output, wire JSON, returned
+     result objects or exit codes. Existing `reason` strings and the fields of
+     `GateResult` and `ContextInjection` stay byte-identical. The trace keys
+     above are the only addition anywhere.
 5. **H1 notices** (charter §5.2.4 items 2, 3 and 5), for **rows 2 and 7 only**,
-   on Claude Code only, each in exactly its probed shape:
+   on Claude Code only, each in exactly its probed shape. H1a covers the
+   direct-write events (`Edit`, `Write`, `MultiEdit`) and Bash.
 
    | Path | Shape |
    |---|---|
@@ -2415,31 +2426,46 @@ behavior change is retroactively justified.
      - **H1b:** suppressed when either existing plain-text line is written;
      - **H1c:** suppressed when `_emit_stop_feedback` or `decision: block` is
        emitted.
+   - **This applies under every authorization state that otherwise exits 0
+     with no `permissionDecision`.** That includes a declaration under
+     `AUTHORIZED` (a row-2 PASS) and under `REVOKED` or `VERIFIED_ABSENT`.
    - **On H1a direct write,** the notice shares the single `additionalContext`
      object with the C2b Amendment 1 proceed text: one object, both texts.
 6. **`MEMORY_PATH_MISMATCH` remediation** (A2-RT; decision option O4). In
    `emit_availability`, when the category is `MEMORY_PATH_MISMATCH`, check
-   whether `declaration.root / MEMORY_PATH` is a file:
-   - **not a file:** print exactly
+   whether `declaration.root / MEMORY_PATH` is a file. The result sets the
+   remediation text inside the existing
+   `mneme-hook: not a decision violation; remediation: <text>.` line:
+   - **not a file:** the text is exactly
      `restore .mneme/project_memory.json from the baseline branch, replacing anything else at that path; while it is not a file, another memory is selected`;
-   - **a file:** print the existing line, unchanged.
+   - **a file:** the existing text, unchanged.
 
    No other diagnostic changes.
-7. **Tests** (charter §5.2.6 and decision §7). The implementation PR must
-   include:
-   - the precedence matrix and override classes;
-   - consumer parity across all eleven consumers;
+7. **Tests:** **all** of charter §5.2.6 and of decision §7. That includes
+   **the specified remediation and the §2 invariant layout-matrix test**, both
+   owner conditions from #811. Among them:
+   - the precedence matrix and the override classes, including relative,
+     symlinked and differently-cased override paths;
+   - consumer parity across all eleven consumers, including the `walk` field;
    - the V4/V5 flips;
-   - the two §6 planted-marker-plus-override flips in
-     `test_memory_boundary_characterization.py` (to row 2);
+   - the two §6 planted-marker-plus-override flips (to row 2), with every
+     other §6 case unchanged;
    - the case-2 and planted-marker cases;
-   - the rewritten C2a, C2b and C2b Amendment 1 tests (parent discovery or
+   - **the rewritten C2a, C2b and C2b Amendment 1 tests** (parent discovery or
      row 6, including the P1 no-declaration `incomplete` parity case), plus
-     the new "`MNEME_MEMORY` alone no longer produces SS-3" test;
-   - channel-shape and suppression tests;
+     the new "`MNEME_MEMORY` alone no longer produces SS-3" test. Every other
+     C2a, C2b and Amendment 1 test stays green and unmodified;
+   - **the §7.8 assertion:** for every row and consumer, hook output, exit
+     code, `GateResult` and `ContextInjection` are identical to what the same
+     selected memory produces today. The exceptions are the H1 notices and the
+     trace keys;
+   - the suppression and channel-shape tests;
    - offline coexistence tests for H1a, H1b and H1c;
-   - the O4 tests for causes A–D, using a `Verification` with a `tip`;
-   - **the §2 invariant layout-matrix test** (owner condition, #811);
+   - the O4 tests: the new text in causes B, C and D and the old text in
+     cause A, each run before and after the selection change where reachable,
+     using a `Verification` with a `tip`;
+   - the §7.7 unchanged tests: T-08 slice 1, the #484 set, setup,
+     strict/warn, and `test_memory_discovery`;
    - the latency benchmark;
    - a full canonical-suite run.
 8. **ADR-033 erratum closure.** The implementation PR records its merge commit
@@ -2448,23 +2474,50 @@ behavior change is retroactively justified.
 
 No other code path is authorized.
 
+### Preserved, mandatory
+
+- **ADR-021 fail-open.** No row blocks. A trusted complete strict `FAIL` still
+  blocks exactly as today.
+- **Exit codes and blocking are unchanged for the same selected memory.**
+  Where the selection changes, the result follows that selection (charter
+  §5.2.4 item 6). For example, in the G3-1 layout the ADR-033 refusal becomes
+  the check's own result.
+- **The category set and the routing order** (C2b §5.3) are unchanged. A
+  changed selection can change which category a layout reaches. The ancestor
+  layout's change from `MEMORY_MISSING` to `MEMORY_PATH_MISMATCH` is stated in
+  the ADR-033 erratum.
+- **Unchanged text:**
+  - the SS-3 stderr line, which stays accurate. SS-3 through `MNEME_MEMORY`
+    still occurs in row 6;
+  - the C2b Amendment 1 proceed sentence;
+  - every remediation text other than change 6.
+- **Unchanged structure:**
+  - the walk;
+  - the parent-directory fallback;
+  - nested-memory nearest-wins;
+  - the T-08 slice-1 direct-write start;
+  - C2a declaration discovery and its policy-root rule (which does not consult
+    `MNEME_MEMORY`);
+  - every start point.
+
 ### Superseded preserved items (for the scope above only)
 
-Each item below stays in force **except** for the effects of change items
-1–6.
+**Each entry's own scope governs.** Each item below stays in force except as
+its entry states.
 
 - **T-08 slice 1:**
   - **Item 3** ("`find_memory` is not modified. `MNEME_MEMORY` precedence is
     unchanged …") is superseded for two points: `find_memory` becomes a
-    wrapper, and precedence follows the rows above. The walk, the
-    parent-directory fallback, nested-memory nearest-wins and the slice-1
-    direct-write start stay preserved.
+    wrapper, and precedence follows the rows above.
   - **Item 6** ("Bash, SessionStart and Stop memory selection and behavior")
-    is superseded for precedence, the H1b and H1c notices, and the knock-on
-    effects of a changed selection (charter §5.2.3).
+    is superseded for three points:
+    - precedence;
+    - the H1a (Bash), H1b and H1c notices;
+    - the knock-on effects of a changed selection (charter §5.2.3), such as
+      the baseline root and audit tree.
 - **C2a:**
   - **Item 1** (no declaration means byte-identical output) is superseded for
-    the H1a notice and the row-2 selection change.
+    the H1a notice and the effects of a changed selection.
   - **Item 4** ("`find_memory`, `MNEME_MEMORY` precedence and T-08 slice-1
     selection") is superseded for the wrapper and precedence. T-08 slice-1
     selection stays preserved.
@@ -2473,58 +2526,70 @@ Each item below stays in force **except** for the effects of change items
 - **C2b:**
   - **Items 1 and 6** are superseded as for C2a.
   - **Item 4** is superseded as for C2a item 4. "C2a declaration discovery
-    and policy-root rule" stays preserved, including that `MNEME_MEMORY` is
-    not consulted for declaration detection.
+    and policy-root rule" stays preserved.
 - **C2b Amendment 1:**
   - **Item 1** is superseded as for C2a item 1.
   - **Item 3** (refusals, exit codes, every existing stderr line) is
-    superseded for three effects:
+    superseded for these effects:
     - SS-3 through `MNEME_MEMORY` beside a discovered memory, and
       `MEMORY_MISSING` through a missing override beside a discovered memory,
       no longer occur;
-    - the ancestor layout (declared memory missing, ancestor memory present)
-      refuses as `MEMORY_PATH_MISMATCH` rather than `MEMORY_MISSING`;
-    - the change-6 remediation line.
+    - the ancestor layout refuses as `MEMORY_PATH_MISMATCH` rather than
+      `MEMORY_MISSING`;
+    - the stderr lines that follow a changed selection, such as
+      "canonical memory missing.";
+    - the change-6 remediation text.
   - **Item 4** (`AUTHORIZED`, `REVOKED` and `VERIFIED_ABSENT` outputs) is
-    superseded for the same SS-3 effects and the change-6 line.
+    superseded for the item-3 effects, the H1a notice under those states, and
+    the change-6 text.
+  - **Item 5** (warn-mode output, except the 17.3 append) is superseded for
+    two effects:
+    - the H1a notice on warn-mode events that are not `defer`;
+    - warn-mode outputs and verdicts that follow a changed selection.
+
+    The `defer` object itself is unchanged, because the notice is suppressed
+    on it.
   - **Item 7** (Bash, SessionStart and Stop) is superseded as for C2a item 6.
   - **Its authorized output** ("exactly one … object with the fixed 17.2
     text") is superseded so that, on H1a, the same single object also carries
     the change-5 notice.
-- **C2b charter §17.6** ("stderr text" preserved) is superseded for the
-  change-6 line only, under A2-RT.
-
-**Still in force, as stated by the ADR-033 erratum:**
-- categories, the routing order (C2b §5.3), exit codes and refusal semantics;
-- the SS-3 stderr line, which stays accurate. SS-3 through `MNEME_MEMORY`
-  still occurs in row 6;
-- the C2b Amendment 1 proceed sentence;
-- every other remediation string.
+- **C2b charter §17.6** (preserved refusal behavior, exit codes, "stderr
+  text", and the Bash, SessionStart and Stop handlers). Where a freeze item
+  above restates a charter-level preservation, the charter text is read
+  together with that freeze item's supersession. Under A2-RT, §17.6 "stderr
+  text" is also superseded for the change-6 text.
 
 ### Exhaustiveness check (charter §5.2.6)
 
-Every amendment in this document was read for a **standing** preservation of
-memory selection, hook output or stderr text. Only the four amendments above
-carry one.
+Every amendment and record in this document was read for a **standing**
+preservation of memory selection, hook output or stderr text. Only the four
+amendments above carry one. None of the others is superseded, and none needs
+to be. The reason for each:
 
-The later amendments' "unchanged" clauses are invariance requirements on
-**their own** change. They require each change to leave the named outputs
-unchanged, and do not bind later authorized changes:
-- **DG1B1** item 3 ("which decisions … hooks … consume is unchanged", headed
-  "unchanged by DG1B1");
-- **DG1F-C1a** non-interference (with and without the preview);
-- **#260** items 1–7;
-- **#613** item 5 (gate surfaces pass `--target-path`, unaffected);
-- **G2-1** (the `assess_verdict` default for existing callers, unaffected);
-- **DG1F-C2 and C3a** "every observable output … unchanged", relative to
-  their own refactors;
-- **DG1B2a** §3.8 "unchanged", for well-formed waiver memory;
-- **C4 and R0** "no edits to `mneme/`" in their "preserved and not
-  authorized" lists, which scope those amendments.
-
-The G1, D1/D2, S1 and R0 S4/S5 amendments have only "Not authorized" lists.
-
-None of these is superseded or needs to be.
+- **Their preservations constrain only their own change.**
+  - **DG1B1** item 3 ("which decisions … hooks … consume is unchanged",
+    headed "unchanged by DG1B1").
+  - **DG1F-C1a** non-interference (with and without the preview).
+  - **G1:** checks with no numeric rule produce byte-identical payloads and
+    exit codes.
+  - **#613** item 5 (gate surfaces pass `--target-path`), unaffected.
+  - **G2-1:** "Every unrouted event is unchanged", and the same holds for
+    every unrouted hook event, relative to its routing change.
+  - **D1/D2:** "the hook's blocking decisions, exit codes, availability
+    handling …" are unchanged by its validator and matcher changes.
+  - **DG1F-C2 and C3a:** "every observable output … unchanged", relative to
+    their own refactors.
+  - **DG1B2a** §3.8 "unchanged", for well-formed waiver memory.
+  - **C4 and R0:** "no edits to `mneme/`" in their "preserved and not
+    authorized" lists, which scope those amendments.
+- **No preservation of memory selection, hook output or stderr.**
+  - **#260**'s preserved list (fail-open, strict/warn, authority, retrieval,
+    the `mneme.check/v1` payload and CLI exit codes, fixtures, memory) says
+    nothing about memory selection, hook output or stderr. P2-first changes
+    none of them.
+  - **The G2-1 §5.1 erratum record** has only a "Not authorized" list.
+  - **S1** has only a "Not authorized" list.
+  - **The R0 S5 and S4 amendments** carry neither kind of list.
 
 ### Not authorized by this amendment
 
@@ -2539,20 +2604,28 @@ None of these is superseded or needs to be.
   - any host-visible claim beyond the H1 run conditions (charter §5.2.4
     item 2).
 - **Other output changes:**
-  - any change to categories, routing order, exit codes, the SS-3 line, the
-    proceed sentence or any other remediation string;
+  - any change to the category set, the routing order, the SS-3 line, the
+    proceed sentence or any other remediation text;
+  - any change to exit codes for the same selected memory;
   - any new CLI flag, schema, `mneme.check/v1` field, MCP surface, or hook
     registration or coverage change.
-- **Other T-08 work:** any change to start points (D1/D2/D7), and D3 or D4.
-- **Other architecture:** any ADR-033 change beyond its erratum; fail-closed
-  or availability behavior; G3/G3-B authority; DG2; C5/C6; DG1 B2b or C1b.
-- **Execution and release:** live runs (the P2-first evidence run is
-  separately authorized), and any release, including the held C2/C3a
-  release.
+- **Other T-08 work:**
+  - any change to start points;
+  - D1;
+  - D2's baseline-root and per-file-memory scoping. The baseline root may
+    still change as a knock-on of a changed selection;
+  - D7 start-point scoping;
+  - D3 and D4.
+- **Other architecture:** any ADR-033 change beyond its erratum; any **new**
+  fail-closed or availability behavior; G3/G3-B authority; DG2; C5/C6; DG1
+  B2b or C1b.
+- **Execution and release:** live runs (the P2-first evidence run needs its
+  own authorization), and any release, including the held C2/C3a release.
 
-The DG1B1, DG1F-C1a, #260, T-08 slice 1, C2a, C2b, C2b Amendment 1, G1,
-G2-1, D1/D2, C4, R0, S1, DG1F-C2, DG1F-C3a and DG1B2a freeze amendments stay
-unchanged, except for the items superseded above.
+The DG1B1, DG1F-C1a, #260, T-08 slice 1, C2a, C2b, ADR-034 G1, C2b
+Amendment 1, #613 record, G2-1, G2-1 §5.1 erratum record, D1/D2, C4, R0,
+R0 S5, R0 S4, S1, DG1F-C2, DG1F-C3a and DG1B2a freeze amendments and records
+stay unchanged, except for the items superseded above.
 
 ---
 
