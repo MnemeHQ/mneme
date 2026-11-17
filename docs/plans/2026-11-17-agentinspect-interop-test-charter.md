@@ -7,6 +7,17 @@ changes no runtime behavior, schema, adapter, test, ADR, Layer 1 freeze,
 section 11 step 2 PR** (harness, fixture and deterministic run, section 10,
 O1). The reviewer study and any message to AgentInspect maintainers each need
 a separate owner go-ahead.
+**Revision 2 (2026-11-17):** answers the #814 architecture review:
+- §4.2 / F3: a proven violation stays `fail` under `PARTIAL` (ADR-034 §4);
+  incompleteness is reported separately and does not force `not_evaluated`;
+- F7: truncation loss is described by the trace marker and the external
+  evidence record, not by the `mneme` block it may remove;
+- §5 / C5: D-2 governs a Python module (ADR-034 numeric rules are
+  Python-only); C5 is a delta-input noncoverage probe, not TypeScript numeric
+  enforcement;
+- F2 / F6: the severity ban is scoped to exported evaluations, and actions
+  are scored against intended and observed effects, including no-op writes.
+
 **Anchors (read-only):**
 - `MnemeHQ/mneme` `main` @ `0fc1f1bc` (#812);
 - `rajudandigam/agent-inspect` tag `agent-inspect@6.31.36` = `f51ca992`
@@ -147,7 +158,7 @@ so the upstream namespace is not squatted.
 | `evaluations[]`, plain-text rule | one **per decision**, and only for a decision with a plain-text violation | No `pass` entry is ever emitted for plain-text rules, because Mneme does not enumerate them |
 | `evaluations[].decisionId` | `decision_id` | Subject to share redaction (section 7, F4) |
 | `evaluations[].ruleId` | `rule_id` | Omitted when empty. Never derived from `rule_index`, `rule_value` or a hash computed by the harness |
-| `evaluations[].verdict` | a matching violation → `fail`; `APPLIED` with no violation and a complete matcher → `pass`; `UNKNOWN`, `PARTIAL` or `MATCHER_UNEVALUATED` → `not_evaluated` | Mneme `WARN` and `FAIL` both map to `fail` |
+| `evaluations[].verdict` | a matching violation → `fail` (including matcher `PARTIAL`, which ADR-034 §4 defines as a FAIL verdict with `evaluation_complete=false`); `APPLIED` with no violation and matcher complete or absent → `pass`; applicability `UNKNOWN`, or `MATCHER_UNEVALUATED` with no violation → `not_evaluated` | Mneme `WARN` and `FAIL` both map to `fail`. A proven violation is never downgraded because evaluation is incomplete; incompleteness is reported in `mneme.evaluation_complete` and the per-rule `matcher_status` |
 | `evaluations[].mode` | `mode`: `strict` → `enforce`, `warn` → `observe` | |
 | `evaluations[].action` | **what the harness actually did**: refused the write → `block`; let it through with a warning → `warn`; let it through silently → `none` | Never derived from `verdict` or the exit code |
 | `evaluations[].severity` | none | Always omitted |
@@ -156,6 +167,9 @@ so the upstream namespace is not squatted.
 - `check_schema`, `verdict` (raw), `evaluation_complete`;
 - `decision_version_ids` (from records that carry one);
 - `excluded_rule_count`, `unknown_rule_count`;
+- `matcher_statuses`: `rule_id` (or `decision_id` plus `rule_index` as a
+  display key when there is no `rule_id`) → `matcher_status`, for numeric
+  rules only;
 - `legacy_rules_enumerated: false`;
 - `subject` digest and `input_kind` when present;
 - `payload_sha256`: the hash of the raw check stdout, which is stored beside
@@ -177,8 +191,10 @@ blocks a section 8 question, the result says so.
 
 A new, minimal and neutral TypeScript service repo. #282 has no frozen
 fixture at the anchor, so there is none to reuse. Layout:
-`src/handlers/`, `src/db/`, `src/adapters/`, `config/`. The fixture commit is
-frozen before any run.
+`src/handlers/`, `src/db/`, `src/adapters/`, plus one Python module
+`tools/limits.py` (a deploy helper). The Python module is there only because
+ADR-034 numeric rules accept `language: python` alone
+(`mneme/numeric_rule.py:243`). The fixture commit is frozen before any run.
 
 Decisions, loaded through the persisted Decision Index so that typed rules
 carry `rule_id`:
@@ -186,7 +202,7 @@ carry `rule_id`:
 | ID | Rule | Purpose |
 |---|---|---|
 | D-1 | `FORBID_LITERAL`, scoped `include_paths: src/handlers/**`: handlers must not import `src/db` directly | Typed violation, `rule_id` present |
-| D-2 | `FORBID_NUMERIC_ABOVE` on a request-timeout value in `config/**` | `UNEVALUATED` path under delta input |
+| D-2 | `FORBID_NUMERIC_ABOVE` (Python), scoped `include_paths: tools/**`, on a timeout symbol in `tools/limits.py` | Delta-input noncoverage probe only. No TypeScript numeric enforcement is claimed or tested |
 | D-3 | Plain-text constraint (anti-pattern prose) | Decision-level evaluation, no `rule_id` |
 
 **Baseline architecture test** (both arms): the fixture ships an ordinary
@@ -234,7 +250,7 @@ Cases (each in both arms):
 | C2 handler imports `src/db` | strict | D-1 `fail`, `ruleId` present, action `block`, file **unchanged** |
 | C3 corrected retry of C2 through an adapter | strict | D-1 `pass`, action `none`, file changed, tests green |
 | C4 same as C2 | warn | `fail`, action `warn`, file **changed**; arm A test fails |
-| C5 timeout edit as a delta | strict | D-2 `not_evaluated`, `evaluation_complete: false`, no run-level pass claim |
+| C5 edit raising the timeout in `tools/limits.py`, checked as delta input (`--input`, not `--source-file`) | strict | D-2 matcher `MATCHER_UNEVALUATED` (delta input never decides a numeric rule), so `not_evaluated`, `evaluation_complete: false`, no run-level pass claim, write applied and visibly marked. This probes noncoverage; it is not numeric enforcement |
 | C6 D-3 prose violation | strict | decision-level `fail`, no `ruleId`, no `pass` entries for D-3 |
 | C7 shell-redirect write to a handler | n/a | no Mneme step (uncovered surface), `outcome_observed` shows the mutation, and the trace makes no governance claim |
 
@@ -247,12 +263,12 @@ the runner.
 | Label | PASS when |
 |---|---|
 | F1 provenance | Every emitted `architecturalIntent` value traces to a field in the stored payload, or to the harness's recorded action |
-| F2 no invented identity or severity | `severity` absent everywhere. `ruleId` present if and only if the source `rule_id` is non-empty |
-| F3 no invented pass | `pass` count equals the number of `APPLIED` typed rules with no violation and a complete matcher. Zero plain-text `pass` entries. When `evaluation_complete` is false: at least one `not_evaluated` and no run-level pass |
+| F2 no invented identity or severity | `severity` absent from every exported `architecturalIntent.evaluations[]` entry (raw Mneme `violations[].severity`, the verdict level, stays in the stored payload and is not mapped). `ruleId` present if and only if the source `rule_id` is non-empty |
+| F3 no invented pass, no lost fail | `pass` count equals the number of `APPLIED` typed rules with no violation and matcher complete or absent. Zero plain-text `pass` entries. Every source violation, including one under matcher `PARTIAL`, appears as `fail`. When `evaluation_complete` is false: `mneme.evaluation_complete` is false and no run-level pass is claimed; a `not_evaluated` entry is required only for a rule that is applicability `UNKNOWN` or `MATCHER_UNEVALUATED` without a violation |
 | F4 redaction | In a share-profile `bundle`: the redaction of `evaluations[].decisionId` is recorded as observed, the fate of `decisionIds` is recorded, no `rule`/`trigger` text appears, and the fixture's planted fake secret is redacted |
 | F5 action fidelity | `action` matches the harness's recorded decision in 100% of B steps |
-| F6 claimed vs actual mutation | For every step, block ⇔ file unchanged, and allow ⇔ observed hash equals the intended hash. C7 is recorded as an ungoverned mutation, not as a failure |
-| F7 limits | A synthetic step with 60 evaluations and one over 64 KiB: truncation is visible in the trace and reflected in the `mneme` block. Silent loss = FAIL |
+| F6 claimed vs actual mutation | For every step, the runner records the pre-write hash, the intended post-write hash and the observed post-write hash. `block`: observed equals pre-write. `none`/`warn`: observed equals intended. An intended no-op write (intended equals pre-write) is labeled `noop` and cannot evidence a block, so no case relies on one to show a block. C7 is recorded as an ungoverned mutation, not as a failure |
+| F7 limits | A synthetic step with 60 evaluations and one over 64 KiB. PASS when every loss is visible: AgentInspect's truncation marker (or the cut array) appears in the trace, and the external evidence record lists, per affected step, what was dropped, by comparing the stored check payload with the trace. The `mneme` block is not required to survive or to describe its own removal. Silent loss = FAIL |
 | F8 integrity | The manifest of SHA-256 for every payload, trace and observation verifies, and `payload_sha256` matches |
 | F9 CI | `agent-inspect check` with a custom `TraceCheckRule` ("enforce mode `fail` with action `none`" is an error) fails on a deliberately corrupted trace and passes on the real ones. `--fail-on-observation failed` behaves as documented |
 | F10 overhead | Report p50/p95 `mneme check` wall time per write over 20 repetitions. Reported only, no threshold |
