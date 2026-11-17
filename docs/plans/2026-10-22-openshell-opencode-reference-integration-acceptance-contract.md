@@ -407,7 +407,7 @@ neither. Any `closed` posture requires its own charter and host validation.
 | ID | Case | Pass criterion | Claim | Status |
 | --- | --- | --- | --- | --- |
 | AC-01 | Build identity and pins | `(package_version, source_commit_or_wheel_sha256)` recorded; historical pins separate; S1 unknowns `TBD`; no secrets | Structural | S1 |
-| AC-02a | Activation, positive | Independent launcher or observer confirms plugin listing, plugin `id`, and a probe event producing the expected hook effect | Structural | S1 |
+| AC-02a | Activation, positive | Independent launcher or observer confirms the plugin is present in the effective configuration and a real behavioural probe produces the expected hook effect; `plugin list` is not required to enumerate local plugins | Structural | S1 |
 | AC-02b | Activation, negative | With the plugin disabled or unregistered, the **preflight** concludes NOT_PROTECTED from absent markers and config inspection; the hook is not expected to report on itself | Structural | S1 |
 | AC-06 | Verified-absent literal block | Absence proof; complete content; corpus = 1 decision / 1 `FORBID_LITERAL` / no constraints / no anti-patterns; argv has no `--top`; no adapter filtering or memory rewrite; trusted FAIL; target still absent | Execution observed | S1 |
 | AC-06b | Verified-absent compliant allow | Same assertions; trusted PASS; file created; functional PASS | Execution observed | S1 |
