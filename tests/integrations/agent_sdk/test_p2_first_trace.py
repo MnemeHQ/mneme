@@ -152,3 +152,77 @@ def test_langchain_annotation_gap_carries_keys(layout, monkeypatch):
     mw.wrap_tool_call(request, lambda r: Command(update=None, goto="x"))
     gaps = [e for e in gate.trace if e.get("annotation") == "skipped"]
     assert gaps and gaps[0]["selection_reason"] == OVERRIDE_IGNORED
+
+
+# ── Concurrency: the selection belongs to the call, not to a shared slot ─────
+
+
+def test_threaded_calls_keep_their_own_selection(layout, monkeypatch):
+    """A selection-free call on another thread must not strip a pending record."""
+    import threading
+
+    monkeypatch.setenv("MNEME_MEMORY", str(layout["foreign"]))
+    in_check = threading.Event()
+    release = threading.Event()
+
+    def slow_runner(command, **kwargs):
+        in_check.set()
+        release.wait(5)
+        return check_result_for(command, "PASS")
+
+    sdk = MnemeAgentSdk(project_dir=layout["project"], check_runner=slow_runner)
+    writer = threading.Thread(target=sdk.evaluate_mutation,
+                              args=("Write", _write(layout["project"] / "a.py")))
+    writer.start()
+    assert in_check.wait(5)
+    sdk.evaluate_mutation("Read", {"file_path": "a.py"})  # no selection
+    release.set()
+    writer.join(5)
+    write_records = [r for r in sdk.trace if r.get("tool") == "Write"]
+    read_records = [r for r in sdk.trace if r.get("tool") == "Read"]
+    assert write_records and write_records[-1]["selection_reason"] == OVERRIDE_IGNORED
+    assert read_records and not KEYS & set(read_records[-1])
+
+
+def test_langchain_async_unmapped_call_does_not_strip_annotation_keys(layout, monkeypatch):
+    pytest.importorskip("langchain")
+    pytest.importorskip("langgraph")
+    import asyncio
+
+    from langchain.agents.middleware.types import ToolCallRequest
+    from langchain_core.messages import ToolMessage
+    from langgraph.types import Command
+
+    from tests.integrations.check_contract import violation
+
+    def runner(command, **kwargs):
+        return check_result_for(command, "WARN", violations=[
+            violation("WARN", decision_id="store_001", rule="no postgres", trigger="postgres")])
+
+    monkeypatch.setenv("MNEME_MEMORY", str(layout["foreign"]))
+    gate = MnemeLangChain(project_dir=layout["project"], mode="warn", check_runner=runner)
+    mw = gate.build_middleware()[1]
+
+    def request(name, args, call_id):
+        return ToolCallRequest(tool_call={"name": name, "args": args, "id": call_id,
+                                          "type": "tool_call"},
+                               tool=None, state={"messages": []}, runtime=None)
+
+    async def slow_handler(_r):
+        await asyncio.sleep(0.1)
+        return Command(update=None, goto="x")
+
+    async def quick_handler(_r):
+        return ToolMessage(content="ok", tool_call_id="c2")
+
+    async def scenario():
+        mapped = asyncio.create_task(mw.awrap_tool_call(
+            request("write_file", {"file_path": "db.py", "content": "import psycopg2\n"}, "c1"),
+            slow_handler))
+        await asyncio.sleep(0.02)
+        await mw.awrap_tool_call(request("web_search", {"q": "x"}, "c2"), quick_handler)
+        await mapped
+
+    asyncio.run(scenario())
+    gaps = [e for e in gate.trace if e.get("annotation") == "skipped"]
+    assert gaps and gaps[0]["selection_reason"] == OVERRIDE_IGNORED

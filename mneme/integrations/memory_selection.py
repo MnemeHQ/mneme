@@ -103,8 +103,10 @@ def explicit_selection(memory: Path) -> MemorySelection:
 def selection_notice(selection: MemorySelection) -> Optional[str]:
     """The host notice for rows 2 and 7, or ``None`` (charter §5.2.4).
 
-    ASCII only. Emitting it is the caller's job, and only on the H1 paths in
-    their probed shapes.
+    The fixed wording is ASCII; the embedded memory path and override value
+    are passed through as given (the JSON writer escapes non-ASCII on the
+    wire). Emitting it is the caller's job, and only on the H1 paths in their
+    probed shapes.
     """
     if selection.reason not in _NOTICE_REASONS:
         return None
@@ -118,7 +120,7 @@ def selection_notice(selection: MemorySelection) -> Optional[str]:
     return (
         "mneme: no memory selected (OVERRIDE_MISSING): MNEME_MEMORY names "
         f"{raw}, which is not a file, and no repository memory was found; "
-        "no Mneme memory governs this action."
+        "no Mneme memory governs here."
     )
 
 

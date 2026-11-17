@@ -264,3 +264,46 @@ def test_h1c_suppressed_beside_stop_feedback(layout, monkeypatch):
 def test_h1c_row1_emits_nothing(layout):
     rc, out, _ = _run(_stop(layout["plain"]))
     assert rc == 0 and out == ""
+
+
+# ── Review additions: H1c row 2, H1c beside decision:block, H1a per state ────
+
+
+def test_h1c_row2_clean_delta_emits_system_message(layout, monkeypatch, tmp_path):
+    monkeypatch.setenv("MNEME_SESSION_STATE_DIR", str(tmp_path / "state"))
+    monkeypatch.setenv("MNEME_MEMORY", str(layout["foreign"]))
+    assert _run(_session(layout["repo"]))[0] == 0
+    rc, out, _ = _run(_stop(layout["repo"]))
+    assert rc == 0
+    objs = _objects(out)
+    assert len(objs) == 1 and set(objs[0]) == {"systemMessage"}
+    assert "OVERRIDE_IGNORED" in objs[0]["systemMessage"]
+
+
+def test_h1c_suppressed_beside_decision_block(layout, monkeypatch, tmp_path):
+    monkeypatch.setenv("MNEME_SESSION_STATE_DIR", str(tmp_path / "state"))
+    monkeypatch.setenv("MNEME_MEMORY", str(layout["foreign"]))
+    assert _run(_session(layout["repo"]))[0] == 0
+    (layout["repo"] / "new_module.py").write_text("import psycopg2\n", encoding="utf-8")
+    rc, out, _ = _run(_stop(layout["repo"]), check_result("FAIL"))
+    objs = _objects(out)
+    assert len(objs) == 1, out
+    assert objs[0].get("decision") == "block"
+    assert "OVERRIDE_IGNORED" not in out
+
+
+@pytest.mark.parametrize("authorization", ["AUTHORIZED", "REVOKED", "VERIFIED_ABSENT"])
+def test_h1a_row2_notice_under_each_verified_state(project, tmp_path, monkeypatch, authorization):  # noqa: F811
+    from mneme.availability_authority import AUTHORIZED, REVOKED, VERIFIED_ABSENT
+    state = {"AUTHORIZED": AUTHORIZED, "REVOKED": REVOKED, "VERIFIED_ABSENT": VERIFIED_ABSENT}
+    root = project(state[authorization])
+    other = tmp_path / "foreign.json"
+    other.write_text(json.dumps(MEM), encoding="utf-8")
+    monkeypatch.setenv("MNEME_MEMORY", str(other))
+    rc, out, _ = _run(_write(root / "service.py"), check_result("PASS"))
+    assert rc == 0
+    objs = _objects(out)
+    assert len(objs) == 1 and out.count("\n") == 1
+    _pretool("OVERRIDE_IGNORED")(objs[0])
+    rc, out, _ = _run(_write(root / "service.py"), check_result("FAIL"))
+    assert rc == 2 and out == ""

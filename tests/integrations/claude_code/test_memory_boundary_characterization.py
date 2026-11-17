@@ -208,7 +208,10 @@ class TestPlantedMarkerPlusOverride:
         assert _selected(target, a) == (mem_a, mem_a)
 
     def test_override_is_ignored_for_repository_memory(self, layout, monkeypatch):
-        """Flipped by P2-first (charter §5.2.6): row 2, A's memory governs."""
+        """Flipped by P2-first (charter §5.2.6): row 2, A's memory governs.
+
+        Was ``test_override_replaces_repository_memory``.
+        """
         a, mem_a, mem_b, target = layout
         monkeypatch.setenv("MNEME_MEMORY", str(mem_b))
         assert _selected(target, a) == (mem_a, mem_a)
@@ -221,6 +224,7 @@ class TestPlantedMarkerPlusOverride:
 
     def test_forbidden_edit_is_blocked_under_override(self, layout, monkeypatch, spy):
         """Flipped by P2-first (charter §5.2.6): A's memory governs and refuses.
+        Was ``test_forbidden_edit_is_permitted_under_override``.
 
         The D6/Q2 wrong-memory outcome (B's memory, complete PASS) no longer
         occurs. This stays a hook-level baseline; it does not apply a host
