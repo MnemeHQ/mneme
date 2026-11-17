@@ -170,6 +170,22 @@ _REMEDIATION = {
                              "fix the cause and retry",
     "COMPLETENESS_UNSTATED": "upgrade mneme so the check states evaluation completeness",
 }
+# Remediation-text decision, option O4 (D5+P2 charter Amendment A2-RT): a
+# mismatch whose declared memory is not a file is fixed by restoring it, not
+# by touching MNEME_MEMORY. The exact text is fixed by that decision.
+_REMEDIATION_DECLARED_NOT_A_FILE = (
+    "restore .mneme/project_memory.json from the baseline branch, replacing "
+    "anything else at that path; while it is not a file, another memory is "
+    "selected"
+)
+
+
+def _remediation(category: str, relation: Optional[str],
+                 declaration: LocalDeclaration) -> str:
+    if (category == "MEMORY_PATH_MISMATCH"
+            and not (declaration.root / MEMORY_PATH).is_file()):
+        return _REMEDIATION_DECLARED_NOT_A_FILE
+    return _REMEDIATION[category].format(relation=(relation or "invalid").lower())
 
 
 def refusal_category(
@@ -314,7 +330,7 @@ def emit_availability(
     if category is not None and detailed:
         lines.append(
             "mneme-hook: not a decision violation; remediation: "
-            + _REMEDIATION[category].format(relation=(relation or "invalid").lower()) + "."
+            + _remediation(category, relation, declaration) + "."
         )
     print("\n".join(lines), file=stderr)
     return refusal

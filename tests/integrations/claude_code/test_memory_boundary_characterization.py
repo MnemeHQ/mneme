@@ -185,8 +185,9 @@ def test_l8b_invalid_git_marker_is_ignored_by_the_walk(root):
 class TestPlantedMarkerPlusOverride:
     """D6/Q2 §5 rule 2 adversarial layout: repo A's memory, ``A/src/.git`` planted.
 
-    Today the planted marker changes nothing, and ``MNEME_MEMORY`` always wins.
-    Charter §3.3 row 5 (OVERRIDE_REFUSED_AT_BOUNDARY) replaces the override case.
+    The planted marker changes nothing, because P2-first keeps today's walk.
+    P2-first (charter §5.2.2 row 2) makes A's memory win over ``MNEME_MEMORY``;
+    charter §3.3 row 5 (OVERRIDE_REFUSED_AT_BOUNDARY) replaces it in Phase 2.
     """
 
     @pytest.fixture
@@ -206,10 +207,11 @@ class TestPlantedMarkerPlusOverride:
         a, mem_a, _, target = layout
         assert _selected(target, a) == (mem_a, mem_a)
 
-    def test_override_replaces_repository_memory(self, layout, monkeypatch):
-        a, _, mem_b, target = layout
+    def test_override_is_ignored_for_repository_memory(self, layout, monkeypatch):
+        """Flipped by P2-first (charter §5.2.6): row 2, A's memory governs."""
+        a, mem_a, mem_b, target = layout
         monkeypatch.setenv("MNEME_MEMORY", str(mem_b))
-        assert _selected(target, a) == (mem_b, mem_b)
+        assert _selected(target, a) == (mem_a, mem_a)
 
     def test_forbidden_edit_is_blocked_without_override(self, layout):
         a, _, _, target = layout
@@ -217,20 +219,20 @@ class TestPlantedMarkerPlusOverride:
         assert rc == 2
         assert "D5-DEC" in err
 
-    def test_forbidden_edit_is_permitted_under_override(self, layout, monkeypatch, spy):
-        """The wrong-memory outcome D6/Q2 records: B's memory, complete PASS.
+    def test_forbidden_edit_is_blocked_under_override(self, layout, monkeypatch, spy):
+        """Flipped by P2-first (charter §5.2.6): A's memory governs and refuses.
 
-        The checker payload rules out fail-open: exit 0 alone cannot tell a
-        complete PASS from a check that never ran. This stays a hook-level
-        baseline; it does not apply a host edit (live evidence is separate).
+        The D6/Q2 wrong-memory outcome (B's memory, complete PASS) no longer
+        occurs. This stays a hook-level baseline; it does not apply a host
+        edit (live evidence is separate).
         """
-        a, _, mem_b, target = layout
+        a, mem_a, mem_b, target = layout
         monkeypatch.setenv("MNEME_MEMORY", str(mem_b))
         rc, err = _run(_edit(target, a))
-        assert [c["memory"] for c in spy] == [mem_b]
+        assert [c["memory"] for c in spy] == [mem_a]
         payload = spy[0]["payload"]
         assert payload is not None
-        assert payload["verdict"] == "PASS"
+        assert payload["verdict"] == "FAIL"
         assert payload["evaluation_complete"] is True
-        assert rc == 0
-        assert "D5-DEC" not in err
+        assert rc == 2
+        assert "D5-DEC" in err

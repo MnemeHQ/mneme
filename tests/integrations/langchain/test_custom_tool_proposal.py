@@ -393,9 +393,11 @@ class TestTraceShape:
         assert entry["tool"] == "Write"
         assert "save_text" not in json.dumps(entry)
         # Characterizes the open limit: no call ID crosses the gate.
+        # P2-first adds the selection trace keys (charter §5.2.4 item 1).
         assert set(entry) == {
             "kind", "tool", "file_path", "action", "verdict",
             "evaluation_complete", "reason",
+            "selection_reason", "selection_source", "walk",
         }
 
 

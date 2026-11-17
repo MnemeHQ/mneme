@@ -120,9 +120,11 @@ def test_a2_each_reason_with_complete_pass(project, reason):
     assert f"availability {UNVERIFIABLE}({reason}); evaluation=TRUSTED_COMPLETE" in err
 
 
-# A3: SS-3 mismatch adds one sentence.
+# A3: SS-3 mismatch adds one sentence. Rewritten for P2-first (charter
+# §5.2.6): SS-3 via MNEME_MEMORY is row 6, which carries no selection notice.
 def test_a3_mismatch_sentence(project, tmp_path, monkeypatch):
     root = project(UNVERIFIABLE, aa.DNS)
+    (root / ".mneme" / "project_memory.json").unlink()
     other = tmp_path / "other.json"
     other.write_bytes(ACTIVE_MEMORY)
     monkeypatch.setenv("MNEME_MEMORY", str(other))
@@ -235,6 +237,8 @@ def _all_texts(project, tmp_path, monkeypatch) -> list[str]:
     other.write_bytes(ACTIVE_MEMORY)
     monkeypatch.setenv("MNEME_MEMORY", str(other))
     root = project(UNVERIFIABLE, aa.DNS)
+    # P2-first (charter §5.2.6): the SS-3 sentence via MNEME_MEMORY is row 6.
+    (root / ".mneme" / "project_memory.json").unlink()
     _, out, _ = _run(_envelope(root / "service.py"), check_result("PASS"))
     texts.append(_objects(out)[0]["hookSpecificOutput"]["additionalContext"])
     return texts

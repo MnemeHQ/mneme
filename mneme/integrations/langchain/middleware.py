@@ -233,6 +233,7 @@ def _record_annotation_gap(gate, result, request, detail: str) -> None:
             "verdict": result.verdict,
             "evaluation_complete": result.evaluation_complete,
             "reason": result.reason,
+            **gate.selection_trace_keys(),
         }
     )
 
