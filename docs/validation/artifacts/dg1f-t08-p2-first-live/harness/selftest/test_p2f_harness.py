@@ -355,3 +355,21 @@ def test_collector_leak_scan_catches_encoded_project_id(tmp_path):
     r = subprocess.run([PY, "-I", str(HARNESS / "collect_redacted.py"), str(live), str(dest), "pyx",
                         "srcx", "cbinx", "", "P2F-V5"], capture_output=True, text=True)
     assert r.returncode == 1 and "LEAK SCAN FAILED" in r.stdout
+
+
+def test_collector_redacts_doubly_escaped_live_root(tmp_path):
+    # The OVERRIDE_IGNORED notice is JSON inside a JSON string, so a Windows
+    # live root appears with four backslashes per separator in hook-log.jsonl.
+    live, dest = tmp_path / "live", tmp_path / "dest"
+    out = live / "P2F-V5-notice" / "out"
+    out.mkdir(parents=True)
+    for name in ("observer.txt", "prompt.txt", "hook-registration.json", "events.selected.jsonl"):
+        (out / name).write_text("clean\n", encoding="utf-8")
+    quad = str(live).replace("/", "\\").replace("\\", "\\\\\\\\")
+    (out / "hook-log.jsonl").write_text('{"stdout": "memory ' + quad + '\\\\\\\\P2F"}\n',
+                                        encoding="utf-8")
+    r = subprocess.run([PY, "-I", str(HARNESS / "collect_redacted.py"), str(live), str(dest), "pyx",
+                        "srcx", "cbinx", "", "P2F-V5-notice"], capture_output=True, text=True)
+    assert r.returncode == 0, r.stdout
+    text = (dest / "P2F-V5-notice" / "hook-log.jsonl").read_text(encoding="utf-8")
+    assert '"memory <LIVE>' in text and quad not in text

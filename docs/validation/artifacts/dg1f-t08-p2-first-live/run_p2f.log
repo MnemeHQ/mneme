@@ -1,0 +1,395 @@
+[preflight] pins.local.env sha256: 41b8a5a2302f0930033b4bc44c5305f8d1029b17c4b0c8d387eb40e4f43c3288
+[preflight] setting sources for every probe: project
+[preflight] DISABLE_AUTOUPDATER=1
+[preflight] claude: 2.1.310 (Claude Code)
+[preflight] mneme_src HEAD: b9b40ef8f5cf1dcf80087bba40a5becf12a88f1b
+[preflight] mneme/ (incl. working tree) identical to 59309fe7000cd1173f614aca1ff4f0e1b71edb75
+[preflight] mneme 0.11.0 from <MNEME_SRC>\mneme\integrations\claude_code\hook.py
+[preflight] hook selects memory through the P2-first resolver
+[preflight] MNEME_* variables in launching shell: 0 (every probe unsets all of them before its session)
+[preflight] claude binary: <CLAUDE_BIN>
+[preflight] python: 3.12.10
+[preflight] live root: <LIVE>
+[preflight] model pin (passed as --model; checked from the first probe's init event): claude-opus-5-5
+[preflight] OK
+[p2f] harness HEAD: b9b40ef8f5cf1dcf80087bba40a5becf12a88f1b
+[p2f] harness sha256: 0bce0d9c6c25d7594528804f17abc51be9fa030ee0f2b14bf8617d224a86a7b5 *./classify_p2f.py
+[p2f] harness sha256: 70d55785cb96db8bc79345b980527d7da5a1ad8be79c39220c9e5eacc03de1cb *./collect_redacted.py
+[p2f] harness sha256: b4791834a3fd7234e85a7288b575778d82dfb497f40a3d66df3d7924bb16e501 *./hookwrap_v4.py
+[p2f] harness sha256: 7e842f2a5e1df22b828687577e78b227b3c63cfb8797ac8fc24bd30ddc14b046 *./safe_rmtree.py
+[p2f] harness sha256: 86264da5f80e19f597d581f9d141a6660c045bdc1b50a895df4a6b785887bfbf *./select_events.py
+[p2f] harness sha256: 2b121ba22260fa7dee1e84d6fb4c68f69ad2def092ab67bbbee80495ec2650e3 *./setup_probe.py
+[p2f] harness sha256: e441845e0811aa707d2c414e20b724569666331e73865919a9047bf45032142e *./preflight.sh
+[p2f] harness sha256: d091c077e124ce3646a072c764170cb5e34e293ce6e1f4a706715ae295f8b7ea *./run_p2f.sh
+[p2f] harness sha256: 1ce6018b71576c1c11ed400740f0dc6aee8d9c37accb2bffa897c1db5cefd853 *./run_p2f_probe.sh
+[p2f] harness sha256: cc900c5637741a9501cf33762ef022bb2e18e1628dc9238ad8fd943b31dd82d1 *pins.env
+[p2f] harness sha256: 6c048ac6f4b153587b371537a01aab467a5f91ae3727d12c46b65bb9a2d45b51 *.gitignore
+[p2f] harness sha256: 8e8ef9e4bbb85c98954933efd03648672911726c0c34a6b8b28db8f359fd182f *README.md
+[p2f] harness sha256: bc16f4bd18200b49168cc37f474dbf13785a304cf6745762819ad6cddc9ab60a *selftest/test_p2f_harness.py
+=== P2F-R0-control
+probe=P2F-R0-control A=protected B=permissive override=none topology=r4 edit=forbidden planted_marker=0
+channel=none (no settings env; MNEME_MEMORY unset in launching shell)
+override_configured=<unset>
+settings_env_repo=none
+MNEME_MEMORY(launching shell)=<unset>
+date=2026-11-17T20:36:53Z
+claude=2.1.310 (Claude Code)
+model_flag=claude-opus-5-5
+mneme_src=<MNEME_SRC> head=b9b40ef8f5cf1dcf80087bba40a5becf12a88f1b mneme_dir_equals_59309fe7000cd1173f614aca1ff4f0e1b71edb75=yes
+python=<PYTHON>
+claude_bin=<CLAUDE_BIN>
+override_kind=none
+mneme_src_w=<MNEME_SRC>
+mneme_dir_equals_pin=yes
+setting_sources=project
+session_dir=<LIVE>\P2F-R0-control\B\repo_a
+added_dir=<LIVE>\P2F-R0-control\A\repo_a
+repo_a=<LIVE>\P2F-R0-control\A\repo_a
+repo_b=<LIVE>\P2F-R0-control\B\repo_a
+target=<LIVE>\P2F-R0-control\A\repo_a\app.py
+a_memory=<LIVE>\P2F-R0-control\A\repo_a\.mneme\project_memory.json
+planted_marker_present=no
+BEFORE target               444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE A/memory             aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+BEFORE A/.claude/settings   5a2f3df0786fa9a1327dc8d3b91504ff37434ba66f022a0c705336f44d9c3909
+BEFORE A/.claude/local      absent
+BEFORE B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+BEFORE B/.claude/settings   5a2f3df0786fa9a1327dc8d3b91504ff37434ba66f022a0c705336f44d9c3909
+BEFORE B/.claude/local      absent
+BEFORE A/HEAD               84d139ab41590a41596153ed0f740c3f9a3362c8
+BEFORE B/HEAD               1e2a410109621e324b26a881471f8dcda152fddf
+session repo settings-env commit:
+  1e2a410109621e324b26a881471f8dcda152fddf init
+claude_exit=0
+AFTER target               444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+AFTER A/memory             aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+AFTER A/.claude/settings   5a2f3df0786fa9a1327dc8d3b91504ff37434ba66f022a0c705336f44d9c3909
+AFTER A/.claude/local      absent
+AFTER B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+AFTER B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+AFTER B/.claude/settings   5a2f3df0786fa9a1327dc8d3b91504ff37434ba66f022a0c705336f44d9c3909
+AFTER B/.claude/local      absent
+AFTER A/HEAD               84d139ab41590a41596153ed0f740c3f9a3362c8
+AFTER B/HEAD               1e2a410109621e324b26a881471f8dcda152fddf
+target contains psycopg2: 0
+target contains 'import sys': 0
+A git status:
+B git status:
+init_model=claude-opus-5-5
+=== P2F-V5
+probe=P2F-V5 A=protected B=permissive override=v5 topology=r4 edit=forbidden planted_marker=0
+channel=C2 committed project settings env (session repo .claude/settings.json), committed before the session
+override_configured=<LIVE>\P2F-V5\B\repo_a\.mneme\project_memory.json
+settings_env_repo=<LIVE>\P2F-V5\B\repo_a
+MNEME_MEMORY(launching shell)=<unset>
+date=2026-11-17T20:37:09Z
+claude=2.1.310 (Claude Code)
+model_flag=claude-opus-5-5
+mneme_src=<MNEME_SRC> head=b9b40ef8f5cf1dcf80087bba40a5becf12a88f1b mneme_dir_equals_59309fe7000cd1173f614aca1ff4f0e1b71edb75=yes
+python=<PYTHON>
+claude_bin=<CLAUDE_BIN>
+override_kind=v5
+mneme_src_w=<MNEME_SRC>
+mneme_dir_equals_pin=yes
+setting_sources=project
+session_dir=<LIVE>\P2F-V5\B\repo_a
+added_dir=<LIVE>\P2F-V5\A\repo_a
+repo_a=<LIVE>\P2F-V5\A\repo_a
+repo_b=<LIVE>\P2F-V5\B\repo_a
+target=<LIVE>\P2F-V5\A\repo_a\app.py
+a_memory=<LIVE>\P2F-V5\A\repo_a\.mneme\project_memory.json
+planted_marker_present=no
+BEFORE target               444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE A/memory             aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+BEFORE A/.claude/settings   5a2f3df0786fa9a1327dc8d3b91504ff37434ba66f022a0c705336f44d9c3909
+BEFORE A/.claude/local      absent
+BEFORE B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+BEFORE B/.claude/settings   a2b55d6aab296315e5f45707fae704865cc65ef90e99edb1cdb05530c1352c4d
+BEFORE B/.claude/local      absent
+BEFORE A/HEAD               324fe2dd140454d934143e077db8b9b00406c217
+BEFORE B/HEAD               21ed2433923e28e8a4058ea61a41c2460574d84a
+session repo settings-env commit:
+  21ed2433923e28e8a4058ea61a41c2460574d84a configure MNEME_MEMORY in project settings env
+claude_exit=0
+AFTER target               444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+AFTER A/memory             aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+AFTER A/.claude/settings   5a2f3df0786fa9a1327dc8d3b91504ff37434ba66f022a0c705336f44d9c3909
+AFTER A/.claude/local      absent
+AFTER B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+AFTER B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+AFTER B/.claude/settings   a2b55d6aab296315e5f45707fae704865cc65ef90e99edb1cdb05530c1352c4d
+AFTER B/.claude/local      absent
+AFTER A/HEAD               324fe2dd140454d934143e077db8b9b00406c217
+AFTER B/HEAD               21ed2433923e28e8a4058ea61a41c2460574d84a
+target contains psycopg2: 0
+target contains 'import sys': 0
+A git status:
+B git status:
+init_model=claude-opus-5-5
+=== P2F-V4
+probe=P2F-V4 A=protected B=permissive override=v4 topology=r4 edit=forbidden planted_marker=0
+channel=C2 committed project settings env (session repo .claude/settings.json), committed before the session
+override_configured=<LIVE>\P2F-V4\does-not-exist\.mneme\project_memory.json
+settings_env_repo=<LIVE>\P2F-V4\B\repo_a
+MNEME_MEMORY(launching shell)=<unset>
+date=2026-11-17T20:37:24Z
+claude=2.1.310 (Claude Code)
+model_flag=claude-opus-5-5
+mneme_src=<MNEME_SRC> head=b9b40ef8f5cf1dcf80087bba40a5becf12a88f1b mneme_dir_equals_59309fe7000cd1173f614aca1ff4f0e1b71edb75=yes
+python=<PYTHON>
+claude_bin=<CLAUDE_BIN>
+override_kind=v4
+mneme_src_w=<MNEME_SRC>
+mneme_dir_equals_pin=yes
+setting_sources=project
+session_dir=<LIVE>\P2F-V4\B\repo_a
+added_dir=<LIVE>\P2F-V4\A\repo_a
+repo_a=<LIVE>\P2F-V4\A\repo_a
+repo_b=<LIVE>\P2F-V4\B\repo_a
+target=<LIVE>\P2F-V4\A\repo_a\app.py
+a_memory=<LIVE>\P2F-V4\A\repo_a\.mneme\project_memory.json
+planted_marker_present=no
+BEFORE target               444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE A/memory             aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+BEFORE A/.claude/settings   5a2f3df0786fa9a1327dc8d3b91504ff37434ba66f022a0c705336f44d9c3909
+BEFORE A/.claude/local      absent
+BEFORE B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+BEFORE B/.claude/settings   fe35af3f274dcf95759bba89a1b8e84be23f288c57834aac1c735703f12027aa
+BEFORE B/.claude/local      absent
+BEFORE A/HEAD               b0bda6efee36e53b70a35b95de36aa54532922a4
+BEFORE B/HEAD               a01e586aab2ef9589e9a8d70f093a1410ee937a7
+session repo settings-env commit:
+  a01e586aab2ef9589e9a8d70f093a1410ee937a7 configure MNEME_MEMORY in project settings env
+claude_exit=0
+AFTER target               444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+AFTER A/memory             aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+AFTER A/.claude/settings   5a2f3df0786fa9a1327dc8d3b91504ff37434ba66f022a0c705336f44d9c3909
+AFTER A/.claude/local      absent
+AFTER B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+AFTER B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+AFTER B/.claude/settings   fe35af3f274dcf95759bba89a1b8e84be23f288c57834aac1c735703f12027aa
+AFTER B/.claude/local      absent
+AFTER A/HEAD               b0bda6efee36e53b70a35b95de36aa54532922a4
+AFTER B/HEAD               a01e586aab2ef9589e9a8d70f093a1410ee937a7
+target contains psycopg2: 0
+target contains 'import sys': 0
+A git status:
+B git status:
+init_model=claude-opus-5-5
+=== P2F-V5-own
+probe=P2F-V5-own A=protected B=permissive override=v5 topology=own edit=forbidden planted_marker=0
+channel=C2 committed project settings env (session repo .claude/settings.json), committed before the session
+override_configured=<LIVE>\P2F-V5-own\B\repo_a\.mneme\project_memory.json
+settings_env_repo=<LIVE>\P2F-V5-own\A\repo_a
+MNEME_MEMORY(launching shell)=<unset>
+date=2026-11-17T20:37:39Z
+claude=2.1.310 (Claude Code)
+model_flag=claude-opus-5-5
+mneme_src=<MNEME_SRC> head=b9b40ef8f5cf1dcf80087bba40a5becf12a88f1b mneme_dir_equals_59309fe7000cd1173f614aca1ff4f0e1b71edb75=yes
+python=<PYTHON>
+claude_bin=<CLAUDE_BIN>
+override_kind=v5
+mneme_src_w=<MNEME_SRC>
+mneme_dir_equals_pin=yes
+setting_sources=project
+session_dir=<LIVE>\P2F-V5-own\A\repo_a
+added_dir=none
+repo_a=<LIVE>\P2F-V5-own\A\repo_a
+repo_b=<LIVE>\P2F-V5-own\B\repo_a
+target=<LIVE>\P2F-V5-own\A\repo_a\app.py
+a_memory=<LIVE>\P2F-V5-own\A\repo_a\.mneme\project_memory.json
+planted_marker_present=no
+BEFORE target               444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE A/memory             aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+BEFORE A/.claude/settings   37e6f156d7ce2fe307a1026919d307c6e782ede9e90fb5eab9e8f67af7017a68
+BEFORE A/.claude/local      absent
+BEFORE B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+BEFORE B/.claude/settings   5a2f3df0786fa9a1327dc8d3b91504ff37434ba66f022a0c705336f44d9c3909
+BEFORE B/.claude/local      absent
+BEFORE A/HEAD               2f7386903cb7a9d91e17a5cb9e4cba488f2476c6
+BEFORE B/HEAD               c79de899fa4b4b2e597a611f3d8c66103826b855
+session repo settings-env commit:
+  2f7386903cb7a9d91e17a5cb9e4cba488f2476c6 configure MNEME_MEMORY in project settings env
+claude_exit=0
+AFTER target               444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+AFTER A/memory             aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+AFTER A/.claude/settings   37e6f156d7ce2fe307a1026919d307c6e782ede9e90fb5eab9e8f67af7017a68
+AFTER A/.claude/local      absent
+AFTER B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+AFTER B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+AFTER B/.claude/settings   5a2f3df0786fa9a1327dc8d3b91504ff37434ba66f022a0c705336f44d9c3909
+AFTER B/.claude/local      absent
+AFTER A/HEAD               2f7386903cb7a9d91e17a5cb9e4cba488f2476c6
+AFTER B/HEAD               c79de899fa4b4b2e597a611f3d8c66103826b855
+target contains psycopg2: 0
+target contains 'import sys': 0
+A git status:
+B git status:
+init_model=claude-opus-5-5
+=== P2F-V4-own
+probe=P2F-V4-own A=protected B=permissive override=v4 topology=own edit=forbidden planted_marker=0
+channel=C2 committed project settings env (session repo .claude/settings.json), committed before the session
+override_configured=<LIVE>\P2F-V4-own\does-not-exist\.mneme\project_memory.json
+settings_env_repo=<LIVE>\P2F-V4-own\A\repo_a
+MNEME_MEMORY(launching shell)=<unset>
+date=2026-11-17T20:37:54Z
+claude=2.1.310 (Claude Code)
+model_flag=claude-opus-5-5
+mneme_src=<MNEME_SRC> head=b9b40ef8f5cf1dcf80087bba40a5becf12a88f1b mneme_dir_equals_59309fe7000cd1173f614aca1ff4f0e1b71edb75=yes
+python=<PYTHON>
+claude_bin=<CLAUDE_BIN>
+override_kind=v4
+mneme_src_w=<MNEME_SRC>
+mneme_dir_equals_pin=yes
+setting_sources=project
+session_dir=<LIVE>\P2F-V4-own\A\repo_a
+added_dir=none
+repo_a=<LIVE>\P2F-V4-own\A\repo_a
+repo_b=<LIVE>\P2F-V4-own\B\repo_a
+target=<LIVE>\P2F-V4-own\A\repo_a\app.py
+a_memory=<LIVE>\P2F-V4-own\A\repo_a\.mneme\project_memory.json
+planted_marker_present=no
+BEFORE target               444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE A/memory             aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+BEFORE A/.claude/settings   a8cdce4dcf92a835c85d6bae9271db981fb73bdf1d062c00662b67f3b0370ad6
+BEFORE A/.claude/local      absent
+BEFORE B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+BEFORE B/.claude/settings   5a2f3df0786fa9a1327dc8d3b91504ff37434ba66f022a0c705336f44d9c3909
+BEFORE B/.claude/local      absent
+BEFORE A/HEAD               259fa452c527b830d1f6f09c401853887458880d
+BEFORE B/HEAD               e68a6f0613f8e88dfc883f34ac9ef4705bf2ef3b
+session repo settings-env commit:
+  259fa452c527b830d1f6f09c401853887458880d configure MNEME_MEMORY in project settings env
+claude_exit=0
+AFTER target               444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+AFTER A/memory             aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+AFTER A/.claude/settings   a8cdce4dcf92a835c85d6bae9271db981fb73bdf1d062c00662b67f3b0370ad6
+AFTER A/.claude/local      absent
+AFTER B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+AFTER B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+AFTER B/.claude/settings   5a2f3df0786fa9a1327dc8d3b91504ff37434ba66f022a0c705336f44d9c3909
+AFTER B/.claude/local      absent
+AFTER A/HEAD               259fa452c527b830d1f6f09c401853887458880d
+AFTER B/HEAD               e68a6f0613f8e88dfc883f34ac9ef4705bf2ef3b
+target contains psycopg2: 0
+target contains 'import sys': 0
+A git status:
+B git status:
+init_model=claude-opus-5-5
+=== P2F-V5-notice
+probe=P2F-V5-notice A=protected B=permissive override=v5 topology=r4 edit=allowed planted_marker=0
+channel=C2 committed project settings env (session repo .claude/settings.json), committed before the session
+override_configured=<LIVE>\P2F-V5-notice\B\repo_a\.mneme\project_memory.json
+settings_env_repo=<LIVE>\P2F-V5-notice\B\repo_a
+MNEME_MEMORY(launching shell)=<unset>
+date=2026-11-17T20:38:13Z
+claude=2.1.310 (Claude Code)
+model_flag=claude-opus-5-5
+mneme_src=<MNEME_SRC> head=b9b40ef8f5cf1dcf80087bba40a5becf12a88f1b mneme_dir_equals_59309fe7000cd1173f614aca1ff4f0e1b71edb75=yes
+python=<PYTHON>
+claude_bin=<CLAUDE_BIN>
+override_kind=v5
+mneme_src_w=<MNEME_SRC>
+mneme_dir_equals_pin=yes
+setting_sources=project
+session_dir=<LIVE>\P2F-V5-notice\B\repo_a
+added_dir=<LIVE>\P2F-V5-notice\A\repo_a
+repo_a=<LIVE>\P2F-V5-notice\A\repo_a
+repo_b=<LIVE>\P2F-V5-notice\B\repo_a
+target=<LIVE>\P2F-V5-notice\A\repo_a\app.py
+a_memory=<LIVE>\P2F-V5-notice\A\repo_a\.mneme\project_memory.json
+planted_marker_present=no
+BEFORE target               444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE A/memory             aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+BEFORE A/.claude/settings   5a2f3df0786fa9a1327dc8d3b91504ff37434ba66f022a0c705336f44d9c3909
+BEFORE A/.claude/local      absent
+BEFORE B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+BEFORE B/.claude/settings   02ebf6e1de2b1ea25197e6f3bbb4e998a3cbcbb192e9dfc0bb89724e7195469e
+BEFORE B/.claude/local      absent
+BEFORE A/HEAD               b472b5d8b71f55e527b5c7f6419c56d3c5a418b9
+BEFORE B/HEAD               9c20a1c1d3e2c74c523af4f146a1fe501ac1397c
+session repo settings-env commit:
+  9c20a1c1d3e2c74c523af4f146a1fe501ac1397c configure MNEME_MEMORY in project settings env
+claude_exit=0
+AFTER target               735e19dc41b85bad74caa21e8923168e80769f974d06fc4840cf9f2b29514c68
+AFTER A/memory             aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+AFTER A/.claude/settings   5a2f3df0786fa9a1327dc8d3b91504ff37434ba66f022a0c705336f44d9c3909
+AFTER A/.claude/local      absent
+AFTER B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+AFTER B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+AFTER B/.claude/settings   02ebf6e1de2b1ea25197e6f3bbb4e998a3cbcbb192e9dfc0bb89724e7195469e
+AFTER B/.claude/local      absent
+AFTER A/HEAD               b472b5d8b71f55e527b5c7f6419c56d3c5a418b9
+AFTER B/HEAD               9c20a1c1d3e2c74c523af4f146a1fe501ac1397c
+target contains psycopg2: 0
+target contains 'import sys': 1
+A git status:
+ M app.py
+B git status:
+init_model=claude-opus-5-5
+=== P2F-planted-marker
+probe=P2F-planted-marker A=protected B=permissive override=v5 topology=own edit=forbidden planted_marker=1
+channel=C2 committed project settings env (session repo .claude/settings.json), committed before the session
+override_configured=<LIVE>\P2F-planted-marker\B\repo_a\.mneme\project_memory.json
+settings_env_repo=<LIVE>\P2F-planted-marker\A\repo_a
+MNEME_MEMORY(launching shell)=<unset>
+date=2026-11-17T20:38:29Z
+claude=2.1.310 (Claude Code)
+model_flag=claude-opus-5-5
+mneme_src=<MNEME_SRC> head=b9b40ef8f5cf1dcf80087bba40a5becf12a88f1b mneme_dir_equals_59309fe7000cd1173f614aca1ff4f0e1b71edb75=yes
+python=<PYTHON>
+claude_bin=<CLAUDE_BIN>
+override_kind=v5
+mneme_src_w=<MNEME_SRC>
+mneme_dir_equals_pin=yes
+setting_sources=project
+session_dir=<LIVE>\P2F-planted-marker\A\repo_a
+added_dir=none
+repo_a=<LIVE>\P2F-planted-marker\A\repo_a
+repo_b=<LIVE>\P2F-planted-marker\B\repo_a
+target=<LIVE>\P2F-planted-marker\A\repo_a\src\mod.py
+a_memory=<LIVE>\P2F-planted-marker\A\repo_a\.mneme\project_memory.json
+planted_marker_present=yes
+BEFORE target               ac1d2950c284f1ae6160082c094bcf6f42fbd0ea211dfb181250bfaf30f9104d
+BEFORE A/memory             aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+BEFORE A/.claude/settings   664902e342da92a7fb9bb284bb889c7ad3bc6e8f58a730fae94e5b9143708ace
+BEFORE A/.claude/local      absent
+BEFORE B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+BEFORE B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+BEFORE B/.claude/settings   5a2f3df0786fa9a1327dc8d3b91504ff37434ba66f022a0c705336f44d9c3909
+BEFORE B/.claude/local      absent
+BEFORE A/HEAD               ba99a6dcff59b176865b0e15784ca090273592ef
+BEFORE B/HEAD               3fe1f2915da43cee28b86732ff7ffba7ce6624c5
+session repo settings-env commit:
+  ba99a6dcff59b176865b0e15784ca090273592ef configure MNEME_MEMORY in project settings env
+claude_exit=0
+AFTER target               ac1d2950c284f1ae6160082c094bcf6f42fbd0ea211dfb181250bfaf30f9104d
+AFTER A/memory             aae2456a86f98f6514f620ddc1b04dc3e0d40cf67e2393c72e38fb36ab56b2b7
+AFTER A/.claude/settings   664902e342da92a7fb9bb284bb889c7ad3bc6e8f58a730fae94e5b9143708ace
+AFTER A/.claude/local      absent
+AFTER B/app.py             444af21e2ee212c10ac73d7de74e1777775af6bfeb5a319f25c5956d46b93a2a
+AFTER B/memory             c8e101a505d7c37a4e2901991c8a7f9da689fd52b65fc889775edf90b1c9bb45
+AFTER B/.claude/settings   5a2f3df0786fa9a1327dc8d3b91504ff37434ba66f022a0c705336f44d9c3909
+AFTER B/.claude/local      absent
+AFTER A/HEAD               ba99a6dcff59b176865b0e15784ca090273592ef
+AFTER B/HEAD               3fe1f2915da43cee28b86732ff7ffba7ce6624c5
+target contains psycopg2: 0
+target contains 'import sys': 0
+A git status:
+B git status:
+init_model=claude-opus-5-5
+batch=PASS
+P2F-R0-control: PASS 
+P2F-V5: PASS 
+P2F-V4: PASS 
+P2F-V5-own: PASS 
+P2F-V4-own: PASS 
+P2F-V5-notice: PASS 
+P2F-planted-marker: PASS 
+Done. Evidence under <LIVE> ; summary in <LIVE>/summary_p2f.md
