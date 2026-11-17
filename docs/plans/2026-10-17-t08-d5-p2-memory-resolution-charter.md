@@ -386,7 +386,7 @@ The implementation PR carries a subset of §7, plus P2-first cases:
   - C2b: `test_h7_mneme_memory_mismatch_refuses` (`test_availability_c2b.py:615`) and `test_h12`;
   - C2b Amendment 1: `test_a3_mismatch_sentence` (`test_availability_c2b_am1.py:124`) and `test_a9`.
 
-  Each is rewritten to produce the same outcome through parent-directory discovery **or through row 6**: a `.mneme/` directory holding the declaration but no memory, no ancestor memory, and `MNEME_MEMORY` naming a foreign memory.
+  Each is rewritten to produce the same outcome through parent-directory discovery **or through row 6**: a `.mneme/` directory holding the declaration but no memory (for the P1 no-declaration parity case: no declaration and no memory), no ancestor memory, and `MNEME_MEMORY` naming a foreign memory.
 
   Row 6 is required for the two `incomplete` cases, which need the target outside the selected memory's root (`test_availability_c2a.py:424-426`). A walked memory is always an ancestor of the target, so parent discovery cannot produce that. The two cases are:
   - the D-matrix `incomplete` case;
