@@ -360,7 +360,7 @@ imports present, no local diff, parser, resolver, matcher or scoring logic.
 | I-12 | Race cases: (a) target appears after absence proof; (b) target appears between evaluation and write; (c) symlink introduced at the target; (d) hardlink substituted | Each outcome is `DETECTED` or `UNDETECTED_RACE`; any undetected sets aggregate `race_resistance: NOT_ESTABLISHED` and is a documented bypass, never a pass |
 | I-13 | Authority mismatch | `setup_invalid`; visible NOT_PROTECTED; claim `none` |
 | I-14 | Host-side block witness | fake host records refusal; bridge return alone is insufficient |
-| I-15 | Non-`.py` new file | exactly `unsupported`; no host write and no claim |
+| I-15 | Non-`.py` new file | exactly `unsupported` with reason `non_python_target`; claim `none`; no Mneme-originated block; default-open host execution is permitted but is not Mneme authorization or protection; the bridge itself does not mutate the target |
 
 ### 12.5 Canonical test battery
 
