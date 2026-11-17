@@ -2629,6 +2629,117 @@ stay unchanged, except for the items superseded above.
 
 ---
 
+## Amendment — authorize the OpenCode S1 pre-mutation surface (2026-11-17)
+
+**Status:** PROPOSED — not authorization. It takes effect only on the squash merge
+of PR [#821](https://github.com/MnemeHQ/mneme/pull/821), with the owner's approval
+recorded in that PR, and only after the S1 implementation charter
+[PR #820](https://github.com/MnemeHQ/mneme/pull/820) is accepted and merged. It
+authorizes exactly one new host surface and nothing else. It is not authorization
+to implement beyond the merged charter, change Core, change benchmarks, or claim
+native support.
+
+**Sections referenced:** the Freeze Anchor **Status** clause ("No behavioral change
+to retrieval or enforcement without an explicit charter amendment"), the
+[Amendment Procedure](#amendment-procedure), ADR-033 implementation gate 2
+(bounded implementation charter and matching `[layer1-freeze]` amendment), and
+ADR-034's reconciliation that the G2-1 charter and freeze amendment are separate
+decisions.
+
+**Rationale (Amendment Procedure §3(b)).** The bounded behavioral charter is
+[PR #820](https://github.com/MnemeHQ/mneme/pull/820), proposed at commit
+`247bdebec76e24d9984f2916fd7556817a124c9e`, to be accepted and merged before this
+amendment. ADR-033 and ADR-034 each require a matching `[layer1-freeze]` amendment
+before implementation. S1 adds a new blocking host surface but no new engine.
+
+### Authorized change — OpenCode S1 only
+
+**Surface.** OpenCode `2.3.0`, V2 plugin API, `execute.before` for the `write`
+tool; verified-new-file `.py` only; complete content; `FORBID_LITERAL` only. G0
+verified tool `write`, payload `path` + `content`, complete content, an
+authoritative session directory at `ctx.session.get({ sessionID }).location.directory`,
+and throw-before-mutation (host binary SHA-256
+`f1aacb96863cea80e84020ff3e53c9f6831f444ef68e7e57aef08d27fee09bed`; evidence
+summary SHA-256
+`16f5d3e837613f53128028d3e419c384ea5e7ba5b7064d897111e2ac8b44710d`). The G0 probe
+used a `.txt` target and does **not** prove `.py` behaviour; S1 requires its own
+`.py` host validation. The surface is pre-mutation blocking; it is not retrieval,
+scoring, conflict detection, CI or a gateway interceptor.
+
+**Location.** New files only:
+`mneme/integrations/opencode/__init__.py`,
+`mneme/integrations/opencode/bridge.py`,
+`integrations/opencode-plugin/package.json`,
+`integrations/opencode-plugin/index.ts`,
+`integrations/opencode-plugin/README.md`, and
+`tests/integrations/opencode/` including fixtures. No changes to
+`mneme/cli.py`, `mneme/enforcer.py`, `mneme/decision_retriever.py`,
+`mneme/conflict_detector.py`, `mneme/decision_governance.py`,
+`mneme/decision_index_persistence.py`, any existing host adapter,
+`.mneme/`, `docs/adr/`, `validation/`, `benchmarks/` or
+`docs/integrations/README.md`.
+
+**No new enforcement engine.** The Python bridge calls the canonical checker
+through the shared `_invoke_check` and `assess_verdict`, and reuses
+`resolve_memory`, `rule_id_for`, `MemoryStore` and `ToolEvent`. It implements no
+matcher, resolver, diff, parser, policy engine, authority model or verdict schema.
+The plugin supplies transport only and does not parse the checker payload.
+
+**Default-open and authority mismatch.** Untrusted, incomplete, missing or failed
+evaluation proceeds with a visible diagnostic. No OpenCode fail-closed
+authorization is created or implied; ADR-033's `closed` authorization remains
+Claude Code-scoped. An `authority.json` mismatch yields `setup_invalid`, proceeds
+with `NOT_PROTECTED`, and makes no evidence claim. No new blocking policy is
+authorized.
+
+**Experimental only.** OpenCode remains Experimental. This amendment and S1 do not
+change the support matrix and do not establish native support.
+
+**Literal evidence ceiling.** The maximum literal claim is `EXECUTION_OBSERVED`
+from a trusted complete checker payload with the rule `APPLIED` or `EXCLUDED`.
+Host prevention is a separate host-side observation requiring a host witness (tool
+error and target absent); it is not ADR-029 relevance. No literal rule can claim
+relevant enforcement observed.
+
+**Unsupported mutation paths.** Existing-file overwrite, non-`.py` new files,
+`edit`, patch or hunk payloads, arbitrary shell, MCP or custom tools, deletion,
+rename, Stop, CI, gateway admission, infrastructure-resource governance,
+`FORBID_NUMERIC_ABOVE` and waivers.
+
+**Required implementation tests and validation.** The charter's unit,
+integration-identity, offline integration and four-race matrices; `.py` host
+validation, `.py` byte-fidelity fixtures and a non-`.py` unsupported case;
+activation proof by effective config plus a behavioural probe; a fixture corpus
+containing exactly one `FORBID_LITERAL` rule and no legacy enforceable content;
+and independent validation by a separate party with the pinned host, the DeepSeek
+V4.1 model identity, setup and activation instructions, a synthetic repository
+with a verified-new-file `.py` target, exact BLOCK/ALLOW/negative-space criteria,
+sanitized evidence and host-side file-state witnesses. The implementer may not
+self-grade.
+
+**Explicitly preserved.** `DecisionRetriever` behavior and outputs;
+`ConflictDetector` semantics; CLI commands, flags, exit codes and the
+`mneme.check/v1` payload; `FORBID_LITERAL` and `FORBID_NUMERIC_ABOVE` rule
+semantics; the Claude Code, Agent SDK, Antigravity, Codex CLI, Kiro, Hermes,
+LangChain and Cursor surfaces; canonical memory and ADRs; the frozen benchmark
+corpora, expectations and scores; and the support matrix.
+
+**Scope limit.** Any extension — existing-file writes, non-`.py` new files,
+`edit`, shell, numeric rules, Stop or CI, another host, a support claim, or a
+byte-exact carrier change — requires its own charter and amendment. This amendment
+authorizes only the surface above.
+
+**Source and approval references.** Charter PR
+[#820](https://github.com/MnemeHQ/mneme/pull/820) at proposed commit
+`247bdebec76e24d9984f2916fd7556817a124c9e`; contract PR
+[#610](https://github.com/MnemeHQ/mneme/pull/610) at commit
+`4e0e5192e2ea0272ad0fc2b1279b1159e4cd7382`; G0 evidence summary SHA-256
+`16f5d3e837613f53128028d3e419c384ea5e7ba5b7064d897111e2ac8b44710d`. The owner's
+approval must be recorded in PR
+[#821](https://github.com/MnemeHQ/mneme/pull/821); it is not inferred here.
+
+---
+
 ## Amendment Procedure
 
 This document is frozen at `e73ff7d`. To amend it:
