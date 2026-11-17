@@ -1,0 +1,278 @@
+{
+  "batch": "PASS",
+  "pins": {
+    "PIN_CLAUDE_VERSION": "2.1.310 (Claude Code)",
+    "PIN_MODEL": "claude-opus-5-5",
+    "PIN_MNEME_BASE": "59309fe7000cd1173f614aca1ff4f0e1b71edb75",
+    "PIN_MNEME_VERSION": "0.11.0",
+    "SOURCES": "project"
+  },
+  "probes": [
+    {
+      "probe": "P2F-R0-control",
+      "verdict": "PASS",
+      "problems": [],
+      "checks": {
+        "selected_repo_a_memory": true,
+        "reason": true,
+        "walk_unbounded": true,
+        "exit": true,
+        "hook_from_pinned_source": true,
+        "hook_saw_configured_override": true,
+        "no_other_mneme_env": true,
+        "no_stdout": true,
+        "refusal_names_T08_DEC": true,
+        "target_changed_as_expected": true,
+        "nothing_else_changed": true,
+        "forbidden_literal_absent": true
+      },
+      "info": {
+        "relevant_hook_records": 1,
+        "selections": [
+          {
+            "start": "<LIVE>\\P2F-R0-control\\A\\repo_a",
+            "path": "<LIVE>\\P2F-R0-control\\A\\repo_a\\.mneme\\project_memory.json",
+            "source": "discovered",
+            "reason": "DISCOVERED",
+            "walk": "unbounded"
+          }
+        ],
+        "exits": [
+          2
+        ],
+        "override_seen_by_hook": [
+          null
+        ],
+        "notice_text_in_session_stream": false
+      }
+    },
+    {
+      "probe": "P2F-V5",
+      "verdict": "PASS",
+      "problems": [],
+      "checks": {
+        "selected_repo_a_memory": true,
+        "reason": true,
+        "walk_unbounded": true,
+        "exit": true,
+        "hook_from_pinned_source": true,
+        "hook_saw_configured_override": true,
+        "no_other_mneme_env": true,
+        "no_stdout": true,
+        "refusal_names_T08_DEC": true,
+        "target_changed_as_expected": true,
+        "nothing_else_changed": true,
+        "forbidden_literal_absent": true
+      },
+      "info": {
+        "relevant_hook_records": 1,
+        "selections": [
+          {
+            "start": "<LIVE>\\P2F-V5\\A\\repo_a",
+            "path": "<LIVE>\\P2F-V5\\A\\repo_a\\.mneme\\project_memory.json",
+            "source": "discovered",
+            "reason": "OVERRIDE_IGNORED",
+            "walk": "unbounded"
+          }
+        ],
+        "exits": [
+          2
+        ],
+        "override_seen_by_hook": [
+          "<LIVE>\\P2F-V5\\B\\repo_a\\.mneme\\project_memory.json"
+        ],
+        "notice_text_in_session_stream": false
+      }
+    },
+    {
+      "probe": "P2F-V4",
+      "verdict": "PASS",
+      "problems": [],
+      "checks": {
+        "selected_repo_a_memory": true,
+        "reason": true,
+        "walk_unbounded": true,
+        "exit": true,
+        "hook_from_pinned_source": true,
+        "hook_saw_configured_override": true,
+        "no_other_mneme_env": true,
+        "no_stdout": true,
+        "refusal_names_T08_DEC": true,
+        "target_changed_as_expected": true,
+        "nothing_else_changed": true,
+        "forbidden_literal_absent": true
+      },
+      "info": {
+        "relevant_hook_records": 1,
+        "selections": [
+          {
+            "start": "<LIVE>\\P2F-V4\\A\\repo_a",
+            "path": "<LIVE>\\P2F-V4\\A\\repo_a\\.mneme\\project_memory.json",
+            "source": "discovered",
+            "reason": "OVERRIDE_IGNORED",
+            "walk": "unbounded"
+          }
+        ],
+        "exits": [
+          2
+        ],
+        "override_seen_by_hook": [
+          "<LIVE>\\P2F-V4\\does-not-exist\\.mneme\\project_memory.json"
+        ],
+        "notice_text_in_session_stream": false
+      }
+    },
+    {
+      "probe": "P2F-V5-own",
+      "verdict": "PASS",
+      "problems": [],
+      "checks": {
+        "selected_repo_a_memory": true,
+        "reason": true,
+        "walk_unbounded": true,
+        "exit": true,
+        "hook_from_pinned_source": true,
+        "hook_saw_configured_override": true,
+        "no_other_mneme_env": true,
+        "no_stdout": true,
+        "refusal_names_T08_DEC": true,
+        "target_changed_as_expected": true,
+        "nothing_else_changed": true,
+        "forbidden_literal_absent": true
+      },
+      "info": {
+        "relevant_hook_records": 1,
+        "selections": [
+          {
+            "start": "<LIVE>\\P2F-V5-own\\A\\repo_a",
+            "path": "<LIVE>\\P2F-V5-own\\A\\repo_a\\.mneme\\project_memory.json",
+            "source": "discovered",
+            "reason": "OVERRIDE_IGNORED",
+            "walk": "unbounded"
+          }
+        ],
+        "exits": [
+          2
+        ],
+        "override_seen_by_hook": [
+          "<LIVE>\\P2F-V5-own\\B\\repo_a\\.mneme\\project_memory.json"
+        ],
+        "notice_text_in_session_stream": false
+      }
+    },
+    {
+      "probe": "P2F-V4-own",
+      "verdict": "PASS",
+      "problems": [],
+      "checks": {
+        "selected_repo_a_memory": true,
+        "reason": true,
+        "walk_unbounded": true,
+        "exit": true,
+        "hook_from_pinned_source": true,
+        "hook_saw_configured_override": true,
+        "no_other_mneme_env": true,
+        "no_stdout": true,
+        "refusal_names_T08_DEC": true,
+        "target_changed_as_expected": true,
+        "nothing_else_changed": true,
+        "forbidden_literal_absent": true
+      },
+      "info": {
+        "relevant_hook_records": 1,
+        "selections": [
+          {
+            "start": "<LIVE>\\P2F-V4-own\\A\\repo_a",
+            "path": "<LIVE>\\P2F-V4-own\\A\\repo_a\\.mneme\\project_memory.json",
+            "source": "discovered",
+            "reason": "OVERRIDE_IGNORED",
+            "walk": "unbounded"
+          }
+        ],
+        "exits": [
+          2
+        ],
+        "override_seen_by_hook": [
+          "<LIVE>\\P2F-V4-own\\does-not-exist\\.mneme\\project_memory.json"
+        ],
+        "notice_text_in_session_stream": false
+      }
+    },
+    {
+      "probe": "P2F-V5-notice",
+      "verdict": "PASS",
+      "problems": [],
+      "checks": {
+        "selected_repo_a_memory": true,
+        "reason": true,
+        "walk_unbounded": true,
+        "exit": true,
+        "hook_from_pinned_source": true,
+        "hook_saw_configured_override": true,
+        "no_other_mneme_env": true,
+        "notice_in_probed_shape": true,
+        "evaluated_no_stderr": true,
+        "target_changed_as_expected": true,
+        "nothing_else_changed": true,
+        "allowed_edit_applied": true
+      },
+      "info": {
+        "relevant_hook_records": 1,
+        "selections": [
+          {
+            "start": "<LIVE>\\P2F-V5-notice\\A\\repo_a",
+            "path": "<LIVE>\\P2F-V5-notice\\A\\repo_a\\.mneme\\project_memory.json",
+            "source": "discovered",
+            "reason": "OVERRIDE_IGNORED",
+            "walk": "unbounded"
+          }
+        ],
+        "exits": [
+          0
+        ],
+        "override_seen_by_hook": [
+          "<LIVE>\\P2F-V5-notice\\B\\repo_a\\.mneme\\project_memory.json"
+        ],
+        "notice_text_in_session_stream": true
+      }
+    },
+    {
+      "probe": "P2F-planted-marker",
+      "verdict": "PASS",
+      "problems": [],
+      "checks": {
+        "selected_repo_a_memory": true,
+        "reason": true,
+        "walk_unbounded": true,
+        "exit": true,
+        "hook_from_pinned_source": true,
+        "hook_saw_configured_override": true,
+        "no_other_mneme_env": true,
+        "no_stdout": true,
+        "refusal_names_T08_DEC": true,
+        "target_changed_as_expected": true,
+        "nothing_else_changed": true,
+        "forbidden_literal_absent": true
+      },
+      "info": {
+        "relevant_hook_records": 1,
+        "selections": [
+          {
+            "start": "<LIVE>\\P2F-planted-marker\\A\\repo_a\\src",
+            "path": "<LIVE>\\P2F-planted-marker\\A\\repo_a\\.mneme\\project_memory.json",
+            "source": "discovered",
+            "reason": "OVERRIDE_IGNORED",
+            "walk": "unbounded"
+          }
+        ],
+        "exits": [
+          2
+        ],
+        "override_seen_by_hook": [
+          "<LIVE>\\P2F-planted-marker\\B\\repo_a\\.mneme\\project_memory.json"
+        ],
+        "notice_text_in_session_stream": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"<PYTHON>\" \"<MNEME_SRC>\\docs\\validation\\artifacts\\dg1f-t08-p2-first-live\\harness\\hookwrap_v4.py\""
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"<PYTHON>\" \"<MNEME_SRC>\\docs\\validation\\artifacts\\dg1f-t08-p2-first-live\\harness\\hookwrap_v4.py\""
+          }
+        ]
+      }
+    ]
+  }
+}
