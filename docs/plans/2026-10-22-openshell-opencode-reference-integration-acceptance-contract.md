@@ -155,6 +155,15 @@ by the launcher or adapter out-of-band until a separate charter adds it.
 `TBD` is a required value, not a placeholder to be inferred or copied from the
 historical image.
 
+**G0-verified reference host (feasibility only).** A disposable probe on OpenCode
+2.3.0 established the V2 contract: tool `write`, payload `path` + `content` with
+complete content, relative or absolute targets, an authoritative session directory
+at `ctx.session.get({ sessionID }).location.directory`, and a thrown hook error that
+aborts the write before mutation. Binary SHA-256
+`f1aacb96863cea80e84020ff3e53c9f6831f444ef68e7e57aef08d27fee09bed`. This is a
+feasibility pin, not the S1 evidence pin; the S1 environment values above remain
+`TBD` until independently verified.
+
 ### 7.3 S1 scope
 
 S1 is a pre-mutation integration for a **verified-absent target** whose host event
@@ -164,9 +173,12 @@ produces at most an **execution observed** claim for literal rules.
 
 S1 is scoped by **payload shape and an explicitly recognized tool identifier**, not
 by tool name and not by permission category. On the historical V1 host the tool is
-`write`. OpenCode V2 changes the plugin API and collapses the permission actions
-`write` and `patch` into `edit`; if the pinned generation does not deliver complete
-content for a verified-absent path, S1 does not apply to it.
+`write`. On the G0-verified V2 host (2.3.0) the in-scope tool is also `write`, with
+`path` and `content`. Permission actions are not tool identifiers: V2 collapses the
+permission actions `write` and `patch` into `edit`, so coverage is established only
+by the observed tool payload, never by a permission name. If the pinned generation
+does not deliver complete content for a verified-absent path, S1 does not apply to
+it.
 
 Deferred: existing-file overwrite, `FORBID_NUMERIC_ABOVE`, hunk or patch edits,
 arbitrary shell, custom or MCP tools, deletion, rename, Stop, CI, cross-agent
@@ -196,6 +208,10 @@ Permission categories are configuration vocabulary. Their names do not establish
 supported mutation coverage, and a permission action must never be treated as
 evidence that a tool was evaluated.
 
+On the G0-verified V2 host the only in-scope identifier is `write` with `path` and
+`content`; no hunk keys were observed. The allowlist remains explicit because the
+identifier is host-version-specific.
+
 ### 7.5 Checker transport and path authority
 
 S1 uses the unrouted shared invocation: a carrier plus
@@ -217,20 +233,24 @@ no absence. The route also carries no independent support claim
 
 **Path authority.** The chain must be:
 
-1. the host event supplies the target path and the host working directory;
-2. the adapter makes the target absolute — as given when absolute, otherwise joined
-   to the **host** directory, never the adapter process cwd;
-3. the adapter constructs `ToolEvent` with the absolute target path, the host
+1. the host event supplies the target path; it does **not** carry a working
+   directory;
+2. the adapter obtains the authoritative session directory from
+   `ctx.session.get({ sessionID }).location.directory`; if it is unavailable, the
+   event is reported unevaluated;
+3. the adapter makes the target absolute — as given when absolute, otherwise joined
+   to the **session** directory, never the adapter process cwd;
+4. the adapter constructs `ToolEvent` with the absolute target path, the session
    directory as `cwd`, and `tool_input` holding the same absolute path and the
    complete content;
-4. `_direct_write_memory_start` starts the memory walk at the resolved target's
+5. `_direct_write_memory_start` starts the memory walk at the resolved target's
    parent (`hook.py:896`);
-5. `resolve_memory` selects the governing memory and its reason;
-6. `_invoke_check` passes `--target-path <abs>`;
-7. the CLI resolves it with `Path(...).resolve()` and normalizes it against the
+6. `resolve_memory` selects the governing memory and its reason;
+7. `_invoke_check` passes `--target-path <abs>`;
+8. the CLI resolves it with `Path(...).resolve()` and normalizes it against the
    memory's policy root (`mneme/path_selectors.py:170-196`).
 
-A relative target with no host directory is **refused or reported unevaluated**,
+A relative target with no session directory is **refused or reported unevaluated**,
 never resolved against the adapter cwd. `_invoke_check` does not set the child cwd,
 so a relative target would otherwise be resolved by the child's inherited cwd — an
 accidental path authority.
@@ -376,7 +396,7 @@ Availability and refusal are separate concerns:
 | Violation mode | `resolve_mode` | Reused with the §7.7 guard |
 | Availability policy | ADR-033 §1 and §3 | Default `open`; `closed` is Claude-scoped and not claimed |
 | Authorization | ADR-033 §4 | Not applicable; `.claude` declaration does not transfer |
-| Host-level refusal | Host hook throw | Must be validated on the pinned host; not assumed |
+| Host-level refusal | Host hook throw | Validated on the G0 host (2.3.0): throw aborts before mutation; re-verify per pin |
 
 ADR-033 §3 scopes its matrix to Claude Code `PreToolUse` (§6), and §4 authorization
 binds to the local `.claude` declaration (`availability.py:43`). OpenCode inherits
@@ -394,7 +414,7 @@ neither. Any `closed` posture requires its own charter and host validation.
 | AC-07 | End-to-end allow | PASS, applied, functional PASS; allow inferred, not per-rule | Execution observed | S1 |
 | AC-08 | Scope and authority | APPLIED, EXCLUDED and UNKNOWN per rule; EXCLUDED never relevance; UNKNOWN operational | Execution observed | S1 |
 | AC-09 | Operational state | State reported apart from verdict and applicability; INCOMPLETE not promoted | Operational | S1 |
-| AC-10 | `--pure` control | Same payload applied; only `module_loaded` observed externally | Behavioural | S1 |
+| AC-10 | Disabled/omitted-plugin control | Same payload applied when the plugin is omitted from the isolated config; no hook effect observed | Behavioural | S1 |
 | AC-11 | Unsupported surfaces | Documented; denial is not evaluation | — | S1 |
 | AC-13 | Reproducibility | Traces, hashes, identities, build identity, evaluator version, manifests | — | S1 |
 | AC-14 | Security | Credentials excluded; no unapproved egress and no sandbox-policy expansion; cleanup | — | S1 |
@@ -405,7 +425,7 @@ neither. Any `closed` posture requires its own charter and host validation.
 | AC-23 | Carrier byte fidelity | Evaluated bytes equal intended bytes on the pinned host | Structural | S1 |
 | AC-25 | Path-authority isolation | Different process cwd, relative target and host directory produce identical resolution; no host directory means refusal, never adapter cwd | Structural | S1 |
 | AC-26 | Memory-selection record | `reason` and `walk="unbounded"` recorded; ignored override visible in diagnostics | Structural | S1 |
-| AC-27 | Host mutation-tool contract | Generation, host version, package, config key, registration form, exact tool identifier and payload shape recorded; complete content required; unknown identifier or hunk payload is unsupported; permission category alone is not coverage | Structural | S1 |
+| AC-27 | Host mutation-tool contract | Generation, host version, package, config key, registration form, exact tool identifier and payload shape recorded; complete content required; unknown identifier or hunk payload is unsupported; permission category alone is not coverage; activation proven by effective-config inspection plus a behavioural probe (`plugin list` is not accepted for local plugins) | Structural | S1 |
 | AC-28 | Mode selection | Effective mode, deciding source and suppression of `CLAUDE_PLUGIN_OPTION_MODE` recorded and tested; unset means strict; unrecognized value means strict; mode is never treated as availability | Structural | S1 |
 | AC-03/04/05 | Existing-file delta path | — | — | DEFERRED |
 | AC-15/16 | Cross-repo and override probe | — | — | DEFERRED |
