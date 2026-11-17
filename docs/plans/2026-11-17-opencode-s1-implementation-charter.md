@@ -17,9 +17,9 @@ native support, production readiness or relevant enforcement observed.
 ## 1. Decision summary
 
 S1 is the smallest OpenCode pre-mutation integration: a **verified-new-file
-`write`** with **complete content**, evaluated against **`FORBID_LITERAL` only**,
-through the canonical `mneme check` engine, P2-first memory selection and shared
-verdict trust. Its maximum evidence claim is **execution observed**.
+`.py` `write`** with **complete content**, evaluated against **`FORBID_LITERAL`
+only**, through the canonical `mneme check` engine, P2-first memory selection and
+shared verdict trust. Its maximum evidence claim is **execution observed**.
 
 Three claim boundaries are explicit:
 
@@ -38,7 +38,7 @@ Three claim boundaries are explicit:
 
 In scope:
 
-- a new-file `write` whose target is verified absent at evaluation time;
+- a new-file `.py` `write` whose target is verified absent at evaluation time;
 - complete proposed content, delivered by the host event;
 - `FORBID_LITERAL` rules only;
 - canonical `mneme check` as the only enforcement engine;
@@ -49,7 +49,7 @@ In scope:
 
 Non-goals:
 
-- existing-file overwrite, `edit`, patch or hunk payloads;
+- existing-file overwrite, non-`.py` new files, `edit`, patch or hunk payloads;
 - `FORBID_NUMERIC_ABOVE`, waivers, new rule types;
 - arbitrary shell, MCP or custom tools, deletion, rename;
 - Stop, CI, gateway admission, resource governance;
@@ -60,7 +60,7 @@ Non-goals:
 
 ## 3. Accepted owner decisions
 
-1. New-file `write` only, complete content, `FORBID_LITERAL` only.
+1. Verified-new-file `.py` `write` only, complete content, `FORBID_LITERAL` only.
 2. Canonical `mneme check` and shared verdict trust.
 3. P2-first memory selection.
 4. Authority-pin mismatch proceeds with a visible `NOT_PROTECTED` diagnostic and
@@ -98,6 +98,9 @@ G0 caveats carried into S1:
 - only `write` was exercised; `edit` and patch payloads are unsupported;
 - the probe used Claude Haiku 4.5; host mechanics are model-independent, but the
   S1 evidence run must use the target model and record it;
+- the G0 probe wrote a `.txt` target. It does **not** prove `.py` behaviour. S1
+  requires its own `.py` host validation, including checker handling and byte
+  fidelity, before implementation;
 - no race or atomicity property was established.
 
 ### 4.2 Pre-validation evidence environment
@@ -175,7 +178,9 @@ The plugin reads only `decision`. It does not parse the checker payload.
 **The bridge never mutates the target.** It may `lstat` the target to prove
 absence, and it invokes the checker on a temporary carrier outside the governed
 root. It never creates, writes, deletes, renames or chmods the target. Only the
-host applies the write, and only after an `allow`.
+host applies the write. A trusted `allow` is a Mneme policy permission. A
+default-open `unevaluated`, `skip`, `unsupported` or `setup_invalid` outcome lets
+the host proceed, but it is **not** Mneme authorization or protection.
 
 The bridge also cannot observe the host's refusal. A `block` decision is the
 bridge's output; whether the host actually refused is a separate host-side fact.
@@ -282,8 +287,8 @@ explicitly declines to claim equality between evaluated and landed bytes; S1 doe
 not claim it either.
 
 Tests compare the host event content SHA-256, the carrier SHA-256 and the
-host-written file SHA-256 for LF, CRLF, non-ASCII and no-trailing-newline
-fixtures. Inequality is a failed test and a stop condition for that host.
+host-written file SHA-256 for `.py` fixtures with LF, CRLF, non-ASCII and no
+trailing newline. Inequality is a failed test and a stop condition for that host.
 
 The shared unrouted `_invoke_check` uses a text-mode carrier. A byte-exact carrier
 is an ADR-034 §7a **routed-only** authorized correction; adopting it for S1 is a
@@ -296,7 +301,9 @@ reviewed shared change requiring a Layer 1 amendment, not a local workaround.
 - The bridge process performs no target mutation. The test snapshots the whole
   governed root and the target parent before and after the bridge call, and runs
   the bridge under a Python audit hook that fails on any write/open-for-write
-  under the governed root. A fake host applies the write only after an `allow`.
+  under the governed root. A fake host applies the write after an `allow`; a
+  separate default-open case asserts the host may proceed but Mneme records no
+  permission and no claim.
 - The carrier must be outside the governed root and removed afterwards.
 - After a block, the target must be **absent**, not merely "unchanged".
 - A skip, missing hook, tool denial or unevaluated result never counts as
@@ -328,6 +335,7 @@ reviewed shared change requiring a Layer 1 amendment, not a local workaround.
 | U-15 | Raw identifiers | Raw record retains `tool`, `sessionID`, `callID`, `agent`, `messageID`, `eventID`; normalized projection strips session/call IDs only |
 | U-16 | Canonical projection | Applicability entries copied verbatim; divergence fails |
 | U-17 | Carrier isolation | Carrier outside governed root; removed after the call |
+| U-18 | Non-`.py` target | exactly `unsupported` with reason `non_python_target`; claim `none` |
 
 ### 12.3 Integration-identity tests
 
@@ -338,8 +346,8 @@ imports present, no local diff, parser, resolver, matcher or scoring logic.
 
 | ID | Case | Expected |
 | --- | --- | --- |
-| I-01 | Verified-absent forbidden literal | `block`; fake host writes nothing; target absent |
-| I-02 | Verified-absent compliant | `allow`; fake host writes; functional check |
+| I-01 | Verified-absent forbidden literal in a `.py` target | `block`; fake host writes nothing; target absent |
+| I-02 | Verified-absent compliant `.py` target | `allow`; fake host writes; functional check |
 | I-03 | Out-of-scope rule | `allow` + `EXCLUDED`; claim `execution_observed` |
 | I-04 | Existing target | exactly `unsupported` with reason `existing_target` |
 | I-05 | No memory | exactly `skip`; claim `none` |
@@ -347,11 +355,12 @@ imports present, no local diff, parser, resolver, matcher or scoring logic.
 | I-07 | Wrong memory | selection reason recorded; no false claim |
 | I-08 | Wrong mode | exactly `allow` with claim `execution_observed`; no block and no host refusal under `warn` |
 | I-09 | Cross-directory session | relative target resolves to session directory |
-| I-10 | Byte fidelity (LF/CRLF/non-ASCII/no trailing newline) | event/carrier/file hashes compared for all four fixtures; inequality fails |
+| I-10 | `.py` byte fidelity (LF/CRLF/non-ASCII/no trailing newline) | event/carrier/file hashes compared for all four fixtures; inequality fails |
 | I-11 | Absent hook | no evaluation; no claim |
 | I-12 | Race cases: (a) target appears after absence proof; (b) target appears between evaluation and write; (c) symlink introduced at the target; (d) hardlink substituted | Each outcome is `DETECTED` or `UNDETECTED_RACE`; any undetected sets aggregate `race_resistance: NOT_ESTABLISHED` and is a documented bypass, never a pass |
 | I-13 | Authority mismatch | `setup_invalid`; visible NOT_PROTECTED; claim `none` |
 | I-14 | Host-side block witness | fake host records refusal; bridge return alone is insufficient |
+| I-15 | Non-`.py` new file | exactly `unsupported`; no host write and no claim |
 
 ### 12.5 Canonical test battery
 
@@ -368,7 +377,8 @@ Handoff package:
   Claude run;
 - setup and activation instructions, including effective-config proof and a
   behavioural probe;
-- synthetic repository and decision fixture;
+- synthetic repository and decision fixture with a verified-new-file `.py`
+  target; the G0 `.txt` probe is not accepted as `.py` proof;
 - exact BLOCK/ALLOW/negative-space criteria;
 - sanitized evidence and host-side file-state witnesses;
 - source and configuration SHA-256 values;
@@ -406,6 +416,7 @@ requires its own freeze classification.
 10. Any test would require the bridge to mutate the target.
 11. The Layer 1 amendment is absent or rejected.
 12. Any new document states or implies a support level.
+13. `.py` host validation is absent or fails.
 
 ## 16. Authorization gates
 
@@ -420,9 +431,9 @@ Implementation may begin only when **all** of the following are true:
    and the exact reviewed commit of the Layer 1 freeze amendment;
 3. this charter is merged;
 4. the Layer 1 freeze amendment in §14 is accepted and merged;
-5. the bounded host contract is verified: OpenCode 2.3.0 V2, tool `write` with
-   `path` and `content`, complete content, session-directory resolution, and
-   throw-before-mutation;
+5. the bounded host contract is verified for a verified-new-file `.py` target:
+   OpenCode 2.3.0 V2, tool `write` with `path` and `content`, complete content,
+   session-directory resolution, and throw-before-mutation;
 6. the implementation boundary is new files only.
 
 Acceptance is an owner statement on the PR. It is not a fill-in record inside this
