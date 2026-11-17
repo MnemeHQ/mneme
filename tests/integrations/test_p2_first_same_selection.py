@@ -28,6 +28,12 @@ MEMORY = {"meta": {"name": "same-selection", "description": "fixture", "version"
           "decisions": [{"id": "store_001", "decision": "SQLite only", "rationale": "one file",
                          "scope": ["storage"], "constraints": ["no postgres"],
                          "anti_patterns": ["psycopg2"]}]}
+# The foreign memory forbids a marker the repository memory allows, so a
+# consumer that wrongly applied the override would produce a different verdict
+# even where its --memory argument is not recorded (Kiro runs the real check).
+FOREIGN = {**MEMORY, "decisions": [{
+    "id": "foreign_001", "decision": "Foreign rule", "rationale": "differs",
+    "scope": ["storage"], "constraints": [], "anti_patterns": ["foreign_only_marker"]}]}
 NOTICE = "OVERRIDE_IGNORED"
 
 
@@ -38,10 +44,10 @@ def _clean_env(monkeypatch):
         monkeypatch.delenv(name, raising=False)
 
 
-def _mem(d: Path) -> Path:
+def _mem(d: Path, memory=MEMORY) -> Path:
     p = d / ".mneme" / "project_memory.json"
     p.parent.mkdir(parents=True, exist_ok=True)
-    p.write_text(json.dumps(MEMORY), encoding="utf-8")
+    p.write_text(json.dumps(memory), encoding="utf-8")
     return p
 
 
@@ -52,7 +58,7 @@ def layout(tmp_path):
     repo.mkdir()
     subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
     mem = _mem(repo)
-    foreign = _mem(base / "foreign")
+    foreign = _mem(base / "foreign", FOREIGN)
     return {"base": base, "repo": repo, "mem": mem, "foreign": foreign}
 
 
@@ -167,7 +173,8 @@ def test_kiro(monkeypatch, layout):
     from mneme.integrations.kiro import hook as kiro
     raw = json.dumps({"hook_event_name": "preToolUse", "cwd": str(layout["repo"]),
                       "tool_name": "fs_write",
-                      "tool_input": {"path": str(layout["repo"] / "k.py"), "content": "x = 1\n"}})
+                      "tool_input": {"path": str(layout["repo"] / "k.py"),
+                                     "content": "foreign_only_marker = 1\n"}})
 
     def run():
         out, err = io.StringIO(), io.StringIO()
@@ -176,6 +183,7 @@ def test_kiro(monkeypatch, layout):
 
     r1, r2 = _both(monkeypatch, layout, run)
     assert r1 == r2
+    assert r1[0] == 0, "the repository memory allows the marker; the foreign one forbids it"
 
 
 def test_antigravity(monkeypatch, layout):

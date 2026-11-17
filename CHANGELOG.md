@@ -15,8 +15,11 @@
   with no memory found, is reported in the probed shapes: PreToolUse and
   SessionStart `additionalContext`, Stop top-level `systemMessage`; never
   beside the hook's own output (warn `defer`, exit 2, Stop feedback or block,
-  SessionStart text). Verified live only for Edit and Bash PreToolUse,
-  SessionStart and Stop on Claude Code 2.1.310 (#808); unverified elsewhere,
+  SessionStart text). Verified live (#808) only for Edit and Bash
+  PreToolUse, SessionStart (delivered to the agent) and Stop (delivered to
+  the developer only), under H1's run conditions: Claude Code 2.1.310,
+  `claude-opus-5-5`, `--permission-mode acceptEdits`, project setting
+  sources, n = 1, headless (interactive for Stop). Unverified elsewhere,
   including Write and MultiEdit. Other integrations emit nothing new; the
   Agent SDK and LangChain record `selection_reason`, `selection_source` and
   `walk` in their traces.

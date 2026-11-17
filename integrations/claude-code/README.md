@@ -47,9 +47,11 @@ On every Edit, Write, or MultiEdit, Claude Code pipes the tool input to
    A memory found this way always governs: `MNEME_MEMORY` only fills an
    absence, when the walk finds no memory (T-08 P2-first). An override that
    is ignored, or that names a missing file while no memory is found, is
-   reported to Claude as one `additionalContext` notice on an exit-0 edit
-   (verified live only for Edit and Bash on Claude Code 2.1.310; unverified
-   elsewhere).
+   reported to Claude as one `additionalContext` notice on an exit-0 edit,
+   unless the hook already writes its own output (for example a warn-mode
+   `defer`). Verified live only for Edit and Bash under H1's run conditions
+   (Claude Code 2.1.310, `claude-opus-5-5`, `acceptEdits`, headless, n = 1);
+   unverified elsewhere.
 3. Shells out to `mneme check`, passing a temp file and a query derived
    from the target file path.
 4. Exits 2 (block) if `mneme check` returns a non-zero verdict in strict

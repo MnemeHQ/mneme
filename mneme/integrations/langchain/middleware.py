@@ -108,7 +108,7 @@ def build_middleware(gate):
                 tool_call_id=str(request.tool_call.get("id", "")),
             )
 
-        def _annotate_verdict(self, executed, result, request, keys=None):
+        def _annotate_verdict(self, executed, result, request, keys):
             if result.action == ACTION_WARN:
                 return _append_note(
                     executed,
@@ -174,7 +174,7 @@ def _merge_system_content(existing: Any, note: str) -> Any:
     return f"{existing}\n{note}"
 
 
-def _annotate_command(command: Command, note: str, gate, result, request, keys=None) -> Command:
+def _annotate_command(command: Command, note: str, gate, result, request, keys) -> Command:
     """Carry a WARN/UNEVALUATED marker through a ``Command`` tool result.
 
     The handler contract allows returning ``ToolMessage | Command``. A
@@ -225,7 +225,7 @@ def _tool_message_with_note(message: ToolMessage, note: str) -> ToolMessage:
     return copy
 
 
-def _record_annotation_gap(gate, result, request, detail: str, keys=None) -> None:
+def _record_annotation_gap(gate, result, request, detail: str, keys) -> None:
     """Record an un-annotatable result on the audit trace; never silent."""
     gate.trace.append(
         {
@@ -239,12 +239,12 @@ def _record_annotation_gap(gate, result, request, detail: str, keys=None) -> Non
             "verdict": result.verdict,
             "evaluation_complete": result.evaluation_complete,
             "reason": result.reason,
-            **(keys or {}),
+            **keys,
         }
     )
 
 
-def _append_note(message: Any, note: str, gate=None, result=None, request=None, keys=None) -> Any:
+def _append_note(message: Any, note: str, gate, result, request, keys) -> Any:
     """Make a warn/unevaluated outcome visible in the tool result itself."""
     if isinstance(message, ToolMessage):
         return _tool_message_with_note(message, note)

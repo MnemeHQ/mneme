@@ -79,6 +79,14 @@ from mneme.integrations.memory_selection import (
 )
 from mneme.memory_store import MemoryStore
 
+# The selection behind the call in progress (charter §5.2.4 item 1), as
+# (owner id, selection). One module-level context variable: concurrent calls
+# (asyncio tasks, threaded tool nodes) each see their own value, and the owner
+# id keeps one adapter instance from reading another's selection.
+_SELECTION: contextvars.ContextVar[tuple] = contextvars.ContextVar(
+    "mneme_sdk_selection", default=(None, None)
+)
+
 # Actions returned by the mutation gate.
 ACTION_ALLOW = "allow"
 ACTION_DENY = "deny"
@@ -138,18 +146,12 @@ class MnemeAgentSdk:
         self._mode_override = mode
         self._check_runner = check_runner or subprocess.run
         self.trace: List[Dict[str, Any]] = []
-        # The selection behind the call in progress (charter §5.2.4 item 1).
-        # A context variable, not an attribute: concurrent calls (asyncio
-        # tasks, threaded tool nodes) each keep their own selection.
-        self._selection_var: contextvars.ContextVar[Optional[MemorySelection]] = (
-            contextvars.ContextVar(f"mneme_sdk_selection_{id(self)}", default=None)
-        )
 
     # ── Context path ────────────────────────────────────────────────────────
 
     def context_for_task(self, query: str) -> ContextInjection:
         """Retrieve relevant decisions via the existing retrieval path."""
-        self._selection_var.set(None)
+        _SELECTION.set((id(self), None))
         memory = self._memory()
         if memory is None:
             self._record(
@@ -205,7 +207,7 @@ class MnemeAgentSdk:
     ) -> GateResult:
         """Evaluate one proposed mutation through the existing Mneme path."""
         file_path = tool_input.get("file_path", "") if isinstance(tool_input, dict) else ""
-        self._selection_var.set(None)
+        _SELECTION.set((id(self), None))
 
         if not should_check(tool_name):
             return self._gate(ACTION_SKIP, tool_name, file_path, "not a mutating tool")
@@ -362,13 +364,13 @@ class MnemeAgentSdk:
             selection = explicit_selection(Path(self._memory_override))
         else:
             selection = resolve_memory(Path(self.project_dir))
-        self._selection_var.set(selection)
+        _SELECTION.set((id(self), selection))
         return selection.path
 
     def _selection_trace_keys(self) -> Dict[str, Any]:
         """Trace keys for the selection behind this context's call, if any."""
-        selection = self._selection_var.get()
-        if selection is None:
+        owner, selection = _SELECTION.get()
+        if owner != id(self) or selection is None:
             return {}
         return {
             "selection_reason": selection.reason,
@@ -378,7 +380,7 @@ class MnemeAgentSdk:
 
     def _clear_selection(self) -> None:
         """Forget this context's selection, for a record written without one."""
-        self._selection_var.set(None)
+        _SELECTION.set((id(self), None))
 
     def _mode(self) -> str:
         if self._mode_override in ("strict", "warn"):
