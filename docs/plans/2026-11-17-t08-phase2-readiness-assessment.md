@@ -20,24 +20,27 @@
 
 **Phase 2 is NOT READY, and its gate is BLOCKED.**
 
-- **The design core is specified well enough to implement.** The B1 walk
-  (charter §3.2), the P2 + I3 table (§3.3 rows 1–8) and the L4, L5, L6 and
-  planted-marker outcomes are all defined, and the D5 §8 definition
-  prerequisites are met.
+- **The walk and the precedence table are specified well enough to
+  implement.** The B1 walk (charter §3.2), the P2 + I3 table (§3.3 rows
+  1–8) and the L4, L5, L6 and planted-marker outcomes are all defined, and
+  the D5 §8 definition prerequisites are met. The `shadowed` field, the
+  row 4/5 notices and the ADR-033 interaction are not (Q1, Q2).
 - **The gate is the blocker.** Only H1 of the six host gates has passed.
   H2–H6 are not started; H3 has no harness; H4 and H6 are marked at risk by
   the probe scope, and either failing would reopen D5 (charter §5).
 - **Seven specification gaps remain** (§5), two of them material:
-  - Phase 2 has **no ADR-033 analysis**. In an enrolled repository, rows 4
-    and 5 select no memory, and today's code then refuses with
-    `MEMORY_MISSING` (exit 2) (S2).
+  - Phase 2 has **no ADR-033 analysis**. On a direct write in an enrolled
+    repository, rows 4 and 5 select no memory, and today's code then
+    refuses with `MEMORY_MISSING` (exit 2). That contradicts charter §10's
+    "no outcome in §3.4 blocks" (S2).
   - **OpenCode S1** (#821, authorized, not yet implemented) adds a
     `resolve_memory` consumer that is outside the charter's §4 consumer
     list and the H1–H6 gate (S1).
 - **Phase 2 would close** the ancestor-memory and above-boundary planted
-  memory gaps from G3 §4. It **would not close** the row 6 absent-memory
-  `PASS` route, start-point divergence (D1/D2/D7), in-boundary planted
-  memory (D4) or the live-coverage gaps (§3).
+  memory gaps from G3 §4. It **would not change** the row 6 absent-memory
+  `PASS` route, and **would not close** start-point divergence
+  (D1/D2/D7), in-boundary planted memory (D4) or the live-coverage gaps
+  (§3).
 
 **Recommended next step (one):** see §6.
 
@@ -96,7 +99,7 @@ NOT READY on the `shadowed` field's definition (S4).**
 | Shadowed and no override (row 4) | **READY** | Row 4: nothing selected, `BOUNDARY_SHADOWS_MEMORY`, anomalous (§3.4). |
 | Conflict: override differs from shadowed, or is missing (row 5) | **READY** | Row 5: nothing selected, `OVERRIDE_REFUSED_AT_BOUNDARY`, anomalous. Row 5 takes precedence over row 7 when `shadowed` exists ("or missing"). Adversarial test §7.3. |
 | Row 2 against a shadowed memory | **READY** | Rows 1–2 key on `M_R`; `shadowed` does not affect them. |
-| Unreadable override | **NOT READY (contradiction)** | Charter §3.3 row 7 says "missing **or unreadable**". Q2 Amendment A1 says Phase 2 "restores … rule 3's classification of an unreadable override (charter §3.3 row 7)". But charter A2-3 rejected the open-probe needed to detect "unreadable" (Windows sharing-lock race, OneDrive placeholder downloads, loss of today's visible fail-open on Codex and the Agent SDK/LangChain), and nothing limits those reasons to P2-first. The same question arises in rows 3 and 5: is an unreadable file equal to `shadowed` row 3 or row 5? (S3, owner decision.) |
+| Unreadable override | **NOT READY (owner decision)** | Charter §3.3 row 7 says "missing **or unreadable**", and Q2 Amendment A1 says Phase 2 "restores … rule 3's classification of an unreadable override (charter §3.3 row 7)". That needs the open-probe charter A2-3 withdrew. One of A2-3's reasons lapses in Phase 2: row 7 would no longer be "silent off the H1 paths", because Phase 2 gates every path. Two still apply: the Windows sharing-lock race and OneDrive placeholder downloads. Rows 3 and 5 inherit the question: is an unreadable file equal to `shadowed` row 3 or row 5? (S3.) |
 | Returned path form, row 3 | **NOT READY (minor)** | A2 §5.2.2 fixes the returned form for P2-first rows only (`Path(M_X)` as given). Phase 2 does not say whether row 3 returns `Path(M_X)` or `shadowed` (S5). |
 | Notice text and emission conditions, rows 4 and 5 | **NOT READY** | `selection_notice` (`memory_selection.py:103-124`) covers rows 2 and 7 only. Charter §7.8 asks only for "the §5 candidate shape". The A2 §5.2.4 item 3 emission conditions (suppress on warn-mode `defer` and exit-2 events) apply to "P2-first only" (§5.2.4 heading). Phase 2 restates neither the texts nor the conditions (S5). |
 | Informational recording (rows 3 and 6) | **NOT READY (minor)** | §3.4: "recorded in structured output". A2 §5.2.4 item 1 found such a record only in the Agent SDK/LangChain trace. Phase 2 restores I4 for anomalous rows, but does not say where rows 3 and 6 are recorded in other consumers (S5). |
@@ -104,7 +107,8 @@ NOT READY on the `shadowed` field's definition (S4).**
 | ADR-033 interaction with rows 3–5 | **NOT READY** | See S2. A2 §5.2.3 (F1) analysed ADR-033 for P2-first. No equivalent exists for Phase 2. |
 
 **Q2 overall: READY for the precedence table; NOT READY on the unreadable
-override (S3), the row 4/5 notices (S5) and ADR-033 (S2).**
+override (S3), the row 4/5 notices (S5), the `shadowed` field (S4) and
+ADR-033 (S2).**
 
 ### Q3. Which G3 §4 gaps does Phase 2 close?
 
@@ -117,18 +121,19 @@ here is evidence.
 | **Planted memory above `R`** | **Closes** | Same mechanism: a memory above the boundary is never selected implicitly. |
 | **Planted memory inside `R`** (V3/V6) | **Does not close** | Nearest-wins inside `R` is D4, out of scope (charter §3.3 "Residual, unchanged"; §10). |
 | **Planted Git marker** | **New surface, made visible only** | B1 creates it. Row 5 blocks substitution; with no override, row 4 leaves edits under the marker ungoverned, with a notice (D5 §5.4; S6). |
-| **Row 6 absent-memory `PASS`** | **Narrows, does not close** | Row 6 needs no `M_R` **and** no `shadowed`. Phase 2 refuses the override only where a memory sits above `R` (row 5). A repository whose memory is absent, with nothing above it, still takes any existing `M_X` (row 6, `OVERRIDE_FILLS_ABSENCE`; Q2 rule 2 "keeps U1 and U5"). Enrolled repositories behave as G3 §4 records (only `AUTHORIZED` refuses). |
+| **Row 6 absent-memory `PASS`** | **Unchanged** | Phase 2 row 6 needs no `M_R` **and** no `shadowed`, and `shadowed` is the nearest memory anywhere above `R` (charter §3.1, §3.2). So row 6 still means "no memory at or above the start", exactly P2-first's row 6 (no `M_W`, A2 §5.2.2). The layouts Phase 2 sends to rows 3–5 were rows 1 and 2 under P2-first, never row 6. A repository whose memory is absent, with nothing above it, still takes any existing `M_X` (`OVERRIDE_FILLS_ABSENCE`; Q2 rule 2 "keeps U1 and U5"). Enrolled repositories behave as G3 §4 records (only `AUTHORIZED` refuses). |
 | **Row 7** (missing override, nothing walked) | **Unchanged** | Still selects nothing, reported. |
 | **Start points not unified** (D1/D2/D7) | **Does not close** | I5 (charter §2) keeps every start point. D5 §5.3: "D5 does not change any start point". A Bash write into A from a `cwd` in B still selects B's memory. |
 | **Write and MultiEdit live** | **Does not close** | H1a's accepted design probes Edit and Bash only (probe scope §4: "Two sub-probes: an Edit and a Bash command"), and #808 passed on those. The H1 gate is met by that design; Write/MultiEdit live coverage stays a G3 limit. Charter §8 does not add it. |
-| **Bash, SessionStart, Stop live under the resolver** | **Not by the gate** | The gate probes channels with a harness emitter, not Mneme (probe scope §3 step 1). Charter §8 behavioral evidence covers C2, the planted marker and L4, all as direct writes. |
+| **Bash, SessionStart, Stop live under the resolver** | **Not by the gate** | The gate probes channels with a harness emitter, not Mneme (probe scope §3 step 1). Charter §8 behavioral evidence covers the C2 re-run (an edit), the planted marker and L4; it names no Bash, SessionStart or Stop case. |
 | **C4 channel and `project,local`; enrolled repositories live** | **Does not close** | Those need the G3-2 and G3-1 re-runs (#822 §5), which are separate and not authorized. |
 | **H2–H6 host visibility** | **Closes only through its own gate** | Phase 2 cannot proceed without all twelve paths passing (charter §5). |
 | **Other versions and models; n = 1** | **Does not close** | Probe scope §9 "would not". |
 | **Outside scope** (C3/C5/C6, `bypassPermissions`, hook removal, admin bypass) | **Does not close** | #822 §4; charter §10. |
 
 **Q3 overall:** Phase 2 closes the boundary gaps (ancestor and
-above-boundary planted memory) and nothing else in G3 §4. G3 would remain
+above-boundary planted memory) and nothing else in G3 §4. It moves those
+layouts out of rows 1 and 2 into rows 3–5; it does not touch row 6. G3 would remain
 `PARTIAL` after Phase 2 unless the row 6 route and start points are also
 addressed. This is a reading, not a re-grade of G3.
 
@@ -139,7 +144,7 @@ addressed. This is a reading, not a re-grade of G3.
 | P1 | D5 contract accepted | D5 §8 | **READY** | Accepted 2026-10-17. |
 | P2 | Q2 resolved (P2 defined, D5 §5.2 declared path) | D5 §8; Q2 §10 | **READY** | Accepted 2026-10-17; P2-first implemented (#815). |
 | P3 | D5 §5.4 planted-marker outcome defined, including the rule-2 case | D5 §8; Q2 §10 | **READY** | Charter §3.3 row 5, I3, §11 C1; A2 §5.2.5 records it as "already met". |
-| P4 | L4 characterization test authorized and recorded | D5 §7 item 4, §8; charter §6 | **READY** | #543 (`5d8bf82a`); flipped for P2-first; Phase 2 flips the planted-marker pair to row 5 (A2 §5.2.5). |
+| P4 | L4 characterization test authorized and recorded | D5 §7 item 4, §8; charter §6 | **READY** | #543 (`5d8bf82a`); flipped for P2-first. In Phase 2 the planted-marker class (`test_memory_boundary_characterization.py:185-232`) flips to row 4 without the override and row 5 with it. A2 §5.2.5 says only "row 5" (S7). |
 | P5 | H1 Claude Code: H1a, H1b, H1c | charter §5 | **READY** | `PASS` on `2.1.310`, `claude-opus-5-5`, n = 1 (#808). Bound to that pin and its run conditions. |
 | P6 | H2 Codex: H2a, H2b | charter §5; probe scope §4, §4.1 | **BLOCKED** | Not started. H2a needs a targeted re-run for artifact-backed delivery (§4.1, D1). H2b is unproven live. Existing harness (`validation/codex-cli/probe/`). Pin `0.149.1` installability not checked here. |
 | P7 | H3 Kiro: H3a | same | **BLOCKED** | Not started. **No harness exists** (probe scope §5). |
@@ -179,16 +184,16 @@ See §5 for the list and §6 for the one recommended next step.
 
 | # | Gap | Kind | Grade | Needed |
 |---|---|---|---|---|
-| **S1** | **OpenCode is a new `resolve_memory` consumer outside Phase 2.** The OpenCode S1 freeze amendment (#821) authorizes a bridge that "reuses `resolve_memory`" (`layer1-freeze-e73ff7d.md`, OpenCode S1 amendment). It is not yet implemented on `main`. Once it lands, D5 §5.3 ("adopts it for every consumer … at once") and charter I1 require OpenCode to take B1 too, but it is not in charter §4 and has no H-gate. | Owner decision | **NOT READY** | Owner chooses: add OpenCode to §4 with its own gate (H7) before the Phase 2 freeze, or record it as excluded with the reason (it is Experimental, #821). Either is a charter amendment. |
-| **S2** | **ADR-033 consequences of Phase 2 are not analysed.** `discover_declaration` (`availability.py:43-72`) walks to the first ancestor `.mneme/` with no marker check; it is not a §4 consumer. On a direct write with no selected memory, the hook calls `emit_availability(..., "NOT_RUN", ...)` with `memory=None` (`hook.py:2108-2113`), and `refusal_category` returns `MEMORY_MISSING` under `AUTHORIZED` (`availability.py:191-213`). So in an enrolled repository, rows 4 and 5 (for example, a planted `.git` at `A/src/`, or an L4 worktree without memory under an enrolled checkout) would **refuse with exit 2**, not proceed with a notice. That may be the intended fail-closed result for an enrolled repository, but no document says so. Charter §10 preserves "every exit code: no outcome in §3.4 blocks", and if A2 §5.2.4 item 3's suppression carried into Phase 2, the row 4/5 notice would not appear on that exit-2 event. | Spec gap | **NOT READY** | An ADR-033 consequences section for Phase 2, like A2 §5.2.3 (F1): rows 3–5 under each authorization state, whether B1 applies to declaration discovery, the notice/refusal interaction, the rewritten tests, and whether an ADR-033 erratum is needed. |
-| **S3** | **Unreadable override: Q2 A1 vs charter A2-3.** Q2 A1 says Phase 2 restores "unreadable" in row 7; A2-3 gives reasons against the open-probe that are not P2-first-specific. Rows 3 and 5 inherit the question. | Contradiction; owner decision | **NOT READY** | Owner chooses: keep `is_file()` only in Phase 2 (amend Q2 A1's Phase 2 sentence), or restore an open-probe with the A2-3 risks accepted. |
+| **S1** | **OpenCode is a new `resolve_memory` consumer outside Phase 2.** The OpenCode S1 freeze amendment (#821) authorizes a bridge that "reuses `resolve_memory`" (`layer1-freeze-e73ff7d.md`, OpenCode S1 amendment). It is not yet implemented on `main`. D5 §5.3 and charter I1 enumerate their consumers (D5 §2, charter §4), so neither literally names OpenCode. But their intent (one stop rule for every implicit-discovery consumer, never one adapter at a time) implies OpenCode should take B1 once it lands, and it has no H-gate. | Owner decision | **NOT READY** | Owner chooses: add OpenCode to §4 with its own gate (H7) before the Phase 2 freeze, or record it as excluded with the reason (it is Experimental, #821). Either is a charter amendment. |
+| **S2** | **ADR-033 consequences of Phase 2 are not analysed.** `discover_declaration` (`availability.py:43-72`) walks to the first ancestor `.mneme/` with no marker check; it is not a §4 consumer. On a direct write with no selected memory, the hook calls `emit_availability(..., "NOT_RUN", ...)` with `memory=None` (`hook.py:2108-2113`), and `refusal_category` returns `MEMORY_MISSING` under `AUTHORIZED` (`availability.py:191-213`). So on a direct write in an enrolled repository, rows 4 and 5 would **refuse with exit 2**, not proceed with a notice. Examples: a planted `.git` at `A/src/`; or an L4 worktree under an enrolled checkout, **only if** the worktree has no `.mneme/` directory at all (`discover_declaration` stops at the first `.mneme/` directory and returns `None` when the declaration file is absent, `availability.py:52-56`; a worktree made by `new_task_worktree.py` has `.mneme/task_context.json`, so it would get a row 4 notice and exit 0). Bash, SessionStart and Stop make no ADR-033 call and return 0. This **contradicts** charter §10, which preserves "every exit code: no outcome in §3.4 blocks" and does not authorize "ADR-033, or any fail-closed or availability behavior", and Q2 §7: "Any blocking on `NO_MEMORY_SELECTED` would be a separate ADR-021 question." If A2 §5.2.4 item 3's suppression carried into Phase 2, the row 4/5 notice would also not appear on that exit-2 event. | Contradiction; spec gap | **NOT READY** | An ADR-033 consequences section for Phase 2, like A2 §5.2.3 (F1): rows 3–5 under each authorization state, whether B1 applies to declaration discovery, the notice/refusal interaction, the rewritten tests, and whether an ADR-033 erratum is needed. |
+| **S3** | **Unreadable override in Phase 2.** Q2 A1 explicitly restores "unreadable" in row 7 for Phase 2. That needs the open-probe A2-3 withdrew. Its silence reason lapses in Phase 2, but the Windows sharing-lock and OneDrive placeholder reasons still apply. Rows 3 and 5 inherit the question. | Owner decision | **NOT READY** | Owner chooses: restore the open-probe as Q2 A1 states, accepting the remaining A2-3 risks; or keep `is_file()` only and amend Q2 A1's Phase 2 sentence. |
 | **S4** | **`shadowed` definition.** (a) Populated or not when `M_R` is found first (§3.1 vs §3.2 vs §7.1). (b) Whether the lookahead may cross further markers above `R`, and so whether row 3 can inherit across two boundaries. (c) Dangling `.git` symlink vs dangling `gitdir:` file. | Spec gap | **NOT READY** | One charter clarification and the matching §7.1 oracle rows. |
 | **S5** | **Phase 2 output contract.** Fixed notice texts for rows 4 and 5; Phase 2 emission/suppression conditions (A2 §5.2.4 item 3 is P2-first only); returned path form for row 3; where rows 3 and 6 are recorded outside the Agent SDK/LangChain trace. | Spec gap | **NOT READY** | One charter clarification, and shape binding to each passed probe (probe scope §3 step 5). |
 | **S6** | **Planted-marker residual and audience.** With no override, a planted marker leaves edits ungoverned with a row 4 notice. On Claude Code PreToolUse that notice reaches the agent only (#808), possibly the agent that planted the marker. D5 §5.1 accepts developer **or** agent, so this meets the accepted rule; the question is whether it is enough for the §5.4 risk. | Owner decision (risk acceptance) | **NOT READY** | Owner accepts the residual as stated, or asks for a stronger §5.4 outcome. D5 §5.4 names "not honoring markers created during the session" as the alternative; charter §11 C1 rejected it because PreToolUse has no baseline. |
-| **S7** | **Status lines and pins.** The charter header still reads "Amendment A2 (PROPOSED …)" and "A2-RT (PROPOSED …)", and Q2 reads "Amendment A1 (PROPOSED …)", although the merging PRs record acceptance (#809, #811). Probe-scope pins for H2–H6 (codex `0.149.1`, Kiro `2.19.2`, Antigravity `2.8.1`, hermes-agent `0.19.0`) date from 2026-08 to 2026-10; whether they are still installable was not checked here, and a re-pin needs a reviewed amendment (probe scope §7). | Hygiene; risk | **NOT READY (minor)** | Fold the status lines into the next charter amendment. Check pin installability at harness-build time for each batch. |
+| **S7** | **Status lines, an A2 erratum and pins.** The charter header still reads "Amendment A2 (PROPOSED …)" and "A2-RT (PROPOSED …)", and Q2 reads "Amendment A1 (PROPOSED …)", although the merging PRs record acceptance (#809, #811); the ADR-033 erratum already notes that the charter's in-file status lines "still read PROPOSED". A2 §5.2.5 says Phase 2 flips the planted-marker pair "to row 5"; the no-override case becomes row 4 (Q4 P4). Charter §8 still pins Claude Code `2.1.202`, so Phase 2 live evidence (P13) needs a re-pin, for example to `2.1.310`, the H1 pin. Probe-scope pins for H2–H6 (codex `0.149.1`, Kiro `2.19.2`, Antigravity `2.8.1`, hermes-agent `0.19.0`) date from 2026-08 to 2026-10; whether they are still installable was not checked here, and a re-pin needs a reviewed amendment (probe scope §7). | Hygiene; risk | **NOT READY (minor)** | Fold the status lines, the row 4 correction and the §8 re-pin into the next charter amendment. Check pin installability at harness-build time for each batch. |
 
-**No contradiction was found** between the charter's Phase 2 design and
-D5, Q2, the P2-first freeze amendment or the H1 record, apart from S3.
+**No other contradiction was found** between the charter's Phase 2 design
+and D5, Q2, the P2-first freeze amendment or the H1 record, apart from S2.
 
 ## 6. Recommended next step (one)
 
@@ -201,21 +206,31 @@ Why this one:
   all consumers and requires D5 to be revisited. H4a and H6a are the two
   paths the probe scope marks "At risk", and both need shape discovery
   before any probe (probe scope §4, §5).
-- **The spec gaps (S1–S6) do not affect the probes.** Probes test the
-  channel with a harness emitter and no Mneme code (probe scope §3 step 1).
-  The gaps can be closed in one charter amendment later, before the Phase 2
-  freeze amendment, and their answers depend on whether the gate is
-  reachable.
-- **It is the cheapest decisive evidence.** Front-loading it avoids
-  building the H2, H3 and H5 harnesses for a gate that might fail on H4 or
-  H6.
+- **Spec gaps S2–S6 do not affect these probes.** Probes test the channel
+  with a harness emitter and no Mneme code (probe scope §3 step 1). Those
+  gaps can be closed in one charter amendment later, before the Phase 2
+  freeze amendment. **S1 is the exception:** if the owner adds OpenCode
+  with its own gate, the probe set grows by that gate, but H4a and H6a are
+  still needed.
+- **It is the most decisive evidence, not the cheapest.** H4 is IDE-only
+  and operator-driven, and H6 needs a live model and credentials (probe
+  scope §5, D5). Front-loading them avoids building the H2, H3 and H5
+  harnesses for a gate that might fail on H4 or H6.
+- **Alternative weighed:** settling S2 and S6 first is docs-only and
+  cheaper, and could decide whether Phase 2 is wanted in enrolled
+  repositories. It is not recommended first, because neither answer can
+  make Phase 2 possible if H4 or H6 has no non-blocking channel, while a
+  failed shape discovery makes both questions moot.
 
-What it needs:
-- **Owner go-ahead** for the batch (probe scope §11), and acceptance of
-  the change to the probe scope's recommended batch order (D5 there puts H4
-  last).
-- An operator for the Antigravity IDE run, and credentials for a live
-  Hermes model session (probe scope §5, D2).
+What it needs, in order:
+1. **A harness PR** for H4a and H6a, each with an offline self-test before
+   any live run (probe scope §5), and a check that the Antigravity `2.8.1`
+   and hermes-agent `0.19.0` pins are still installable (S7).
+2. **An explicit owner go-ahead** for the batch (probe scope §11), with
+   acceptance of the change to the batch order (probe-scope decision D5
+   puts H4 last).
+3. An operator for the Antigravity IDE run, and operator-supplied
+   credentials for a live Hermes model session (probe scope §5, D2).
 
 ## 7. Not authorized by this record
 
