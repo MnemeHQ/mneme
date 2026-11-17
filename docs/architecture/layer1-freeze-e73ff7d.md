@@ -2648,7 +2648,7 @@ decisions.
 
 **Rationale (Amendment Procedure §3(b)).** The bounded behavioral charter is
 [PR #820](https://github.com/MnemeHQ/mneme/pull/820), proposed at commit
-`34092d1452b391be075414db9b2c9bd4a7bc315c`, to be accepted and merged before this
+`247bdebec76e24d9984f2916fd7556817a124c9e`, to be accepted and merged before this
 amendment. ADR-033 and ADR-034 each require a matching `[layer1-freeze]` amendment
 before implementation. S1 adds a new blocking host surface but no new engine.
 
@@ -2731,7 +2731,7 @@ authorizes only the surface above.
 
 **Source and approval references.** Charter PR
 [#820](https://github.com/MnemeHQ/mneme/pull/820) at proposed commit
-`34092d1452b391be075414db9b2c9bd4a7bc315c`; contract PR
+`247bdebec76e24d9984f2916fd7556817a124c9e`; contract PR
 [#610](https://github.com/MnemeHQ/mneme/pull/610) at commit
 `4e0e5192e2ea0272ad0fc2b1279b1159e4cd7382`; G0 evidence summary SHA-256
 `16f5d3e837613f53128028d3e419c384ea5e7ba5b7064d897111e2ac8b44710d`. The owner's
