@@ -1,7 +1,8 @@
 # OpenCode S1 implementation charter
 
 **Status:** PROPOSED — not implementation authorization. Implementation may begin
-only after the approval record in §16 is complete and this charter is merged.
+only after the implementation authorization gate in §16.1 is satisfied and this
+charter is merged.
 **Date:** 2026-11-17
 **Base:** `b9b40ef8f5cf1dcf80087bba40a5becf12a88f1b`, Mneme `0.11.0`.
 **Contract:** [PR #610](https://github.com/MnemeHQ/mneme/pull/610).
@@ -99,22 +100,12 @@ G0 caveats carried into S1:
   S1 evidence run must use the target model and record it;
 - no race or atomicity property was established.
 
-### 4.2 S1 evidence environment (TBD until independently verified)
+### 4.2 Pre-validation evidence environment
 
-The implementation target is OpenCode `2.3.0` V2 unless the owner pins otherwise.
-The **evidence** environment must not be inferred from G0. Every value below is
-`TBD` and must be recorded before an S1 evidence claim:
-
-| Item | Value |
-| --- | --- |
-| Image digest | `TBD` |
-| OpenShell | `TBD` |
-| Host version | `TBD` |
-| Host OS | `TBD` |
-| Python | `TBD` |
-| Memory schema | `TBD` (`v1` or `v2`) |
-| Plugin, bridge, checker SHA-256 | `TBD` |
-| Target model identity | `TBD` (DeepSeek V4.1) |
+The final runtime image, host OS, component hashes, memory schema and target
+model are **not** implementation prerequisites. They cannot exist before the
+implementation is built. They are recorded at the pre-validation evidence gate in
+§16.2, after implementation and before any evidence claim.
 
 ## 5. Architecture and file boundaries
 
@@ -188,24 +179,31 @@ host applies the write, and only after an `allow`.
 
 The bridge also cannot observe the host's refusal. A `block` decision is the
 bridge's output; whether the host actually refused is a separate host-side fact.
-An `EXECUTION_OBSERVED` block claim therefore requires a host-side witness (tool
-error and/or target absent), not the bridge return value alone.
+The charter records that as **host prevention observed** (§10), separate from
+checker execution. Neither is inferred from the other.
 
 ## 7. Behaviour and decision matrix
 
-| Observation | Applicability | Decision | Claim | Host action |
-| --- | --- | --- | --- | --- |
-| `TRUSTED_COMPLETE` | `APPLIED` + `FAIL` | `block` | `execution_observed` only with host-side refusal witness | throw; no write |
-| `TRUSTED_COMPLETE` | `APPLIED` or `EXCLUDED` + `PASS` | `allow` | `execution_observed` | host writes |
-| `UNKNOWN` | any | `unevaluated` | `none` | proceed + diagnostic |
-| `INCOMPLETE` | any | `unevaluated` | `none` | proceed + diagnostic |
-| `UNTRUSTED` / `COMPLETENESS_UNSTATED` | any | `unevaluated` | `none` | proceed + diagnostic |
-| launch error / timeout | none | `unevaluated` | `none` | proceed + diagnostic |
-| no memory | none | `skip` | `none` | proceed + diagnostic |
-| unlisted tool or non-complete payload | none | `unsupported` | `none` | proceed + diagnostic |
-| `authority.json` mismatch | none | `setup_invalid` | `none` | proceed + `NOT_PROTECTED` diagnostic |
+| Observation | Applicability | Effective mode | Decision | Evidence | Host action |
+| --- | --- | --- | --- | --- | --- |
+| `TRUSTED_COMPLETE` | `APPLIED` + `FAIL` | `strict` | `block` | checker execution + host prevention witness | throw; no write |
+| `TRUSTED_COMPLETE` | `APPLIED` + `FAIL` | `warn` | `allow` | checker execution | proceed + warning |
+| `TRUSTED_COMPLETE` | `APPLIED` or `EXCLUDED` + `PASS` | `strict` or `warn` | `allow` | checker execution | host writes |
+| `UNKNOWN` | any | either | `unevaluated` | none | proceed + diagnostic |
+| `INCOMPLETE` | any | either | `unevaluated` | none | proceed + diagnostic |
+| `UNTRUSTED` / `COMPLETENESS_UNSTATED` | any | either | `unevaluated` | none | proceed + diagnostic |
+| launch error / timeout | none | either | `unevaluated` | none | proceed + diagnostic |
+| no memory | none | either | `skip` | none | proceed + diagnostic |
+| unlisted tool or non-complete payload | none | either | `unsupported` | none | proceed + diagnostic |
+| `authority.json` mismatch | none | either | `setup_invalid` | none | proceed + `NOT_PROTECTED` diagnostic |
 
-Only a trusted complete literal `FAIL` may block. `warn` mode never blocks.
+Only a trusted complete literal `FAIL` in effective `strict` mode may block. `warn`
+never blocks.
+
+`allow` is the only outcome that is a **trusted policy permission**. `unevaluated`,
+`skip`, `unsupported` and `setup_invalid` may proceed under the explicit
+default-open posture, but they are **not** Mneme-authorized protection and carry no
+claim that Mneme permitted or protected the write.
 
 ## 8. Authority pin
 
@@ -231,7 +229,9 @@ mechanism.
 
 Mode is resolved through `resolve_mode` after removing
 `CLAUDE_PLUGIN_OPTION_MODE`; the bridge records the effective mode and source.
-Mode is violation policy, not availability.
+Mode is violation policy, not availability. In effective `strict` mode a trusted
+complete literal `FAIL` blocks; in `warn` the same evaluation proceeds with a
+visible warning and does not block.
 
 ## 10. Evidence and claim ceiling
 
@@ -254,13 +254,23 @@ event identifiers, and the host-side refusal witness (tool status/error and
 target state) where applicable. The refusal witness is populated by the test
 harness or validator, never by the bridge. No source content and no credentials.
 
-`EXECUTION_OBSERVED` requires all of:
+Two evidence facts are separate and must not be merged:
+
+**Checker execution observed** requires:
 
 1. a canonical `TRUSTED_COMPLETE` checker payload for this event;
 2. the rule present as `APPLIED` or `EXCLUDED` with its canonical identity;
-3. the raw host event identifiers are present: `tool`, `sessionID`, `callID`,
-   `agent`, `messageID`, `eventID`;
-4. for a block, a host-side witness that the write was refused.
+3. the raw host event identifiers present: `tool`, `sessionID`, `callID`,
+   `agent`, `messageID`, `eventID`.
+
+This is the literal-rule ceiling and is the only basis for
+`EXECUTION_OBSERVED`.
+
+**Host prevention observed** requires a host-side witness that the write was
+refused: the host tool status/error and the target being absent. It is a host
+observation, not an ADR-029 evidence level and not relevance. A block record may
+carry both facts, but the host witness is not inferred from the bridge's `block`
+return and does not upgrade the literal claim.
 
 `UNKNOWN`, `INCOMPLETE`, `UNTRUSTED`, `skip`, `unsupported`, `setup_invalid` and
 transport failures yield `none`. Never relevance.
@@ -374,8 +384,8 @@ on a new host. ADR-033's implementation gates and the ADR-034 reconciliation
 require a matching `[layer1-freeze]` amendment alongside the bounded
 implementation charter. New files alone do not exempt the surface.
 
-The amendment must be accepted and recorded in the approval record before
-implementation. There is no charter-level waiver: any change to this requirement
+The amendment must be accepted and recorded in the implementation authorization
+gate (§16.1) before implementation. There is no charter-level waiver: any change to this requirement
 is itself an ADR-level decision, not an implementation choice.
 
 A byte-exact carrier or any shared-code change is a separate reviewed change and
@@ -397,38 +407,43 @@ requires its own freeze classification.
 11. The Layer 1 amendment is absent or rejected.
 12. Any new document states or implies a support level.
 
-## 16. Approval record
+## 16. Authorization gates
 
-Implementation may begin only when all fields are complete. Owner acceptance must
-name a specific reviewed commit; green CI is not acceptance.
+Two gates, in order. Passing one does not imply the other.
 
-```text
-S1 CHARTER APPROVAL RECORD
-Charter: docs/plans/2026-11-17-opencode-s1-implementation-charter.md
-Charter commit: <40-hex commit containing this file>
-Charter SHA-256: <sha256 of the merged file>
-Base: b9b40ef8f5cf1dcf80087bba40a5becf12a88f1b
-G0 feasibility host: OpenCode 2.3.0, V2 API, binary f1aacb96…
-S1 evidence environment:
-  image digest: TBD
-  OpenShell: TBD
-  host version: TBD
-  host OS: TBD
-  Python: TBD
-  memory schema: TBD
-  plugin/bridge/checker SHA-256: TBD
-  target model: TBD (DeepSeek V4.1)
-Independent source/archive verification: required (record hashes)
-Layer 1 amendment: required — <commit>
-Implementation boundary: new files only
-Implementation PR acceptance: required before merge (owner + evidence)
-Support-level change: none (authoritative row: docs/integrations/README.md)
-Owner: TheoV823
-Decision: ACCEPTED / REJECTED
-Merge: <PR number and merge commit>
-Date:
-```
+### 16.1 Implementation authorization gate
 
-Until this record is complete and the charter is merged, no implementation work
-is authorized. No implementation PR may merge without separate owner acceptance
-of the implementation and its evidence.
+Implementation may begin only when **all** of the following are true:
+
+1. this charter is accepted by the owner;
+2. owner acceptance is recorded against the exact reviewed commit of this charter
+   and the exact reviewed commit of the Layer 1 freeze amendment;
+3. this charter is merged;
+4. the Layer 1 freeze amendment in §14 is accepted and merged;
+5. the bounded host contract is verified: OpenCode 2.3.0 V2, tool `write` with
+   `path` and `content`, complete content, session-directory resolution, and
+   throw-before-mutation;
+6. the implementation boundary is new files only.
+
+Acceptance is an owner statement on the PR. It is not a fill-in record inside this
+document, and green CI is not acceptance.
+
+### 16.2 Pre-validation evidence gate
+
+This gate applies after implementation and before any evidence claim. It does not
+block implementation. Every value is recorded in the validation package:
+
+- final runtime image digest;
+- OpenShell version;
+- host version and host OS used for validation;
+- Python version;
+- memory schema (`v1` or `v2`);
+- plugin, bridge and checker SHA-256;
+- DeepSeek V4.1 model identity;
+- independent validator identity and environment;
+- sanitized evidence copies and file-state witnesses;
+- source and configuration hashes.
+
+The implementation may be built and unit-tested before this gate. No checker
+execution observation, host prevention observation or validation claim may be made
+until it is satisfied.
