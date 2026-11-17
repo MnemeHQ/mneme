@@ -14,6 +14,8 @@
 
 It states the ADR-033 C2a/C2b consequences of P2 precedence, and it requires an ADR-033 §4.1 erratum. Its gate is H1 only. B1, I3, §3.3 rows 3–5 and the H1–H6 gate become Phase 2, with every original prerequisite kept. Acceptance would authorize no code, test, live run, ADR change or `[layer1-freeze]` amendment.
 
+**Amendment A2-RT (PROPOSED, 2026-11-16):** amends Amendment A2 for exactly one change, decided in the [remediation-text decision](2026-11-16-dg1f-t08-d5-p2-first-remediation-text-decision.md) (option O4). It adds to §5.2.6's "authorize only" list, and to what §5.2.8 permits, the following: the `MEMORY_PATH_MISMATCH` remediation line is chosen at emit time from whether the declared memory is a file. When it is not a file, the line names restoring the declared memory. When it is a file, the existing line is kept. The P2-first `[layer1-freeze]` amendment covers it by superseding C2b Amendment 1 preserved items 3 and 4 and C2b charter §17.6 "stderr text", for this line only. Everything else in A2 is unchanged.
+
 **Revision 3 (2026-10-17):** records the provenance of the D5 §5.1 owner approval (§3.4, C2, and the D5 contract), and splits H1–H6 into per-output-path probe requirements (§5).
 - C2 is applied through an owner-approved refinement of D5 §5.1, recorded in the D5 contract itself (§3.4).
 - The C4 wrapper limit is stated (§3.1).
