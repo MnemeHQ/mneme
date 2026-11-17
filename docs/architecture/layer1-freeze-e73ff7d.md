@@ -2733,7 +2733,7 @@ authorizes only the surface above.
 [#820](https://github.com/MnemeHQ/mneme/pull/820) at proposed commit
 `34092d1452b391be075414db9b2c9bd4a7bc315c`; contract PR
 [#610](https://github.com/MnemeHQ/mneme/pull/610) at commit
-`a31bf7e40540da6bb068a90c6356fb8962830529`; G0 evidence summary SHA-256
+`4e0e5192e2ea0272ad0fc2b1279b1159e4cd7382`; G0 evidence summary SHA-256
 `16f5d3e837613f53128028d3e419c384ea5e7ba5b7064d897111e2ac8b44710d`. The owner's
 approval must be recorded in PR
 [#821](https://github.com/MnemeHQ/mneme/pull/821); it is not inferred here.
