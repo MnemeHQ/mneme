@@ -14,6 +14,8 @@
 
 It states the ADR-033 C2a/C2b consequences of P2 precedence, and it requires an ADR-033 §4.1 erratum. Its gate is H1 only. B1, I3, §3.3 rows 3–5 and the H1–H6 gate become Phase 2, with every original prerequisite kept. Acceptance would authorize no code, test, live run, ADR change or `[layer1-freeze]` amendment.
 
+**Amendment A2-RT (PROPOSED, 2026-11-16; if accepted, the acceptance is recorded in the merging PR record and squash commit, as for A2 in #809):** amends Amendment A2 for exactly one change, decided in the [remediation-text decision](2026-11-16-dg1f-t08-d5-p2-first-remediation-text-decision.md) (option O4). It adds to §5.2.6's "authorize only" list, and to what §5.2.8 permits, the following: the `MEMORY_PATH_MISMATCH` remediation line is chosen at emit time from whether the declared memory is a file. When it is not a file, the line names restoring the declared memory, with the exact text fixed in that decision. When it is a file, the existing line is kept. The P2-first `[layer1-freeze]` amendment covers it by superseding C2b Amendment 1 preserved items 3 and 4 and C2b charter §17.6 "stderr text", for this line only. Everything else in A2 is unchanged.
+
 **Revision 3 (2026-10-17):** records the provenance of the D5 §5.1 owner approval (§3.4, C2, and the D5 contract), and splits H1–H6 into per-output-path probe requirements (§5).
 - C2 is applied through an owner-approved refinement of D5 §5.1, recorded in the D5 contract itself (§3.4).
 - The C4 wrapper limit is stated (§3.1).
@@ -371,6 +373,7 @@ A separate `[layer1-freeze]` P2-first amendment PR, under Amendment Procedure §
     - preserved item 7 (Bash, SessionStart and Stop behavior);
     - its authorized "exactly one … object with the fixed 17.2 text", which gains the coexisting H1a notice;
 - **leave unauthorized** everything else in §10, including B1, I3 and rows 3–5.
+- **also authorize, under Amendment A2-RT:** the `MEMORY_PATH_MISMATCH` remediation line chosen at emit time (header note A2-RT; remediation-text decision, option O4).
 - **confirm the list is exhaustive.** The later freeze amendments (DG1B1, #260, G1, G2-1, S1, C4, R0) were checked for preserved memory-selection items by keyword only. The freeze PR must confirm that none of them preserves memory selection.
 
 The implementation PR carries a subset of §7, plus P2-first cases:
@@ -417,6 +420,8 @@ The full canonical suite must run.
 Each step needs the previous one merged and its own go-ahead. Phase 2 then continues with §12 steps 3–6, rebased as §5.2.5 states. The H2–H6 probes proceed by adoption. As each passes, it extends item 2 under §5.2.5's extension rule.
 
 ### 5.2.8 Not authorized by A2
+
+Amendment A2-RT (header) permits exactly one diagnostic change beyond this list: the `MEMORY_PATH_MISMATCH` remediation line (option O4).
 
 - code, tests, live runs, the ADR-033 erratum or the P2-first freeze amendment;
 - B1, I3 or rows 3–5;

@@ -13,7 +13,8 @@ scope: enforcement.availability_policy
 merge-gate semantics included. Acceptance confers **no** implementation
 authority, implementation charter or Layer 1 amendment.
 **Date:** 2026-10-13 (revised and accepted 2026-10-20)
-**Erratum:** 2026-11-16, `MNEME_MEMORY` precedence under T-08 P2-first (§4.1).
+**Erratum:** 2026-11-16, `MNEME_MEMORY` precedence under T-08 P2-first (§4.1);
+revised 2026-11-16 for the `MEMORY_PATH_MISMATCH` remediation text.
 Takes effect when the P2-first implementation merges; see
 [Erratum](#erratum-2026-11-16-mneme_memory-precedence-under-t-08-p2-first)
 **Deciders:** Theo Valmis
@@ -551,9 +552,10 @@ implementation.
     row 2 selects the discovered memory.
   - It still occurs in row 7 and row 8.
   - It is replaced by `MEMORY_PATH_MISMATCH` in the layout above.
-- **Remediation text.** The §4.4 matrix, the mismatch rule, the refusal
-  semantics and the remediation strings are unchanged. Two strings become
-  **insufficient**:
+- **Remediation text.** The §4.4 matrix, the mismatch rule and the refusal
+  semantics are unchanged. The `MEMORY_PATH_MISMATCH` remediation string is
+  changed by the decision recorded below. Without that change, the string
+  would be **insufficient** in two layouts:
   - **In row 6** the declared memory is always missing. Following "unset
     MNEME_MEMORY or point it at the declared .mneme/project_memory.json" leads
     to row 7 or row 8, and so to a `MEMORY_MISSING` refusal. That refusal's
@@ -561,9 +563,20 @@ implementation.
     needed.
   - **In the ancestor layout,** "unset MNEME_MEMORY …" changes nothing.
     Restoring the declared memory is the fix.
-  - Changing those strings would be an ADR-033 behavior change, and it is out
-    of scope here. **Open item:** the P2-first freeze amendment and the
-    implementation PR must decide whether to revise them.
+  - Changing that string is an ADR-033 behavior change at the diagnostic
+    level (§7).
+  - The same line is already wrong today when `MNEME_MEMORY` is unset, the
+    declared memory is missing and an ancestor memory exists.
+  - **Decision (revision, 2026-11-16):** see the
+    [remediation-text decision](../plans/2026-11-16-dg1f-t08-d5-p2-first-remediation-text-decision.md), option O4. The
+    `MEMORY_PATH_MISMATCH` remediation is chosen at emit time:
+    - when the declared memory is not a file, it reads "restore
+      .mneme/project_memory.json from the baseline branch, replacing anything
+      else at that path; while it is not a file, another memory is selected";
+    - otherwise, the existing line is kept.
+  - It lands with the P2-first implementation, under D5+P2 charter Amendment
+    A2-RT and the P2-first `[layer1-freeze]` amendment. Category, routing,
+    exit codes, the SS-3 line and the proceed sentence are unchanged.
 - **§4.3 default-open parity.** "Identical to current behavior" refers, once
   P2-first merges, to post-P2-first behavior. That includes the H1a notice and
   the row-2 selection change. Charter §5.2.6 supersedes the C2a, C2b and C2b
@@ -581,7 +594,8 @@ implementation.
 
 - Architecture A: the §4.0 threat model and verification trigger, and the
   binding of repository identity and exact effective memory path.
-- §4.2 to §4.5, apart from the §4.3 note above, and §5 to §7.
+- §4.2 to §4.5, apart from the §4.3 note above, and §5 to §7, apart from the
+  §7-level remediation change above.
 - ADR-030's sole canonical decision authority.
 - The "memory selection is a precondition" point in §4.1. Discovery start
   points are unchanged. Bash, SessionStart and Stop still select from `cwd`,
