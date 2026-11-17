@@ -2632,7 +2632,7 @@ stay unchanged, except for the items superseded above.
 ## Amendment — authorize the OpenCode S1 pre-mutation surface (2026-11-17)
 
 **Status:** PROPOSED — not authorization. It takes effect only on the squash merge
-of the `[layer1-freeze]` PR that adds this section, with the owner's approval
+of PR [#821](https://github.com/MnemeHQ/mneme/pull/821), with the owner's approval
 recorded in that PR, and only after the S1 implementation charter
 [PR #820](https://github.com/MnemeHQ/mneme/pull/820) is accepted and merged. It
 authorizes exactly one new host surface and nothing else. It is not authorization
@@ -2732,7 +2732,8 @@ above.
 [#610](https://github.com/MnemeHQ/mneme/pull/610) at commit
 `a31bf7e40540da6bb068a90c6356fb8962830529`; G0 evidence summary SHA-256
 `16f5d3e837613f53128028d3e419c384ea5e7ba5b7064d897111e2ac8b44710d`. The owner's
-approval must be recorded in the `[layer1-freeze]` PR; it is not inferred here.
+approval must be recorded in PR
+[#821](https://github.com/MnemeHQ/mneme/pull/821); it is not inferred here.
 
 ---
 
