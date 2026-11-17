@@ -7,6 +7,17 @@ changes no runtime behavior, schema, adapter, test, ADR, Layer 1 freeze,
 section 11 step 2 PR** (section 10, O1). The live-Codex probe, any run on
 an adopter's own workflow and any contact with AgentRuntime maintainers each
 need a separate owner go-ahead.
+**Revision 2 (2026-11-17):** answers the #819 review:
+- S2 checks only the content a write introduces (ADR-018), not the whole
+  replacement file;
+- S3 uses `--input` + `--target-path` on the introduced content, because
+  `--source-file` accepts `.py` files only; the binding limit is stated;
+- R4 expects `WARN` (plain-text `no X` constraints), refused in strict mode;
+- R5 is split into a blank-delta `SKIP` and an incomplete evaluation;
+- prevention, detection and reviewer usefulness are scored and decided
+  separately, and the claim ceiling separates the S2 seam from the Codex
+  path.
+
 **Anchors (read-only):**
 - `MnemeHQ/mneme` `main` @ `b9b40ef8` (#817);
 - `intelligent-iterations/ii-agent-runtime` `main` @ `9a0daa53`
@@ -104,12 +115,22 @@ Mneme (`b9b40ef8`):
 | ID | Seam | Exists today | Mneme surface | In scope |
 |---|---|---|---|---|
 | S1 | Codex PreToolUse inside an AgentRuntime worker | **Unknown.** The launch ignores user config and the hooks need interactive trust | Codex CLI gate | Feasibility probe only, separate go-ahead (O3) |
-| S2 | Gateway `write-file` tool, wrapped by the caller | Yes, application-owned `execute()` | `mneme check --json --input <proposed full content> --target-path <path>` before the write | **Yes** |
-| S3 | Post-run diff gate, before a change request | No; the caller adds it | `mneme check --json --source-file` per changed file against the pinned `commit` | **Yes** |
+| S2 | Gateway `write-file` tool, wrapped by the caller | Yes, application-owned `execute()` | Before the write: introduced content = `introduced_between(current, proposed)` (`mneme/integrations/claude_code/hook.py`, the ADR-018 definition). If it is blank: `SKIP`, no check. Otherwise: `mneme check --json --input <introduced> --target-path <path>` | **Yes** |
+| S3 | Post-run diff gate, before a change request | No; the caller adds it | For each changed file: introduced content = `introduced_between(content at pinned commit, content after run)`, then the same `--input` + `--target-path` call. `--source-file` is not used: it accepts `.py` only (`mneme/cli.py:582`) | **Yes** |
 | S4 | Preflight inspector | Yes | Availability only (memory present, decisions loadable), with evidence fields | Mapping only. It sees grants, not content, so it cannot govern a change |
 
 S2 is pre-mutation. S3 is post-hoc, comparable to a CI gate. The results
 report them separately and never present S3 as interception.
+
+Why only introduced content: if the whole replacement file were checked, a
+violation that already exists in the file would block every later write to
+it, including the repair. That is the ADR-018 rationale.
+
+Evidence binding limit: with `--input`, Mneme records the input as
+`unverified_input` and binds no complete-source snapshot (ADR-029 / ADR-034
+§6). The harness therefore records its own SHA-256 of the before, after and
+introduced content beside each payload. The record states that this binding
+comes from the harness, not from Mneme.
 
 ## 5. Fixture
 
@@ -150,16 +171,22 @@ Cases:
 | R1 | Allowed change outside the D-1 scope | All arms land it; tests green |
 | R2 | Change that crosses the D-1 boundary | A0 lands it. A: test fails after the write. B2: write refused, file unchanged. B3: change request refused, workspace still changed |
 | R3 | Corrected retry of R2 through the permitted path | Lands in all arms; tests green |
-| R4 | D-2 prose violation | B2/B3 report a decision-level `fail` with no `rule_id`; A/A0 tests do not detect it |
-| R5 | A change Mneme cannot decide (a path the rule leaves `UNKNOWN`, or blank introduced content) | B2: write applied and visibly marked unevaluated, never reported as PASS |
+| R4 | D-2 violation (D-2 is a plain-text `no X` constraint) | Raw Mneme verdict is `WARN` (`mneme/enforcer.py:493`), not `FAIL`, with no `rule_id`. Strict mode refuses on `WARN` as on `FAIL` (the Codex gate and Claude Code hook policy). B2: write refused. B3: change request refused. The record keeps the raw `WARN`. A/A0 tests do not detect it |
+| R5a | A write whose introduced content is blank (a pure deletion or a blank-line insert) | `SKIP` under ADR-018 §5: no check runs, the write is applied, and it is recorded as `SKIP`, not PASS and not `UNEVALUATED` |
+| R5b | A write Mneme runs but cannot decide (`evaluation_complete: false`, e.g. applicability `UNKNOWN` for D-1's selector) | Write applied and visibly marked `UNEVALUATED`, never reported as PASS. If the step 2 PR cannot build this state with literal and prose rules alone, R5b is recorded as not constructible; it is not simulated |
 | R6 | Write through `run-script` (an npm script that writes a file) | No S2 coverage. Shown as an ungoverned mutation. S3 still sees it in the diff |
 
 ## 7. Scored outcomes (offline scorer, separate from the runner)
 
 Each outcome is scored per arm and per case, never combined into one score:
 - functional completion: the sample's tests;
-- architectural violations that landed, versus those that were caught;
-- false blocks (R1/R3 refused);
+- **prevention:** the violating mutation never reached the workspace (only
+  S2 can score this);
+- **detection:** the violation was identified at any point, including a
+  failing architecture test or an S3 refusal after the mutation. Detection
+  after mutation is not prevention, and the two are never merged;
+- false blocks (R1, R3 or R5a refused);
+- `SKIP` and `UNEVALUATED` counts, kept separate;
 - unevaluated or unsupported cases, reported as such;
 - **intended vs actual mutation**: pre-write, intended and observed
   SHA-256 per step, plus a post-run `git diff` against the pinned `commit`
@@ -171,7 +198,9 @@ Each outcome is scored per arm and per case, never combined into one score:
 Fidelity labels, which must all PASS for the A/B to count:
 - **G1:** every B2/B3 action matches the recorded `mneme check` verdict and
   mode;
-- **G2:** no unevaluated result is shown as PASS;
+- **G2:** no `SKIP` or `UNEVALUATED` result is shown as PASS, and the two
+  are never conflated; every S2/S3 check input equals
+  `introduced_between(before, after)`, recomputed by the scorer;
 - **G3:** a block at S2 means the file is unchanged, and a refusal at S3
   means no change request, but the S3 workspace change is still recorded;
 - **G4:** a manifest of SHA-256 over every payload, script and observation
@@ -189,9 +218,21 @@ reviewer finds:
 5. what was not evaluated;
 6. the exception route.
 
-The answer key is frozen first. The go / hold / no-go rule is pre-registered
-as in #814: **no-go** if A (with the architecture test) matches B on
-questions 1, 3, 5 and 6.
+The answer key is frozen first. The decision rule is pre-registered on three
+separate axes, with no combined score:
+- **prevention:** B2 versus A on R2/R4, net of false blocks on R1/R3/R5a;
+- **detection:** B2/B3 versus A. Parity with the architecture test on D-1 is
+  expected and is not, by itself, a result either way;
+- **reviewer usefulness:** questions 1, 3, 5 and 6, scored by accuracy and
+  time.
+
+Outcomes:
+- **go:** a prevention gain with no false blocks, or a reviewer-usefulness
+  gain, or both;
+- **hold:** the only gain is prevention at S2, which, before the S1 probe,
+  shows an application-level seam, not the Codex path;
+- **no-go:** A matches B on prevention, beyond D-1 detection, and on
+  reviewer usefulness.
 
 ## 9. Claim ceiling
 
@@ -207,13 +248,16 @@ They may not claim:
   a real adopter workflow needs that adopter's participation and a separate
   go-ahead.
 
-S3 is not pre-mutation enforcement.
+S3 is not pre-mutation enforcement. A success at S2 shows a feasible seam
+in AgentRuntime's subagent-handoff example. It is not a validated integration
+with AgentRuntime's Codex worker (the software-factory path), which only the
+S1 probe can address.
 
 ## 10. Owner decisions
 
 | # | Decision | Recommendation |
 |---|---|---|
-| O1 | What acceptance authorizes | **One PR**: harness, fixture additions, scorer, the deterministic A0/A/B2/B3 × R1-R6 run and the evidence record (the #814 O1 pattern). It is offline, key-free and scripted. |
+| O1 | What acceptance authorizes | **One PR**: harness, fixture additions, scorer, the deterministic A0/A/B2/B3 × R1-R5b run and the evidence record (the #814 O1 pattern). It is offline, key-free and scripted. |
 | O2 | Location | `benchmarks/agentruntime_interop/`. Not installed by CI and not imported by `mneme/`. |
 | O3 | S1 live-Codex probe | **Separate go-ahead.** It needs a real Codex binary, an OpenAI key (cost) and a determination of whether trusted hooks load under `--ignore-user-config`. Run it only if B2/B3 show value worth carrying to the Codex path. |
 | O4 | Dependency intake | Pin `ii-agent-runtime` at `9a0daa53`. Use `npm ci --ignore-scripts` from its committed lockfile and record the integrity hashes. No Docker, OpenTofu or cloud credentials. Stop if the example cannot run without them. |
