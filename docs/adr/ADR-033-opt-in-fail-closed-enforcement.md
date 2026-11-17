@@ -13,6 +13,9 @@ scope: enforcement.availability_policy
 merge-gate semantics included. Acceptance confers **no** implementation
 authority, implementation charter or Layer 1 amendment.
 **Date:** 2026-10-13 (revised and accepted 2026-10-20)
+**Erratum:** 2026-11-16, `MNEME_MEMORY` precedence under T-08 P2-first (§4.1).
+Takes effect when the P2-first implementation merges; see
+[Erratum](#erratum-2026-11-16-mneme_memory-precedence-under-t-08-p2-first)
 **Deciders:** Theo Valmis
 **Charter:** none yet. The earlier bundled C0 charter was removed as stale. A
 bounded implementation charter, with its `[layer1-freeze]` amendment, is a
@@ -221,7 +224,9 @@ amendment.
   surface this ADR covers. It did not change `MNEME_MEMORY`, which still takes
   precedence in `find_memory`; an override pointing at other memory (T-08 V5)
   is handled only by the mismatch rule above, and only when authorization is
-  verified. Other hook seams (Bash, SessionStart, Stop) still select from
+  verified. (Superseded on the merge of the T-08 P2-first implementation: see
+  the [2026-11-16 erratum](#erratum-2026-11-16-mneme_memory-precedence-under-t-08-p2-first).)
+  Other hook seams (Bash, SessionStart, Stop) still select from
   `cwd` and stay outside this contract until their T-08 slices land.
 - The concrete schema, enrollment command and verifier belong to a **future
   bounded charter**, which must preserve these invariants.
@@ -467,6 +472,77 @@ different trust boundary.
 Every behavioral slice requires its own reviewed PR and tests; no direct writes
 to `main` (ADR-022).
 
+## Erratum (2026-11-16): `MNEME_MEMORY` precedence under T-08 P2-first
+
+**Defect (prospective).** §4.1 makes two statements:
+- `MNEME_MEMORY` "still takes precedence in `find_memory`";
+- an override pointing at other memory (T-08 V5) "is handled only by the
+  mismatch rule above, and only when authorization is verified".
+
+Both are true at `84ee88b7`. Both become false when the implementation of the
+accepted T-08 D5+P2 charter
+[Amendment A2](../plans/2026-10-17-t08-d5-p2-memory-resolution-charter.md)
+lands. A2 (P2-first, charter §5.2; #809) applies the D6/Q2 P2 precedence rule
+on today's walk. Charter §5.2.7 step 2 requires this erratum before that
+implementation.
+
+**Effective date.** This erratum takes effect when the P2-first implementation
+PR merges. Until then, §4.1 describes the shipped behavior and stays
+authoritative. The erratum changes no code and no behavior.
+
+**Correction (from that point on).**
+
+- `MNEME_MEMORY` no longer takes precedence over a memory that today's walk
+  discovers from the edited target (charter §5.2.2, rows 1 and 2). An override
+  that differs from a discovered memory, or names a missing file, is ignored.
+  The discovered memory is then the effective memory.
+- `MNEME_MEMORY` is still the effective memory when the walk discovers none and
+  it names an existing file (row 6: the override fills an absence).
+- T-08 V5 is therefore handled by P2 precedence in every authorization state,
+  not only by the mismatch rule.
+
+**Consequences for this ADR's contract** (charter §5.2.3):
+
+- **SS-3 through `MNEME_MEMORY`** occurs only in row 6, where no memory is
+  discovered and the override names a memory other than the bound path. It no
+  longer occurs beside a discovered memory. SS-3 through parent-directory
+  discovery is unaffected. The charter's §5.2.3 wording, "SS-3 through
+  `MNEME_MEMORY` becomes unreachable", holds beside a discovered memory. Its
+  own §5.2.6 test route through row 6 shows the remaining case.
+- **`MEMORY_MISSING` driven by a missing override** beside a discovered memory
+  no longer occurs, because row 2 selects the discovered memory.
+- **The §4.4 matrix, the mismatch rule, and the refusal and remediation
+  semantics are unchanged.** Only the cases in which `MNEME_MEMORY` reaches them
+  change. The `MEMORY_PATH_MISMATCH` remediation ("unset MNEME_MEMORY or point
+  it at the declared .mneme/project_memory.json") stays accurate for row 6.
+- **The §4.0 non-guarantee for `MNEME_MEMORY` set through project settings
+  `env`** (BP-6, T-07) is unchanged. P2-first narrows what such a setting can
+  do: it can fill an absence, but it can no longer replace a discovered memory.
+  This ADR still claims no protection against it.
+- **G3-1's `REFUSED_MEMORY_PATH_MISMATCH`** (#793) does not reproduce through
+  `MNEME_MEMORY` beside a discovered memory. The charter's G3 re-assessment
+  step records this (charter §5.2.7).
+
+**Unchanged.**
+
+- Architecture A: the §4.0 threat model and verification trigger, and the
+  binding of repository identity and exact effective memory path.
+- §4.2 to §4.5, and §5 to §7.
+- ADR-030's sole canonical decision authority.
+- The "memory selection is a precondition" point in §4.1. Discovery start
+  points are unchanged. Bash, SessionStart and Stop still select from `cwd`, and
+  this ADR's contract still covers direct writes only.
+
+**Implementation obligation (charter §5.2.6; not authorized here).**
+
+- The C2a, C2b and C2b Amendment 1 tests that set `MNEME_MEMORY` beside a
+  declared memory are rewritten to reach the same outcome, either through
+  parent-directory discovery or through row 6.
+- A new test asserts that `MNEME_MEMORY` alone, beside a discovered memory, no
+  longer produces SS-3.
+
+---
+
 ## Related
 
 - Core #260 / merged PR #484: verdict coherence
@@ -475,7 +551,7 @@ to `main` (ADR-022).
 - DG1F `AUTHORIZATION_UNVERIFIABLE` architecture comparison and adversarial spec,
   merged PR #513 (`docs/plans/2026-10-15-dg1f-authorization-unverifiable-adversarial-spec.md`)
 - T-08 memory selection: evidence #513, slice 1 #517 (`2a445142`), live re-probe
-  #518
+  #518; D5+P2 charter Amendment A2 (P2-first), #809 (`84ee88b7`)
 - DG1F G2 CI-consumer coverage audit
 - CI1 (#540): CI1.4 record, C1 and V11 Option A lab results, production-readiness
   reconciliation (#569)
