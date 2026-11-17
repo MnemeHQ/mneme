@@ -11,9 +11,7 @@ BASE=$(cd "$(dirname "$0")" && pwd)
 . "$BASE/pins.env"
 NAME=$1
 [ -n "${P2F_LIVE:-}" ] && { echo "ABORT: P2F_LIVE is set; the live root is fixed"; exit 1; }
-if [ "${P2F_SELFTEST:-}" != 1 ] && [ -n "${CLAUDECODE:-}" ]; then
-  echo "ABORT: CLAUDECODE set (see preflight.sh)"; exit 1
-fi
+[ -n "${CLAUDECODE:-}" ] && { echo "ABORT: CLAUDECODE set (see preflight.sh)"; exit 1; }
 [ "${DISABLE_AUTOUPDATER:-}" = 1 ] || { echo "ABORT: DISABLE_AUTOUPDATER is not 1"; exit 1; }
 
 # name -> A kind | override | topology | edit | planted marker
@@ -34,9 +32,10 @@ case "$NAME" in
 esac
 [ "$(cygpath -w "$LIVE")" = 'C:\dev\t08-p2first-live' ] || { echo "ABORT: live root is not C:\\dev\\t08-p2first-live"; exit 1; }
 P="$LIVE/$NAME"
-# The only recursive deletion: guarded (allowlist, pinned root, no reparse points).
-"$PY" -I "$BASE/safe_rmtree.py" delete "$NAME" || { echo "ABORT: guarded delete refused"; exit 1; }
-[ -e "$P" ] && { echo "ABORT: $P still exists after guarded delete"; exit 1; }
+# No deletion: an existing probe directory is earlier evidence and is never
+# replaced (no re-rolling). Archive the live root to run again.
+"$PY" -I "$BASE/safe_rmtree.py" check-root || { echo "ABORT: disposable root unsafe"; exit 1; }
+[ -e "$P" ] && { echo "ABORT: $P already exists (earlier evidence is kept; archive the live root)"; exit 1; }
 mkdir -p "$P"
 WRAP_W=$(cygpath -w "$BASE/hookwrap_v4.py")
 MARKARG=(); [ "$MARK" = 1 ] && MARKARG=(--planted-marker)
@@ -67,14 +66,19 @@ snap() {  # $1 = BEFORE|AFTER
   echo "$1 target               $(h "$TARGET_U")"
   echo "$1 A/memory             $(h "$AU/.mneme/project_memory.json")"
   echo "$1 A/.claude/settings   $(h "$AU/.claude/settings.json")"
+  echo "$1 A/.claude/local      $(h "$AU/.claude/settings.local.json")"
   echo "$1 B/app.py             $(h "$BU/app.py")"
   echo "$1 B/memory             $(h "$BU/.mneme/project_memory.json")"
   echo "$1 B/.claude/settings   $(h "$BU/.claude/settings.json")"
+  echo "$1 B/.claude/local      $(h "$BU/.claude/settings.local.json")"
   echo "$1 A/HEAD               $(git -C "$AU" rev-parse HEAD)"
   echo "$1 B/HEAD               $(git -C "$BU" rev-parse HEAD)"
 }
 
-unset MNEME_HOOK_MODE CLAUDE_PLUGIN_OPTION_MODE MNEME_MEMORY
+# Every MNEME_* variable is removed, not only the three the hook reads, so no
+# operator setting (for example MNEME_HOOK_CHECK_TRANSPORT) reaches the hook.
+for _v in $(env | cut -d= -f1 | grep '^MNEME_' || true); do unset "$_v"; done
+unset CLAUDE_PLUGIN_OPTION_MODE
 export T08_MNEME_SRC="$MNEME_SRC_W" T08_LOG="$(cygpath -w "$OUT/hook-log.jsonl")"
 
 if [ "$EDIT" = forbidden ]; then NEW='import psycopg2'; else NEW='import sys'; fi
@@ -95,7 +99,9 @@ CV=$(claude --version | tr -d '\r')
   echo "mneme_src=$MNEME_SRC_W head=$(git -C "$MNEME_SRC_U" rev-parse HEAD) mneme_dir_equals_$PIN_MNEME_BASE=$(git -C "$MNEME_SRC_U" diff --quiet "$PIN_MNEME_BASE" -- mneme/ && echo yes || echo no)"
   echo "python=$PY"
   echo "claude_bin=$(command -v claude)"
-  [ "${P2F_SELFTEST:-}" = 1 ] && echo "SELFTEST=1 (stub claude; NOT live evidence)"
+  echo "override_kind=$OVR"
+  echo "mneme_src_w=$MNEME_SRC_W"
+  echo "mneme_dir_equals_pin=$(git -C "$MNEME_SRC_U" diff --quiet "$PIN_MNEME_BASE" -- mneme/ && echo yes || echo no)"
   echo "setting_sources=$SOURCES"
   echo "session_dir=$SESS_W"
   echo "added_dir=$([ "$TOPO" = r4 ] && echo "$A" || echo none)"

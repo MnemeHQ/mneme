@@ -42,17 +42,13 @@ for v in MNEME_MEMORY MNEME_HOOK_MODE CLAUDE_PLUGIN_OPTION_MODE; do
   [ -n "${!v:-}" ] && say "note: $v is set in your shell (runners unset it per probe)"
 done
 
-# Guards: never nested inside a Claude Code session; never a redirected live root.
-# P2F_SELFTEST=1 (stub `claude`, not Claude Code) relaxes only the CLAUDECODE
-# guard and marks the run invalid as evidence. P2F_LIVE is never honored.
+# Guards: never nested inside a Claude Code session; never a redirected live
+# root. There is no self-test mode: the live root only ever holds a real run.
 [ -n "${P2F_LIVE:-}" ] && bad "P2F_LIVE is set; the live root is fixed (no override). Run: unset P2F_LIVE"
-if [ "${P2F_SELFTEST:-}" = 1 ]; then
-  say "SELF-TEST MODE (P2F_SELFTEST=1): output is NOT live evidence"
-else
-  [ -n "${CLAUDECODE:-}" ] && bad "CLAUDECODE is set: this shell is inside a Claude Code session; run from your own terminal"
-fi
+[ -n "${CLAUDECODE:-}" ] && bad "CLAUDECODE is set: this shell is inside a Claude Code session; run from your own terminal"
+[ "$LIVE" = /c/dev/t08-p2first-live ] || bad "LIVE '$LIVE' is not the pinned live root"
 n=$(env | cut -d= -f1 | grep -c '^MNEME_' || true)
-say "MNEME_* variables in launching shell: $n (names/values not printed; the hook log records values only for MNEME_MEMORY, MNEME_HOOK_MODE)"
+say "MNEME_* variables in launching shell: $n (every probe unsets all of them before its session)"
 say "claude binary: $(command -v claude)"
 say "python: $("$PY" -I -c 'import sys; print(sys.version.split()[0])' | tr -d '\r')"
 

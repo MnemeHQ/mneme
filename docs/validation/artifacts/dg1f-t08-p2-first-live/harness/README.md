@@ -19,11 +19,21 @@ evidence PR and any claim from it each need the owner's separate go-ahead.
 
 It reuses the D6 C2 harness
 (`../../dg1f-t08-d6-c2-mneme-memory-live/harness/`) with these changes:
-- **Pins:** the H1/A2 host (Claude Code `2.1.310`, `--model claude-opus-5-5`,
-  `DISABLE_AUTOUPDATER=1`), and hook source `mneme/` equal to `59309fe7`.
+- **Pins:** the H1/A2 host and run conditions: Claude Code `2.1.310`,
+  `--model claude-opus-5-5`, `DISABLE_AUTOUPDATER=1`, setting sources
+  `project` only (charter §5.2.4 item 2). The hook source `mneme/` must equal
+  `59309fe7`. `pins.local.env` may set only `MNEME_SRC_W`, `MNEME_SRC_U` and
+  `PY`; any other change aborts (the H1 guard).
 - **`hookwrap_v4.py`:** records the hook's `resolve_memory` selections (path,
   source, reason, walk) instead of `find_memory` calls.
-- **Probes:** three new ones, below, plus a classifier with expectations.
+- **Probes:** two new ones, below, plus a classifier with expectations. The
+  D6 C2 R2 counterfactual (repo A permissive) is dropped: under P2-first the
+  `T08-DEC` refusals in every override probe already attribute the outcome to
+  A's memory, and R0 is the positive control.
+- **No re-rolling:** probes never delete a probe directory. A batch writes
+  `P2F_STARTED` before its first probe and refuses to start if any earlier
+  batch file exists, so an aborted or failed batch is kept and the live root
+  must be archived before another run. There is no self-test mode.
 - **Leak scan:** also catches Claude Code's encoded project ids (`C--dev`).
 
 ## Probes
@@ -57,16 +67,26 @@ For each probe, the classifier looks at every PreToolUse
 one. Every one must have:
 - repo A's memory as the selection path, with the expected `reason` and
   `walk == "unbounded"`;
+- the hook module loaded from the pinned source;
+- exactly the configured `MNEME_MEMORY` seen by the hook (none for R0), with
+  `is_file` False for v4 and True for v5, and no other `MNEME_*` variable;
 - the expected exit code;
 - the expected stdout: the notice in its probed shape, or empty;
-- on a refusal, `T08-DEC` in stderr.
+- the expected stderr: `T08-DEC` on a refusal; empty on the exit-0 edit (a
+  check that failed open would also exit 0 with the notice).
 
-The target file must also change, or not, as expected. The host version and
-the init-event model must equal the pins.
+The target must change, or not, as expected; every other snapshot (memories,
+settings, B's `app.py`) must be unchanged; the target content must match the
+edit. The host version, init-event model, setting sources and `mneme/` tree
+must equal the pins.
 
 Verdicts are `PASS`, `FAIL`, or `INCONCLUSIVE`. `INCONCLUSIVE` covers: the
-edit never attempted, a pin mismatch, a wrapper error, or a self-test run. The
-batch is `PASS` only if all seven probes are `PASS`.
+edit never attempted (flagged as an *ungoverned write* if the target changed
+anyway), a pin mismatch, a malformed hook-log line, missing observer fields,
+or a wrapper error. The batch is `PASS` only if all seven probes are `PASS`.
+
+**"Visible" means emitted by the hook.** The notice is graded in the hook's
+own output, which is what the shape-binding rule governs.
 
 **Informational only:** whether the notice text appears in the raw session
 stream. Delivery of this shape to the agent is H1's evidence (#808: H1a,
@@ -87,12 +107,16 @@ re-establish or extend it.
    ```
 
 The runner:
-- refuses to start if `C:\dev\t08-p2first-live\P2F_DONE` exists;
-- runs the preflight;
+- refuses to start if any earlier batch file exists in
+  `C:\dev\t08-p2first-live` (`P2F_STARTED`, `P2F_DONE`, the summary, the
+  classification or the log);
+- runs the preflight, records the harness HEAD and file hashes, and refuses a
+  harness directory with uncommitted changes;
+- writes `P2F_STARTED`;
 - runs the seven probes, aborting after the first if the init model differs;
-- classifies the batch;
-- writes `summary_p2f.md`, `classification_p2f.json` and `P2F_DONE` into the
-  live root.
+- classifies the batch, aborting (batch INCOMPLETE, evidence kept) if the
+  classifier fails or writes no summary;
+- writes `P2F_DONE` last.
 
 For the evidence PR, copy the redacted evidence with `collect_redacted.py`.
 Its leak scan must be clean.
@@ -103,14 +127,21 @@ Its leak scan must be clean.
 python -m pytest docs/validation/artifacts/dg1f-t08-p2-first-live/harness/selftest -q
 ```
 
-The self-tests run the wrapper around the real P2-first hook (refusal, notice
-and planted marker), plus probe setup, every classifier verdict, the
-allowlist guard and the leak scan. They never touch the live root.
+The self-tests cover:
+- the wrapper around the real P2-first hook: refusal, notice, planted
+  marker, the r4 topology (session in B) and a missing (v4) override;
+- probe setup;
+- each classifier check, with a FAIL or INCONCLUSIVE case for each;
+- the pins guard;
+- the runner guards (statically);
+- the allowlist and the leak scan.
+
+They never touch the live root.
 
 ## What a PASS would and would not establish
 
 **It would establish**, for Claude Code `2.1.310` with `claude-opus-5-5`,
-`acceptEdits`, project/local setting sources, headless, n = 1 per probe:
+`acceptEdits`, `project` setting sources, headless, n = 1 per probe:
 - at the Claude Code direct-write boundary, P2-first selects the repository's
   memory over a committed `MNEME_MEMORY` (both the sibling-repo and the
   own-repo channel, existing and missing override);
