@@ -16,7 +16,7 @@
 | Item | Value |
 |---|---|
 | Host | **Claude Code `2.1.310 (Claude Code)`** on Windows 11, `DISABLE_AUTOUPDATER=1`. Run by the operator from their own terminal, as the README directs (PowerShell launching Git Bash). Only "not nested" is enforced: the preflight refuses when `CLAUDECODE` is set. |
-| Invocation | `claude -p … --model claude-opus-5-5 --setting-sources project --permission-mode acceptEdits [--add-dir <repo_a>] --allowedTools Read Edit --output-format stream-json` (`run_p2f_probe.sh`). `--add-dir` is used in the r4 topology only. |
+| Invocation | `claude -p … --model claude-opus-5-5 --setting-sources project --permission-mode acceptEdits [--add-dir <repo_a>] --allowedTools Read Edit --output-format stream-json --verbose` (`run_p2f_probe.sh`). `--add-dir` is used in the r4 topology only. |
 | Model | `--model claude-opus-5-5`; the init event reports **`claude-opus-5-5`** in all seven probes. |
 | Setting sources | **`project`** only, for every probe (charter §5.2.4 item 2). |
 | Permission mode | **`acceptEdits`** |
