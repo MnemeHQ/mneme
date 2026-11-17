@@ -37,7 +37,7 @@ contains `59309fe7`, and the latest release, `v0.11.0`, predates it. Every
 
 `resolve_memory` reads `MNEME_MEMORY` from the process environment only
 (`memory_selection.py:79`). It does not know which settings channel set it.
-When the walk from the edited file finds a memory, that memory is selected:
+When the walk finds a memory, that memory is selected. Direct writes start the walk at the edited file; Bash, SessionStart and Stop start at the session `cwd` (§4). The selection is:
 - `DISCOVERED` when there is no override, or the override is the same file;
 - otherwise `OVERRIDE_IGNORED` (charter row 2).
 
@@ -79,9 +79,15 @@ Charter §5.2.1 names G3-2 as "the same defect" that row 2 fixes.
   - `P2F-V5`: the r4 topology.
 
   In both, the hook selected A's memory (`OVERRIDE_IGNORED`), refused the
-  forbidden edit with `T08-DEC` (exit 2), and left the target unchanged. This
-  is the G3-2 pattern in an unenrolled repository with its own memory. The
-  only differences are the channel and the fixture.
+  forbidden edit with `T08-DEC` (exit 2), and left the target unchanged.
+  `P2F-V5-own` is the close analogue of G3-2: an unenrolled repository with its
+  own memory, redirected by its own settings. `P2F-V5` is a sibling-repository
+  layout (session and `env` in B), not the G3-2 pattern. Several conditions
+  still differ from G3-2:
+  - the channel (C2 committed `settings.json`, not C4 `settings.local.json`);
+  - the setting sources (`project`, not `project,local`);
+  - the fixture and the decision under test (`T08-DEC`, not `C3-DEC`);
+  - the hook wrapper (`hookwrap_v4`, not the C3 wrapper).
 
 **Why it is not `PASS`.** #818 did not run under G3-2's own conditions:
 - channel C4, with setting sources `project,local`;
@@ -111,7 +117,8 @@ memory.
 disk, so the walk finds it, and row 2 selects it. `memory_mismatch` is
 therefore false, and the `MEMORY_PATH_MISMATCH` refusal **does not reproduce
 through `MNEME_MEMORY`** (charter §5.2.3; ADR-033 erratum #810/#811). The edit
-is instead checked against the declared memory, where it is forbidden.
+is instead checked against the declared memory. That memory forbids the edit,
+which rests on #793's replay (`C3-DEC`), not on a live evaluation.
 
 **Evidence:**
 - **Offline:**
@@ -127,12 +134,18 @@ label is history; it is neither upgraded nor invalidated.
 
 ### 3.3 Finding C: observation and replay stay separate
 
-**Grade: `PASS`** (unchanged method, now also met by #818).
+**Grade: `MET` (method finding; the §3 scale does not apply).** This is not
+a defect that P2-first resolves.
 
 #793 kept the observed items (selection, checker result, availability, host
-outcome) apart from the replay. #818 observed selection, exit code, stderr
-(`T08-DEC`) and the host outcome directly, with no replay. This record keeps
-the same separation: §3.1 and §3.2 say which statements are inferred.
+outcome) apart from the replay. That still holds:
+- G3's own claim that the edit was forbidden for its repository still rests
+  on replay alone.
+- #818 observed selection, exit code, stderr (`T08-DEC`) and the host outcome
+  directly, with no replay, for its own probes only.
+
+This record keeps the same separation: §3.1 and §3.2 say which statements are
+inferred.
 
 ## 4. Remaining gaps
 
@@ -146,8 +159,16 @@ the same separation: §3.1 and §3.2 say which statements are inferred.
 - Rows 3–5, which govern an override that equals or conflicts with a shadowed memory, cannot occur until Phase 2.
 
 **The override still governs where nothing is walked.**
-- **Row 6:** with no memory on the walk, `MNEME_MEMORY` still selects any existing file (`OVERRIDE_FILLS_ABSENCE`). A repository with no memory of its own can still be evaluated against a foreign one. It has no own decisions for that to contradict. SS-3 refusal for enrolled repositories applies here.
+- **Row 6: a remaining wrong-source PASS route.** With no memory on the walk, `MNEME_MEMORY` still selects any existing file (`OVERRIDE_FILLS_ABSENCE`).
+  - **Unenrolled repositories:** if the repository's memory is deleted or absent, a foreign permissive memory still yields a complete PASS. This is the G3-2 shape without a walked memory, and it falls inside G3's definition ("missing local declaration … never an authoritative PASS").
+  - **Enrolled repositories:** only `AUTHORIZED` refuses (SS-3, `test_h7`). `UNVERIFIABLE` is reported but not refused (`test_h12`), and `REVOKED` and `VERIFIED_ABSENT` proceed.
 - **Row 7:** a missing override with no walked memory selects nothing (`OVERRIDE_MISSING`). The H1a notice reports it, but nothing governs.
+
+**Start points are not unified (D1/D2/D7; charter §5.2.3 "Not removed").**
+- Every consumer uses the resolver, but only direct writes start the walk at the edited file (`hook.py:896-910`).
+- Bash, SessionStart and Stop start at the session `cwd` (`hook.py:1617`, `:1680`, `:1831`).
+- So a Bash write into repository A from a `cwd` in repository B selects B's memory. `test_hook_target_memory_resolution.py::test_bash_heredoc_still_selects_memory_from_cwd` pins this.
+- This is a wrong-source route that needs no `MNEME_MEMORY`, and P2-first does not change it.
 
 **Host paths not live-verified under P2-first.**
 - **`Write` and `MultiEdit`:** H1a is authorized for Edit, Write, MultiEdit and Bash, but live-verified only for Edit and Bash (#808). #818 probed Edit only.
@@ -167,8 +188,9 @@ the same separation: §3.1 and §3.2 say which statements are inferred.
 **G3: `PARTIAL`.** The status is unchanged; the bounded statement is updated.
 
 > **partial, bounded.** On `main` at `02c09871` (P2-first, unreleased), a
-> `MNEME_MEMORY` override no longer replaces or masks the memory found by
-> walking up from the edited file:
+> `MNEME_MEMORY` override no longer replaces or masks the walked memory. For
+> direct-write tools, that is the memory found by walking up from the edited
+> file; Bash, SessionStart and Stop walk from the session `cwd`.
 > - **Mechanism:** code and offline tests, for every channel.
 > - **Live:** observed on Claude Code `2.1.310` for the committed-settings channel C2, Edit only, n = 1 (#818).
 >
@@ -178,9 +200,10 @@ the same separation: §3.1 and §3.2 say which statements are inferred.
 > `MEMORY_PATH_MISMATCH` refusal is superseded by evaluation against the
 > declared memory; this is offline-tested only.
 >
-> Protection still depends on the walk finding the right memory. There is no
-> boundary binding (Phase 2), an ancestor or planted memory wins, and
-> `MNEME_MEMORY` still governs where no memory is walked. Hook removal,
+> Protection still depends on the walk finding the right memory:
+> - there is no boundary binding (Phase 2), so an ancestor or planted memory wins;
+> - start points are not unified;
+> - `MNEME_MEMORY` still governs where no memory is walked, which leaves a wrong-source PASS route for a repository whose memory is absent. Hook removal,
 > configuration changes and administrator bypass are outside this control's
 > current evidence.
 
