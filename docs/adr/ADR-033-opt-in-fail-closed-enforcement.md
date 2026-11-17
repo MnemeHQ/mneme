@@ -481,9 +481,9 @@ to `main` (ADR-022).
   mismatch rule above, and only when authorization is verified".
 
 Both are true at `84ee88b7`. The second is true as to **refusal** only: the
-SS-3 stderr line and the C2b Amendment 1 proceed sentence are emitted under
-every authorization state when a declaration exists
-(`availability.py:250`, `:280-281`).
+SS-3 stderr line is emitted under every authorization state when a
+declaration exists (`availability.py:250`, `:280-281`), and the C2b Amendment 1
+proceed sentence under `AUTHORIZATION_UNVERIFIABLE` (`:260-261`).
 
 Both become false when the implementation of T-08 D5+P2 charter
 [Amendment A2](../plans/2026-10-17-t08-d5-p2-memory-resolution-charter.md)
@@ -521,7 +521,7 @@ implementation.
 **Consequences for this ADR's contract.** These were checked against
 `availability.py` and `hook.py` at `84ee88b7`. With a valid declaration at
 `R`, the declaration walk and the memory walk start from the same point. So if
-`R/.mneme/project_memory.json` exists, the memory walk finds it, and
+`R/.mneme/project_memory.json` is a file, the memory walk finds it, and
 `MNEME_MEMORY` matters only once the declared memory is missing.
 
 - **SS-3 through `MNEME_MEMORY`** occurs only in row 6. There the declared
@@ -536,8 +536,7 @@ implementation.
   - Today, discovery-driven SS-3 needs `MNEME_MEMORY` unset, because
     `find_memory` checks the environment first (`hook.py:202-206`).
   - Under P2-first the walk always runs. Wherever the declared memory is
-    missing and another memory sits on the walk (an ancestor, or a nested
-    memory), the result is `MEMORY_PATH_MISMATCH`, whatever `MNEME_MEMORY` is
+    missing and an ancestor memory sits on the walk, the result is `MEMORY_PATH_MISMATCH`, whatever `MNEME_MEMORY` is
     set to. `emit_availability` checks mismatch before missing memory
     (`availability.py:193-196`).
   - Example: authorization is AUTHORIZED, `R/.mneme/project_memory.json` has
