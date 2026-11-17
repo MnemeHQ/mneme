@@ -1,0 +1,20 @@
+=== run_c3_batch.sh G3 1 --recheck ===
+[preflight] pins.local.env sha256: 2f5c6f1c761ba5100efa5fa1773d4590fd9a41ebdd634691ada2762b91395056
+[preflight] claude: 2.1.310 (Claude Code)
+[preflight] DISABLE_AUTOUPDATER=1 (G3 charter O2)
+[preflight] pin set: G3 (mneme base 1575008772128c53c38e7a16b960c05cd5546bdd, claude '2.1.310 (Claude Code)')
+[preflight] mneme_src HEAD: dde40958d02fcddc70fb25fa471a71f259290a0c
+[preflight] mneme/ (incl. working tree) identical to 1575008772128c53c38e7a16b960c05cd5546bdd
+[preflight] hook module: <MNEME_SRC>\mneme\integrations\claude_code\hook.py
+[preflight] MNEME_* variables in launching shell: 0 (runners unset them per probe)
+[preflight] git: git version 2.47.1.windows.2
+[preflight] python: 3.12.10
+[preflight] os: MINGW64_NT-10.0-26300 <HOST> 3.5.4-395fda67.x86_64 2024-11-25 09:49 UTC x86_64 Msys
+[preflight] live root: <LIVE>
+[preflight] fixture: https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture
+[preflight] model pin (passed as --model, checked in each init event): claude-opus-5-5
+[preflight] OK
+G3-2 Edit 1 headless RECORDED_FALSE_COMPLETE_PASS
+G3-1 Edit 1 headless REFUSED_MEMORY_PATH_MISMATCH
+BATCH_DONE G3
+STEP3_RESULT=exit_0

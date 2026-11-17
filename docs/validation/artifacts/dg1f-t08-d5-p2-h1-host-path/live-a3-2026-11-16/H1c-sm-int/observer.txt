@@ -1,0 +1,15 @@
+arm=H1c-sm-int
+mode=interactive
+pinset=A3
+model_flag=claude-opus-5-5
+claude_version=2.1.310 (Claude Code)
+pinned_model=claude-opus-5-5
+harness_head=c9480c11b3371975da2ec29fad71327b2f72d082
+sources=project
+settings_sha=56c36abdf690736452e88630187bd9e1bf272d882d70b77606fe08abec54c567
+prepared=2026-11-16T18:55:31Z
+recording_sha256=63278d67d414da00ff29e124de020409f3aab25440cf3a20aa291bc785b9f574
+recording_bytes=121920
+finished=2026-11-16T19:02:04Z
+notes_after=b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060
+transcript_collected=yes

@@ -1,0 +1,14 @@
+{
+  "reviewer": "Theo Valmis",
+  "recording_sha256": "63278d67d414da00ff29e124de020409f3aab25440cf3a20aa291bc785b9f574",
+  "notice_visible": true,
+  "frames": [
+    {
+      "file": "frames/f1.webp",
+      "t": "13:58 (taskbar clock)",
+      "sha256": "63278d67d414da00ff29e124de020409f3aab25440cf3a20aa291bc785b9f574",
+      "shows_nonce": true
+    }
+  ],
+  "review_note": "Owner's capture review, given in the operator chat on 2026-11-16 from the operator's own screenshots (owner decision: screenshots instead of a screen recording). Control: no MNEME-PROBE- token in either screenshot. Emitter: MNEME-PROBE-ac6914cfa1176045 in the 'Stop says:' line. Written to file by the agent; the reviewer is not the classifier."
+}

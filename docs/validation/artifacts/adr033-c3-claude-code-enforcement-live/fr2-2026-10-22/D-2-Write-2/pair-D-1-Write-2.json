@@ -1,0 +1,7 @@
+{
+  "diagnostic": "D-2-Write-2",
+  "control": "D-1-Write-2",
+  "rules": "R3 (#551)",
+  "label": "PAIR_OK",
+  "problems": []
+}

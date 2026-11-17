@@ -1,0 +1,3710 @@
+{
+  "schema": "mneme.cm01.b0m.verification/v1",
+  "generated_at": "2026-10-25T13:58:15.160Z",
+  "verification_status": "VERIFIED",
+  "original_verdict": "PASS",
+  "original_verdict_changed": false,
+  "baseline": "f8591102b2693379dabec9b5704862e194eca4ce",
+  "head": "f8591102b2693379dabec9b5704862e194eca4ce",
+  "canonical_evidence": {
+    "manifest": {
+      "measurements.json": "07d954a0896e7d197e547346c6b773a26c2dac937e83c909c5a8fc2e7d505797",
+      "raw/run1-T1-code-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run1-T1-code-harness.jsonl": "17353c0e141216408afcef7e02cc31e9f456a5b458f42dee3277c6050e595c0d",
+      "raw/run1-T1-code-transport.jsonl": "6ed8a86455cc314ef1639522d25c3cf806fc1550c1e70015bf25a602446abb73",
+      "raw/run1-T1-direct-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run1-T1-direct-harness.jsonl": "a460b11031db05ffc00e7ea14c6ca0374a8fba67e854cd366fad6a676cfa9093",
+      "raw/run1-T1-direct-transport.jsonl": "e2aaecd803e692512ce061d31f6ce4df7ad6cc22507d8d83729d067a824ccf92",
+      "raw/run1-T2-code-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run1-T2-code-harness.jsonl": "8439af5158bf82f0fc4802771e65712b3ea7e483cd4e22d75127c3cebe0c4ac0",
+      "raw/run1-T2-code-transport.jsonl": "914a5b47a927271fee46d7535f834821d3440492550db8e74cff37020d8695f0",
+      "raw/run1-T2-direct-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run1-T2-direct-harness.jsonl": "89c5d58f824d3ecaac4ddeb8a71fd5b8aa0cf47bbf37441197d0fff0388ffad6",
+      "raw/run1-T2-direct-transport.jsonl": "b5bacd76a6b861ac66db10b2e6189a593aa9ac507369f5b041571e6f357f124f",
+      "raw/run1-T3-code-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run1-T3-code-harness.jsonl": "3a698af0f15862f2186593ac6fa51872914834e3eba8ef2e9f2837a061febc12",
+      "raw/run1-T3-code-transport.jsonl": "efa9b0381616f0cdf2946c6d26f6500e227ae705cc4f5e33265789bcfa3e1a2a",
+      "raw/run1-T3-direct-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run1-T3-direct-harness.jsonl": "9ea8f39b1bb0660043e097349880be7fa9effe5b8cb11a14288f68365edbf037",
+      "raw/run1-T3-direct-transport.jsonl": "647e0b6474120043c6af6213944260352b650d691364d54827d89c2e7c721575",
+      "raw/run1-T4-code-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run1-T4-code-harness.jsonl": "7feab4e7d9ea25812f4837b7c331c05124b7ce75b467d29a2a22076fc29ac667",
+      "raw/run1-T4-code-transport.jsonl": "fee816074106ee9e8ac5504a5cd7adb64c55c2a997b1a257f16c9e6ebe4b31e0",
+      "raw/run1-T4-direct-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run1-T4-direct-harness.jsonl": "5b838367a4debbc1ba443996fa2fe6a967ba5e3031cc1573c32ba111e8013592",
+      "raw/run1-T4-direct-transport.jsonl": "d906096c696a25358587b5eec8d08bd512e4ce3db05c9c15a8b1023dbaa58f5b",
+      "raw/run1-T5-code-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run1-T5-code-harness.jsonl": "77b1ba0f8978843291e521b2a59d9f50233e6983acf2abd0b9b41c598774087e",
+      "raw/run1-T5-code-transport.jsonl": "2fb52e5fde830493d0543aaf918d668a560b9b0e7343294e2090771a86eac43f",
+      "raw/run1-T5-direct-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run1-T5-direct-harness.jsonl": "aab92f022484ea343575969e76ef88f150db7042f87ab1c747badaf8bb056f81",
+      "raw/run1-T5-direct-transport.jsonl": "ec3de06a2736e1f5b3fedbf02a5021934e486575647564c984df1c70ea1e320b",
+      "raw/run1-T6-code-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run1-T6-code-harness.jsonl": "c2afb3c6a2afbe37378eba5d6d6edb0dd425a8071ba10dea28d15a5cb49de7e3",
+      "raw/run1-T6-code-transport.jsonl": "b67dbdf4f242ae0f9950a044dd7ec2c5c3bd622104ead688427122d40107eb1c",
+      "raw/run1-T6-direct-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run1-T6-direct-harness.jsonl": "63149f683b8bc8b13384fd80e16dc802278b46f36dfa7593720aa5f3e4d0cab4",
+      "raw/run1-T6-direct-transport.jsonl": "ee549e6994cb2c8ed1feece0da3796e8ba32a9d8dcd9a5947725e1d003ee280c",
+      "raw/run1-T7-code-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run1-T7-code-harness.jsonl": "ffcea7b0a30125cfaae4bd2e2f944a1a72884b782bb55a0a2fa95a7f95d9f241",
+      "raw/run1-T7-code-transport.jsonl": "a93ae1153220f9d0ae5c5ea1f858e5dfc52bc0420b9610ac5b565cbda0a120b3",
+      "raw/run1-T7-direct-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run1-T7-direct-harness.jsonl": "3ab9195e3ec4bc0d9a913e8210a54f2e66b2b65e963d856410ccac55cab69993",
+      "raw/run1-T7-direct-transport.jsonl": "31f0fb2c43134a46e2bf067f745977318c12712646e4bd073c6b56f522b03910",
+      "raw/run1-T8-code-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run1-T8-code-harness.jsonl": "72ea23d92ac09d0ab60e23998786119ff2016066824529fed99be23f759e2683",
+      "raw/run1-T8-code-transport.jsonl": "abfd26291f8ccc4354c12eeeeabd1dc1cb12506285c9ab28c976e449fbd6b553",
+      "raw/run1-T8-direct-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run1-T8-direct-harness.jsonl": "61054ebfe5f758465fabcfbbec59987f7570ca0ebebb4d3213c46c567d99abac",
+      "raw/run1-T8-direct-transport.jsonl": "0e4c6be6d64e6c0141b1637df36826e110091caad9b12cd390fb5319149dcc24",
+      "raw/run1-cancellation-child-events.jsonl": "f141cd3adbe9fbf87fe29071ad647fc2b832efdec14ca7594d7710aa0af0db04",
+      "raw/run1-cancellation-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run1-cancellation-harness.jsonl": "fd3cf662b02d7d698a88176f10f3e58d3a5190e24e5f600a5cfe53b3b704ce50",
+      "raw/run1-cancellation-relay-stderr.log": "8855be099d1c7313f4a77e810d3a9d85a65984155925fbf48804230f6ff17b85",
+      "raw/run1-cancellation-relay.jsonl": "c54e9993818343c0c384931360b7365ce696367cba698668bdcdb93ee3bf8214",
+      "raw/run2-T1-code-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run2-T1-code-harness.jsonl": "0f0d88f46b3410af7257a197ab74306b98f453da68ada05649967a779ab888d6",
+      "raw/run2-T1-code-transport.jsonl": "759b7f19ab866d05d937441656d860f03f406492ad948d2e42d3fea752a3d765",
+      "raw/run2-T1-direct-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run2-T1-direct-harness.jsonl": "5c2614298f734a31b6e8a3ca8996a0ef5da367901da6b96e9949da8ebd0fba82",
+      "raw/run2-T1-direct-transport.jsonl": "42a54eb03883cb74fd037a74390f0850d8c1c316a34ac10032d5ee4439a95c7a",
+      "raw/run2-T2-code-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run2-T2-code-harness.jsonl": "9b07909bfb85b642fca4fbfd57d741b56274cc3b15eff924573d9457083e802d",
+      "raw/run2-T2-code-transport.jsonl": "342e40dcbcdcc8412dbb58278c074dfabd4b5aed91d3a10faebecaeec81e2398",
+      "raw/run2-T2-direct-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run2-T2-direct-harness.jsonl": "4dbb30d560a421ab5a9f6a7fab0ca56dcbbbe9a3000c9cd8b48da9dca5033df4",
+      "raw/run2-T2-direct-transport.jsonl": "0eaf052dfa710342f6d030e886eb6b58f4b80f1ace59ac1d1d7ff234f86c1b6c",
+      "raw/run2-T3-code-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run2-T3-code-harness.jsonl": "b9278b34238a30ca794c726ac822d84f7628b9fd597935cffe95377a0a4cbe66",
+      "raw/run2-T3-code-transport.jsonl": "86a0575b8075b5ea8ceb0f45eccd89a6dd3343aec8beaa9d115d85c5caa73997",
+      "raw/run2-T3-direct-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run2-T3-direct-harness.jsonl": "48138b80b97fc211397ef451e8a2c177a5ec404b61223c2b203cd6c32195e1a6",
+      "raw/run2-T3-direct-transport.jsonl": "d5c1d6ebefe0409315ddcbb6746140be4e3b0fa4d45fee9e454e5d1683e4a0a5",
+      "raw/run2-T4-code-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run2-T4-code-harness.jsonl": "08b28715d2eb02ee45657dd6e2b9c6f5b97ac0c79b94f5a31a1c59adc593483b",
+      "raw/run2-T4-code-transport.jsonl": "61e648dc45162e4a26b49946353b7b499eb5083a26ff66beceeb2e625fc892a1",
+      "raw/run2-T4-direct-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run2-T4-direct-harness.jsonl": "0ff71a6cb698e0ff067b1c48967b42947dac75e3b7e82149cd6fdd89c58bd68d",
+      "raw/run2-T4-direct-transport.jsonl": "f5f52352353b2b7fbd57880059f8f877def55afd60314f352b33808e0949889e",
+      "raw/run2-T5-code-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run2-T5-code-harness.jsonl": "b91fd2b3fa7edb00e6e063bcbce8c6032511700783872f0bf5fa007d46a200ea",
+      "raw/run2-T5-code-transport.jsonl": "db0d07b3e00f61b490c6619ddaf4267537177f290eea7cedeb503f79ec15e6f4",
+      "raw/run2-T5-direct-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run2-T5-direct-harness.jsonl": "3d6b6557cdd2e1a5b3e0ff08bee526b2b474ecd572c89a7313ea82d1c35ab87b",
+      "raw/run2-T5-direct-transport.jsonl": "db8f6d9d4fe86f247a3d5c6bd9a423ef1f0bee4f55549fbbc687b291291909b6",
+      "raw/run2-T6-code-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run2-T6-code-harness.jsonl": "13d2d915c23a7a13a0718002b7b2ce1b6fc58e15d7f514ae9932a11f0efeab67",
+      "raw/run2-T6-code-transport.jsonl": "ddfc823e5315a166eb672912e787d0e0d31b4d323e4b5dae25daa021c68a03cf",
+      "raw/run2-T6-direct-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run2-T6-direct-harness.jsonl": "1e94cc2a0aa5f5bc16da7cad6073c5ee10ea8c92f3fd7000311278ade137c76e",
+      "raw/run2-T6-direct-transport.jsonl": "15b6995ac54aeb7919240be260ce8713d5604ae8fe6f6604d3fb25074007c7e3",
+      "raw/run2-T7-code-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run2-T7-code-harness.jsonl": "f5cf0b4fda1b36960b7f63b18ef060364cf7b56223f9c447e619cbea01372200",
+      "raw/run2-T7-code-transport.jsonl": "5e45000b0a6df5501ea1474ccb7fbb6e3a4bac408dcc64172de47b151ef3cdae",
+      "raw/run2-T7-direct-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run2-T7-direct-harness.jsonl": "091fe3cd8698d847bb278c623c40cac354c0159636f460becc69851bcdbe7280",
+      "raw/run2-T7-direct-transport.jsonl": "b42e68a52bfb19e70d0be91a630911938ff7be328ff0ed4d7cc950c86b227592",
+      "raw/run2-T8-code-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run2-T8-code-harness.jsonl": "611207b5cba701ee7461e7e08c787b4e66fca8502851922b051d684c63b85b70",
+      "raw/run2-T8-code-transport.jsonl": "a540d4449b877684c0959ecfbc62100f55b81125668d5be873035634a63ffdf3",
+      "raw/run2-T8-direct-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run2-T8-direct-harness.jsonl": "d1fdb73b4668aaecc49e276ae68d90d3596f69dbc74366cebf5f6c8128db6444",
+      "raw/run2-T8-direct-transport.jsonl": "7138b31b7e1ebc82f7bcc2d18f579b575f9412a4ec5ef78856c4bd83b3a019c1",
+      "raw/run2-cancellation-child-events.jsonl": "821f085722da197f821225f822da2525a953b8eb589ca0b218404ca013384fd6",
+      "raw/run2-cancellation-child-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw/run2-cancellation-harness.jsonl": "2916daa771be68ee19f9b270b2319672aeb068e519604ee3ffa15a409067301f",
+      "raw/run2-cancellation-relay-stderr.log": "b03377dc31323a7f72ed51ee5ec6f04f0da3fce5d8468117fa0ba46ec8ed2cd8",
+      "raw/run2-cancellation-relay.jsonl": "ec7dcde4cfc22e3baa7e37e0e90ed76846670356674017d3c2d38a8298bd6ae1",
+      "run1.json": "a49f39dd176faee606c2e97b1112ba7141463c972f8c6b8a063770b55aa77a73",
+      "run2.json": "50812b74f8625387f7c4d7467fd0a21e7168fd61f30574dcd056ce98096d35a6",
+      "verdict.json": "dae34cbf38ae819170f77329d0975f3b9a34dcb5e042134cb8a16af5eaf589fd",
+      "versions.json": "0b69abb0e7027530d0ec311bc48ae77e581d8d04eca041474bce395f1c7a2537"
+    },
+    "digest_before": "94dd0ee381fba2e9775634e0fc8f005dfeb59c9b874fd022227c6fcb92ed17ac",
+    "digest_after": "94dd0ee381fba2e9775634e0fc8f005dfeb59c9b874fd022227c6fcb92ed17ac",
+    "unchanged": true
+  },
+  "checks": [
+    {
+      "id": "B0M-ORIGINAL-VERDICT",
+      "pass": true,
+      "detail": {
+        "verdict": "PASS",
+        "runs": [
+          {
+            "run": "run1",
+            "verdict": "PASS",
+            "checks": 39,
+            "failed": []
+          },
+          {
+            "run": "run2",
+            "verdict": "PASS",
+            "checks": 39,
+            "failed": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "B0M-CHECK-MATRIX",
+      "pass": true,
+      "detail": {
+        "expectedCheckIds": [
+          "B0M-T1-DIRECT",
+          "B0M-T1-CODE",
+          "B0M-T1-EQUIVALENT",
+          "B0M-T1-NO-PROPOSAL",
+          "B0M-T2-DIRECT",
+          "B0M-T2-CODE",
+          "B0M-T2-EQUIVALENT",
+          "B0M-T2-NO-PROPOSAL",
+          "B0M-T3-DIRECT",
+          "B0M-T3-CODE",
+          "B0M-T3-EQUIVALENT",
+          "B0M-T3-NO-PROPOSAL",
+          "B0M-T4-DIRECT",
+          "B0M-T4-CODE",
+          "B0M-T4-EQUIVALENT",
+          "B0M-T4-NO-PROPOSAL",
+          "B0M-T5-DIRECT",
+          "B0M-T5-CODE",
+          "B0M-T5-EQUIVALENT",
+          "B0M-T5-NO-PROPOSAL",
+          "B0M-T6-DIRECT",
+          "B0M-T6-CODE",
+          "B0M-T6-EQUIVALENT",
+          "B0M-T6-NO-PROPOSAL",
+          "B0M-T7-DIRECT",
+          "B0M-T7-CODE",
+          "B0M-T7-EQUIVALENT",
+          "B0M-T7-NO-PROPOSAL",
+          "B0M-T8-DIRECT",
+          "B0M-T8-CODE",
+          "B0M-T8-EQUIVALENT",
+          "B0M-T8-NO-PROPOSAL",
+          "B0M-MCP-INSTRUMENTATION",
+          "B0M-MCP-CALL-METRICS",
+          "B0M-RESULT-SIZES",
+          "B0M-MODEL-NOT-MEASURED",
+          "B0M-CANCELLATION",
+          "B0M-CLEANUP",
+          "B0M-UNHANDLED"
+        ],
+        "actual": [
+          [
+            "B0M-T1-DIRECT",
+            "B0M-T1-CODE",
+            "B0M-T1-EQUIVALENT",
+            "B0M-T1-NO-PROPOSAL",
+            "B0M-T2-DIRECT",
+            "B0M-T2-CODE",
+            "B0M-T2-EQUIVALENT",
+            "B0M-T2-NO-PROPOSAL",
+            "B0M-T3-DIRECT",
+            "B0M-T3-CODE",
+            "B0M-T3-EQUIVALENT",
+            "B0M-T3-NO-PROPOSAL",
+            "B0M-T4-DIRECT",
+            "B0M-T4-CODE",
+            "B0M-T4-EQUIVALENT",
+            "B0M-T4-NO-PROPOSAL",
+            "B0M-T5-DIRECT",
+            "B0M-T5-CODE",
+            "B0M-T5-EQUIVALENT",
+            "B0M-T5-NO-PROPOSAL",
+            "B0M-T6-DIRECT",
+            "B0M-T6-CODE",
+            "B0M-T6-EQUIVALENT",
+            "B0M-T6-NO-PROPOSAL",
+            "B0M-T7-DIRECT",
+            "B0M-T7-CODE",
+            "B0M-T7-EQUIVALENT",
+            "B0M-T7-NO-PROPOSAL",
+            "B0M-T8-DIRECT",
+            "B0M-T8-CODE",
+            "B0M-T8-EQUIVALENT",
+            "B0M-T8-NO-PROPOSAL",
+            "B0M-MCP-INSTRUMENTATION",
+            "B0M-MCP-CALL-METRICS",
+            "B0M-RESULT-SIZES",
+            "B0M-MODEL-NOT-MEASURED",
+            "B0M-CANCELLATION",
+            "B0M-CLEANUP",
+            "B0M-UNHANDLED"
+          ],
+          [
+            "B0M-T1-DIRECT",
+            "B0M-T1-CODE",
+            "B0M-T1-EQUIVALENT",
+            "B0M-T1-NO-PROPOSAL",
+            "B0M-T2-DIRECT",
+            "B0M-T2-CODE",
+            "B0M-T2-EQUIVALENT",
+            "B0M-T2-NO-PROPOSAL",
+            "B0M-T3-DIRECT",
+            "B0M-T3-CODE",
+            "B0M-T3-EQUIVALENT",
+            "B0M-T3-NO-PROPOSAL",
+            "B0M-T4-DIRECT",
+            "B0M-T4-CODE",
+            "B0M-T4-EQUIVALENT",
+            "B0M-T4-NO-PROPOSAL",
+            "B0M-T5-DIRECT",
+            "B0M-T5-CODE",
+            "B0M-T5-EQUIVALENT",
+            "B0M-T5-NO-PROPOSAL",
+            "B0M-T6-DIRECT",
+            "B0M-T6-CODE",
+            "B0M-T6-EQUIVALENT",
+            "B0M-T6-NO-PROPOSAL",
+            "B0M-T7-DIRECT",
+            "B0M-T7-CODE",
+            "B0M-T7-EQUIVALENT",
+            "B0M-T7-NO-PROPOSAL",
+            "B0M-T8-DIRECT",
+            "B0M-T8-CODE",
+            "B0M-T8-EQUIVALENT",
+            "B0M-T8-NO-PROPOSAL",
+            "B0M-MCP-INSTRUMENTATION",
+            "B0M-MCP-CALL-METRICS",
+            "B0M-RESULT-SIZES",
+            "B0M-MODEL-NOT-MEASURED",
+            "B0M-CANCELLATION",
+            "B0M-CLEANUP",
+            "B0M-UNHANDLED"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "B0M-FIXTURE-TASKS",
+      "pass": true,
+      "detail": {
+        "fixtureHash": "a996e2aa5c2d41bf8a75293c8d60adebf9ab89eb59caea926fbccf97297a1dca",
+        "tasksHash": "7aaa196a72b52726ea6db7e46db612c6a6abc0f2bf7f3d5f3a13be2822e163b6",
+        "expectedDerivation": [
+          {
+            "id": "T1",
+            "expected": {
+              "decision_id": "ADR-B0-001",
+              "version": "1",
+              "version_id": "dver-6321b0b53db41080445166681c6546a9",
+              "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+              "lifecycle_status": "active",
+              "context_scope": [
+                "cache",
+                "storage"
+              ],
+              "derived_rule_ids": [
+                "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+              ]
+            },
+            "frozen": {
+              "decision_id": "ADR-B0-001",
+              "version": "1",
+              "version_id": "dver-6321b0b53db41080445166681c6546a9",
+              "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+              "lifecycle_status": "active",
+              "context_scope": [
+                "cache",
+                "storage"
+              ],
+              "derived_rule_ids": [
+                "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+              ]
+            }
+          },
+          {
+            "id": "T2",
+            "expected": {
+              "canonical_ids": [
+                "ADR-B0-003"
+              ],
+              "count": 1
+            },
+            "frozen": {
+              "canonical_ids": [
+                "ADR-B0-003"
+              ],
+              "count": 1
+            }
+          },
+          {
+            "id": "T3",
+            "expected": {
+              "canonical_ids": [
+                "ADR-B0-001",
+                "ADR-B0-002",
+                "ADR-B0-013",
+                "ADR-B0-014"
+              ],
+              "count": 4
+            },
+            "frozen": {
+              "canonical_ids": [
+                "ADR-B0-001",
+                "ADR-B0-002",
+                "ADR-B0-013",
+                "ADR-B0-014"
+              ],
+              "count": 4
+            }
+          },
+          {
+            "id": "T4",
+            "expected": {
+              "canonical_decision_id": "ADR-B0-001",
+              "version": "1",
+              "version_id": "dver-6321b0b53db41080445166681c6546a9",
+              "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+              "derived_rule_ids": [
+                "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+              ],
+              "declared_test_evidence": [
+                {
+                  "selector": "tests/b0/adr-b0-001.spec",
+                  "sha": "aad3098acc972583962263cc7ff36bb950739edeeb779683050f6fde3d3f3cfc"
+                }
+              ]
+            },
+            "frozen": {
+              "canonical_decision_id": "ADR-B0-001",
+              "version": "1",
+              "version_id": "dver-6321b0b53db41080445166681c6546a9",
+              "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+              "derived_rule_ids": [
+                "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+              ],
+              "declared_test_evidence": [
+                {
+                  "selector": "tests/b0/adr-b0-001.spec",
+                  "sha": "aad3098acc972583962263cc7ff36bb950739edeeb779683050f6fde3d3f3cfc"
+                }
+              ]
+            }
+          },
+          {
+            "id": "T5",
+            "expected": {
+              "decision_id": "ADR-B0-005",
+              "version": "1",
+              "version_id": "dver-47cd76fdfae32baeea61f8217b71f0ef",
+              "content_digest": "7d2408aa0101228eed70f0226e577e49d2d0e73ec6aca894d2d026ae5b10785e",
+              "lifecycle_status": "active",
+              "context_scope": [
+                "auth",
+                "ui"
+              ],
+              "derived_rule_ids": [
+                "ADR-B0-005:FORBID_LITERAL:33e0b5c00d04cbc00fe36d09c7ed8c6b"
+              ]
+            },
+            "frozen": {
+              "decision_id": "ADR-B0-005",
+              "version": "1",
+              "version_id": "dver-47cd76fdfae32baeea61f8217b71f0ef",
+              "content_digest": "7d2408aa0101228eed70f0226e577e49d2d0e73ec6aca894d2d026ae5b10785e",
+              "lifecycle_status": "active",
+              "context_scope": [
+                "auth",
+                "ui"
+              ],
+              "derived_rule_ids": [
+                "ADR-B0-005:FORBID_LITERAL:33e0b5c00d04cbc00fe36d09c7ed8c6b"
+              ]
+            }
+          },
+          {
+            "id": "T6",
+            "expected": {
+              "canonical_decision_id": "ADR-B0-018",
+              "version": "1",
+              "version_id": "dver-082a078fea409b08ac2c6b080ea8467b",
+              "content_digest": "e0d33d4075485c7c1047504d597f45dbb24328d25e3ea12b23d6762fee4c4451",
+              "derived_rule_ids": [
+                "ADR-B0-018:FORBID_LITERAL:9117b71942559968fda4807f41dae271"
+              ],
+              "declared_test_evidence": []
+            },
+            "frozen": {
+              "canonical_decision_id": "ADR-B0-018",
+              "version": "1",
+              "version_id": "dver-082a078fea409b08ac2c6b080ea8467b",
+              "content_digest": "e0d33d4075485c7c1047504d597f45dbb24328d25e3ea12b23d6762fee4c4451",
+              "derived_rule_ids": [
+                "ADR-B0-018:FORBID_LITERAL:9117b71942559968fda4807f41dae271"
+              ],
+              "declared_test_evidence": []
+            }
+          },
+          {
+            "id": "T7",
+            "expected": {
+              "selected_id": "ADR-B0-003",
+              "get": {
+                "decision_id": "ADR-B0-003",
+                "version": "1",
+                "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+                "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                "lifecycle_status": "active",
+                "context_scope": [
+                  "routing",
+                  "telemetry"
+                ],
+                "derived_rule_ids": [
+                  "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                ]
+              },
+              "trace": {
+                "canonical_decision_id": "ADR-B0-003",
+                "version": "1",
+                "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+                "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                "derived_rule_ids": [
+                  "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                ],
+                "declared_test_evidence": []
+              }
+            },
+            "frozen": {
+              "selected_id": "ADR-B0-003",
+              "get": {
+                "decision_id": "ADR-B0-003",
+                "version": "1",
+                "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+                "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                "lifecycle_status": "active",
+                "context_scope": [
+                  "routing",
+                  "telemetry"
+                ],
+                "derived_rule_ids": [
+                  "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                ]
+              },
+              "trace": {
+                "canonical_decision_id": "ADR-B0-003",
+                "version": "1",
+                "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+                "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                "derived_rule_ids": [
+                  "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                ],
+                "declared_test_evidence": []
+              }
+            }
+          },
+          {
+            "id": "T8",
+            "expected": {
+              "items": [
+                {
+                  "decision_id": "ADR-B0-003",
+                  "version": "1",
+                  "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                  "derived_rule_ids": [
+                    "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                  ]
+                },
+                {
+                  "decision_id": "ADR-B0-004",
+                  "version": "1",
+                  "content_digest": "55873a2190bb0d54d2fc060523d759d7fbfcc0f56142ccd2e13b1ea4e319c5a5",
+                  "derived_rule_ids": [
+                    "ADR-B0-004:FORBID_LITERAL:1562f5d6c95745c48f3245d09f4f5f32"
+                  ]
+                }
+              ]
+            },
+            "frozen": {
+              "items": [
+                {
+                  "decision_id": "ADR-B0-003",
+                  "version": "1",
+                  "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                  "derived_rule_ids": [
+                    "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                  ]
+                },
+                {
+                  "decision_id": "ADR-B0-004",
+                  "version": "1",
+                  "content_digest": "55873a2190bb0d54d2fc060523d759d7fbfcc0f56142ccd2e13b1ea4e319c5a5",
+                  "derived_rule_ids": [
+                    "ADR-B0-004:FORBID_LITERAL:1562f5d6c95745c48f3245d09f4f5f32"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "B0M-TASK-RESULTS",
+      "pass": true,
+      "detail": [
+        {
+          "run": "run1",
+          "tasks": [
+            {
+              "id": "T1",
+              "expected_match": true,
+              "direct_ok": true,
+              "code_ok": true,
+              "direct_expected": true,
+              "code_expected": true,
+              "equivalent": true,
+              "direct_calls": [
+                "decision.get"
+              ],
+              "code_calls": [
+                "decision.get"
+              ],
+              "no_proposal": true
+            },
+            {
+              "id": "T2",
+              "expected_match": true,
+              "direct_ok": true,
+              "code_ok": true,
+              "direct_expected": true,
+              "code_expected": true,
+              "equivalent": true,
+              "direct_calls": [
+                "decision.search"
+              ],
+              "code_calls": [
+                "decision.search"
+              ],
+              "no_proposal": true
+            },
+            {
+              "id": "T3",
+              "expected_match": true,
+              "direct_ok": true,
+              "code_ok": true,
+              "direct_expected": true,
+              "code_expected": true,
+              "equivalent": true,
+              "direct_calls": [
+                "decision.applicable_to"
+              ],
+              "code_calls": [
+                "decision.applicable_to"
+              ],
+              "no_proposal": true
+            },
+            {
+              "id": "T4",
+              "expected_match": true,
+              "direct_ok": true,
+              "code_ok": true,
+              "direct_expected": true,
+              "code_expected": true,
+              "equivalent": true,
+              "direct_calls": [
+                "decision.trace"
+              ],
+              "code_calls": [
+                "decision.trace"
+              ],
+              "no_proposal": true
+            },
+            {
+              "id": "T5",
+              "expected_match": true,
+              "direct_ok": true,
+              "code_ok": true,
+              "direct_expected": true,
+              "code_expected": true,
+              "equivalent": true,
+              "direct_calls": [
+                "decision.search",
+                "decision.get"
+              ],
+              "code_calls": [
+                "decision.search",
+                "decision.get"
+              ],
+              "no_proposal": true
+            },
+            {
+              "id": "T6",
+              "expected_match": true,
+              "direct_ok": true,
+              "code_ok": true,
+              "direct_expected": true,
+              "code_expected": true,
+              "equivalent": true,
+              "direct_calls": [
+                "decision.search",
+                "decision.trace"
+              ],
+              "code_calls": [
+                "decision.search",
+                "decision.trace"
+              ],
+              "no_proposal": true
+            },
+            {
+              "id": "T7",
+              "expected_match": true,
+              "direct_ok": true,
+              "code_ok": true,
+              "direct_expected": true,
+              "code_expected": true,
+              "equivalent": true,
+              "direct_calls": [
+                "decision.applicable_to",
+                "decision.get",
+                "decision.trace"
+              ],
+              "code_calls": [
+                "decision.applicable_to",
+                "decision.get",
+                "decision.trace"
+              ],
+              "no_proposal": true
+            },
+            {
+              "id": "T8",
+              "expected_match": true,
+              "direct_ok": true,
+              "code_ok": true,
+              "direct_expected": true,
+              "code_expected": true,
+              "equivalent": true,
+              "direct_calls": [
+                "decision.search",
+                "decision.get",
+                "decision.get"
+              ],
+              "code_calls": [
+                "decision.search",
+                "decision.get",
+                "decision.get"
+              ],
+              "no_proposal": true
+            }
+          ]
+        },
+        {
+          "run": "run2",
+          "tasks": [
+            {
+              "id": "T1",
+              "expected_match": true,
+              "direct_ok": true,
+              "code_ok": true,
+              "direct_expected": true,
+              "code_expected": true,
+              "equivalent": true,
+              "direct_calls": [
+                "decision.get"
+              ],
+              "code_calls": [
+                "decision.get"
+              ],
+              "no_proposal": true
+            },
+            {
+              "id": "T2",
+              "expected_match": true,
+              "direct_ok": true,
+              "code_ok": true,
+              "direct_expected": true,
+              "code_expected": true,
+              "equivalent": true,
+              "direct_calls": [
+                "decision.search"
+              ],
+              "code_calls": [
+                "decision.search"
+              ],
+              "no_proposal": true
+            },
+            {
+              "id": "T3",
+              "expected_match": true,
+              "direct_ok": true,
+              "code_ok": true,
+              "direct_expected": true,
+              "code_expected": true,
+              "equivalent": true,
+              "direct_calls": [
+                "decision.applicable_to"
+              ],
+              "code_calls": [
+                "decision.applicable_to"
+              ],
+              "no_proposal": true
+            },
+            {
+              "id": "T4",
+              "expected_match": true,
+              "direct_ok": true,
+              "code_ok": true,
+              "direct_expected": true,
+              "code_expected": true,
+              "equivalent": true,
+              "direct_calls": [
+                "decision.trace"
+              ],
+              "code_calls": [
+                "decision.trace"
+              ],
+              "no_proposal": true
+            },
+            {
+              "id": "T5",
+              "expected_match": true,
+              "direct_ok": true,
+              "code_ok": true,
+              "direct_expected": true,
+              "code_expected": true,
+              "equivalent": true,
+              "direct_calls": [
+                "decision.search",
+                "decision.get"
+              ],
+              "code_calls": [
+                "decision.search",
+                "decision.get"
+              ],
+              "no_proposal": true
+            },
+            {
+              "id": "T6",
+              "expected_match": true,
+              "direct_ok": true,
+              "code_ok": true,
+              "direct_expected": true,
+              "code_expected": true,
+              "equivalent": true,
+              "direct_calls": [
+                "decision.search",
+                "decision.trace"
+              ],
+              "code_calls": [
+                "decision.search",
+                "decision.trace"
+              ],
+              "no_proposal": true
+            },
+            {
+              "id": "T7",
+              "expected_match": true,
+              "direct_ok": true,
+              "code_ok": true,
+              "direct_expected": true,
+              "code_expected": true,
+              "equivalent": true,
+              "direct_calls": [
+                "decision.applicable_to",
+                "decision.get",
+                "decision.trace"
+              ],
+              "code_calls": [
+                "decision.applicable_to",
+                "decision.get",
+                "decision.trace"
+              ],
+              "no_proposal": true
+            },
+            {
+              "id": "T8",
+              "expected_match": true,
+              "direct_ok": true,
+              "code_ok": true,
+              "direct_expected": true,
+              "code_expected": true,
+              "equivalent": true,
+              "direct_calls": [
+                "decision.search",
+                "decision.get",
+                "decision.get"
+              ],
+              "code_calls": [
+                "decision.search",
+                "decision.get",
+                "decision.get"
+              ],
+              "no_proposal": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "B0M-INSTRUMENTATION",
+      "pass": true,
+      "detail": [
+        {
+          "run": "run1",
+          "calls": [
+            {
+              "id": "T1",
+              "direct": 1,
+              "code": 1
+            },
+            {
+              "id": "T2",
+              "direct": 1,
+              "code": 1
+            },
+            {
+              "id": "T3",
+              "direct": 1,
+              "code": 1
+            },
+            {
+              "id": "T4",
+              "direct": 1,
+              "code": 1
+            },
+            {
+              "id": "T5",
+              "direct": 2,
+              "code": 2
+            },
+            {
+              "id": "T6",
+              "direct": 2,
+              "code": 2
+            },
+            {
+              "id": "T7",
+              "direct": 3,
+              "code": 3
+            },
+            {
+              "id": "T8",
+              "direct": 3,
+              "code": 3
+            }
+          ]
+        },
+        {
+          "run": "run2",
+          "calls": [
+            {
+              "id": "T1",
+              "direct": 1,
+              "code": 1
+            },
+            {
+              "id": "T2",
+              "direct": 1,
+              "code": 1
+            },
+            {
+              "id": "T3",
+              "direct": 1,
+              "code": 1
+            },
+            {
+              "id": "T4",
+              "direct": 1,
+              "code": 1
+            },
+            {
+              "id": "T5",
+              "direct": 2,
+              "code": 2
+            },
+            {
+              "id": "T6",
+              "direct": 2,
+              "code": 2
+            },
+            {
+              "id": "T7",
+              "direct": 3,
+              "code": 3
+            },
+            {
+              "id": "T8",
+              "direct": 3,
+              "code": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "B0M-MODEL-NOT-MEASURED",
+      "pass": true,
+      "detail": {
+        "model_fields": {
+          "status": "NOT_MEASURED",
+          "note": "Model turns, input/output tokens, and model-visible intermediate context are not measured in B0-M."
+        }
+      }
+    },
+    {
+      "id": "B0M-CANCELLATION",
+      "pass": true,
+      "detail": [
+        {
+          "phase": "cancellation",
+          "ok": true,
+          "withheld": true,
+          "outcome": {
+            "result": null,
+            "error": "Code execution failed: execution exceeded 250ms",
+            "stats": {
+              "hostCalls": 1,
+              "resolvedCalls": 0,
+              "failedCalls": 0,
+              "rejectedCalls": 1,
+              "cancelledCalls": 1,
+              "cancelledRejections": 1,
+              "cancelledLateSuccess": 0,
+              "cancelledSettled": 1,
+              "cancelledUnsettled": 0,
+              "lateHostSettlements": 0,
+              "timedOut": true,
+              "interrupted": true,
+              "pendingAtEnd": 0,
+              "deferredDisposed": 1,
+              "drainMs": 0,
+              "hostCancellationGraceMs": 50,
+              "cleanupErrors": [],
+              "durationMs": 261
+            }
+          },
+          "state": {
+            "seq": 1,
+            "name": "decision.get",
+            "args": {
+              "record_id": "ADR-B0-001"
+            },
+            "requestId": 2,
+            "startedAt": "2026-10-25T13:54:22.793Z",
+            "pending": false,
+            "outcome": "rejected",
+            "settledAt": "2026-10-25T13:54:23.052Z",
+            "errorName": "McpError",
+            "errorCode": -32001,
+            "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 250ms",
+            "cancellationSentAt": "2026-10-25T13:54:23.051Z",
+            "cancellationSeen": true,
+            "signalAborted": true
+          },
+          "settled": {
+            "found": true,
+            "state": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-B0-001"
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-25T13:54:22.793Z",
+              "pending": false,
+              "outcome": "rejected",
+              "settledAt": "2026-10-25T13:54:23.052Z",
+              "errorName": "McpError",
+              "errorCode": -32001,
+              "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 250ms",
+              "cancellationSentAt": "2026-10-25T13:54:23.051Z",
+              "cancellationSeen": true,
+              "signalAborted": true
+            },
+            "elapsedMs": 0
+          },
+          "cancellation_count": 1,
+          "released": true,
+          "stats": {
+            "hostCalls": 1,
+            "resolvedCalls": 0,
+            "failedCalls": 0,
+            "rejectedCalls": 1,
+            "cancelledCalls": 1,
+            "cancelledRejections": 1,
+            "cancelledLateSuccess": 0,
+            "cancelledSettled": 1,
+            "cancelledUnsettled": 0,
+            "lateHostSettlements": 0,
+            "timedOut": true,
+            "interrupted": true,
+            "pendingAtEnd": 0,
+            "deferredDisposed": 1,
+            "drainMs": 0,
+            "hostCancellationGraceMs": 50,
+            "cleanupErrors": [],
+            "durationMs": 261
+          },
+          "client_errors": [
+            "Received a response for an unknown message ID: {\"jsonrpc\":\"2.0\",\"id\":2,\"result\":{\"content\":[{\"text\":\"{\\n  \\\"record_type\\\": \\\"canonical_decision\\\",\\n  \\\"canonical_decision\\\": {\\n    \\\"decision_id\\\": \\\"ADR-B0-001\\\",\\n    \\\"version\\\": \\\"1\\\",\\n    \\\"version_id\\\": \\\"dver-6321b0b53db41080445166681c6546a9\\\",\\n    \\\"decision_version_id\\\": \\\"dver-6321b0b53db41080445166681c6546a9\\\",\\n    \\\"content_digest\\\": \\\"5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653\\\",\\n    \\\"decision_class\\\": \\\"architecture\\\",\\n    \\\"statement\\\": \\\"Synthetic B0 decision ADR-B0-001 governs cache behavior for the mechanical benchmark marker_adr-b0-001.\\\",\\n    \\\"rationale\\\": \\\"Frozen deterministic B0 corpus entry for scope cache. This is synthetic validation data, not repository project memory.\\\",\\n    \\\"lifecycle_status\\\": \\\"active\\\",\\n    \\\"owner\\\": \\\"\\\",\\n    \\\"decided_at\\\": \\\"2026-02-01T00:00:00Z\\\",\\n    \\\"updated_at\\\": \\\"2026-02-01T00:00:00Z\\\",\\n    \\\"context_scope\\\": [\\n      \\\"cache\\\",\\n      \\\"storage\\\"\\n    ],\\n    \\\"targets\\\": [],\\n    \\\"constraints\\\": [\\n      \\\"no external cache service\\\",\\n      \\\"preserve storage boundary\\\",\\n      \\\"record marker_adr-b0-001\\\"\\n    ],\\n    \\\"anti_patterns\\\": [\\n      \\\"external_cache_client\\\",\\n      \\\"implicit_storage_coupling\\\",\\n      \\\"unbounded_cache_retry\\\"\\n    ],\\n    \\\"source_evidence\\\": [\\n      {\\n        \\\"source_type\\\": \\\"runtime\\\",\\n        \\\"source_locator\\\": \\\"\\\",\\n        \\\"source_revision\\\": \\\"b0m-v1\\\",\\n        \\\"observed_at\\\": \\\"2026-02-01T00:00:00Z\\\"\\n      }\\n    ],\\n    \\\"test_evidence\\\": [\\n      {\\n        \\\"selector\\\": \\\"tests/b0/adr-b0-001.spec\\\",\\n        \\\"sha\\\": \\\"aad3098acc972583962263cc7ff36bb950739edeeb779683050f6fde3d3f3cfc\\\"\\n      }\\n    ],\\n    \\\"relationships\\\": [],\\n    \\\"derived_rule_ids\\\": [\\n      \\\"ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4\\\"\\n    ]\\n  }\\n}\",\"type\":\"text\"}],\"isError\":false,\"structuredContent\":{\"record_type\":\"canonical_decision\",\"canonical_decision\":{\"decision_id\":\"ADR-B0-001\",\"version\":\"1\",\"version_id\":\"dver-6321b0b53db41080445166681c6546a9\",\"decision_version_id\":\"dver-6321b0b53db41080445166681c6546a9\",\"content_digest\":\"5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653\",\"decision_class\":\"architecture\",\"statement\":\"Synthetic B0 decision ADR-B0-001 governs cache behavior for the mechanical benchmark marker_adr-b0-001.\",\"rationale\":\"Frozen deterministic B0 corpus entry for scope cache. This is synthetic validation data, not repository project memory.\",\"lifecycle_status\":\"active\",\"owner\":\"\",\"decided_at\":\"2026-02-01T00:00:00Z\",\"updated_at\":\"2026-02-01T00:00:00Z\",\"context_scope\":[\"cache\",\"storage\"],\"targets\":[],\"constraints\":[\"no external cache service\",\"preserve storage boundary\",\"record marker_adr-b0-001\"],\"anti_patterns\":[\"external_cache_client\",\"implicit_storage_coupling\",\"unbounded_cache_retry\"],\"source_evidence\":[{\"source_type\":\"runtime\",\"source_locator\":\"\",\"source_revision\":\"b0m-v1\",\"observed_at\":\"2026-02-01T00:00:00Z\"}],\"test_evidence\":[{\"selector\":\"tests/b0/adr-b0-001.spec\",\"sha\":\"aad3098acc972583962263cc7ff36bb950739edeeb779683050f6fde3d3f3cfc\"}],\"relationships\":[],\"derived_rule_ids\":[\"ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4\"]}}}}"
+          ],
+          "cleanup": {
+            "kind": "relay",
+            "phase": "cancellation",
+            "errors": [],
+            "relay_pid": 23620,
+            "upstream_pid": 29964,
+            "child_exit_event": {
+              "seq": 13,
+              "ts": "2026-10-25T13:54:23.216Z",
+              "pid": 23620,
+              "type": "child_exit",
+              "code": 0,
+              "signal": null,
+              "upstream_pid": 29964,
+              "observed_by": "top_level"
+            },
+            "child_exit_observed": true,
+            "relay_exit_observed": true,
+            "relay_alive_after": false,
+            "upstream_exit_observed": true,
+            "upstream_alive_after": false
+          },
+          "finished_at": "2026-10-25T13:54:23.292Z"
+        },
+        {
+          "phase": "cancellation",
+          "ok": true,
+          "withheld": true,
+          "outcome": {
+            "result": null,
+            "error": "Code execution failed: execution exceeded 250ms",
+            "stats": {
+              "hostCalls": 1,
+              "resolvedCalls": 0,
+              "failedCalls": 0,
+              "rejectedCalls": 1,
+              "cancelledCalls": 1,
+              "cancelledRejections": 1,
+              "cancelledLateSuccess": 0,
+              "cancelledSettled": 1,
+              "cancelledUnsettled": 0,
+              "lateHostSettlements": 0,
+              "timedOut": true,
+              "interrupted": true,
+              "pendingAtEnd": 0,
+              "deferredDisposed": 1,
+              "drainMs": 0,
+              "hostCancellationGraceMs": 50,
+              "cleanupErrors": [],
+              "durationMs": 254
+            }
+          },
+          "state": {
+            "seq": 1,
+            "name": "decision.get",
+            "args": {
+              "record_id": "ADR-B0-001"
+            },
+            "requestId": 2,
+            "startedAt": "2026-10-25T13:54:54.735Z",
+            "pending": false,
+            "outcome": "rejected",
+            "settledAt": "2026-10-25T13:54:54.988Z",
+            "errorName": "McpError",
+            "errorCode": -32001,
+            "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 250ms",
+            "cancellationSentAt": "2026-10-25T13:54:54.987Z",
+            "cancellationSeen": true,
+            "signalAborted": true
+          },
+          "settled": {
+            "found": true,
+            "state": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-B0-001"
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-25T13:54:54.735Z",
+              "pending": false,
+              "outcome": "rejected",
+              "settledAt": "2026-10-25T13:54:54.988Z",
+              "errorName": "McpError",
+              "errorCode": -32001,
+              "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 250ms",
+              "cancellationSentAt": "2026-10-25T13:54:54.987Z",
+              "cancellationSeen": true,
+              "signalAborted": true
+            },
+            "elapsedMs": 0
+          },
+          "cancellation_count": 1,
+          "released": true,
+          "stats": {
+            "hostCalls": 1,
+            "resolvedCalls": 0,
+            "failedCalls": 0,
+            "rejectedCalls": 1,
+            "cancelledCalls": 1,
+            "cancelledRejections": 1,
+            "cancelledLateSuccess": 0,
+            "cancelledSettled": 1,
+            "cancelledUnsettled": 0,
+            "lateHostSettlements": 0,
+            "timedOut": true,
+            "interrupted": true,
+            "pendingAtEnd": 0,
+            "deferredDisposed": 1,
+            "drainMs": 0,
+            "hostCancellationGraceMs": 50,
+            "cleanupErrors": [],
+            "durationMs": 254
+          },
+          "client_errors": [
+            "Received a response for an unknown message ID: {\"jsonrpc\":\"2.0\",\"id\":2,\"result\":{\"content\":[{\"text\":\"{\\n  \\\"record_type\\\": \\\"canonical_decision\\\",\\n  \\\"canonical_decision\\\": {\\n    \\\"decision_id\\\": \\\"ADR-B0-001\\\",\\n    \\\"version\\\": \\\"1\\\",\\n    \\\"version_id\\\": \\\"dver-6321b0b53db41080445166681c6546a9\\\",\\n    \\\"decision_version_id\\\": \\\"dver-6321b0b53db41080445166681c6546a9\\\",\\n    \\\"content_digest\\\": \\\"5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653\\\",\\n    \\\"decision_class\\\": \\\"architecture\\\",\\n    \\\"statement\\\": \\\"Synthetic B0 decision ADR-B0-001 governs cache behavior for the mechanical benchmark marker_adr-b0-001.\\\",\\n    \\\"rationale\\\": \\\"Frozen deterministic B0 corpus entry for scope cache. This is synthetic validation data, not repository project memory.\\\",\\n    \\\"lifecycle_status\\\": \\\"active\\\",\\n    \\\"owner\\\": \\\"\\\",\\n    \\\"decided_at\\\": \\\"2026-02-01T00:00:00Z\\\",\\n    \\\"updated_at\\\": \\\"2026-02-01T00:00:00Z\\\",\\n    \\\"context_scope\\\": [\\n      \\\"cache\\\",\\n      \\\"storage\\\"\\n    ],\\n    \\\"targets\\\": [],\\n    \\\"constraints\\\": [\\n      \\\"no external cache service\\\",\\n      \\\"preserve storage boundary\\\",\\n      \\\"record marker_adr-b0-001\\\"\\n    ],\\n    \\\"anti_patterns\\\": [\\n      \\\"external_cache_client\\\",\\n      \\\"implicit_storage_coupling\\\",\\n      \\\"unbounded_cache_retry\\\"\\n    ],\\n    \\\"source_evidence\\\": [\\n      {\\n        \\\"source_type\\\": \\\"runtime\\\",\\n        \\\"source_locator\\\": \\\"\\\",\\n        \\\"source_revision\\\": \\\"b0m-v1\\\",\\n        \\\"observed_at\\\": \\\"2026-02-01T00:00:00Z\\\"\\n      }\\n    ],\\n    \\\"test_evidence\\\": [\\n      {\\n        \\\"selector\\\": \\\"tests/b0/adr-b0-001.spec\\\",\\n        \\\"sha\\\": \\\"aad3098acc972583962263cc7ff36bb950739edeeb779683050f6fde3d3f3cfc\\\"\\n      }\\n    ],\\n    \\\"relationships\\\": [],\\n    \\\"derived_rule_ids\\\": [\\n      \\\"ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4\\\"\\n    ]\\n  }\\n}\",\"type\":\"text\"}],\"isError\":false,\"structuredContent\":{\"record_type\":\"canonical_decision\",\"canonical_decision\":{\"decision_id\":\"ADR-B0-001\",\"version\":\"1\",\"version_id\":\"dver-6321b0b53db41080445166681c6546a9\",\"decision_version_id\":\"dver-6321b0b53db41080445166681c6546a9\",\"content_digest\":\"5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653\",\"decision_class\":\"architecture\",\"statement\":\"Synthetic B0 decision ADR-B0-001 governs cache behavior for the mechanical benchmark marker_adr-b0-001.\",\"rationale\":\"Frozen deterministic B0 corpus entry for scope cache. This is synthetic validation data, not repository project memory.\",\"lifecycle_status\":\"active\",\"owner\":\"\",\"decided_at\":\"2026-02-01T00:00:00Z\",\"updated_at\":\"2026-02-01T00:00:00Z\",\"context_scope\":[\"cache\",\"storage\"],\"targets\":[],\"constraints\":[\"no external cache service\",\"preserve storage boundary\",\"record marker_adr-b0-001\"],\"anti_patterns\":[\"external_cache_client\",\"implicit_storage_coupling\",\"unbounded_cache_retry\"],\"source_evidence\":[{\"source_type\":\"runtime\",\"source_locator\":\"\",\"source_revision\":\"b0m-v1\",\"observed_at\":\"2026-02-01T00:00:00Z\"}],\"test_evidence\":[{\"selector\":\"tests/b0/adr-b0-001.spec\",\"sha\":\"aad3098acc972583962263cc7ff36bb950739edeeb779683050f6fde3d3f3cfc\"}],\"relationships\":[],\"derived_rule_ids\":[\"ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4\"]}}}}"
+          ],
+          "cleanup": {
+            "kind": "relay",
+            "phase": "cancellation",
+            "errors": [],
+            "relay_pid": 50228,
+            "upstream_pid": 9488,
+            "child_exit_event": {
+              "seq": 13,
+              "ts": "2026-10-25T13:54:55.157Z",
+              "pid": 50228,
+              "type": "child_exit",
+              "code": 0,
+              "signal": null,
+              "upstream_pid": 9488,
+              "observed_by": "top_level"
+            },
+            "child_exit_observed": true,
+            "relay_exit_observed": true,
+            "relay_alive_after": false,
+            "upstream_exit_observed": true,
+            "upstream_alive_after": false
+          },
+          "finished_at": "2026-10-25T13:54:55.232Z"
+        }
+      ]
+    },
+    {
+      "id": "B0M-CLEANUP",
+      "pass": true,
+      "detail": [
+        {
+          "run": "run1",
+          "failures": []
+        },
+        {
+          "run": "run2",
+          "failures": []
+        }
+      ]
+    },
+    {
+      "id": "B0M-UNHANDLED",
+      "pass": true,
+      "detail": {
+        "verdict": [],
+        "runs": [
+          [],
+          []
+        ]
+      }
+    },
+    {
+      "id": "B0M-REPEATABLE",
+      "pass": true,
+      "detail": {
+        "recorded": true,
+        "derived": true
+      }
+    },
+    {
+      "id": "B0M-SOURCE-HASHES",
+      "pass": true,
+      "detail": {
+        "arms": true,
+        "runner": true,
+        "make_corpus": true,
+        "make_tasks": true,
+        "fixture": true,
+        "tasks": true,
+        "package_lock": true,
+        "f1_executor": true,
+        "f1_adapter": true,
+        "f1_relay": true,
+        "f1_runner": true,
+        "frozen_executor": true
+      }
+    },
+    {
+      "id": "B0M-PRESERVATION",
+      "pass": true,
+      "detail": {
+        "s1a": "cc7f884866e6e94255b100de57b82eec4a51660aadaf51c6464198131030af57",
+        "frozenStatus": [],
+        "frozenDiff": [],
+        "m4Guard": {
+          "schema": "mneme.cm01.s1a1.e0.m4-guard/v1",
+          "s0_sha": "9eb4057a290795883076ab05bf11c92038c6ca13",
+          "base_sha": "f8591102b2693379dabec9b5704862e194eca4ce",
+          "head_sha": "f8591102b2693379dabec9b5704862e194eca4ce",
+          "base_to_head_is_clean": true,
+          "inherited_m4_diff": "benchmarks/adr034_m4/README.md                     |  222 +\n benchmarks/adr034_m4/harness.py                    | 2067 ++++++++\n benchmarks/adr034_m4/m4_child.py                   |  153 +\n ...DR-034-static-numeric-upper-bound-typed-rule.md |  250 +-\n docs/architecture/layer1-freeze-e73ff7d.md         |  215 +\n ...eliable-enforcement-c3-live-validation-scope.md |   74 +-\n .../2026-10-24-adr-034-g2-1-behavioral-charter.md  |  722 +++\n ...adr-034-g2-new-file-write-amendment-proposal.md |  394 ++\n docs/roadmap/README.md                             |   19 +\n .../adr-034-m4-heldout-scoring-2026-10-24.md       |  256 +\n .../adr-034-m4-pre-scoring-record-2026-10-23.md    |  262 +\n .../harness/README.md                              |    3 +-\n .../harness/selftest/run_selftest.sh               |   58 +-\n .../harness/setup_c3_probe.py                      |   60 +-\n scripts/run_test_battery.py                        |    9 +\n tests/adr034_m4_synthetic_corpus.py                |  226 +\n tests/test_adr034_m4_harness.py                    |  926 ++++\n tests/test_adr034_m4_harness_old_reader.py         |   47 +\n validation/cm01/p0-cancellation/.gitattributes     |    2 +\n validation/cm01/p0-cancellation/.gitignore         |    2 +\n validation/cm01/p0-cancellation/README.md          |  154 +\n validation/cm01/p0-cancellation/VERIFICATION.md    |   86 +\n .../cm01/p0-cancellation/evidence/commands.txt     |   72 +\n .../raw/run1-control-direct-child-stderr.log       |    0\n .../raw/run1-control-relay-child-events.jsonl      |    9 +\n .../raw/run1-control-relay-child-stderr.log        |    0\n .../raw/run1-control-relay-relay-stderr.log        |   12 +\n .../evidence/raw/run1-control-relay-relay.jsonl    |   12 +\n .../evidence/raw/run1-fault-child-events.jsonl     |    9 +\n .../evidence/raw/run1-fault-child-stderr.log       |    0\n .../evidence/raw/run1-fault-relay-stderr.log       |   13 +\n .../evidence/raw/run1-fault-relay.jsonl            |   13 +\n .../evidence/raw/run1-harness-events.jsonl         |   30 +\n .../raw/run2-control-direct-child-stderr.log       |    0\n .../raw/run2-control-relay-child-events.jsonl      |    9 +\n .../raw/run2-control-relay-child-stderr.log        |    0\n .../raw/run2-control-relay-relay-stderr.log        |   12 +\n .../evidence/raw/run2-control-relay-relay.jsonl    |   12 +\n .../evidence/raw/run2-fault-child-events.jsonl     |    9 +\n .../evidence/raw/run2-fault-child-stderr.log       |    0\n .../evidence/raw/run2-fault-relay-stderr.log       |   13 +\n .../evidence/raw/run2-fault-relay.jsonl            |   13 +\n .../evidence/raw/run2-harness-events.jsonl         |   30 +\n .../evidence/raw/runner-console.log                |  Bin 0 -> 7756 bytes\n validation/cm01/p0-cancellation/evidence/run1.json |  567 +++\n validation/cm01/p0-cancellation/evidence/run2.json |  567 +++\n .../cm01/p0-cancellation/evidence/verdict.json     |  325 ++\n .../p0-cancellation/evidence/verification.json     | 1342 +++++\n .../cm01/p0-cancellation/evidence/versions.json    |   45 +\n validation/cm01/p0-cancellation/package-lock.json  | 1341 +++++\n validation/cm01/p0-cancellation/package.json       |   20 +\n validation/cm01/p0-cancellation/relay.mjs          |  337 ++\n .../cm01/p0-cancellation/run-cancellation.mjs      | 1446 ++++++\n .../cm01/p0-cancellation/verify-evidence.mjs       |  872 ++++\n validation/cm01/p0-f1/.gitattributes               |    2 +\n validation/cm01/p0-f1/.gitignore                   |    2 +\n validation/cm01/p0-f1/README.md                    |  125 +\n validation/cm01/p0-f1/VERIFICATION.md              |   93 +\n validation/cm01/p0-f1/adapter.mjs                  |  121 +\n .../evidence/calibration-100ms-measurements.json   |   91 +\n .../cm01/p0-f1/evidence/calibration-100ms.json     | 3734 ++++++++++++++\n validation/cm01/p0-f1/evidence/commands.txt        |   70 +\n validation/cm01/p0-f1/evidence/measurements.json   |   91 +\n .../raw/run1-control-direct-child-stderr.log       |    0\n .../evidence/raw/run1-control-direct-harness.jsonl |    6 +\n .../raw/run1-control-direct-host-events.jsonl      |    8 +\n .../raw/run1-control-relay-child-events.jsonl      |   15 +\n .../raw/run1-control-relay-child-stderr.log        |    0\n .../evidence/raw/run1-control-relay-harness.jsonl  |    7 +\n .../raw/run1-control-relay-host-events.jsonl       |    8 +\n .../raw/run1-control-relay-relay-stderr.log        |   26 +\n .../evidence/raw/run1-control-relay-relay.jsonl    |   26 +\n .../evidence/raw/run1-mcp-error-child-stderr.log   |    3 +\n .../evidence/raw/run1-mcp-error-harness.jsonl      |    6 +\n .../evidence/raw/run1-mcp-error-host-events.jsonl  |    2 +\n .../evidence/raw/run1-parallel-child-events.jsonl  |   12 +\n .../evidence/raw/run1-parallel-child-stderr.log    |    0\n .../p0-f1/evidence/raw/run1-parallel-harness.jsonl |    8 +\n .../evidence/raw/run1-parallel-host-events.jsonl   |    5 +\n .../evidence/raw/run1-parallel-relay-stderr.log    |   16 +\n .../p0-f1/evidence/raw/run1-parallel-relay.jsonl   |   16 +\n .../raw/run1-race-after-child-events.jsonl         |   10 +\n .../evidence/raw/run1-race-after-child-stderr.log  |    0\n .../evidence/raw/run1-race-after-harness.jsonl     |    8 +\n .../evidence/raw/run1-race-after-host-events.jsonl |    3 +\n .../evidence/raw/run1-race-after-relay-stderr.log  |   13 +\n .../p0-f1/evidence/raw/run1-race-after-relay.jsonl |   13 +\n .../raw/run1-race-before-child-events.jsonl        |    9 +\n .../evidence/raw/run1-race-before-child-stderr.log |    0\n .../evidence/raw/run1-race-before-harness.jsonl    |    7 +\n .../raw/run1-race-before-host-events.jsonl         |    2 +\n .../evidence/raw/run1-race-before-relay-stderr.log |   12 +\n .../evidence/raw/run1-race-before-relay.jsonl      |   12 +\n .../raw/run1-race-boundary-0-host-events.jsonl     |    3 +\n .../raw/run1-race-boundary-1-host-events.jsonl     |    3 +\n .../raw/run1-race-boundary-2-host-events.jsonl     |    3 +\n .../raw/run1-race-boundary-child-events.jsonl      |   16 +\n .../raw/run1-race-boundary-child-stderr.log        |    0\n .../evidence/raw/run1-race-boundary-harness.jsonl  |   12 +\n .../raw/run1-race-boundary-relay-stderr.log        |   27 +\n .../evidence/raw/run1-race-boundary-relay.jsonl    |   27 +\n .../evidence/raw/run1-repeated-0-host-events.jsonl |    3 +\n .../evidence/raw/run1-repeated-1-host-events.jsonl |    3 +\n .../evidence/raw/run1-repeated-2-host-events.jsonl |    3 +\n .../evidence/raw/run1-repeated-child-events.jsonl  |   16 +\n .../evidence/raw/run1-repeated-child-stderr.log    |    0\n .../p0-f1/evidence/raw/run1-repeated-harness.jsonl |   12 +\n .../evidence/raw/run1-repeated-relay-stderr.log    |   30 +\n .../p0-f1/evidence/raw/run1-repeated-relay.jsonl   |   30 +\n .../raw/run1-sequential-fourth-child-events.jsonl  |   16 +\n .../raw/run1-sequential-fourth-child-stderr.log    |    0\n .../raw/run1-sequential-fourth-harness.jsonl       |    8 +\n .../raw/run1-sequential-fourth-host-events.jsonl   |    9 +\n .../raw/run1-sequential-fourth-relay-stderr.log    |   20 +\n .../raw/run1-sequential-fourth-relay.jsonl         |   20 +\n .../raw/run1-synthetic-cancel-harness.jsonl        |    5 +\n .../raw/run1-synthetic-cancel-host-events.jsonl    |    3 +\n .../raw/run1-synthetic-cancel-server.jsonl         |    4 +\n .../raw/run1-timeout-then-close-child-events.jsonl |   10 +\n .../raw/run1-timeout-then-close-child-stderr.log   |    0\n .../raw/run1-timeout-then-close-harness.jsonl      |    7 +\n .../raw/run1-timeout-then-close-host-events.jsonl  |    3 +\n .../raw/run1-timeout-then-close-relay-stderr.log   |   12 +\n .../raw/run1-timeout-then-close-relay.jsonl        |   12 +\n .../raw/run1-timeout-withhold-child-events.jsonl   |   10 +\n .../raw/run1-timeout-withhold-child-stderr.log     |    0\n .../raw/run1-timeout-withhold-harness.jsonl        |    8 +\n .../raw/run1-timeout-withhold-host-events.jsonl    |    3 +\n .../raw/run1-timeout-withhold-relay-stderr.log     |   15 +\n .../evidence/raw/run1-timeout-withhold-relay.jsonl |   15 +\n .../raw/run1-transport-close-child-events.jsonl    |    9 +\n .../raw/run1-transport-close-child-stderr.log      |    0\n .../raw/run1-transport-close-harness.jsonl         |    7 +\n .../raw/run1-transport-close-host-events.jsonl     |    2 +\n .../raw/run1-transport-close-relay-stderr.log      |   11 +\n .../evidence/raw/run1-transport-close-relay.jsonl  |   11 +\n .../evidence/raw/run1-validation-child-stderr.log  |    0\n .../evidence/raw/run1-validation-harness.jsonl     |    6 +\n .../evidence/raw/run1-validation-host-events.jsonl |    2 +\n .../raw/run2-control-direct-child-stderr.log       |    0\n .../evidence/raw/run2-control-direct-harness.jsonl |    6 +\n .../raw/run2-control-direct-host-events.jsonl      |    8 +\n .../raw/run2-control-relay-child-events.jsonl      |   15 +\n .../raw/run2-control-relay-child-stderr.log        |    0\n .../evidence/raw/run2-control-relay-harness.jsonl  |    7 +\n .../raw/run2-control-relay-host-events.jsonl       |    8 +\n .../raw/run2-control-relay-relay-stderr.log        |   26 +\n .../evidence/raw/run2-control-relay-relay.jsonl    |   26 +\n .../evidence/raw/run2-mcp-error-child-stderr.log   |    3 +\n .../evidence/raw/run2-mcp-error-harness.jsonl      |    6 +\n .../evidence/raw/run2-mcp-error-host-events.jsonl  |    2 +\n .../evidence/raw/run2-parallel-child-events.jsonl  |   12 +\n .../evidence/raw/run2-parallel-child-stderr.log    |    0\n .../p0-f1/evidence/raw/run2-parallel-harness.jsonl |    8 +\n .../evidence/raw/run2-parallel-host-events.jsonl   |    5 +\n .../evidence/raw/run2-parallel-relay-stderr.log    |   16 +\n .../p0-f1/evidence/raw/run2-parallel-relay.jsonl   |   16 +\n .../raw/run2-race-after-child-events.jsonl         |   10 +\n .../evidence/raw/run2-race-after-child-stderr.log  |    0\n .../evidence/raw/run2-race-after-harness.jsonl     |    8 +\n .../evidence/raw/run2-race-after-host-events.jsonl |    3 +\n .../evidence/raw/run2-race-after-relay-stderr.log  |   13 +\n .../p0-f1/evidence/raw/run2-race-after-relay.jsonl |   13 +\n .../raw/run2-race-before-child-events.jsonl        |    9 +\n .../evidence/raw/run2-race-before-child-stderr.log |    0\n .../evidence/raw/run2-race-before-harness.jsonl    |    7 +\n .../raw/run2-race-before-host-events.jsonl         |    2 +\n .../evidence/raw/run2-race-before-relay-stderr.log |   12 +\n .../evidence/raw/run2-race-before-relay.jsonl      |   12 +\n .../raw/run2-race-boundary-0-host-events.jsonl     |    3 +\n .../raw/run2-race-boundary-1-host-events.jsonl     |    3 +\n .../raw/run2-race-boundary-2-host-events.jsonl     |    3 +\n .../raw/run2-race-boundary-child-events.jsonl      |   16 +\n .../raw/run2-race-boundary-child-stderr.log        |    0\n .../evidence/raw/run2-race-boundary-harness.jsonl  |   12 +\n .../raw/run2-race-boundary-relay-stderr.log        |   27 +\n .../evidence/raw/run2-race-boundary-relay.jsonl    |   27 +\n .../evidence/raw/run2-repeated-0-host-events.jsonl |    3 +\n .../evidence/raw/run2-repeated-1-host-events.jsonl |    3 +\n .../evidence/raw/run2-repeated-2-host-events.jsonl |    3 +\n .../evidence/raw/run2-repeated-child-events.jsonl  |   16 +\n .../evidence/raw/run2-repeated-child-stderr.log    |    0\n .../p0-f1/evidence/raw/run2-repeated-harness.jsonl |   12 +\n .../evidence/raw/run2-repeated-relay-stderr.log    |   30 +\n .../p0-f1/evidence/raw/run2-repeated-relay.jsonl   |   30 +\n .../raw/run2-sequential-fourth-child-events.jsonl  |   16 +\n .../raw/run2-sequential-fourth-child-stderr.log    |    0\n .../raw/run2-sequential-fourth-harness.jsonl       |    8 +\n .../raw/run2-sequential-fourth-host-events.jsonl   |    9 +\n .../raw/run2-sequential-fourth-relay-stderr.log    |   20 +\n .../raw/run2-sequential-fourth-relay.jsonl         |   20 +\n .../raw/run2-synthetic-cancel-harness.jsonl        |    5 +\n .../raw/run2-synthetic-cancel-host-events.jsonl    |    3 +\n .../raw/run2-synthetic-cancel-server.jsonl         |    4 +\n .../raw/run2-timeout-then-close-child-events.jsonl |   10 +\n .../raw/run2-timeout-then-close-child-stderr.log   |    0\n .../raw/run2-timeout-then-close-harness.jsonl      |    7 +\n .../raw/run2-timeout-then-close-host-events.jsonl  |    3 +\n .../raw/run2-timeout-then-close-relay-stderr.log   |   12 +\n .../raw/run2-timeout-then-close-relay.jsonl        |   12 +\n .../raw/run2-timeout-withhold-child-events.jsonl   |   10 +\n .../raw/run2-timeout-withhold-child-stderr.log     |    0\n .../raw/run2-timeout-withhold-harness.jsonl        |    8 +\n .../raw/run2-timeout-withhold-host-events.jsonl    |    3 +\n .../raw/run2-timeout-withhold-relay-stderr.log     |   15 +\n .../evidence/raw/run2-timeout-withhold-relay.jsonl |   15 +\n .../raw/run2-transport-close-child-events.jsonl    |    9 +\n .../raw/run2-transport-close-child-stderr.log      |    0\n .../raw/run2-transport-close-harness.jsonl         |    7 +\n .../raw/run2-transport-close-host-events.jsonl     |    2 +\n .../raw/run2-transport-close-relay-stderr.log      |   11 +\n .../evidence/raw/run2-transport-close-relay.jsonl  |   11 +\n .../evidence/raw/run2-validation-child-stderr.log  |    0\n .../evidence/raw/run2-validation-harness.jsonl     |    6 +\n .../evidence/raw/run2-validation-host-events.jsonl |    2 +\n validation/cm01/p0-f1/evidence/run1.json           | 5201 ++++++++++++++++++++\n validation/cm01/p0-f1/evidence/run2.json           | 5201 ++++++++++++++++++++\n validation/cm01/p0-f1/evidence/verdict.json        | 3914 +++++++++++++++\n validation/cm01/p0-f1/evidence/verification.json   | 2946 +++++++++++\n validation/cm01/p0-f1/evidence/versions.json       |   12 +\n validation/cm01/p0-f1/harness.mjs                  |  742 +++\n validation/cm01/p0-f1/package-lock.json            | 1341 +++++\n validation/cm01/p0-f1/package.json                 |   21 +\n validation/cm01/p0-f1/quickjs-executor.mjs         |  484 ++\n validation/cm01/p0-f1/relay.mjs                    |  369 ++\n validation/cm01/p0-f1/run-f1.mjs                   | 1478 ++++++\n validation/cm01/p0-f1/synthetic-server.mjs         |   93 +\n validation/cm01/p0-f1/verify-f1-evidence.mjs       | 1232 +++++\n validation/cm01/s1a-local/.gitattributes           |    3 +\n validation/cm01/s1a-local/.gitignore               |    2 +\n validation/cm01/s1a-local/INCLUSION-MANIFEST.txt   |  123 +\n validation/cm01/s1a-local/README.md                |  107 +\n validation/cm01/s1a-local/S1-A1-SUMMARY.md         |  133 +\n .../cm01/s1a-local/e0/probe-native-promise.mjs     |   47 +\n validation/cm01/s1a-local/e0/quickjs-executor.mjs  |  309 ++\n validation/cm01/s1a-local/e0/run-e0.mjs            |  295 ++\n validation/cm01/s1a-local/e0/synthetic-host.mjs    |   66 +\n validation/cm01/s1a-local/evidence/commands.txt    |   35 +\n validation/cm01/s1a-local/evidence/e0-run1.json    |  492 ++\n validation/cm01/s1a-local/evidence/e0-run2.json    |  494 ++\n validation/cm01/s1a-local/evidence/e0.json         |  494 ++\n validation/cm01/s1a-local/evidence/raw/e0.log      |   75 +\n .../cm01/s1a-local/evidence/repeatability.json     |   19 +\n validation/cm01/s1a-local/m1/README.md             |   84 +\n validation/cm01/s1a-local/m1/evidence/commands.txt |   48 +\n validation/cm01/s1a-local/m1/evidence/m1.json      | 2473 ++++++++++\n .../cm01/s1a-local/m1/evidence/run1-stderr.log     |    1 +\n .../cm01/s1a-local/m1/evidence/run1-tools.json     |  558 +++\n .../cm01/s1a-local/m1/evidence/run2-stderr.log     |    1 +\n .../cm01/s1a-local/m1/evidence/run2-tools.json     |  558 +++\n .../m1/fixture/canonical/project_memory.json       |   97 +\n .../cm01/s1a-local/m1/fixture/pre_migration.json   |   27 +\n .../s1a-local/m1/fixture/work/project_memory.json  |   97 +\n validation/cm01/s1a-local/m1/package-lock.json     | 1223 +++++\n validation/cm01/s1a-local/m1/package.json          |   17 +\n validation/cm01/s1a-local/m1/run-m1.mjs            |  296 ++\n validation/cm01/s1a-local/m2/README.md             |   91 +\n validation/cm01/s1a-local/m2/evidence/commands.txt |   50 +\n validation/cm01/s1a-local/m2/evidence/m2.json      | 2628 ++++++++++\n .../cm01/s1a-local/m2/evidence/run1-stderr.log     |    4 +\n validation/cm01/s1a-local/m2/evidence/run1.json    | 1199 +++++\n .../cm01/s1a-local/m2/evidence/run2-stderr.log     |    4 +\n validation/cm01/s1a-local/m2/evidence/run2.json    | 1199 +++++\n validation/cm01/s1a-local/m2/package-lock.json     | 1273 +++++\n validation/cm01/s1a-local/m2/package.json          |   19 +\n validation/cm01/s1a-local/m2/run-m2.mjs            |  561 +++\n validation/cm01/s1a-local/m3/README.md             |   88 +\n validation/cm01/s1a-local/m3/evidence/commands.txt |   49 +\n validation/cm01/s1a-local/m3/evidence/m3.json      |  961 ++++\n .../cm01/s1a-local/m3/evidence/run1-stderr.log     |    1 +\n validation/cm01/s1a-local/m3/evidence/run1.json    |  362 ++\n .../cm01/s1a-local/m3/evidence/run2-stderr.log     |    1 +\n validation/cm01/s1a-local/m3/evidence/run2.json    |  362 ++\n validation/cm01/s1a-local/m3/package-lock.json     | 1273 +++++\n validation/cm01/s1a-local/m3/package.json          |   19 +\n validation/cm01/s1a-local/m3/run-m3.mjs            |  484 ++\n validation/cm01/s1a-local/m4-guard.mjs             |   70 +\n validation/cm01/s1a-local/m4/README.md             |   78 +\n validation/cm01/s1a-local/m4/evidence/commands.txt |   54 +\n validation/cm01/s1a-local/m4/evidence/m4.json      | 1467 ++++++\n .../cm01/s1a-local/m4/evidence/run1-stderr.log     |    1 +\n validation/cm01/s1a-local/m4/evidence/run1.json    |  608 +++\n .../cm01/s1a-local/m4/evidence/run2-stderr.log     |    1 +\n validation/cm01/s1a-local/m4/evidence/run2.json    |  608 +++\n validation/cm01/s1a-local/m4/f1/README.md          |  116 +\n .../cm01/s1a-local/m4/f1/evidence/commands.txt     |   55 +\n .../cm01/s1a-local/m4/f1/evidence/m4-f1.json       | 2348 +++++++++\n .../cm01/s1a-local/m4/f1/evidence/run1-stderr.log  |    1 +\n validation/cm01/s1a-local/m4/f1/evidence/run1.json | 1035 ++++\n .../cm01/s1a-local/m4/f1/evidence/run2-stderr.log  |    1 +\n validation/cm01/s1a-local/m4/f1/evidence/run2.json | 1035 ++++\n validation/cm01/s1a-local/m4/f1/run-m4-f1.mjs      |  623 +++\n validation/cm01/s1a-local/m4/fixture/SHA256SUMS    |    2 +\n .../m4/fixture/canonical/project_memory.json       |  134 +\n .../cm01/s1a-local/m4/fixture/pre_migration.json   |   39 +\n .../s1a-local/m4/fixture/work/project_memory.json  |  134 +\n validation/cm01/s1a-local/m4/package-lock.json     | 1273 +++++\n validation/cm01/s1a-local/m4/package.json          |   19 +\n validation/cm01/s1a-local/m4/run-m4.mjs            |  547 ++\n validation/cm01/s1a-local/m5/README.md             |  116 +\n validation/cm01/s1a-local/m5/evidence/commands.txt |   58 +\n validation/cm01/s1a-local/m5/evidence/m5.json      | 1125 +++++\n .../cm01/s1a-local/m5/evidence/run1-stderr.log     |    1 +\n validation/cm01/s1a-local/m5/evidence/run1.json    |  405 ++\n .../cm01/s1a-local/m5/evidence/run2-stderr.log     |    1 +\n validation/cm01/s1a-local/m5/evidence/run2.json    |  405 ++\n validation/cm01/s1a-local/m5/package-lock.json     | 1273 +++++\n validation/cm01/s1a-local/m5/package.json          |   19 +\n validation/cm01/s1a-local/m5/run-m5.mjs            |  583 +++\n validation/cm01/s1a-local/m6/README.md             |  108 +\n validation/cm01/s1a-local/m6/evidence/commands.txt |   55 +\n validation/cm01/s1a-local/m6/evidence/m6.json      | 1925 ++++++++\n .../cm01/s1a-local/m6/evidence/run1-stderr.log     |    1 +\n validation/cm01/s1a-local/m6/evidence/run1.json    |  800 +++\n .../cm01/s1a-local/m6/evidence/run2-stderr.log     |    1 +\n validation/cm01/s1a-local/m6/evidence/run2.json    |  800 +++\n validation/cm01/s1a-local/m6/package-lock.json     | 1273 +++++\n validation/cm01/s1a-local/m6/package.json          |   19 +\n validation/cm01/s1a-local/m6/run-m6.mjs            |  618 +++\n validation/cm01/s1a-local/m7/README.md             |  105 +\n validation/cm01/s1a-local/m7/evidence/commands.txt |   60 +\n validation/cm01/s1a-local/m7/evidence/m7.json      | 2256 +++++++++\n .../cm01/s1a-local/m7/evidence/run1-stderr.log     |    1 +\n validation/cm01/s1a-local/m7/evidence/run1.json    |  958 ++++\n .../cm01/s1a-local/m7/evidence/run2-stderr.log     |    1 +\n validation/cm01/s1a-local/m7/evidence/run2.json    |  958 ++++\n validation/cm01/s1a-local/m7/package-lock.json     | 1273 +++++\n validation/cm01/s1a-local/m7/package.json          |   19 +\n validation/cm01/s1a-local/m7/run-m7.mjs            |  630 +++\n validation/cm01/s1a-local/m8/README.md             |   90 +\n validation/cm01/s1a-local/m8/evidence/commands.txt |   62 +\n .../cm01/s1a-local/m8/evidence/e4-run1-stderr.log  |    1 +\n .../cm01/s1a-local/m8/evidence/e4-run2-stderr.log  |    1 +\n .../cm01/s1a-local/m8/evidence/e5-run1-stderr.log  |    4 +\n .../cm01/s1a-local/m8/evidence/e5-run2-stderr.log  |    4 +\n validation/cm01/s1a-local/m8/evidence/m8.json      |  884 ++++\n .../cm01/s1a-local/m8/evidence/run1-stderr.log     |    7 +\n validation/cm01/s1a-local/m8/evidence/run1.json    |  258 +\n .../cm01/s1a-local/m8/evidence/run2-stderr.log     |    7 +\n validation/cm01/s1a-local/m8/evidence/run2.json    |  258 +\n .../cm01/s1a-local/m8/fixture/sectionless.json     |    9 +\n validation/cm01/s1a-local/m8/package-lock.json     | 1273 +++++\n validation/cm01/s1a-local/m8/package.json          |   19 +\n validation/cm01/s1a-local/m8/run-m8.mjs            |  782 +++\n validation/cm01/s1a-local/package-lock.json        |  134 +\n validation/cm01/s1a-local/package.json             |   19 +\n 346 files changed, 90739 insertions(+), 9 deletions(-)",
+          "groups": {
+            "committed_vs_base": [],
+            "staged": [],
+            "unstaged": [],
+            "untracked": [
+              "validation/cm01/b0-benchmark/.gitattributes",
+              "validation/cm01/b0-benchmark/.gitignore",
+              "validation/cm01/b0-benchmark/arms.mjs",
+              "validation/cm01/b0-benchmark/evidence/measurements.json",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T1-code-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T1-code-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T1-code-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T1-direct-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T1-direct-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T1-direct-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T2-code-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T2-code-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T2-code-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T2-direct-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T2-direct-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T2-direct-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T3-code-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T3-code-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T3-code-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T3-direct-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T3-direct-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T3-direct-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T4-code-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T4-code-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T4-code-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T4-direct-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T4-direct-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T4-direct-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T5-code-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T5-code-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T5-code-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T5-direct-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T5-direct-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T5-direct-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T6-code-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T6-code-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T6-code-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T6-direct-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T6-direct-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T6-direct-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T7-code-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T7-code-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T7-code-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T7-direct-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T7-direct-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T7-direct-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T8-code-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T8-code-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T8-code-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T8-direct-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T8-direct-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-T8-direct-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-cancellation-child-events.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-cancellation-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-cancellation-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-cancellation-relay-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run1-cancellation-relay.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T1-code-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T1-code-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T1-code-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T1-direct-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T1-direct-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T1-direct-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T2-code-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T2-code-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T2-code-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T2-direct-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T2-direct-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T2-direct-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T3-code-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T3-code-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T3-code-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T3-direct-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T3-direct-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T3-direct-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T4-code-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T4-code-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T4-code-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T4-direct-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T4-direct-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T4-direct-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T5-code-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T5-code-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T5-code-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T5-direct-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T5-direct-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T5-direct-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T6-code-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T6-code-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T6-code-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T6-direct-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T6-direct-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T6-direct-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T7-code-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T7-code-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T7-code-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T7-direct-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T7-direct-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T7-direct-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T8-code-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T8-code-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T8-code-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T8-direct-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T8-direct-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-T8-direct-transport.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-cancellation-child-events.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-cancellation-child-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-cancellation-harness.jsonl",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-cancellation-relay-stderr.log",
+              "validation/cm01/b0-benchmark/evidence/raw/run2-cancellation-relay.jsonl",
+              "validation/cm01/b0-benchmark/evidence/run1.json",
+              "validation/cm01/b0-benchmark/evidence/run2.json",
+              "validation/cm01/b0-benchmark/evidence/verdict.json",
+              "validation/cm01/b0-benchmark/evidence/verification.json",
+              "validation/cm01/b0-benchmark/evidence/versions.json",
+              "validation/cm01/b0-benchmark/fixture/project_memory.json",
+              "validation/cm01/b0-benchmark/make-corpus.py",
+              "validation/cm01/b0-benchmark/make-tasks.py",
+              "validation/cm01/b0-benchmark/package-lock.json",
+              "validation/cm01/b0-benchmark/package.json",
+              "validation/cm01/b0-benchmark/run-b0m.mjs",
+              "validation/cm01/b0-benchmark/tasks.json",
+              "validation/cm01/b0-benchmark/verify-b0m-evidence.mjs"
+            ]
+          },
+          "protected_patterns": [
+            "^benchmarks\\/adr034_m4\\/",
+            "^tests\\/adr034_m4_",
+            "^tests\\/test_adr034_m4_",
+            "^scripts\\/run_test_battery\\.py$",
+            "^docs\\/validation\\/adr-034-m4-",
+            "^docs\\/plans\\/.*adr-034-m4"
+          ],
+          "violations": [],
+          "pass": true
+        },
+        "p0Verdict": "FAIL",
+        "p0Verification": "VERIFIED",
+        "f1Verdict": "PASS",
+        "f1Verification": "VERIFIED"
+      }
+    },
+    {
+      "id": "B0M-ONLY-B0",
+      "pass": true,
+      "detail": {
+        "status": [
+          "?? validation/cm01/b0-benchmark/.gitattributes",
+          "?? validation/cm01/b0-benchmark/.gitignore",
+          "?? validation/cm01/b0-benchmark/arms.mjs",
+          "?? validation/cm01/b0-benchmark/evidence/measurements.json",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T1-code-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T1-code-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T1-code-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T1-direct-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T1-direct-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T1-direct-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T2-code-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T2-code-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T2-code-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T2-direct-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T2-direct-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T2-direct-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T3-code-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T3-code-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T3-code-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T3-direct-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T3-direct-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T3-direct-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T4-code-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T4-code-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T4-code-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T4-direct-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T4-direct-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T4-direct-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T5-code-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T5-code-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T5-code-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T5-direct-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T5-direct-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T5-direct-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T6-code-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T6-code-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T6-code-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T6-direct-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T6-direct-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T6-direct-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T7-code-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T7-code-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T7-code-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T7-direct-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T7-direct-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T7-direct-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T8-code-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T8-code-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T8-code-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T8-direct-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T8-direct-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-T8-direct-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-cancellation-child-events.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-cancellation-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-cancellation-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-cancellation-relay-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run1-cancellation-relay.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T1-code-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T1-code-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T1-code-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T1-direct-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T1-direct-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T1-direct-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T2-code-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T2-code-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T2-code-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T2-direct-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T2-direct-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T2-direct-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T3-code-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T3-code-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T3-code-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T3-direct-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T3-direct-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T3-direct-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T4-code-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T4-code-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T4-code-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T4-direct-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T4-direct-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T4-direct-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T5-code-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T5-code-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T5-code-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T5-direct-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T5-direct-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T5-direct-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T6-code-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T6-code-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T6-code-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T6-direct-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T6-direct-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T6-direct-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T7-code-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T7-code-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T7-code-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T7-direct-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T7-direct-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T7-direct-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T8-code-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T8-code-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T8-code-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T8-direct-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T8-direct-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-T8-direct-transport.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-cancellation-child-events.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-cancellation-child-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-cancellation-harness.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-cancellation-relay-stderr.log",
+          "?? validation/cm01/b0-benchmark/evidence/raw/run2-cancellation-relay.jsonl",
+          "?? validation/cm01/b0-benchmark/evidence/run1.json",
+          "?? validation/cm01/b0-benchmark/evidence/run2.json",
+          "?? validation/cm01/b0-benchmark/evidence/verdict.json",
+          "?? validation/cm01/b0-benchmark/evidence/verification.json",
+          "?? validation/cm01/b0-benchmark/evidence/versions.json",
+          "?? validation/cm01/b0-benchmark/fixture/project_memory.json",
+          "?? validation/cm01/b0-benchmark/make-corpus.py",
+          "?? validation/cm01/b0-benchmark/make-tasks.py",
+          "?? validation/cm01/b0-benchmark/package-lock.json",
+          "?? validation/cm01/b0-benchmark/package.json",
+          "?? validation/cm01/b0-benchmark/run-b0m.mjs",
+          "?? validation/cm01/b0-benchmark/tasks.json",
+          "?? validation/cm01/b0-benchmark/verify-b0m-evidence.mjs"
+        ],
+        "outside": []
+      }
+    },
+    {
+      "id": "B0M-EVIDENCE-UNCHANGED",
+      "pass": true,
+      "detail": {
+        "before": "94dd0ee381fba2e9775634e0fc8f005dfeb59c9b874fd022227c6fcb92ed17ac",
+        "after": "94dd0ee381fba2e9775634e0fc8f005dfeb59c9b874fd022227c6fcb92ed17ac"
+      }
+    }
+  ],
+  "reproduction": {
+    "performed": true,
+    "temp_worktree": "C:\\Users\\hi\\AppData\\Local\\Temp\\opencode\\b0m-verify-1792936567262",
+    "baseline": "f8591102b2693379dabec9b5704862e194eca4ce",
+    "steps": [
+      {
+        "step": "worktree_add",
+        "ok": true
+      },
+      {
+        "step": "copy_sources",
+        "ok": true,
+        "files": [
+          "package.json",
+          "package-lock.json",
+          ".gitignore",
+          ".gitattributes",
+          "make-corpus.py",
+          "make-tasks.py",
+          "fixture/project_memory.json",
+          "tasks.json",
+          "arms.mjs",
+          "run-b0m.mjs"
+        ]
+      },
+      {
+        "step": "npm_ci_f1",
+        "ok": true
+      },
+      {
+        "step": "npm_ci_b0",
+        "ok": true
+      },
+      {
+        "step": "run",
+        "ok": true,
+        "status": 0
+      }
+    ],
+    "checks": [
+      {
+        "id": "REPRO-VERDICT",
+        "pass": true,
+        "detail": {
+          "verdict": "PASS",
+          "runs": [
+            "PASS",
+            "PASS"
+          ],
+          "repeatable": true,
+          "preservation": true,
+          "unhandled": []
+        }
+      },
+      {
+        "id": "REPRO-SIGNATURE",
+        "pass": true,
+        "detail": {
+          "canonical": {
+            "tasks": [
+              {
+                "id": "T1",
+                "direct": {
+                  "task_id": "T1",
+                  "arm": "direct",
+                  "ok": true,
+                  "actual": {
+                    "decision_id": "ADR-B0-001",
+                    "version": "1",
+                    "version_id": "dver-6321b0b53db41080445166681c6546a9",
+                    "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+                    "lifecycle_status": "active",
+                    "context_scope": [
+                      "cache",
+                      "storage"
+                    ],
+                    "derived_rule_ids": [
+                      "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+                    ]
+                  },
+                  "expected": {
+                    "decision_id": "ADR-B0-001",
+                    "version": "1",
+                    "version_id": "dver-6321b0b53db41080445166681c6546a9",
+                    "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+                    "lifecycle_status": "active",
+                    "context_scope": [
+                      "cache",
+                      "storage"
+                    ],
+                    "derived_rule_ids": [
+                      "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+                    ]
+                  },
+                  "mcp_call_names": [
+                    "decision.get"
+                  ],
+                  "mcp_call_count": 1,
+                  "result_bytes": 325,
+                  "mcp_result_bytes": 3180,
+                  "host_calls": 0,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                },
+                "code": {
+                  "task_id": "T1",
+                  "arm": "code",
+                  "ok": true,
+                  "actual": {
+                    "decision_id": "ADR-B0-001",
+                    "version": "1",
+                    "version_id": "dver-6321b0b53db41080445166681c6546a9",
+                    "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+                    "lifecycle_status": "active",
+                    "context_scope": [
+                      "cache",
+                      "storage"
+                    ],
+                    "derived_rule_ids": [
+                      "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+                    ]
+                  },
+                  "expected": {
+                    "decision_id": "ADR-B0-001",
+                    "version": "1",
+                    "version_id": "dver-6321b0b53db41080445166681c6546a9",
+                    "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+                    "lifecycle_status": "active",
+                    "context_scope": [
+                      "cache",
+                      "storage"
+                    ],
+                    "derived_rule_ids": [
+                      "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+                    ]
+                  },
+                  "mcp_call_names": [
+                    "decision.get"
+                  ],
+                  "mcp_call_count": 1,
+                  "result_bytes": 325,
+                  "mcp_result_bytes": 3180,
+                  "host_calls": 1,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                }
+              },
+              {
+                "id": "T2",
+                "direct": {
+                  "task_id": "T2",
+                  "arm": "direct",
+                  "ok": true,
+                  "actual": {
+                    "canonical_ids": [
+                      "ADR-B0-003"
+                    ],
+                    "count": 1
+                  },
+                  "expected": {
+                    "canonical_ids": [
+                      "ADR-B0-003"
+                    ],
+                    "count": 1
+                  },
+                  "mcp_call_names": [
+                    "decision.search"
+                  ],
+                  "mcp_call_count": 1,
+                  "result_bytes": 42,
+                  "mcp_result_bytes": 3008,
+                  "host_calls": 0,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                },
+                "code": {
+                  "task_id": "T2",
+                  "arm": "code",
+                  "ok": true,
+                  "actual": {
+                    "canonical_ids": [
+                      "ADR-B0-003"
+                    ],
+                    "count": 1
+                  },
+                  "expected": {
+                    "canonical_ids": [
+                      "ADR-B0-003"
+                    ],
+                    "count": 1
+                  },
+                  "mcp_call_names": [
+                    "decision.search"
+                  ],
+                  "mcp_call_count": 1,
+                  "result_bytes": 42,
+                  "mcp_result_bytes": 3008,
+                  "host_calls": 1,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                }
+              },
+              {
+                "id": "T3",
+                "direct": {
+                  "task_id": "T3",
+                  "arm": "direct",
+                  "ok": true,
+                  "actual": {
+                    "canonical_ids": [
+                      "ADR-B0-001",
+                      "ADR-B0-002",
+                      "ADR-B0-013",
+                      "ADR-B0-014"
+                    ],
+                    "count": 4
+                  },
+                  "expected": {
+                    "canonical_ids": [
+                      "ADR-B0-001",
+                      "ADR-B0-002",
+                      "ADR-B0-013",
+                      "ADR-B0-014"
+                    ],
+                    "count": 4
+                  },
+                  "mcp_call_names": [
+                    "decision.applicable_to"
+                  ],
+                  "mcp_call_count": 1,
+                  "result_bytes": 81,
+                  "mcp_result_bytes": 2986,
+                  "host_calls": 0,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                },
+                "code": {
+                  "task_id": "T3",
+                  "arm": "code",
+                  "ok": true,
+                  "actual": {
+                    "canonical_ids": [
+                      "ADR-B0-001",
+                      "ADR-B0-002",
+                      "ADR-B0-013",
+                      "ADR-B0-014"
+                    ],
+                    "count": 4
+                  },
+                  "expected": {
+                    "canonical_ids": [
+                      "ADR-B0-001",
+                      "ADR-B0-002",
+                      "ADR-B0-013",
+                      "ADR-B0-014"
+                    ],
+                    "count": 4
+                  },
+                  "mcp_call_names": [
+                    "decision.applicable_to"
+                  ],
+                  "mcp_call_count": 1,
+                  "result_bytes": 81,
+                  "mcp_result_bytes": 2986,
+                  "host_calls": 1,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                }
+              },
+              {
+                "id": "T4",
+                "direct": {
+                  "task_id": "T4",
+                  "arm": "direct",
+                  "ok": true,
+                  "actual": {
+                    "canonical_decision_id": "ADR-B0-001",
+                    "version": "1",
+                    "version_id": "dver-6321b0b53db41080445166681c6546a9",
+                    "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+                    "derived_rule_ids": [
+                      "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+                    ],
+                    "declared_test_evidence": [
+                      {
+                        "selector": "tests/b0/adr-b0-001.spec",
+                        "sha": "aad3098acc972583962263cc7ff36bb950739edeeb779683050f6fde3d3f3cfc"
+                      }
+                    ]
+                  },
+                  "expected": {
+                    "canonical_decision_id": "ADR-B0-001",
+                    "version": "1",
+                    "version_id": "dver-6321b0b53db41080445166681c6546a9",
+                    "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+                    "derived_rule_ids": [
+                      "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+                    ],
+                    "declared_test_evidence": [
+                      {
+                        "selector": "tests/b0/adr-b0-001.spec",
+                        "sha": "aad3098acc972583962263cc7ff36bb950739edeeb779683050f6fde3d3f3cfc"
+                      }
+                    ]
+                  },
+                  "mcp_call_names": [
+                    "decision.trace"
+                  ],
+                  "mcp_call_count": 1,
+                  "result_bytes": 411,
+                  "mcp_result_bytes": 4996,
+                  "host_calls": 0,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                },
+                "code": {
+                  "task_id": "T4",
+                  "arm": "code",
+                  "ok": true,
+                  "actual": {
+                    "canonical_decision_id": "ADR-B0-001",
+                    "version": "1",
+                    "version_id": "dver-6321b0b53db41080445166681c6546a9",
+                    "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+                    "derived_rule_ids": [
+                      "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+                    ],
+                    "declared_test_evidence": [
+                      {
+                        "selector": "tests/b0/adr-b0-001.spec",
+                        "sha": "aad3098acc972583962263cc7ff36bb950739edeeb779683050f6fde3d3f3cfc"
+                      }
+                    ]
+                  },
+                  "expected": {
+                    "canonical_decision_id": "ADR-B0-001",
+                    "version": "1",
+                    "version_id": "dver-6321b0b53db41080445166681c6546a9",
+                    "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+                    "derived_rule_ids": [
+                      "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+                    ],
+                    "declared_test_evidence": [
+                      {
+                        "selector": "tests/b0/adr-b0-001.spec",
+                        "sha": "aad3098acc972583962263cc7ff36bb950739edeeb779683050f6fde3d3f3cfc"
+                      }
+                    ]
+                  },
+                  "mcp_call_names": [
+                    "decision.trace"
+                  ],
+                  "mcp_call_count": 1,
+                  "result_bytes": 411,
+                  "mcp_result_bytes": 4996,
+                  "host_calls": 1,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                }
+              },
+              {
+                "id": "T5",
+                "direct": {
+                  "task_id": "T5",
+                  "arm": "direct",
+                  "ok": true,
+                  "actual": {
+                    "decision_id": "ADR-B0-005",
+                    "version": "1",
+                    "version_id": "dver-47cd76fdfae32baeea61f8217b71f0ef",
+                    "content_digest": "7d2408aa0101228eed70f0226e577e49d2d0e73ec6aca894d2d026ae5b10785e",
+                    "lifecycle_status": "active",
+                    "context_scope": [
+                      "auth",
+                      "ui"
+                    ],
+                    "derived_rule_ids": [
+                      "ADR-B0-005:FORBID_LITERAL:33e0b5c00d04cbc00fe36d09c7ed8c6b"
+                    ]
+                  },
+                  "expected": {
+                    "decision_id": "ADR-B0-005",
+                    "version": "1",
+                    "version_id": "dver-47cd76fdfae32baeea61f8217b71f0ef",
+                    "content_digest": "7d2408aa0101228eed70f0226e577e49d2d0e73ec6aca894d2d026ae5b10785e",
+                    "lifecycle_status": "active",
+                    "context_scope": [
+                      "auth",
+                      "ui"
+                    ],
+                    "derived_rule_ids": [
+                      "ADR-B0-005:FORBID_LITERAL:33e0b5c00d04cbc00fe36d09c7ed8c6b"
+                    ]
+                  },
+                  "mcp_call_names": [
+                    "decision.search",
+                    "decision.get"
+                  ],
+                  "mcp_call_count": 2,
+                  "result_bytes": 319,
+                  "mcp_result_bytes": 5780,
+                  "host_calls": 0,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                },
+                "code": {
+                  "task_id": "T5",
+                  "arm": "code",
+                  "ok": true,
+                  "actual": {
+                    "decision_id": "ADR-B0-005",
+                    "version": "1",
+                    "version_id": "dver-47cd76fdfae32baeea61f8217b71f0ef",
+                    "content_digest": "7d2408aa0101228eed70f0226e577e49d2d0e73ec6aca894d2d026ae5b10785e",
+                    "lifecycle_status": "active",
+                    "context_scope": [
+                      "auth",
+                      "ui"
+                    ],
+                    "derived_rule_ids": [
+                      "ADR-B0-005:FORBID_LITERAL:33e0b5c00d04cbc00fe36d09c7ed8c6b"
+                    ]
+                  },
+                  "expected": {
+                    "decision_id": "ADR-B0-005",
+                    "version": "1",
+                    "version_id": "dver-47cd76fdfae32baeea61f8217b71f0ef",
+                    "content_digest": "7d2408aa0101228eed70f0226e577e49d2d0e73ec6aca894d2d026ae5b10785e",
+                    "lifecycle_status": "active",
+                    "context_scope": [
+                      "auth",
+                      "ui"
+                    ],
+                    "derived_rule_ids": [
+                      "ADR-B0-005:FORBID_LITERAL:33e0b5c00d04cbc00fe36d09c7ed8c6b"
+                    ]
+                  },
+                  "mcp_call_names": [
+                    "decision.search",
+                    "decision.get"
+                  ],
+                  "mcp_call_count": 2,
+                  "result_bytes": 319,
+                  "mcp_result_bytes": 5780,
+                  "host_calls": 2,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                }
+              },
+              {
+                "id": "T6",
+                "direct": {
+                  "task_id": "T6",
+                  "arm": "direct",
+                  "ok": true,
+                  "actual": {
+                    "canonical_decision_id": "ADR-B0-018",
+                    "version": "1",
+                    "version_id": "dver-082a078fea409b08ac2c6b080ea8467b",
+                    "content_digest": "e0d33d4075485c7c1047504d597f45dbb24328d25e3ea12b23d6762fee4c4451",
+                    "derived_rule_ids": [
+                      "ADR-B0-018:FORBID_LITERAL:9117b71942559968fda4807f41dae271"
+                    ],
+                    "declared_test_evidence": []
+                  },
+                  "expected": {
+                    "canonical_decision_id": "ADR-B0-018",
+                    "version": "1",
+                    "version_id": "dver-082a078fea409b08ac2c6b080ea8467b",
+                    "content_digest": "e0d33d4075485c7c1047504d597f45dbb24328d25e3ea12b23d6762fee4c4451",
+                    "derived_rule_ids": [
+                      "ADR-B0-018:FORBID_LITERAL:9117b71942559968fda4807f41dae271"
+                    ],
+                    "declared_test_evidence": []
+                  },
+                  "mcp_call_names": [
+                    "decision.search",
+                    "decision.trace"
+                  ],
+                  "mcp_call_count": 2,
+                  "result_bytes": 299,
+                  "mcp_result_bytes": 7148,
+                  "host_calls": 0,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                },
+                "code": {
+                  "task_id": "T6",
+                  "arm": "code",
+                  "ok": true,
+                  "actual": {
+                    "canonical_decision_id": "ADR-B0-018",
+                    "version": "1",
+                    "version_id": "dver-082a078fea409b08ac2c6b080ea8467b",
+                    "content_digest": "e0d33d4075485c7c1047504d597f45dbb24328d25e3ea12b23d6762fee4c4451",
+                    "derived_rule_ids": [
+                      "ADR-B0-018:FORBID_LITERAL:9117b71942559968fda4807f41dae271"
+                    ],
+                    "declared_test_evidence": []
+                  },
+                  "expected": {
+                    "canonical_decision_id": "ADR-B0-018",
+                    "version": "1",
+                    "version_id": "dver-082a078fea409b08ac2c6b080ea8467b",
+                    "content_digest": "e0d33d4075485c7c1047504d597f45dbb24328d25e3ea12b23d6762fee4c4451",
+                    "derived_rule_ids": [
+                      "ADR-B0-018:FORBID_LITERAL:9117b71942559968fda4807f41dae271"
+                    ],
+                    "declared_test_evidence": []
+                  },
+                  "mcp_call_names": [
+                    "decision.search",
+                    "decision.trace"
+                  ],
+                  "mcp_call_count": 2,
+                  "result_bytes": 299,
+                  "mcp_result_bytes": 7148,
+                  "host_calls": 2,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                }
+              },
+              {
+                "id": "T7",
+                "direct": {
+                  "task_id": "T7",
+                  "arm": "direct",
+                  "ok": true,
+                  "actual": {
+                    "selected_id": "ADR-B0-003",
+                    "get": {
+                      "decision_id": "ADR-B0-003",
+                      "version": "1",
+                      "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+                      "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                      "lifecycle_status": "active",
+                      "context_scope": [
+                        "routing",
+                        "telemetry"
+                      ],
+                      "derived_rule_ids": [
+                        "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                      ]
+                    },
+                    "trace": {
+                      "canonical_decision_id": "ADR-B0-003",
+                      "version": "1",
+                      "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+                      "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                      "derived_rule_ids": [
+                        "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                      ],
+                      "declared_test_evidence": []
+                    }
+                  },
+                  "expected": {
+                    "selected_id": "ADR-B0-003",
+                    "get": {
+                      "decision_id": "ADR-B0-003",
+                      "version": "1",
+                      "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+                      "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                      "lifecycle_status": "active",
+                      "context_scope": [
+                        "routing",
+                        "telemetry"
+                      ],
+                      "derived_rule_ids": [
+                        "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                      ]
+                    },
+                    "trace": {
+                      "canonical_decision_id": "ADR-B0-003",
+                      "version": "1",
+                      "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+                      "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                      "derived_rule_ids": [
+                        "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                      ],
+                      "declared_test_evidence": []
+                    }
+                  },
+                  "mcp_call_names": [
+                    "decision.applicable_to",
+                    "decision.get",
+                    "decision.trace"
+                  ],
+                  "mcp_call_count": 3,
+                  "result_bytes": 672,
+                  "mcp_result_bytes": 10258,
+                  "host_calls": 0,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                },
+                "code": {
+                  "task_id": "T7",
+                  "arm": "code",
+                  "ok": true,
+                  "actual": {
+                    "selected_id": "ADR-B0-003",
+                    "get": {
+                      "decision_id": "ADR-B0-003",
+                      "version": "1",
+                      "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+                      "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                      "lifecycle_status": "active",
+                      "context_scope": [
+                        "routing",
+                        "telemetry"
+                      ],
+                      "derived_rule_ids": [
+                        "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                      ]
+                    },
+                    "trace": {
+                      "canonical_decision_id": "ADR-B0-003",
+                      "version": "1",
+                      "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+                      "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                      "derived_rule_ids": [
+                        "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                      ],
+                      "declared_test_evidence": []
+                    }
+                  },
+                  "expected": {
+                    "selected_id": "ADR-B0-003",
+                    "get": {
+                      "decision_id": "ADR-B0-003",
+                      "version": "1",
+                      "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+                      "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                      "lifecycle_status": "active",
+                      "context_scope": [
+                        "routing",
+                        "telemetry"
+                      ],
+                      "derived_rule_ids": [
+                        "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                      ]
+                    },
+                    "trace": {
+                      "canonical_decision_id": "ADR-B0-003",
+                      "version": "1",
+                      "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+                      "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                      "derived_rule_ids": [
+                        "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                      ],
+                      "declared_test_evidence": []
+                    }
+                  },
+                  "mcp_call_names": [
+                    "decision.applicable_to",
+                    "decision.get",
+                    "decision.trace"
+                  ],
+                  "mcp_call_count": 3,
+                  "result_bytes": 672,
+                  "mcp_result_bytes": 10258,
+                  "host_calls": 3,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                }
+              },
+              {
+                "id": "T8",
+                "direct": {
+                  "task_id": "T8",
+                  "arm": "direct",
+                  "ok": true,
+                  "actual": {
+                    "items": [
+                      {
+                        "decision_id": "ADR-B0-003",
+                        "version": "1",
+                        "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                        "derived_rule_ids": [
+                          "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                        ]
+                      },
+                      {
+                        "decision_id": "ADR-B0-004",
+                        "version": "1",
+                        "content_digest": "55873a2190bb0d54d2fc060523d759d7fbfcc0f56142ccd2e13b1ea4e319c5a5",
+                        "derived_rule_ids": [
+                          "ADR-B0-004:FORBID_LITERAL:1562f5d6c95745c48f3245d09f4f5f32"
+                        ]
+                      }
+                    ]
+                  },
+                  "expected": {
+                    "items": [
+                      {
+                        "decision_id": "ADR-B0-003",
+                        "version": "1",
+                        "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                        "derived_rule_ids": [
+                          "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                        ]
+                      },
+                      {
+                        "decision_id": "ADR-B0-004",
+                        "version": "1",
+                        "content_digest": "55873a2190bb0d54d2fc060523d759d7fbfcc0f56142ccd2e13b1ea4e319c5a5",
+                        "derived_rule_ids": [
+                          "ADR-B0-004:FORBID_LITERAL:1562f5d6c95745c48f3245d09f4f5f32"
+                        ]
+                      }
+                    ]
+                  },
+                  "mcp_call_names": [
+                    "decision.search",
+                    "decision.get",
+                    "decision.get"
+                  ],
+                  "mcp_call_count": 3,
+                  "result_bytes": 429,
+                  "mcp_result_bytes": 15230,
+                  "host_calls": 0,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                },
+                "code": {
+                  "task_id": "T8",
+                  "arm": "code",
+                  "ok": true,
+                  "actual": {
+                    "items": [
+                      {
+                        "decision_id": "ADR-B0-003",
+                        "version": "1",
+                        "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                        "derived_rule_ids": [
+                          "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                        ]
+                      },
+                      {
+                        "decision_id": "ADR-B0-004",
+                        "version": "1",
+                        "content_digest": "55873a2190bb0d54d2fc060523d759d7fbfcc0f56142ccd2e13b1ea4e319c5a5",
+                        "derived_rule_ids": [
+                          "ADR-B0-004:FORBID_LITERAL:1562f5d6c95745c48f3245d09f4f5f32"
+                        ]
+                      }
+                    ]
+                  },
+                  "expected": {
+                    "items": [
+                      {
+                        "decision_id": "ADR-B0-003",
+                        "version": "1",
+                        "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                        "derived_rule_ids": [
+                          "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                        ]
+                      },
+                      {
+                        "decision_id": "ADR-B0-004",
+                        "version": "1",
+                        "content_digest": "55873a2190bb0d54d2fc060523d759d7fbfcc0f56142ccd2e13b1ea4e319c5a5",
+                        "derived_rule_ids": [
+                          "ADR-B0-004:FORBID_LITERAL:1562f5d6c95745c48f3245d09f4f5f32"
+                        ]
+                      }
+                    ]
+                  },
+                  "mcp_call_names": [
+                    "decision.search",
+                    "decision.get",
+                    "decision.get"
+                  ],
+                  "mcp_call_count": 3,
+                  "result_bytes": 429,
+                  "mcp_result_bytes": 15230,
+                  "host_calls": 3,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                }
+              }
+            ],
+            "cancellation": {
+              "ok": true,
+              "withheld": true,
+              "cancellation_count": 1,
+              "outcome": "rejected",
+              "error_code": -32001,
+              "pending": false,
+              "settled": true,
+              "stats": {
+                "cancelledCalls": 1,
+                "cancelledSettled": 1,
+                "cancelledUnsettled": 0
+              }
+            },
+            "checks": [
+              {
+                "id": "B0M-T1-DIRECT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T1-CODE",
+                "pass": true
+              },
+              {
+                "id": "B0M-T1-EQUIVALENT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T1-NO-PROPOSAL",
+                "pass": true
+              },
+              {
+                "id": "B0M-T2-DIRECT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T2-CODE",
+                "pass": true
+              },
+              {
+                "id": "B0M-T2-EQUIVALENT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T2-NO-PROPOSAL",
+                "pass": true
+              },
+              {
+                "id": "B0M-T3-DIRECT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T3-CODE",
+                "pass": true
+              },
+              {
+                "id": "B0M-T3-EQUIVALENT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T3-NO-PROPOSAL",
+                "pass": true
+              },
+              {
+                "id": "B0M-T4-DIRECT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T4-CODE",
+                "pass": true
+              },
+              {
+                "id": "B0M-T4-EQUIVALENT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T4-NO-PROPOSAL",
+                "pass": true
+              },
+              {
+                "id": "B0M-T5-DIRECT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T5-CODE",
+                "pass": true
+              },
+              {
+                "id": "B0M-T5-EQUIVALENT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T5-NO-PROPOSAL",
+                "pass": true
+              },
+              {
+                "id": "B0M-T6-DIRECT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T6-CODE",
+                "pass": true
+              },
+              {
+                "id": "B0M-T6-EQUIVALENT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T6-NO-PROPOSAL",
+                "pass": true
+              },
+              {
+                "id": "B0M-T7-DIRECT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T7-CODE",
+                "pass": true
+              },
+              {
+                "id": "B0M-T7-EQUIVALENT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T7-NO-PROPOSAL",
+                "pass": true
+              },
+              {
+                "id": "B0M-T8-DIRECT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T8-CODE",
+                "pass": true
+              },
+              {
+                "id": "B0M-T8-EQUIVALENT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T8-NO-PROPOSAL",
+                "pass": true
+              },
+              {
+                "id": "B0M-MCP-INSTRUMENTATION",
+                "pass": true
+              },
+              {
+                "id": "B0M-MCP-CALL-METRICS",
+                "pass": true
+              },
+              {
+                "id": "B0M-RESULT-SIZES",
+                "pass": true
+              },
+              {
+                "id": "B0M-MODEL-NOT-MEASURED",
+                "pass": true
+              },
+              {
+                "id": "B0M-CANCELLATION",
+                "pass": true
+              },
+              {
+                "id": "B0M-CLEANUP",
+                "pass": true
+              },
+              {
+                "id": "B0M-UNHANDLED",
+                "pass": true
+              }
+            ]
+          },
+          "reproduced": {
+            "tasks": [
+              {
+                "id": "T1",
+                "direct": {
+                  "task_id": "T1",
+                  "arm": "direct",
+                  "ok": true,
+                  "actual": {
+                    "decision_id": "ADR-B0-001",
+                    "version": "1",
+                    "version_id": "dver-6321b0b53db41080445166681c6546a9",
+                    "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+                    "lifecycle_status": "active",
+                    "context_scope": [
+                      "cache",
+                      "storage"
+                    ],
+                    "derived_rule_ids": [
+                      "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+                    ]
+                  },
+                  "expected": {
+                    "decision_id": "ADR-B0-001",
+                    "version": "1",
+                    "version_id": "dver-6321b0b53db41080445166681c6546a9",
+                    "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+                    "lifecycle_status": "active",
+                    "context_scope": [
+                      "cache",
+                      "storage"
+                    ],
+                    "derived_rule_ids": [
+                      "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+                    ]
+                  },
+                  "mcp_call_names": [
+                    "decision.get"
+                  ],
+                  "mcp_call_count": 1,
+                  "result_bytes": 325,
+                  "mcp_result_bytes": 3180,
+                  "host_calls": 0,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                },
+                "code": {
+                  "task_id": "T1",
+                  "arm": "code",
+                  "ok": true,
+                  "actual": {
+                    "decision_id": "ADR-B0-001",
+                    "version": "1",
+                    "version_id": "dver-6321b0b53db41080445166681c6546a9",
+                    "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+                    "lifecycle_status": "active",
+                    "context_scope": [
+                      "cache",
+                      "storage"
+                    ],
+                    "derived_rule_ids": [
+                      "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+                    ]
+                  },
+                  "expected": {
+                    "decision_id": "ADR-B0-001",
+                    "version": "1",
+                    "version_id": "dver-6321b0b53db41080445166681c6546a9",
+                    "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+                    "lifecycle_status": "active",
+                    "context_scope": [
+                      "cache",
+                      "storage"
+                    ],
+                    "derived_rule_ids": [
+                      "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+                    ]
+                  },
+                  "mcp_call_names": [
+                    "decision.get"
+                  ],
+                  "mcp_call_count": 1,
+                  "result_bytes": 325,
+                  "mcp_result_bytes": 3180,
+                  "host_calls": 1,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                }
+              },
+              {
+                "id": "T2",
+                "direct": {
+                  "task_id": "T2",
+                  "arm": "direct",
+                  "ok": true,
+                  "actual": {
+                    "canonical_ids": [
+                      "ADR-B0-003"
+                    ],
+                    "count": 1
+                  },
+                  "expected": {
+                    "canonical_ids": [
+                      "ADR-B0-003"
+                    ],
+                    "count": 1
+                  },
+                  "mcp_call_names": [
+                    "decision.search"
+                  ],
+                  "mcp_call_count": 1,
+                  "result_bytes": 42,
+                  "mcp_result_bytes": 3008,
+                  "host_calls": 0,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                },
+                "code": {
+                  "task_id": "T2",
+                  "arm": "code",
+                  "ok": true,
+                  "actual": {
+                    "canonical_ids": [
+                      "ADR-B0-003"
+                    ],
+                    "count": 1
+                  },
+                  "expected": {
+                    "canonical_ids": [
+                      "ADR-B0-003"
+                    ],
+                    "count": 1
+                  },
+                  "mcp_call_names": [
+                    "decision.search"
+                  ],
+                  "mcp_call_count": 1,
+                  "result_bytes": 42,
+                  "mcp_result_bytes": 3008,
+                  "host_calls": 1,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                }
+              },
+              {
+                "id": "T3",
+                "direct": {
+                  "task_id": "T3",
+                  "arm": "direct",
+                  "ok": true,
+                  "actual": {
+                    "canonical_ids": [
+                      "ADR-B0-001",
+                      "ADR-B0-002",
+                      "ADR-B0-013",
+                      "ADR-B0-014"
+                    ],
+                    "count": 4
+                  },
+                  "expected": {
+                    "canonical_ids": [
+                      "ADR-B0-001",
+                      "ADR-B0-002",
+                      "ADR-B0-013",
+                      "ADR-B0-014"
+                    ],
+                    "count": 4
+                  },
+                  "mcp_call_names": [
+                    "decision.applicable_to"
+                  ],
+                  "mcp_call_count": 1,
+                  "result_bytes": 81,
+                  "mcp_result_bytes": 2986,
+                  "host_calls": 0,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                },
+                "code": {
+                  "task_id": "T3",
+                  "arm": "code",
+                  "ok": true,
+                  "actual": {
+                    "canonical_ids": [
+                      "ADR-B0-001",
+                      "ADR-B0-002",
+                      "ADR-B0-013",
+                      "ADR-B0-014"
+                    ],
+                    "count": 4
+                  },
+                  "expected": {
+                    "canonical_ids": [
+                      "ADR-B0-001",
+                      "ADR-B0-002",
+                      "ADR-B0-013",
+                      "ADR-B0-014"
+                    ],
+                    "count": 4
+                  },
+                  "mcp_call_names": [
+                    "decision.applicable_to"
+                  ],
+                  "mcp_call_count": 1,
+                  "result_bytes": 81,
+                  "mcp_result_bytes": 2986,
+                  "host_calls": 1,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                }
+              },
+              {
+                "id": "T4",
+                "direct": {
+                  "task_id": "T4",
+                  "arm": "direct",
+                  "ok": true,
+                  "actual": {
+                    "canonical_decision_id": "ADR-B0-001",
+                    "version": "1",
+                    "version_id": "dver-6321b0b53db41080445166681c6546a9",
+                    "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+                    "derived_rule_ids": [
+                      "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+                    ],
+                    "declared_test_evidence": [
+                      {
+                        "selector": "tests/b0/adr-b0-001.spec",
+                        "sha": "aad3098acc972583962263cc7ff36bb950739edeeb779683050f6fde3d3f3cfc"
+                      }
+                    ]
+                  },
+                  "expected": {
+                    "canonical_decision_id": "ADR-B0-001",
+                    "version": "1",
+                    "version_id": "dver-6321b0b53db41080445166681c6546a9",
+                    "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+                    "derived_rule_ids": [
+                      "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+                    ],
+                    "declared_test_evidence": [
+                      {
+                        "selector": "tests/b0/adr-b0-001.spec",
+                        "sha": "aad3098acc972583962263cc7ff36bb950739edeeb779683050f6fde3d3f3cfc"
+                      }
+                    ]
+                  },
+                  "mcp_call_names": [
+                    "decision.trace"
+                  ],
+                  "mcp_call_count": 1,
+                  "result_bytes": 411,
+                  "mcp_result_bytes": 4996,
+                  "host_calls": 0,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                },
+                "code": {
+                  "task_id": "T4",
+                  "arm": "code",
+                  "ok": true,
+                  "actual": {
+                    "canonical_decision_id": "ADR-B0-001",
+                    "version": "1",
+                    "version_id": "dver-6321b0b53db41080445166681c6546a9",
+                    "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+                    "derived_rule_ids": [
+                      "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+                    ],
+                    "declared_test_evidence": [
+                      {
+                        "selector": "tests/b0/adr-b0-001.spec",
+                        "sha": "aad3098acc972583962263cc7ff36bb950739edeeb779683050f6fde3d3f3cfc"
+                      }
+                    ]
+                  },
+                  "expected": {
+                    "canonical_decision_id": "ADR-B0-001",
+                    "version": "1",
+                    "version_id": "dver-6321b0b53db41080445166681c6546a9",
+                    "content_digest": "5241353484aac3f95f92421b5f21924888732da1daa0e52a318a573ca6e7c653",
+                    "derived_rule_ids": [
+                      "ADR-B0-001:FORBID_LITERAL:584da28075f60b57d9f610030e68d3c4"
+                    ],
+                    "declared_test_evidence": [
+                      {
+                        "selector": "tests/b0/adr-b0-001.spec",
+                        "sha": "aad3098acc972583962263cc7ff36bb950739edeeb779683050f6fde3d3f3cfc"
+                      }
+                    ]
+                  },
+                  "mcp_call_names": [
+                    "decision.trace"
+                  ],
+                  "mcp_call_count": 1,
+                  "result_bytes": 411,
+                  "mcp_result_bytes": 4996,
+                  "host_calls": 1,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                }
+              },
+              {
+                "id": "T5",
+                "direct": {
+                  "task_id": "T5",
+                  "arm": "direct",
+                  "ok": true,
+                  "actual": {
+                    "decision_id": "ADR-B0-005",
+                    "version": "1",
+                    "version_id": "dver-47cd76fdfae32baeea61f8217b71f0ef",
+                    "content_digest": "7d2408aa0101228eed70f0226e577e49d2d0e73ec6aca894d2d026ae5b10785e",
+                    "lifecycle_status": "active",
+                    "context_scope": [
+                      "auth",
+                      "ui"
+                    ],
+                    "derived_rule_ids": [
+                      "ADR-B0-005:FORBID_LITERAL:33e0b5c00d04cbc00fe36d09c7ed8c6b"
+                    ]
+                  },
+                  "expected": {
+                    "decision_id": "ADR-B0-005",
+                    "version": "1",
+                    "version_id": "dver-47cd76fdfae32baeea61f8217b71f0ef",
+                    "content_digest": "7d2408aa0101228eed70f0226e577e49d2d0e73ec6aca894d2d026ae5b10785e",
+                    "lifecycle_status": "active",
+                    "context_scope": [
+                      "auth",
+                      "ui"
+                    ],
+                    "derived_rule_ids": [
+                      "ADR-B0-005:FORBID_LITERAL:33e0b5c00d04cbc00fe36d09c7ed8c6b"
+                    ]
+                  },
+                  "mcp_call_names": [
+                    "decision.search",
+                    "decision.get"
+                  ],
+                  "mcp_call_count": 2,
+                  "result_bytes": 319,
+                  "mcp_result_bytes": 5780,
+                  "host_calls": 0,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                },
+                "code": {
+                  "task_id": "T5",
+                  "arm": "code",
+                  "ok": true,
+                  "actual": {
+                    "decision_id": "ADR-B0-005",
+                    "version": "1",
+                    "version_id": "dver-47cd76fdfae32baeea61f8217b71f0ef",
+                    "content_digest": "7d2408aa0101228eed70f0226e577e49d2d0e73ec6aca894d2d026ae5b10785e",
+                    "lifecycle_status": "active",
+                    "context_scope": [
+                      "auth",
+                      "ui"
+                    ],
+                    "derived_rule_ids": [
+                      "ADR-B0-005:FORBID_LITERAL:33e0b5c00d04cbc00fe36d09c7ed8c6b"
+                    ]
+                  },
+                  "expected": {
+                    "decision_id": "ADR-B0-005",
+                    "version": "1",
+                    "version_id": "dver-47cd76fdfae32baeea61f8217b71f0ef",
+                    "content_digest": "7d2408aa0101228eed70f0226e577e49d2d0e73ec6aca894d2d026ae5b10785e",
+                    "lifecycle_status": "active",
+                    "context_scope": [
+                      "auth",
+                      "ui"
+                    ],
+                    "derived_rule_ids": [
+                      "ADR-B0-005:FORBID_LITERAL:33e0b5c00d04cbc00fe36d09c7ed8c6b"
+                    ]
+                  },
+                  "mcp_call_names": [
+                    "decision.search",
+                    "decision.get"
+                  ],
+                  "mcp_call_count": 2,
+                  "result_bytes": 319,
+                  "mcp_result_bytes": 5780,
+                  "host_calls": 2,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                }
+              },
+              {
+                "id": "T6",
+                "direct": {
+                  "task_id": "T6",
+                  "arm": "direct",
+                  "ok": true,
+                  "actual": {
+                    "canonical_decision_id": "ADR-B0-018",
+                    "version": "1",
+                    "version_id": "dver-082a078fea409b08ac2c6b080ea8467b",
+                    "content_digest": "e0d33d4075485c7c1047504d597f45dbb24328d25e3ea12b23d6762fee4c4451",
+                    "derived_rule_ids": [
+                      "ADR-B0-018:FORBID_LITERAL:9117b71942559968fda4807f41dae271"
+                    ],
+                    "declared_test_evidence": []
+                  },
+                  "expected": {
+                    "canonical_decision_id": "ADR-B0-018",
+                    "version": "1",
+                    "version_id": "dver-082a078fea409b08ac2c6b080ea8467b",
+                    "content_digest": "e0d33d4075485c7c1047504d597f45dbb24328d25e3ea12b23d6762fee4c4451",
+                    "derived_rule_ids": [
+                      "ADR-B0-018:FORBID_LITERAL:9117b71942559968fda4807f41dae271"
+                    ],
+                    "declared_test_evidence": []
+                  },
+                  "mcp_call_names": [
+                    "decision.search",
+                    "decision.trace"
+                  ],
+                  "mcp_call_count": 2,
+                  "result_bytes": 299,
+                  "mcp_result_bytes": 7148,
+                  "host_calls": 0,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                },
+                "code": {
+                  "task_id": "T6",
+                  "arm": "code",
+                  "ok": true,
+                  "actual": {
+                    "canonical_decision_id": "ADR-B0-018",
+                    "version": "1",
+                    "version_id": "dver-082a078fea409b08ac2c6b080ea8467b",
+                    "content_digest": "e0d33d4075485c7c1047504d597f45dbb24328d25e3ea12b23d6762fee4c4451",
+                    "derived_rule_ids": [
+                      "ADR-B0-018:FORBID_LITERAL:9117b71942559968fda4807f41dae271"
+                    ],
+                    "declared_test_evidence": []
+                  },
+                  "expected": {
+                    "canonical_decision_id": "ADR-B0-018",
+                    "version": "1",
+                    "version_id": "dver-082a078fea409b08ac2c6b080ea8467b",
+                    "content_digest": "e0d33d4075485c7c1047504d597f45dbb24328d25e3ea12b23d6762fee4c4451",
+                    "derived_rule_ids": [
+                      "ADR-B0-018:FORBID_LITERAL:9117b71942559968fda4807f41dae271"
+                    ],
+                    "declared_test_evidence": []
+                  },
+                  "mcp_call_names": [
+                    "decision.search",
+                    "decision.trace"
+                  ],
+                  "mcp_call_count": 2,
+                  "result_bytes": 299,
+                  "mcp_result_bytes": 7148,
+                  "host_calls": 2,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                }
+              },
+              {
+                "id": "T7",
+                "direct": {
+                  "task_id": "T7",
+                  "arm": "direct",
+                  "ok": true,
+                  "actual": {
+                    "selected_id": "ADR-B0-003",
+                    "get": {
+                      "decision_id": "ADR-B0-003",
+                      "version": "1",
+                      "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+                      "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                      "lifecycle_status": "active",
+                      "context_scope": [
+                        "routing",
+                        "telemetry"
+                      ],
+                      "derived_rule_ids": [
+                        "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                      ]
+                    },
+                    "trace": {
+                      "canonical_decision_id": "ADR-B0-003",
+                      "version": "1",
+                      "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+                      "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                      "derived_rule_ids": [
+                        "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                      ],
+                      "declared_test_evidence": []
+                    }
+                  },
+                  "expected": {
+                    "selected_id": "ADR-B0-003",
+                    "get": {
+                      "decision_id": "ADR-B0-003",
+                      "version": "1",
+                      "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+                      "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                      "lifecycle_status": "active",
+                      "context_scope": [
+                        "routing",
+                        "telemetry"
+                      ],
+                      "derived_rule_ids": [
+                        "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                      ]
+                    },
+                    "trace": {
+                      "canonical_decision_id": "ADR-B0-003",
+                      "version": "1",
+                      "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+                      "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                      "derived_rule_ids": [
+                        "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                      ],
+                      "declared_test_evidence": []
+                    }
+                  },
+                  "mcp_call_names": [
+                    "decision.applicable_to",
+                    "decision.get",
+                    "decision.trace"
+                  ],
+                  "mcp_call_count": 3,
+                  "result_bytes": 672,
+                  "mcp_result_bytes": 10258,
+                  "host_calls": 0,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                },
+                "code": {
+                  "task_id": "T7",
+                  "arm": "code",
+                  "ok": true,
+                  "actual": {
+                    "selected_id": "ADR-B0-003",
+                    "get": {
+                      "decision_id": "ADR-B0-003",
+                      "version": "1",
+                      "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+                      "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                      "lifecycle_status": "active",
+                      "context_scope": [
+                        "routing",
+                        "telemetry"
+                      ],
+                      "derived_rule_ids": [
+                        "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                      ]
+                    },
+                    "trace": {
+                      "canonical_decision_id": "ADR-B0-003",
+                      "version": "1",
+                      "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+                      "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                      "derived_rule_ids": [
+                        "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                      ],
+                      "declared_test_evidence": []
+                    }
+                  },
+                  "expected": {
+                    "selected_id": "ADR-B0-003",
+                    "get": {
+                      "decision_id": "ADR-B0-003",
+                      "version": "1",
+                      "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+                      "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                      "lifecycle_status": "active",
+                      "context_scope": [
+                        "routing",
+                        "telemetry"
+                      ],
+                      "derived_rule_ids": [
+                        "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                      ]
+                    },
+                    "trace": {
+                      "canonical_decision_id": "ADR-B0-003",
+                      "version": "1",
+                      "version_id": "dver-9ed712800589864a867e13f2b7f4481f",
+                      "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                      "derived_rule_ids": [
+                        "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                      ],
+                      "declared_test_evidence": []
+                    }
+                  },
+                  "mcp_call_names": [
+                    "decision.applicable_to",
+                    "decision.get",
+                    "decision.trace"
+                  ],
+                  "mcp_call_count": 3,
+                  "result_bytes": 672,
+                  "mcp_result_bytes": 10258,
+                  "host_calls": 3,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                }
+              },
+              {
+                "id": "T8",
+                "direct": {
+                  "task_id": "T8",
+                  "arm": "direct",
+                  "ok": true,
+                  "actual": {
+                    "items": [
+                      {
+                        "decision_id": "ADR-B0-003",
+                        "version": "1",
+                        "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                        "derived_rule_ids": [
+                          "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                        ]
+                      },
+                      {
+                        "decision_id": "ADR-B0-004",
+                        "version": "1",
+                        "content_digest": "55873a2190bb0d54d2fc060523d759d7fbfcc0f56142ccd2e13b1ea4e319c5a5",
+                        "derived_rule_ids": [
+                          "ADR-B0-004:FORBID_LITERAL:1562f5d6c95745c48f3245d09f4f5f32"
+                        ]
+                      }
+                    ]
+                  },
+                  "expected": {
+                    "items": [
+                      {
+                        "decision_id": "ADR-B0-003",
+                        "version": "1",
+                        "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                        "derived_rule_ids": [
+                          "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                        ]
+                      },
+                      {
+                        "decision_id": "ADR-B0-004",
+                        "version": "1",
+                        "content_digest": "55873a2190bb0d54d2fc060523d759d7fbfcc0f56142ccd2e13b1ea4e319c5a5",
+                        "derived_rule_ids": [
+                          "ADR-B0-004:FORBID_LITERAL:1562f5d6c95745c48f3245d09f4f5f32"
+                        ]
+                      }
+                    ]
+                  },
+                  "mcp_call_names": [
+                    "decision.search",
+                    "decision.get",
+                    "decision.get"
+                  ],
+                  "mcp_call_count": 3,
+                  "result_bytes": 429,
+                  "mcp_result_bytes": 15230,
+                  "host_calls": 0,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                },
+                "code": {
+                  "task_id": "T8",
+                  "arm": "code",
+                  "ok": true,
+                  "actual": {
+                    "items": [
+                      {
+                        "decision_id": "ADR-B0-003",
+                        "version": "1",
+                        "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                        "derived_rule_ids": [
+                          "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                        ]
+                      },
+                      {
+                        "decision_id": "ADR-B0-004",
+                        "version": "1",
+                        "content_digest": "55873a2190bb0d54d2fc060523d759d7fbfcc0f56142ccd2e13b1ea4e319c5a5",
+                        "derived_rule_ids": [
+                          "ADR-B0-004:FORBID_LITERAL:1562f5d6c95745c48f3245d09f4f5f32"
+                        ]
+                      }
+                    ]
+                  },
+                  "expected": {
+                    "items": [
+                      {
+                        "decision_id": "ADR-B0-003",
+                        "version": "1",
+                        "content_digest": "0f23035aa50a2e22993c6ff7eb6a2bafa54cc20e35f971c4049a587ceff7acc4",
+                        "derived_rule_ids": [
+                          "ADR-B0-003:FORBID_LITERAL:a19c5b73c83ccf8ae6b7f27247641bd3"
+                        ]
+                      },
+                      {
+                        "decision_id": "ADR-B0-004",
+                        "version": "1",
+                        "content_digest": "55873a2190bb0d54d2fc060523d759d7fbfcc0f56142ccd2e13b1ea4e319c5a5",
+                        "derived_rule_ids": [
+                          "ADR-B0-004:FORBID_LITERAL:1562f5d6c95745c48f3245d09f4f5f32"
+                        ]
+                      }
+                    ]
+                  },
+                  "mcp_call_names": [
+                    "decision.search",
+                    "decision.get",
+                    "decision.get"
+                  ],
+                  "mcp_call_count": 3,
+                  "result_bytes": 429,
+                  "mcp_result_bytes": 15230,
+                  "host_calls": 3,
+                  "no_proposal": true,
+                  "functional_completion": true,
+                  "decision_identity_ok": true,
+                  "cleanup_errors": [],
+                  "process_cleanup_ok": true
+                }
+              }
+            ],
+            "cancellation": {
+              "ok": true,
+              "withheld": true,
+              "cancellation_count": 1,
+              "outcome": "rejected",
+              "error_code": -32001,
+              "pending": false,
+              "settled": true,
+              "stats": {
+                "cancelledCalls": 1,
+                "cancelledSettled": 1,
+                "cancelledUnsettled": 0
+              }
+            },
+            "checks": [
+              {
+                "id": "B0M-T1-DIRECT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T1-CODE",
+                "pass": true
+              },
+              {
+                "id": "B0M-T1-EQUIVALENT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T1-NO-PROPOSAL",
+                "pass": true
+              },
+              {
+                "id": "B0M-T2-DIRECT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T2-CODE",
+                "pass": true
+              },
+              {
+                "id": "B0M-T2-EQUIVALENT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T2-NO-PROPOSAL",
+                "pass": true
+              },
+              {
+                "id": "B0M-T3-DIRECT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T3-CODE",
+                "pass": true
+              },
+              {
+                "id": "B0M-T3-EQUIVALENT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T3-NO-PROPOSAL",
+                "pass": true
+              },
+              {
+                "id": "B0M-T4-DIRECT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T4-CODE",
+                "pass": true
+              },
+              {
+                "id": "B0M-T4-EQUIVALENT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T4-NO-PROPOSAL",
+                "pass": true
+              },
+              {
+                "id": "B0M-T5-DIRECT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T5-CODE",
+                "pass": true
+              },
+              {
+                "id": "B0M-T5-EQUIVALENT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T5-NO-PROPOSAL",
+                "pass": true
+              },
+              {
+                "id": "B0M-T6-DIRECT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T6-CODE",
+                "pass": true
+              },
+              {
+                "id": "B0M-T6-EQUIVALENT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T6-NO-PROPOSAL",
+                "pass": true
+              },
+              {
+                "id": "B0M-T7-DIRECT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T7-CODE",
+                "pass": true
+              },
+              {
+                "id": "B0M-T7-EQUIVALENT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T7-NO-PROPOSAL",
+                "pass": true
+              },
+              {
+                "id": "B0M-T8-DIRECT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T8-CODE",
+                "pass": true
+              },
+              {
+                "id": "B0M-T8-EQUIVALENT",
+                "pass": true
+              },
+              {
+                "id": "B0M-T8-NO-PROPOSAL",
+                "pass": true
+              },
+              {
+                "id": "B0M-MCP-INSTRUMENTATION",
+                "pass": true
+              },
+              {
+                "id": "B0M-MCP-CALL-METRICS",
+                "pass": true
+              },
+              {
+                "id": "B0M-RESULT-SIZES",
+                "pass": true
+              },
+              {
+                "id": "B0M-MODEL-NOT-MEASURED",
+                "pass": true
+              },
+              {
+                "id": "B0M-CANCELLATION",
+                "pass": true
+              },
+              {
+                "id": "B0M-CLEANUP",
+                "pass": true
+              },
+              {
+                "id": "B0M-UNHANDLED",
+                "pass": true
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "REPRO-SOURCE-HASHES",
+        "pass": true,
+        "detail": {
+          "canonical": {
+            "arms": "6b9fd4f5b368b2f5a4f153bbe49c912f565ab2c1c177936423fceea7f4de1dbf",
+            "runner": "fb1172f1a6e26db340774701bfc0f3d9b199886bfc89f79a8b382907cb1440c3",
+            "make_corpus": "01fc3084ffa91a8ddd7ee67019e3400202794341f451f4526b55fe7574c11919",
+            "make_tasks": "08f80596869ee641083c13414f8d0b5619befbe0eda9aaf480f5e7852a0c9472",
+            "fixture": "a996e2aa5c2d41bf8a75293c8d60adebf9ab89eb59caea926fbccf97297a1dca",
+            "tasks": "7aaa196a72b52726ea6db7e46db612c6a6abc0f2bf7f3d5f3a13be2822e163b6",
+            "package_lock": "c9850209a6330a810fbf2f784427eca6c89df4cce71fb6ec49564fee01c55e9f",
+            "f1_executor": "0d81093b20fa0b77a3fc9f2e6b4a90bf184668d0377242c3e4f37e64afd9d2b1",
+            "f1_adapter": "3d8123975bc9f67147fec90ff3e6911a08e40a7f2dc4bd7b43da14b0530cb08c",
+            "f1_relay": "536f32e7869fc407782b1c1db7d55afc3bd383bc0ede405f40d6f08b45e0f5e5",
+            "f1_runner": "55a40f182df80bf7f3828e165601758298912eaa7f6285ef0772cc967103e830",
+            "frozen_executor": "4b960124e9218ed124ed34e3b3595b648477b9dab6540c4ce1609d2efaf31313"
+          },
+          "reproduced": {
+            "arms": "6b9fd4f5b368b2f5a4f153bbe49c912f565ab2c1c177936423fceea7f4de1dbf",
+            "runner": "fb1172f1a6e26db340774701bfc0f3d9b199886bfc89f79a8b382907cb1440c3",
+            "make_corpus": "01fc3084ffa91a8ddd7ee67019e3400202794341f451f4526b55fe7574c11919",
+            "make_tasks": "08f80596869ee641083c13414f8d0b5619befbe0eda9aaf480f5e7852a0c9472",
+            "fixture": "a996e2aa5c2d41bf8a75293c8d60adebf9ab89eb59caea926fbccf97297a1dca",
+            "tasks": "7aaa196a72b52726ea6db7e46db612c6a6abc0f2bf7f3d5f3a13be2822e163b6",
+            "package_lock": "c9850209a6330a810fbf2f784427eca6c89df4cce71fb6ec49564fee01c55e9f",
+            "f1_executor": "0d81093b20fa0b77a3fc9f2e6b4a90bf184668d0377242c3e4f37e64afd9d2b1",
+            "f1_adapter": "3d8123975bc9f67147fec90ff3e6911a08e40a7f2dc4bd7b43da14b0530cb08c",
+            "f1_relay": "536f32e7869fc407782b1c1db7d55afc3bd383bc0ede405f40d6f08b45e0f5e5",
+            "f1_runner": "55a40f182df80bf7f3828e165601758298912eaa7f6285ef0772cc967103e830",
+            "frozen_executor": "4b960124e9218ed124ed34e3b3595b648477b9dab6540c4ce1609d2efaf31313"
+          }
+        }
+      },
+      {
+        "id": "REPRO-CHECK-MATRIX",
+        "pass": true,
+        "detail": {
+          "temp": [
+            {
+              "id": "B0M-T1-DIRECT",
+              "pass": true
+            },
+            {
+              "id": "B0M-T1-CODE",
+              "pass": true
+            },
+            {
+              "id": "B0M-T1-EQUIVALENT",
+              "pass": true
+            },
+            {
+              "id": "B0M-T1-NO-PROPOSAL",
+              "pass": true
+            },
+            {
+              "id": "B0M-T2-DIRECT",
+              "pass": true
+            },
+            {
+              "id": "B0M-T2-CODE",
+              "pass": true
+            },
+            {
+              "id": "B0M-T2-EQUIVALENT",
+              "pass": true
+            },
+            {
+              "id": "B0M-T2-NO-PROPOSAL",
+              "pass": true
+            },
+            {
+              "id": "B0M-T3-DIRECT",
+              "pass": true
+            },
+            {
+              "id": "B0M-T3-CODE",
+              "pass": true
+            },
+            {
+              "id": "B0M-T3-EQUIVALENT",
+              "pass": true
+            },
+            {
+              "id": "B0M-T3-NO-PROPOSAL",
+              "pass": true
+            },
+            {
+              "id": "B0M-T4-DIRECT",
+              "pass": true
+            },
+            {
+              "id": "B0M-T4-CODE",
+              "pass": true
+            },
+            {
+              "id": "B0M-T4-EQUIVALENT",
+              "pass": true
+            },
+            {
+              "id": "B0M-T4-NO-PROPOSAL",
+              "pass": true
+            },
+            {
+              "id": "B0M-T5-DIRECT",
+              "pass": true
+            },
+            {
+              "id": "B0M-T5-CODE",
+              "pass": true
+            },
+            {
+              "id": "B0M-T5-EQUIVALENT",
+              "pass": true
+            },
+            {
+              "id": "B0M-T5-NO-PROPOSAL",
+              "pass": true
+            },
+            {
+              "id": "B0M-T6-DIRECT",
+              "pass": true
+            },
+            {
+              "id": "B0M-T6-CODE",
+              "pass": true
+            },
+            {
+              "id": "B0M-T6-EQUIVALENT",
+              "pass": true
+            },
+            {
+              "id": "B0M-T6-NO-PROPOSAL",
+              "pass": true
+            },
+            {
+              "id": "B0M-T7-DIRECT",
+              "pass": true
+            },
+            {
+              "id": "B0M-T7-CODE",
+              "pass": true
+            },
+            {
+              "id": "B0M-T7-EQUIVALENT",
+              "pass": true
+            },
+            {
+              "id": "B0M-T7-NO-PROPOSAL",
+              "pass": true
+            },
+            {
+              "id": "B0M-T8-DIRECT",
+              "pass": true
+            },
+            {
+              "id": "B0M-T8-CODE",
+              "pass": true
+            },
+            {
+              "id": "B0M-T8-EQUIVALENT",
+              "pass": true
+            },
+            {
+              "id": "B0M-T8-NO-PROPOSAL",
+              "pass": true
+            },
+            {
+              "id": "B0M-MCP-INSTRUMENTATION",
+              "pass": true
+            },
+            {
+              "id": "B0M-MCP-CALL-METRICS",
+              "pass": true
+            },
+            {
+              "id": "B0M-RESULT-SIZES",
+              "pass": true
+            },
+            {
+              "id": "B0M-MODEL-NOT-MEASURED",
+              "pass": true
+            },
+            {
+              "id": "B0M-CANCELLATION",
+              "pass": true
+            },
+            {
+              "id": "B0M-CLEANUP",
+              "pass": true
+            },
+            {
+              "id": "B0M-UNHANDLED",
+              "pass": true
+            }
+          ]
+        }
+      }
+    ],
+    "exit_code": 0,
+    "stdout_tail": [
+      "{\"run\":\"run1\",\"verdict\":\"PASS\",\"failed\":[]}",
+      "[b0m] starting run2",
+      "{\"run\":\"run2\",\"verdict\":\"PASS\",\"failed\":[]}",
+      "{\"verdict\":\"PASS\",\"repeatable\":true,\"preservation\":true,\"failed_checks\":[],\"model_fields\":\"NOT_MEASURED\"}"
+    ],
+    "stderr_tail": [],
+    "verdict": "PASS",
+    "cleaned_worktree": true
+  },
+  "summary": {
+    "total_checks": 14,
+    "failed_checks": [],
+    "reproduced": true,
+    "verification_status": "VERIFIED"
+  },
+  "properties": {
+    "model_free": true,
+    "model_fields": "NOT_MEASURED",
+    "s1a2": "undefined and blocked",
+    "b0a_authorized": false
+  },
+  "errors": []
+}

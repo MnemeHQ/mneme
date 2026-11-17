@@ -218,7 +218,10 @@ when:
 - the check did not run, was untrusted, or was incomplete,
 - the local declaration differs from the baseline (including an older copy:
   update from the default branch), or
-- `MNEME_MEMORY` selects memory other than `.mneme/project_memory.json`.
+- the selected memory is not the declared `.mneme/project_memory.json`. Since
+  T-08 P2-first this happens when the declared memory is missing and another
+  memory is selected (a parent-directory memory, or `MNEME_MEMORY` filling the
+  absence); the remediation then says to restore the declared memory.
 
 If the baseline cannot be verified (network, DNS, TLS, authentication,
 timeout, missing ref, invalid evidence, or no usable `origin`), the hook does

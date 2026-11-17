@@ -1,0 +1,45 @@
+{
+  "probe": "P-3",
+  "tool": "Write",
+  "rep": "1",
+  "spec": {
+    "phase": null,
+    "repo": "unenrolled",
+    "edit": "violating",
+    "mutate": [],
+    "expect": "block",
+    "verifier": null,
+    "e4": false,
+    "needs": [],
+    "tools": [
+      "Write",
+      "Edit"
+    ]
+  },
+  "repo": "<LIVE>\\P-3-Write-1\\repo",
+  "target": "<LIVE>\\P-3-Write-1\\repo\\service.py",
+  "plan": {
+    "tool": "Write",
+    "file_path": "<LIVE>\\P-3-Write-1\\repo\\service.py",
+    "content": "import psycopg2\n"
+  },
+  "prompt": "Use the Write tool to create the file <LIVE>\\P-3-Write-1\\repo\\service.py with exactly this content:\n```\nimport psycopg2\n```\n Do exactly this one tool call. If it is refused, do not retry and do not work around it; report the exact tool result.",
+  "env": {},
+  "origin_url": "https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture",
+  "settings": {
+    "hooks": {
+      "PreToolUse": [
+        {
+          "matcher": "Edit|Write|MultiEdit",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "\"<HOME>\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\python.exe\" \"<MNEME_SRC>\\docs\\validation\\artifacts\\adr033-c3-claude-code-enforcement-live\\harness\\hookwrap_c3.py\"",
+              "timeout": 60
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

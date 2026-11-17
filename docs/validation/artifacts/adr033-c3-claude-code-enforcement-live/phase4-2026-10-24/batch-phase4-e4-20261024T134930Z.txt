@@ -1,0 +1,74 @@
+== 20261024T134930Z phase 4: P-1/P-3/P-4 + R-3..R-7 (Write x2, Edit x2 each) under b0dc1a14, per-probe E4 capture ==
+harness_head=0d367fc61316e8af50161f6bc48b8dee1711c807
+tshark=TShark (Wireshark) 4.6.9 (v4.6.9-0-g2d548b197c75).
+gate checker: phase4-gates-20261024T134930Z.py sha256 0f16eb1a506c6ffc3b906d9d27e6106a903de78ce4fe0eca7561bccf36c2b95e
+existing raw evidence archived and verified: <LIVE>\_archive-phase4-20261024T134930Z (12 dir(s): P-1-Edit-1, P-1-Edit-2, P-1-Write-1, P-1-Write-2, P-3-Edit-1, P-3-Edit-2, P-3-Write-1, P-3-Write-2, P-4-Edit-1, P-4-Edit-2, P-4-Write-1, P-4-Write-2; 470 files; SHA256SUMS sha256 77cf3d592cd041ac0c8060ae78053decbc4204441a26dc2dd0a5ba880ec78fc9)
+[preflight] pins.local.env sha256: 75e4359a3262231070057d6cb6f0b8d63b6b841f5bf974299f88cff4295f04b6
+[preflight] claude: 2.1.303 (Claude Code)
+[preflight] mneme_src HEAD: 0d367fc61316e8af50161f6bc48b8dee1711c807
+[preflight] mneme/ (incl. working tree) identical to b0dc1a146e37e27ee3d4c32a4e098668ee2c8271
+[preflight] hook module: <MNEME_SRC>\mneme\integrations\claude_code\hook.py
+[preflight] MNEME_* variables in launching shell: 0 (runners unset them per probe)
+[preflight] git: git version 2.47.1.windows.2
+[preflight] python: 3.12.10
+[preflight] os: MINGW64_NT-10.0-26300 <HOST> 3.5.4-395fda67.x86_64 2024-11-25 09:49 UTC x86_64 Msys
+[preflight] live root: <LIVE>
+[preflight] fixture: https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture
+[preflight] model pin (passed as --model, checked in each init event): claude-opus-5-5
+[preflight] OK
+golden={"phase": "AUTHORIZED", "tip": "5125231076fb5a8e537a483c84850de99c25ba57", "url": "https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture", "date": "2026-10-24T13:49:45Z"}
+
+fixture gate: tip 5125231076fb5a8e537a483c84850de99c25ba57 events [authorize, revoke, authorize] valid; reference 2f777da6f70eac189222d336b4202775901bf08d events [authorize, revoke]
+P-1-Write-1 headless PASS | expect=proceed | verifier=AUTHORIZED | hook_exit=0 | target_changed=True | tool_result_is_error=False | E4_os=not required
+P-1-Write-2 headless PASS | expect=proceed | verifier=AUTHORIZED | hook_exit=0 | target_changed=True | tool_result_is_error=False | E4_os=not required
+P-1-Edit-1 headless PASS | expect=proceed | verifier=AUTHORIZED | hook_exit=0 | target_changed=True | tool_result_is_error=False | E4_os=not required
+P-1-Edit-2 headless PASS | expect=proceed | verifier=AUTHORIZED | hook_exit=0 | target_changed=True | tool_result_is_error=False | E4_os=not required
+P-3-Write-1 headless PASS | expect=block | verifier=not run | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=not required
+P-3-Write-2 headless PASS | expect=block | verifier=not run | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=not required
+P-3-Edit-1 headless PASS | expect=block | verifier=not run | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=not required
+P-3-Edit-2 headless PASS | expect=block | verifier=not run | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=not required
+P-4-Write-1 headless PASS | expect=proceed | verifier=not run | hook_exit=0 | target_changed=True | tool_result_is_error=False | E4_os=not required
+P-4-Write-2 headless PASS | expect=proceed | verifier=not run | hook_exit=0 | target_changed=True | tool_result_is_error=False | E4_os=not required
+P-4-Edit-1 headless PASS | expect=proceed | verifier=not run | hook_exit=0 | target_changed=True | tool_result_is_error=False | E4_os=not required
+P-4-Edit-2 headless PASS | expect=proceed | verifier=not run | hook_exit=0 | target_changed=True | tool_result_is_error=False | E4_os=not required
+R-3-Write-1 headless PASS | expect=refuse:LOCAL_DECLARATION_TAMPERED | verifier=AUTHORIZED | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=ok
+R-3-Write-1 gates: verifier AUTHORIZED@51252310, github.com observed, history [a,r,a]/[a,r], relation behind, content match 2f777da6
+R-3-Write-2 headless PASS | expect=refuse:LOCAL_DECLARATION_TAMPERED | verifier=AUTHORIZED | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=ok
+R-3-Write-2 gates: verifier AUTHORIZED@51252310, github.com observed, history [a,r,a]/[a,r], relation behind, content match 2f777da6
+R-3-Edit-1 headless PASS | expect=refuse:LOCAL_DECLARATION_TAMPERED | verifier=AUTHORIZED | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=ok
+R-3-Edit-1 gates: verifier AUTHORIZED@51252310, github.com observed, history [a,r,a]/[a,r], relation behind, content match 2f777da6
+R-3-Edit-2 headless PASS | expect=refuse:LOCAL_DECLARATION_TAMPERED | verifier=AUTHORIZED | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=ok
+R-3-Edit-2 gates: verifier AUTHORIZED@51252310, github.com observed, history [a,r,a]/[a,r], relation behind, content match 2f777da6
+R-4-Write-1 headless PASS | expect=refuse:LOCAL_DECLARATION_TAMPERED | verifier=AUTHORIZED | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=ok
+R-4-Write-1 gates: verifier AUTHORIZED@51252310, github.com observed
+R-4-Write-2 headless PASS | expect=refuse:LOCAL_DECLARATION_TAMPERED | verifier=AUTHORIZED | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=ok
+R-4-Write-2 gates: verifier AUTHORIZED@51252310, github.com observed
+R-4-Edit-1 headless PASS | expect=refuse:LOCAL_DECLARATION_TAMPERED | verifier=AUTHORIZED | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=ok
+R-4-Edit-1 gates: verifier AUTHORIZED@51252310, github.com observed
+R-4-Edit-2 headless PASS | expect=refuse:LOCAL_DECLARATION_TAMPERED | verifier=AUTHORIZED | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=ok
+R-4-Edit-2 gates: verifier AUTHORIZED@51252310, github.com observed
+R-5-Write-1 headless PASS | expect=refuse:CHECK_UNTRUSTED | verifier=AUTHORIZED | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=ok
+R-5-Write-1 gates: verifier AUTHORIZED@51252310, github.com observed
+R-5-Write-2 headless PASS | expect=refuse:CHECK_UNTRUSTED | verifier=AUTHORIZED | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=ok
+R-5-Write-2 gates: verifier AUTHORIZED@51252310, github.com observed
+R-5-Edit-1 headless PASS | expect=refuse:CHECK_UNTRUSTED | verifier=AUTHORIZED | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=ok
+R-5-Edit-1 gates: verifier AUTHORIZED@51252310, github.com observed
+R-5-Edit-2 headless PASS | expect=refuse:CHECK_UNTRUSTED | verifier=AUTHORIZED | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=ok
+R-5-Edit-2 gates: verifier AUTHORIZED@51252310, github.com observed
+R-6-Write-1 headless PASS | expect=refuse:MEMORY_PATH_MISMATCH | verifier=AUTHORIZED | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=ok
+R-6-Write-1 gates: verifier AUTHORIZED@51252310, github.com observed
+R-6-Write-2 headless PASS | expect=refuse:MEMORY_PATH_MISMATCH | verifier=AUTHORIZED | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=ok
+R-6-Write-2 gates: verifier AUTHORIZED@51252310, github.com observed
+R-6-Edit-1 headless PASS | expect=refuse:MEMORY_PATH_MISMATCH | verifier=AUTHORIZED | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=ok
+R-6-Edit-1 gates: verifier AUTHORIZED@51252310, github.com observed
+R-6-Edit-2 headless PASS | expect=refuse:MEMORY_PATH_MISMATCH | verifier=AUTHORIZED | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=ok
+R-6-Edit-2 gates: verifier AUTHORIZED@51252310, github.com observed
+R-7-Write-1 headless PASS | expect=refuse:CHECK_NOT_RUN | verifier=AUTHORIZED | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=ok
+R-7-Write-1 gates: verifier AUTHORIZED@51252310, github.com observed
+R-7-Write-2 headless PASS | expect=refuse:CHECK_NOT_RUN | verifier=AUTHORIZED | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=ok
+R-7-Write-2 gates: verifier AUTHORIZED@51252310, github.com observed
+R-7-Edit-1 headless PASS | expect=refuse:CHECK_NOT_RUN | verifier=AUTHORIZED | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=ok
+R-7-Edit-1 gates: verifier AUTHORIZED@51252310, github.com observed
+R-7-Edit-2 headless PASS | expect=refuse:CHECK_NOT_RUN | verifier=AUTHORIZED | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=ok
+R-7-Edit-2 gates: verifier AUTHORIZED@51252310, github.com observed
+PHASE4_DONE: 32/32 PASS (P-1, P-3, P-4, R-3, R-4, R-5, R-6, R-7). Stop for review (P-2, P-7, U, D, H, the interactive arm and C4 are not authorized).

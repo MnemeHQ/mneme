@@ -1,0 +1,4 @@
+{"seq":1,"ts":"2026-10-25T13:53:54.966Z","type":"connected_direct","phase":"T2-direct","pid":30376,"tools":6}
+{"seq":2,"ts":"2026-10-25T13:53:55.218Z","type":"client_closed","phase":"T2-direct"}
+{"seq":3,"ts":"2026-10-25T13:53:55.219Z","type":"cleanup_direct","kind":"direct","phase":"T2-direct","errors":[],"pid":30376,"server_exit_observed":true,"server_alive_after":false}
+{"seq":4,"ts":"2026-10-25T13:53:55.221Z","type":"task_end","task":"T2","arm":"direct","ok":true}

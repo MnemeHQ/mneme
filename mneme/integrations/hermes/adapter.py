@@ -40,12 +40,14 @@ from typing import Any, Callable, Dict, List, Optional
 
 from mneme.context_builder import DEFAULT_MAX_DECISIONS, format_decisions
 from mneme.decision_retriever import DecisionRetriever
+from mneme.integrations.memory_selection import (
+    resolve_memory,
+)
 from mneme.integrations.claude_code.hook import (
     ToolEvent,
     _CHECK_TIMEOUT_SECONDS,
     _child_env,
     _resolve_target,
-    find_memory,
     format_applicability_reason,
     format_reason,
     introduced_between,
@@ -257,7 +259,7 @@ class MnemeHermes:
         if self._memory_override:
             p = Path(self._memory_override)
             return p if p.is_file() else None
-        return find_memory(Path(self.project_dir))
+        return resolve_memory(Path(self.project_dir)).path
 
     def _mode(self) -> str:
         if self._mode_override in ("strict", "warn"):

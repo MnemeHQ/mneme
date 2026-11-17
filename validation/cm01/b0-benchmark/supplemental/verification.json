@@ -1,0 +1,932 @@
+{
+  "schema": "mneme.cm01.b0m.supplemental-verification/v1",
+  "generated_at": "2026-10-25T14:00:00Z",
+  "verification_status": "VERIFIED",
+  "scope": "read-only supplemental verification of original CM-01-B0-M evidence",
+  "baseline": "f8591102b2693379dabec9b5704862e194eca4ce",
+  "original_verdict": "PASS",
+  "original_verdict_preserved": true,
+  "original_verification": {
+    "status": "VERIFIED",
+    "static_checks": 14,
+    "reproduction_checks": 4,
+    "sha256": "2537beb1356f37bbdf63a980d1fd5637057bf6ace0ca0676d5bffc2c804de6b1"
+  },
+  "original_evidence": {
+    "file_count": 111,
+    "manifest_sha256": "94dd0ee381fba2e9775634e0fc8f005dfeb59c9b874fd022227c6fcb92ed17ac",
+    "historical_manifest_sha256": "94dd0ee381fba2e9775634e0fc8f005dfeb59c9b874fd022227c6fcb92ed17ac",
+    "unchanged": true,
+    "coverage": "all files under evidence/ except verification.json"
+  },
+  "supplemental_evidence": {
+    "record_path": "supplemental/verification.json",
+    "hash_file": "supplemental/verification.sha256",
+    "coverage": "supplemental record only; outside the original evidence manifest",
+    "verifier_path": "verify-b0m-supplemental.mjs",
+    "verifier_sha256": "c481171e98ffeb515906706dda084b15e29637864b09e0db910113e1bc347041"
+  },
+  "hashes": {
+    "fixture_sha256": "a996e2aa5c2d41bf8a75293c8d60adebf9ab89eb59caea926fbccf97297a1dca",
+    "tasks_sha256": "7aaa196a72b52726ea6db7e46db612c6a6abc0f2bf7f3d5f3a13be2822e163b6",
+    "package_lock_sha256": "c9850209a6330a810fbf2f784427eca6c89df4cce71fb6ec49564fee01c55e9f",
+    "original_evidence_manifest_sha256": "94dd0ee381fba2e9775634e0fc8f005dfeb59c9b874fd022227c6fcb92ed17ac",
+    "f1_executor_sha256": "0d81093b20fa0b77a3fc9f2e6b4a90bf184668d0377242c3e4f37e64afd9d2b1",
+    "f1_adapter_sha256": "3d8123975bc9f67147fec90ff3e6911a08e40a7f2dc4bd7b43da14b0530cb08c",
+    "f1_relay_sha256": "536f32e7869fc407782b1c1db7d55afc3bd383bc0ede405f40d6f08b45e0f5e5",
+    "f1_runner_sha256": "55a40f182df80bf7f3828e165601758298912eaa7f6285ef0772cc967103e830",
+    "f1_harness_sha256": "3b2a7591614dd19532e3d7a5064e403ea4d58e73e73e305009b9d67385ba8076",
+    "frozen_executor_sha256": "4b960124e9218ed124ed34e3b3595b648477b9dab6540c4ce1609d2efaf31313",
+    "f1_package_lock_sha256": "4f4f81b24f31490ff1a1d3f5c1a33fd359d1545567f91daffaa56abaa8e63167",
+    "m4_guard_sha256": "7df06ddb301355d2a040e2a3d04e915f513f36177d640e40b5224b7ca9d128a6",
+    "s1a_digest": "cc7f884866e6e94255b100de57b82eec4a51660aadaf51c6464198131030af57"
+  },
+  "checks": [
+    {
+      "id": "SUP-ORIGINAL-MANIFEST",
+      "pass": true,
+      "detail": {
+        "file_count": 111,
+        "digest": "94dd0ee381fba2e9775634e0fc8f005dfeb59c9b874fd022227c6fcb92ed17ac"
+      }
+    },
+    {
+      "id": "SUP-FIXTURE-HASH",
+      "pass": true,
+      "detail": {
+        "sha256": "a996e2aa5c2d41bf8a75293c8d60adebf9ab89eb59caea926fbccf97297a1dca"
+      }
+    },
+    {
+      "id": "SUP-TASKS-HASH",
+      "pass": true,
+      "detail": {
+        "sha256": "7aaa196a72b52726ea6db7e46db612c6a6abc0f2bf7f3d5f3a13be2822e163b6"
+      }
+    },
+    {
+      "id": "SUP-PACKAGE-LOCK-HASH",
+      "pass": true,
+      "detail": {
+        "sha256": "c9850209a6330a810fbf2f784427eca6c89df4cce71fb6ec49564fee01c55e9f"
+      }
+    },
+    {
+      "id": "SUP-ORIGINAL-VERDICT",
+      "pass": true,
+      "detail": {
+        "verdict": "PASS",
+        "runs": {
+          "run1": {
+            "verdict": "PASS",
+            "checks": 39
+          },
+          "run2": {
+            "verdict": "PASS",
+            "checks": 39
+          }
+        }
+      }
+    },
+    {
+      "id": "SUP-ORIGINAL-VERIFICATION",
+      "pass": true,
+      "detail": {
+        "status": "VERIFIED",
+        "static_checks": 14,
+        "reproduction_checks": 4
+      }
+    },
+    {
+      "id": "SUP-F1-HASHES",
+      "pass": true,
+      "detail": {
+        "f1_executor": "0d81093b20fa0b77a3fc9f2e6b4a90bf184668d0377242c3e4f37e64afd9d2b1",
+        "f1_adapter": "3d8123975bc9f67147fec90ff3e6911a08e40a7f2dc4bd7b43da14b0530cb08c",
+        "f1_relay": "536f32e7869fc407782b1c1db7d55afc3bd383bc0ede405f40d6f08b45e0f5e5",
+        "f1_runner": "55a40f182df80bf7f3828e165601758298912eaa7f6285ef0772cc967103e830",
+        "f1_harness": "3b2a7591614dd19532e3d7a5064e403ea4d58e73e73e305009b9d67385ba8076",
+        "frozen_executor": "4b960124e9218ed124ed34e3b3595b648477b9dab6540c4ce1609d2efaf31313"
+      }
+    },
+    {
+      "id": "SUP-S1A-DIGEST",
+      "pass": true,
+      "detail": {
+        "digest": "cc7f884866e6e94255b100de57b82eec4a51660aadaf51c6464198131030af57"
+      }
+    },
+    {
+      "id": "SUP-P0-F1-PRESERVATION",
+      "pass": true,
+      "detail": {
+        "p0": "FAIL",
+        "p0_verification": "VERIFIED",
+        "f1": "PASS",
+        "f1_verification": "VERIFIED",
+        "preserved_status": [],
+        "preserved_diff": []
+      }
+    },
+    {
+      "id": "SUP-REPO-SCOPE",
+      "pass": true,
+      "detail": {
+        "outside_count": 0,
+        "outside": []
+      }
+    },
+    {
+      "id": "SUP-CALLS-run1-T1-direct",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.get"
+        ],
+        "observedNames": [
+          "decision.get"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run1-T1-direct",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run1-T1-code",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.get"
+        ],
+        "observedNames": [
+          "decision.get"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run1-T1-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-EQUIVALENT-run1-T1",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run1-T2-direct",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.search"
+        ],
+        "observedNames": [
+          "decision.search"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run1-T2-direct",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run1-T2-code",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.search"
+        ],
+        "observedNames": [
+          "decision.search"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run1-T2-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-EQUIVALENT-run1-T2",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run1-T3-direct",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.applicable_to"
+        ],
+        "observedNames": [
+          "decision.applicable_to"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run1-T3-direct",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run1-T3-code",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.applicable_to"
+        ],
+        "observedNames": [
+          "decision.applicable_to"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run1-T3-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-EQUIVALENT-run1-T3",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run1-T4-direct",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.trace"
+        ],
+        "observedNames": [
+          "decision.trace"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run1-T4-direct",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run1-T4-code",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.trace"
+        ],
+        "observedNames": [
+          "decision.trace"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run1-T4-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-EQUIVALENT-run1-T4",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run1-T5-direct",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.search",
+          "decision.get"
+        ],
+        "observedNames": [
+          "decision.search",
+          "decision.get"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run1-T5-direct",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run1-T5-code",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.search",
+          "decision.get"
+        ],
+        "observedNames": [
+          "decision.search",
+          "decision.get"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run1-T5-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-EQUIVALENT-run1-T5",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run1-T6-direct",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.search",
+          "decision.trace"
+        ],
+        "observedNames": [
+          "decision.search",
+          "decision.trace"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run1-T6-direct",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run1-T6-code",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.search",
+          "decision.trace"
+        ],
+        "observedNames": [
+          "decision.search",
+          "decision.trace"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run1-T6-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-EQUIVALENT-run1-T6",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run1-T7-direct",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.applicable_to",
+          "decision.get",
+          "decision.trace"
+        ],
+        "observedNames": [
+          "decision.applicable_to",
+          "decision.get",
+          "decision.trace"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run1-T7-direct",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run1-T7-code",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.applicable_to",
+          "decision.get",
+          "decision.trace"
+        ],
+        "observedNames": [
+          "decision.applicable_to",
+          "decision.get",
+          "decision.trace"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run1-T7-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-EQUIVALENT-run1-T7",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run1-T8-direct",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.search",
+          "decision.get",
+          "decision.get"
+        ],
+        "observedNames": [
+          "decision.search",
+          "decision.get",
+          "decision.get"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run1-T8-direct",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run1-T8-code",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.search",
+          "decision.get",
+          "decision.get"
+        ],
+        "observedNames": [
+          "decision.search",
+          "decision.get",
+          "decision.get"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run1-T8-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-EQUIVALENT-run1-T8",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run2-T1-direct",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.get"
+        ],
+        "observedNames": [
+          "decision.get"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run2-T1-direct",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run2-T1-code",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.get"
+        ],
+        "observedNames": [
+          "decision.get"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run2-T1-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-EQUIVALENT-run2-T1",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run2-T2-direct",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.search"
+        ],
+        "observedNames": [
+          "decision.search"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run2-T2-direct",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run2-T2-code",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.search"
+        ],
+        "observedNames": [
+          "decision.search"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run2-T2-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-EQUIVALENT-run2-T2",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run2-T3-direct",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.applicable_to"
+        ],
+        "observedNames": [
+          "decision.applicable_to"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run2-T3-direct",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run2-T3-code",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.applicable_to"
+        ],
+        "observedNames": [
+          "decision.applicable_to"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run2-T3-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-EQUIVALENT-run2-T3",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run2-T4-direct",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.trace"
+        ],
+        "observedNames": [
+          "decision.trace"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run2-T4-direct",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run2-T4-code",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.trace"
+        ],
+        "observedNames": [
+          "decision.trace"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run2-T4-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-EQUIVALENT-run2-T4",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run2-T5-direct",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.search",
+          "decision.get"
+        ],
+        "observedNames": [
+          "decision.search",
+          "decision.get"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run2-T5-direct",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run2-T5-code",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.search",
+          "decision.get"
+        ],
+        "observedNames": [
+          "decision.search",
+          "decision.get"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run2-T5-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-EQUIVALENT-run2-T5",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run2-T6-direct",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.search",
+          "decision.trace"
+        ],
+        "observedNames": [
+          "decision.search",
+          "decision.trace"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run2-T6-direct",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run2-T6-code",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.search",
+          "decision.trace"
+        ],
+        "observedNames": [
+          "decision.search",
+          "decision.trace"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run2-T6-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-EQUIVALENT-run2-T6",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run2-T7-direct",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.applicable_to",
+          "decision.get",
+          "decision.trace"
+        ],
+        "observedNames": [
+          "decision.applicable_to",
+          "decision.get",
+          "decision.trace"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run2-T7-direct",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run2-T7-code",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.applicable_to",
+          "decision.get",
+          "decision.trace"
+        ],
+        "observedNames": [
+          "decision.applicable_to",
+          "decision.get",
+          "decision.trace"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run2-T7-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-EQUIVALENT-run2-T7",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run2-T8-direct",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.search",
+          "decision.get",
+          "decision.get"
+        ],
+        "observedNames": [
+          "decision.search",
+          "decision.get",
+          "decision.get"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run2-T8-direct",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CALLS-run2-T8-code",
+      "pass": true,
+      "detail": {
+        "expectedNames": [
+          "decision.search",
+          "decision.get",
+          "decision.get"
+        ],
+        "observedNames": [
+          "decision.search",
+          "decision.get",
+          "decision.get"
+        ]
+      }
+    },
+    {
+      "id": "SUP-ACTUAL-run2-T8-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-EQUIVALENT-run2-T8",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-GENUINE-MCP",
+      "pass": true,
+      "detail": {
+        "phases": 32,
+        "unique_pids": 32
+      }
+    },
+    {
+      "id": "SUP-TOOL-INVENTORY",
+      "pass": true,
+      "detail": {
+        "expected": [
+          "decision.propose",
+          "decision.propose_batch",
+          "decision.get",
+          "decision.search",
+          "decision.applicable_to",
+          "decision.trace"
+        ],
+        "phases_checked": 32
+      }
+    },
+    {
+      "id": "SUP-NO-PROPOSAL",
+      "pass": true,
+      "detail": {
+        "called": [
+          "decision.get",
+          "decision.search",
+          "decision.applicable_to",
+          "decision.trace"
+        ]
+      }
+    },
+    {
+      "id": "SUP-MODEL-NOT-MEASURED",
+      "pass": true,
+      "detail": {
+        "fields": 32
+      }
+    },
+    {
+      "id": "SUP-REPEATABLE",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-CANCELLATION",
+      "pass": true,
+      "detail": [
+        {
+          "run": "run1",
+          "withheld": 1,
+          "cancelled": 1,
+          "released": 1,
+          "childCancels": 1,
+          "childExit": 0,
+          "relayExit": 0,
+          "server": "mneme-decision-index"
+        },
+        {
+          "run": "run2",
+          "withheld": 1,
+          "cancelled": 1,
+          "released": 1,
+          "childCancels": 1,
+          "childExit": 0,
+          "relayExit": 0,
+          "server": "mneme-decision-index"
+        }
+      ]
+    },
+    {
+      "id": "SUP-CLEANUP",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "SUP-BYTES-ATTRIBUTES",
+      "pass": true,
+      "detail": {
+        "checked": 121,
+        "failures": []
+      }
+    }
+  ],
+  "summary": {
+    "total_checks": 98,
+    "failed_checks": [],
+    "verification_status": "VERIFIED"
+  },
+  "observations": {
+    "inbound_initialize_logged_for_task_transports": false,
+    "inbound_initialize_note": "Task transport logs begin after the client installs incoming-message logging. Cancellation child events contain the initialize response and serverInfo.",
+    "pids": 32,
+    "unique_pids": 32
+  },
+  "model_fields": {
+    "model_turns": "NOT_MEASURED",
+    "input_tokens": "NOT_MEASURED",
+    "output_tokens": "NOT_MEASURED",
+    "intermediate_context_model_tokens": "NOT_MEASURED",
+    "efficiency": "NOT_MEASURED"
+  },
+  "limitations": [
+    "Two sequential executions within one Node process, each using fresh MCP child processes, followed by independent fresh-worktree reproduction.",
+    "Original raw transport logs do not contain the full MCP initialize exchange.",
+    "Mechanical timing excludes some lifecycle overhead.",
+    "Model tokens and turns are NOT_MEASURED.",
+    "The ground truth is derived from the frozen fixture.",
+    "B0-A statistical power has not been validated.",
+    "No B0 protocol document is committed or preregistered in this repository; tasks.json and make-tasks.py are the executable task definitions."
+  ],
+  "provenance": {
+    "change_author": "agent",
+    "agent": "opencode",
+    "agent_model": "opencode-go/deepseek-v4.1-flash",
+    "agent_session": "not-exposed",
+    "task_origin": "local"
+  }
+}

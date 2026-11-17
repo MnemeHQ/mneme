@@ -1,0 +1,19 @@
+{
+  "name": "mneme-cm01-s1a1-m5",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "CM-01 S1-A1 M5: decision.applicable_to retrieval/context parity.",
+  "scripts": {
+    "m5": "node run-m5.mjs"
+  },
+  "dependencies": {
+    "@cloudflare/codemode": "0.5.5",
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "ajv": "8.17.1",
+    "zod": "4.6.7"
+  },
+  "engines": {
+    "node": "24.13.1"
+  }
+}

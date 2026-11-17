@@ -1,0 +1,1 @@
+Use the Edit tool on the file <LIVE>\P-7-Edit-2\repo\app.py to replace `import os` with `(nothing: delete it)`. Do exactly this one tool call. If it is refused, do not retry and do not work around it; report the exact tool result.

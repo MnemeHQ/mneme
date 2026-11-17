@@ -1,0 +1,11 @@
+== 20261023T161726Z R-1 revalidation (Write x2, Edit x2) under b0dc1a14, per-probe E4 capture ==
+harness_head=a54eefda9cf585594954472cb8e997626b9c15eb
+tshark=TShark (Wireshark) 4.6.9 (v4.6.9-0-g2d548b197c75).
+original R-1 evidence archived and verified: <LIVE>\_archive-batch-r-r1-20261023T161726Z (177 files, SHA256SUMS sha256 b28310235ee2adab6f052eee377c2b60ba6861c670e96aecd61c98bbf03507a0)
+golden={"phase": "AUTHORIZED", "tip": "0530b644d5f695869af6b264cce12b29783bf443", "url": "https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture", "date": "2026-10-23T16:17:40Z"}
+
+R-1-Write-1 headless PASS | verifier=AUTHORIZED | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=ok
+R-1-Write-2 headless PASS | verifier=AUTHORIZED | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=ok
+R-1-Edit-1 headless PASS | verifier=AUTHORIZED | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=ok
+R-1-Edit-2 headless PASS | verifier=AUTHORIZED | hook_exit=2 | target_changed=False | tool_result_is_error=True | E4_os=ok
+R1_REVAL_DONE: 4/4 PASS. Stop for review (R-2..R-7, P-1/P-3/P-4 and the interactive arm are not authorized).

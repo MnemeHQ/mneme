@@ -1,0 +1,19 @@
+{
+  "schema": "mneme.cm01.s1a1.e0.repeatability/v1",
+  "runs": [
+    "e0-run1.json",
+    "e0-run2.json"
+  ],
+  "compared_fields": [
+    "checks",
+    "native_probe",
+    "details",
+    "versions",
+    "verdict"
+  ],
+  "excluded_fields": [
+    "started_at",
+    "finished_at"
+  ],
+  "equal": true
+}

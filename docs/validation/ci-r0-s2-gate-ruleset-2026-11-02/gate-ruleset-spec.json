@@ -1,0 +1,21 @@
+{
+  "name": "mneme-ci-gate",
+  "target": "branch",
+  "enforcement": "disabled",
+  "conditions": {
+    "ref_name": {
+      "include": [
+        "refs/heads/main"
+      ],
+      "exclude": []
+    }
+  },
+  "bypass_actors": [
+    {
+      "actor_id": 54006786,
+      "actor_type": "User",
+      "bypass_mode": "pull_request"
+    }
+  ],
+  "rules": []
+}

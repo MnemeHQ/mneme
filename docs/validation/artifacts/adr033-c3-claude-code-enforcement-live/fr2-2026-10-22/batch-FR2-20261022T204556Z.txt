@@ -1,0 +1,22 @@
+batch=FR2 reps=2 mode=--recheck harness_head=b3f1e7fad6b98a76c28068f7d9be0638f10cf892
+P-1 Write 1 headless PASS
+P-1 Write 2 headless PASS
+P-1 Edit 1 headless PASS
+P-1 Edit 2 headless PASS
+D-1 Write 1 headless PASS
+D-1 Write 2 headless PASS
+D-1 Edit 1 headless PASS
+D-1 Edit 2 headless PASS
+D-2 Write 1 headless PASS
+D-2 Write 2 headless PASS
+D-2 Edit 1 headless PASS
+D-2 Edit 2 headless PASS
+PAIR D-2/P-1 Write 1 PAIR_OK
+PAIR D-2/P-1 Write 2 PAIR_OK
+PAIR D-2/P-1 Edit 1 PAIR_OK
+PAIR D-2/P-1 Edit 2 PAIR_OK
+PAIR D-2/D-1 Write 1 PAIR_OK
+PAIR D-2/D-1 Write 2 PAIR_OK
+PAIR D-2/D-1 Edit 1 PAIR_OK
+PAIR D-2/D-1 Edit 2 PAIR_OK
+BATCH_DONE FR2

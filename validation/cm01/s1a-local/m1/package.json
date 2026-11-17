@@ -1,0 +1,17 @@
+{
+  "name": "mneme-cm01-s1a1-m1",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "CM-01 S1-A1 M1: local Decision MCP inventory and stdio handshake.",
+  "scripts": {
+    "m1": "node run-m1.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "zod": "4.6.7"
+  },
+  "engines": {
+    "node": "24.13.1"
+  }
+}

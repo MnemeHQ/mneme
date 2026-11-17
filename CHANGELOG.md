@@ -2,15 +2,171 @@
 
 ## Unreleased
 
-**`FORBID_NUMERIC_ABOVE`: whole-file numeric audit (ADR-034 G1)**
+**T-08 P2-first memory precedence (all integrations).** Charter Amendments A2
+#809 and A2-RT #811, ADR-033 erratum #810/#811, Layer 1 freeze amendment #812.
 
-- **New typed rule, audit only.** `FORBID_NUMERIC_ABOVE` declares an
-  inclusive upper bound on a Python module-level symbol and/or a positional
-  argument of direct calls. It is decided only by the new
-  `mneme check --source-file <file.py>` complete-source audit; every other
-  input reports it `MATCHER_UNEVALUATED` / `INCOMPLETE_SOURCE_INPUT`, never
-  PASS. No pre-write numeric enforcement and no production claim until
-  independent held-out scoring passes. See `docs/integrations/adr-import.md`.
+- **A memory the walk finds now always governs.** One shared resolver
+  (`mneme.integrations.memory_selection.resolve_memory`) keeps today's walk
+  (nearest `.mneme/project_memory.json` at or above the start, no Git-marker
+  check) and applies the D6/Q2 P2 rule: `MNEME_MEMORY` no longer replaces or
+  masks a discovered memory; it only fills an absence. Every integration uses
+  it, with start points unchanged. `find_memory` remains as a wrapper.
+- **Notices on Claude Code only.** An ignored override, or a missing override
+  with no memory found, is reported in the probed shapes: PreToolUse and
+  SessionStart `additionalContext`, Stop top-level `systemMessage`; never
+  beside the hook's own output (warn `defer`, exit 2, Stop feedback or block,
+  SessionStart text). Verified live (#808) only for Edit and Bash
+  PreToolUse, SessionStart (delivered to the agent) and Stop (delivered to
+  the developer only), under H1's run conditions: Claude Code 2.1.310,
+  `claude-opus-5-5`, `--permission-mode acceptEdits`, project setting
+  sources, n = 1, headless (interactive for Stop). Unverified elsewhere,
+  including Write and MultiEdit. Other integrations emit nothing new; the
+  Agent SDK and LangChain record `selection_reason`, `selection_source` and
+  `walk` in their traces.
+- **ADR-033:** a `MNEME_MEMORY` beside the declared memory no longer causes
+  `MEMORY_PATH_MISMATCH`. When the declared memory is missing and another
+  memory is selected, the remediation now says to restore it.
+- **Unchanged:** fail-open policy and exit codes for the same selected memory.
+
+**DG1B2a canonical waiver records (recorded and explained only; no
+enforcement change).** Charter #784, Layer 1 freeze amendment #785, evidence
+packet #783.
+
+- **New v2 semantic feature `decision_waivers`.** A waiver is a canonical
+  record in the top-level `decision_index.waivers` array: it binds an exact
+  active decision version, is scoped by non-empty required labels and
+  optionally by an RFC 3339 UTC window, and records requester, approver
+  (must differ), approval reference and reason. Its id is
+  `wvr-` + the first 32 hex of the SHA-256 of the canonical JSON creation
+  payload; loaders recompute it and refuse mismatches and duplicates.
+- **Explicit authority commands only:** `mneme decision waive`,
+  `mneme decision revoke-waiver` (the record is retained) and the read-only
+  `mneme decision waivers [--json]`. v1 and section-less memory are refused
+  with the migration message. No MCP tool, producer, hook or runtime surface
+  writes waivers. Identities are recorded claims, not authenticated.
+- **Resolver:** `resolve_effective` reports cause `waived` (with
+  `DecisionResolution.waiver_ids` and a `waiver` trace step) only for an
+  active waiver on the active version, with supplied matching labels and,
+  for a time-bound waiver, a supplied `as_of` inside the window. Every other
+  case leaves the decision effective. `dangling_waiver_target` and
+  `waiver_version_mismatch` are non-blocking findings. Semantics id is now
+  `mneme.governance-semantics/dg1b2a-1`. Resolutions of memory without
+  waivers are unchanged apart from that id.
+- **No authoritative consumer acts on waivers (DG1B2b is deferred).**
+  Projection, `mneme check` (stdout, JSON, exit codes), hooks, CI, MCP,
+  Audit, setup readiness and `protect` behave exactly as before. Only the
+  NON-AUTHORITATIVE `mneme check --applicability-preview` may show
+  `cause=waived`, and a waiver finding makes it report PREVIEW UNAVAILABLE.
+- **Compatibility (ADR-031 §8):** memory that contains a waiver declares
+  `decision_waivers`, so readers without the feature, including
+  `mneme-hq` 0.11.0 and earlier and any pinned trusted-gate evaluator, refuse
+  the whole document. Do not write waivers to memory read by an older binary.
+  Memory without waivers is unaffected.
+
+**DG1F-C3a resolver-result consumption by three reporting consumers (no
+output change).** Charter #774, Layer 1 freeze amendment #775.
+
+- `mneme audit`, `mneme setup` readiness and `mneme protect list` now take
+  their governed decision set from the DG1 resolver result on canonical
+  memory (`decision_governance.governed_runtime_decisions`: labels not
+  supplied, same validated snapshot), and keep the C2 path on section-less
+  memory. Every output is byte-identical (golden tests, including
+  `--repo-root` evidence, setup and `protect list` error paths).
+- Not converged: `github_evidence.audit_with_github_claim`, `protect
+  status/validate/activate`, CI evidence-matching APIs and every enforcement
+  input. This is not full ADR-031 §11 convergence.
+
+**DG1F-C2 lifecycle-authority consolidation (preparatory; no runtime output
+change).** Charter #764, Layer 1 freeze amendment #767.
+
+- **One lifecycle authority.** `mneme.decision_index.lifecycle_governs` and
+  `GOVERNING_LIFECYCLE_STATUSES` now define "only `active` governs" once.
+  Projection (`PROJECTABLE_LIFECYCLE_STATUSES` is the same object), the DG1
+  resolver, Audit aggregation, protection and CI evidence matching read it.
+  Golden tests pin `mneme audit`, `protect list/status/validate`, readiness,
+  CI evidence matching, the Audit report builder, `mneme check` (text and
+  JSON, strict and warn) and the applicability preview as byte-identical;
+  hook and MCP code paths are untouched. Section-less legacy
+  memory keeps its exact semantics, including enforcement of superseded legacy
+  decisions by `mneme check`. This is not ADR-031 §11 resolver-result
+  convergence, which remains open.
+- **Library change: `GovernanceContext()` now means labels *not supplied*.**
+  `GovernanceContext.labels` defaults to `None`. With labels not supplied,
+  `resolve_effective` conservatively includes a lifecycle-active decision that
+  declares applicability (trace `applicability: context_not_supplied`,
+  `applicability_evaluated=False`) instead of reporting it `not_applicable`.
+  Pass `GovernanceContext(labels=())` for the previous "no labels" behavior.
+  `DecisionResolution` gains `lifecycle_eligible` and `applicability_evaluated`.
+  A bare string passed as `labels` is now rejected instead of being split into
+  single-character labels.
+  The resolver semantics id is now `mneme.governance-semantics/dg1f-c2-1`;
+  `resolve_change` refuses to compare results across semantics versions. The
+  `mneme check --applicability-preview` output is unchanged.
+
+## v0.11.0 — 2026-11-07
+
+**Decision governance semantics (ADR-031 DG1), the `FORBID_NUMERIC_ABOVE`
+numeric rule (ADR-034), opt-in fail-closed availability (ADR-033) and
+enforcement-trust fixes.** This release contains behavior changes; see
+`docs/releases/v0.11.0.md` for the full list and upgrade notes.
+
+**Opt-in fail-closed availability (ADR-033 C2a/C2b)**
+
+- **New `mneme availability status | authorize | revoke`.** A repository can
+  opt in to refusing Claude Code direct writes (`Edit`, `Write`,
+  `MultiEdit`) when the check cannot run or cannot be trusted. The opt-in is
+  `.mneme/availability.json`, and it counts only when the live default branch
+  of `origin` holds a reviewed authorization event for it. `authorize` and
+  `revoke` write the declaration and never commit. See
+  `docs/integrations/claude-code.md`.
+- **Without a declaration, hook behavior is byte-identical** and no verifier
+  runs.
+- **Known limitation (Architecture A):** deleting the local declaration can
+  silently disable opt-in fail-closed protection. An unverifiable baseline
+  (for example a DNS failure) still lets the edit proceed; the hook then
+  emits a PreToolUse `additionalContext` notice saying the edit was not
+  covered by fail-closed availability enforcement. That notice is not
+  evidence that a file changed.
+
+**Enforcement-trust fixes**
+
+- **Only coherent `mneme check` verdicts are trusted (#260).** The hook (and
+  the Agent SDK and LangChain consumers) now trust a payload only when its
+  mode, violation shape, aggregate verdict and exit code agree. An
+  incoherent result fails open with a diagnostic naming the contradiction.
+- **Relative tool paths resolve against the event `cwd` for change
+  materialization (#571).** Previously the current-file snapshot was read
+  relative to the host process cwd, which could silently skip a forbidden
+  edit, produce a false PASS, or blame pre-existing violations on an
+  unrelated write. Affects the Claude Code, Agent SDK, LangChain, Kiro,
+  Antigravity and Hermes paths.
+- **`mneme adr import` schema errors** are reported as actionable errors
+  instead of a traceback, with canonical memory unchanged.
+
+**`FORBID_NUMERIC_ABOVE`: numeric rule (ADR-034)**
+
+- **New typed rule.** `FORBID_NUMERIC_ABOVE` declares an inclusive upper
+  bound on a Python module-level symbol and/or a positional argument of
+  direct calls. It is decided by the new
+  `mneme check --source-file <file.py>` complete-source audit, and by
+  `--proposed-new-file` for a Claude Code `Write` of a new `.py` file (G2-1,
+  below). Every other input reports it `MATCHER_UNEVALUATED` /
+  `INCOMPLETE_SOURCE_INPUT`, never PASS. See
+  `docs/integrations/adr-import.md`.
+- **Pre-write check for new-file `Write` (G2-1), no support claim.** A Claude
+  Code `PreToolUse` `Write` to a verified-absent `.py` target in an existing
+  directory is checked as complete proposed source. Edits, existing-file
+  writes and other surfaces are unchanged. Independent validation of this
+  path has not passed, so no enforcement claim is made for it.
+- **Matcher corrections.** `--input` without `--target-path` never returns a
+  clean numeric result (F-1); function-source call sites resolve by lexical
+  scope (D2); dynamic writes to the governed symbol (`globals()[...]`,
+  `setattr`, star imports and similar) make the symbol source
+  `AMBIGUOUS_BINDING` instead of a clean PASS (S1, F-G1-1).
+- **Hook evidence attribution (§7b, §7c).** The validation-only
+  `mneme.hook_evidence/v1` record attributes relevant enforcement per rule
+  and names literal-rule refusals; it is inert unless
+  `MNEME_HOOK_EVIDENCE_LOG` is set.
 - **Persistence.** The type is stored only under `mneme.decision-index/v2`
   with the `numeric_upper_bound_rule` semantic feature. Older Mneme versions
   refuse such memory; v1 and section-less memory cannot carry the type.
@@ -132,6 +288,24 @@
     unchanged. See the
     [slice-1 charter](docs/plans/2026-10-15-t08-target-path-memory-resolution-charter.md)
     for the deferred items.
+
+**Other additions**
+
+- **`mneme check --applicability-preview LABEL` (DG1F-C1a).** Opt-in,
+  repeatable, report-only: renders per-decision effective status on stderr
+  marked `NON-AUTHORITATIVE`. Stdout, the JSON verdict and exit codes are
+  unchanged.
+- **Faster `mneme check` startup.** Modules used only by other subcommands
+  are imported lazily, which shortens every hook-triggered check. Behavior
+  is unchanged.
+
+## Install
+
+```bash
+pip install "mneme-hq[mcp]==0.11.0"
+```
+
+---
 
 ## v0.10.0 — 2026-10-07
 

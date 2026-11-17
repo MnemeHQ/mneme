@@ -1,0 +1,7 @@
+[10/23/26 21:07:28] INFO     Tool 'decision.search' rejected      server.py:441
+                             arguments:                                        
+                             ['canonical_lifecycle_status']                    
+                    INFO     Tool 'decision.search' rejected      server.py:441
+                             arguments:                                        
+                             ['canonical_lifecycle_status']                    
+

@@ -1,0 +1,251 @@
+{
+  "canonical_conflict": {
+    "audit_repo_root": {
+      "exit": 1,
+      "stderr": "",
+      "stdout": "Audit report written: audit.json\nWARN: candidate enforcement evidence found; the CI mention does not fail the build\n"
+    },
+    "audit_repo_root_json": "{\n  \"schema\": \"mneme.audit/v1\",\n  \"memory\": \"<WORK>/.mneme/project_memory.json\",\n  \"summary\": {\n    \"total_decisions\": 4,\n    \"protection_relevant\": 3,\n    \"protected\": 1,\n    \"mneme_ready\": 1,\n    \"requires_modelling\": 1,\n    \"guidance\": 1,\n    \"current_protection_pct\": 33.3,\n    \"identified_mneme_potential_pct\": 66.7,\n    \"protection_gap_pct\": 66.7\n  },\n  \"decisions\": [\n    {\n      \"id\": \"C2-LIT\",\n      \"decision\": \"Do not import psycopg2; the service uses SQLite.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"protected\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: psycopg2\",\n      \"evidence_confidence\": \"verified\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-PICKLE\",\n      \"decision\": \"Do not use pickle for persistence.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"mneme_ready\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: pickle\",\n      \"evidence_confidence\": \"candidate\",\n      \"evidence_sources\": [\n        \"ci:candidate:ci.yml\"\n      ]\n    },\n    {\n      \"id\": \"C2-READY\",\n      \"decision\": \"Never call requests.get without a timeout.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"requires_modelling\",\n      \"mneme_guardrail\": null,\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-GUIDE\",\n      \"decision\": \"Prefer small, composable modules.\",\n      \"status\": \"active\",\n      \"intent\": \"guidance\",\n      \"protection_tier\": \"guidance\",\n      \"mneme_guardrail\": null,\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    }\n  ]\n}\n",
+    "audit_repo_root_text": {
+      "exit": 1,
+      "stderr": "",
+      "stdout": "Architecture Protection Audit\n============================================================\nDecisions discovered:         4\nProtection-relevant:          3\n\nCurrent Protection:           33.3%\nProtection Gap:               66.7%\n\nProtected today:              1\nMneme-ready:                  1\nRequires modelling:           1\nGuidance-only:                1\n\nPer-decision breakdown:\n  [protected] C2-LIT: Do not import psycopg2; the service uses SQLite.\n      guardrail: FORBID_LITERAL: psycopg2\n  [mneme_ready] C2-PICKLE: Do not use pickle for persistence.\n      guardrail: FORBID_LITERAL: pickle\n      evidence: ci:candidate:ci.yml\n  [requires_modelling] C2-READY: Never call requests.get without a timeout.\n  [guidance] C2-GUIDE: Prefer small, composable modules.\n\nWARN: candidate enforcement evidence found; the CI mention does not fail the build\n"
+    },
+    "protect_list_repo_root": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Protection activation candidates\n============================================================\nProtected: 1  Mneme-ready: 1  Requires modelling: 1  Guidance: 1\nCandidates: 1\n\n[1] C2-PICKLE: Do not use pickle for persistence.\n    guardrail: FORBID_LITERAL: pickle\n    rule to install: FORBID_LITERAL \"pickle\"\n    applies to: global applicability (canonical policy sources exempt)\n    enforcement: FORBID_LITERAL fails on an exact case-sensitive match, enforced independently of retrieval score; canonical policy sources are exempt (ADR-019/ADR-020)\n\nValidate before activating:  mneme protect validate <decision-id>\nActivate (explicit):         mneme protect activate <decision-id>\n"
+    },
+    "setup_cli": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Mneme setup\n\nRepository\n  OK repo (<WORK>)\n\nProject memory\n  Found <WORK>/.mneme/project_memory.json\n\nArchitecture baseline\n  Not connected (no audit reference provided)\n\nIntegrations\n  None detected\n\nProtection readiness\n  Protected: 1\n  Mneme-ready: 1\n  Requires modelling: 1\n  Guidance: 1\n\nEnforcement\n  Not enabled\n\nInitial check\n  OK (4 decisions)\n\nMneme is installed in setup mode.\n"
+    },
+    "setup_in_process_rerun": {
+      "created_memory": false,
+      "decision_count": 4,
+      "previous_state": "setup",
+      "readiness": {
+        "guidance": 1,
+        "mneme_ready": 1,
+        "protected": 1,
+        "requires_modelling": 1
+      },
+      "rerun": true,
+      "state": "setup"
+    }
+  },
+  "canonical_dangling": {
+    "audit_repo_root": {
+      "exit": 1,
+      "stderr": "",
+      "stdout": "Audit report written: audit.json\nWARN: candidate enforcement evidence found; the CI mention does not fail the build\n"
+    },
+    "audit_repo_root_json": "{\n  \"schema\": \"mneme.audit/v1\",\n  \"memory\": \"<WORK>/.mneme/project_memory.json\",\n  \"summary\": {\n    \"total_decisions\": 4,\n    \"protection_relevant\": 3,\n    \"protected\": 1,\n    \"mneme_ready\": 1,\n    \"requires_modelling\": 1,\n    \"guidance\": 1,\n    \"current_protection_pct\": 33.3,\n    \"identified_mneme_potential_pct\": 66.7,\n    \"protection_gap_pct\": 66.7\n  },\n  \"decisions\": [\n    {\n      \"id\": \"C2-LIT\",\n      \"decision\": \"Do not import psycopg2; the service uses SQLite.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"protected\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: psycopg2\",\n      \"evidence_confidence\": \"verified\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-PICKLE\",\n      \"decision\": \"Do not use pickle for persistence.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"mneme_ready\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: pickle\",\n      \"evidence_confidence\": \"candidate\",\n      \"evidence_sources\": [\n        \"ci:candidate:ci.yml\"\n      ]\n    },\n    {\n      \"id\": \"C2-READY\",\n      \"decision\": \"Never call requests.get without a timeout.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"requires_modelling\",\n      \"mneme_guardrail\": null,\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-GUIDE\",\n      \"decision\": \"Prefer small, composable modules.\",\n      \"status\": \"active\",\n      \"intent\": \"guidance\",\n      \"protection_tier\": \"guidance\",\n      \"mneme_guardrail\": null,\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    }\n  ]\n}\n",
+    "audit_repo_root_text": {
+      "exit": 1,
+      "stderr": "",
+      "stdout": "Architecture Protection Audit\n============================================================\nDecisions discovered:         4\nProtection-relevant:          3\n\nCurrent Protection:           33.3%\nProtection Gap:               66.7%\n\nProtected today:              1\nMneme-ready:                  1\nRequires modelling:           1\nGuidance-only:                1\n\nPer-decision breakdown:\n  [protected] C2-LIT: Do not import psycopg2; the service uses SQLite.\n      guardrail: FORBID_LITERAL: psycopg2\n  [mneme_ready] C2-PICKLE: Do not use pickle for persistence.\n      guardrail: FORBID_LITERAL: pickle\n      evidence: ci:candidate:ci.yml\n  [requires_modelling] C2-READY: Never call requests.get without a timeout.\n  [guidance] C2-GUIDE: Prefer small, composable modules.\n\nWARN: candidate enforcement evidence found; the CI mention does not fail the build\n"
+    },
+    "protect_list_repo_root": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Protection activation candidates\n============================================================\nProtected: 1  Mneme-ready: 1  Requires modelling: 1  Guidance: 1\nCandidates: 1\n\n[1] C2-PICKLE: Do not use pickle for persistence.\n    guardrail: FORBID_LITERAL: pickle\n    rule to install: FORBID_LITERAL \"pickle\"\n    applies to: global applicability (canonical policy sources exempt)\n    enforcement: FORBID_LITERAL fails on an exact case-sensitive match, enforced independently of retrieval score; canonical policy sources are exempt (ADR-019/ADR-020)\n\nValidate before activating:  mneme protect validate <decision-id>\nActivate (explicit):         mneme protect activate <decision-id>\n"
+    },
+    "setup_cli": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Mneme setup\n\nRepository\n  OK repo (<WORK>)\n\nProject memory\n  Found <WORK>/.mneme/project_memory.json\n\nArchitecture baseline\n  Not connected (no audit reference provided)\n\nIntegrations\n  None detected\n\nProtection readiness\n  Protected: 1\n  Mneme-ready: 1\n  Requires modelling: 1\n  Guidance: 1\n\nEnforcement\n  Not enabled\n\nInitial check\n  OK (4 decisions)\n\nMneme is installed in setup mode.\n"
+    },
+    "setup_in_process_rerun": {
+      "created_memory": false,
+      "decision_count": 4,
+      "previous_state": "setup",
+      "readiness": {
+        "guidance": 1,
+        "mneme_ready": 1,
+        "protected": 1,
+        "requires_modelling": 1
+      },
+      "rerun": true,
+      "state": "setup"
+    }
+  },
+  "canonical_v1": {
+    "audit_repo_root": {
+      "exit": 1,
+      "stderr": "",
+      "stdout": "Audit report written: audit.json\nWARN: candidate enforcement evidence found; the CI mention does not fail the build\n"
+    },
+    "audit_repo_root_json": "{\n  \"schema\": \"mneme.audit/v1\",\n  \"memory\": \"<WORK>/.mneme/project_memory.json\",\n  \"summary\": {\n    \"total_decisions\": 4,\n    \"protection_relevant\": 3,\n    \"protected\": 1,\n    \"mneme_ready\": 1,\n    \"requires_modelling\": 1,\n    \"guidance\": 1,\n    \"current_protection_pct\": 33.3,\n    \"identified_mneme_potential_pct\": 66.7,\n    \"protection_gap_pct\": 66.7\n  },\n  \"decisions\": [\n    {\n      \"id\": \"C2-LIT\",\n      \"decision\": \"Do not import psycopg2; the service uses SQLite.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"protected\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: psycopg2\",\n      \"evidence_confidence\": \"verified\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-PICKLE\",\n      \"decision\": \"Do not use pickle for persistence.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"mneme_ready\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: pickle\",\n      \"evidence_confidence\": \"candidate\",\n      \"evidence_sources\": [\n        \"ci:candidate:ci.yml\"\n      ]\n    },\n    {\n      \"id\": \"C2-READY\",\n      \"decision\": \"Never call requests.get without a timeout.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"requires_modelling\",\n      \"mneme_guardrail\": null,\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-GUIDE\",\n      \"decision\": \"Prefer small, composable modules.\",\n      \"status\": \"active\",\n      \"intent\": \"guidance\",\n      \"protection_tier\": \"guidance\",\n      \"mneme_guardrail\": null,\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    }\n  ]\n}\n",
+    "audit_repo_root_text": {
+      "exit": 1,
+      "stderr": "",
+      "stdout": "Architecture Protection Audit\n============================================================\nDecisions discovered:         4\nProtection-relevant:          3\n\nCurrent Protection:           33.3%\nProtection Gap:               66.7%\n\nProtected today:              1\nMneme-ready:                  1\nRequires modelling:           1\nGuidance-only:                1\n\nPer-decision breakdown:\n  [protected] C2-LIT: Do not import psycopg2; the service uses SQLite.\n      guardrail: FORBID_LITERAL: psycopg2\n  [mneme_ready] C2-PICKLE: Do not use pickle for persistence.\n      guardrail: FORBID_LITERAL: pickle\n      evidence: ci:candidate:ci.yml\n  [requires_modelling] C2-READY: Never call requests.get without a timeout.\n  [guidance] C2-GUIDE: Prefer small, composable modules.\n\nWARN: candidate enforcement evidence found; the CI mention does not fail the build\n"
+    },
+    "protect_list_repo_root": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Protection activation candidates\n============================================================\nProtected: 1  Mneme-ready: 1  Requires modelling: 1  Guidance: 1\nCandidates: 1\n\n[1] C2-PICKLE: Do not use pickle for persistence.\n    guardrail: FORBID_LITERAL: pickle\n    rule to install: FORBID_LITERAL \"pickle\"\n    applies to: global applicability (canonical policy sources exempt)\n    enforcement: FORBID_LITERAL fails on an exact case-sensitive match, enforced independently of retrieval score; canonical policy sources are exempt (ADR-019/ADR-020)\n\nValidate before activating:  mneme protect validate <decision-id>\nActivate (explicit):         mneme protect activate <decision-id>\n"
+    },
+    "setup_cli": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Mneme setup\n\nRepository\n  OK repo (<WORK>)\n\nProject memory\n  Found <WORK>/.mneme/project_memory.json\n\nArchitecture baseline\n  Not connected (no audit reference provided)\n\nIntegrations\n  None detected\n\nProtection readiness\n  Protected: 1\n  Mneme-ready: 1\n  Requires modelling: 1\n  Guidance: 1\n\nEnforcement\n  Not enabled\n\nInitial check\n  OK (4 decisions)\n\nMneme is installed in setup mode.\n"
+    },
+    "setup_in_process_rerun": {
+      "created_memory": false,
+      "decision_count": 4,
+      "previous_state": "setup",
+      "readiness": {
+        "guidance": 1,
+        "mneme_ready": 1,
+        "protected": 1,
+        "requires_modelling": 1
+      },
+      "rerun": true,
+      "state": "setup"
+    }
+  },
+  "canonical_v2_applicability": {
+    "audit_repo_root": {
+      "exit": 1,
+      "stderr": "",
+      "stdout": "Audit report written: audit.json\nWARN: candidate enforcement evidence found; the CI mention does not fail the build\n"
+    },
+    "audit_repo_root_json": "{\n  \"schema\": \"mneme.audit/v1\",\n  \"memory\": \"<WORK>/.mneme/project_memory.json\",\n  \"summary\": {\n    \"total_decisions\": 4,\n    \"protection_relevant\": 3,\n    \"protected\": 1,\n    \"mneme_ready\": 1,\n    \"requires_modelling\": 1,\n    \"guidance\": 1,\n    \"current_protection_pct\": 33.3,\n    \"identified_mneme_potential_pct\": 66.7,\n    \"protection_gap_pct\": 66.7\n  },\n  \"decisions\": [\n    {\n      \"id\": \"C2-LIT\",\n      \"decision\": \"Do not import psycopg2; the service uses SQLite.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"protected\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: psycopg2\",\n      \"evidence_confidence\": \"verified\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-PICKLE\",\n      \"decision\": \"Do not use pickle for persistence.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"mneme_ready\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: pickle\",\n      \"evidence_confidence\": \"candidate\",\n      \"evidence_sources\": [\n        \"ci:candidate:ci.yml\"\n      ]\n    },\n    {\n      \"id\": \"C2-READY\",\n      \"decision\": \"Never call requests.get without a timeout.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"requires_modelling\",\n      \"mneme_guardrail\": null,\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-GUIDE\",\n      \"decision\": \"Prefer small, composable modules.\",\n      \"status\": \"active\",\n      \"intent\": \"guidance\",\n      \"protection_tier\": \"guidance\",\n      \"mneme_guardrail\": null,\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    }\n  ]\n}\n",
+    "audit_repo_root_text": {
+      "exit": 1,
+      "stderr": "",
+      "stdout": "Architecture Protection Audit\n============================================================\nDecisions discovered:         4\nProtection-relevant:          3\n\nCurrent Protection:           33.3%\nProtection Gap:               66.7%\n\nProtected today:              1\nMneme-ready:                  1\nRequires modelling:           1\nGuidance-only:                1\n\nPer-decision breakdown:\n  [protected] C2-LIT: Do not import psycopg2; the service uses SQLite.\n      guardrail: FORBID_LITERAL: psycopg2\n  [mneme_ready] C2-PICKLE: Do not use pickle for persistence.\n      guardrail: FORBID_LITERAL: pickle\n      evidence: ci:candidate:ci.yml\n  [requires_modelling] C2-READY: Never call requests.get without a timeout.\n  [guidance] C2-GUIDE: Prefer small, composable modules.\n\nWARN: candidate enforcement evidence found; the CI mention does not fail the build\n"
+    },
+    "protect_list_repo_root": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Protection activation candidates\n============================================================\nProtected: 1  Mneme-ready: 1  Requires modelling: 1  Guidance: 1\nCandidates: 1\n\n[1] C2-PICKLE: Do not use pickle for persistence.\n    guardrail: FORBID_LITERAL: pickle\n    rule to install: FORBID_LITERAL \"pickle\"\n    applies to: global applicability (canonical policy sources exempt)\n    enforcement: FORBID_LITERAL fails on an exact case-sensitive match, enforced independently of retrieval score; canonical policy sources are exempt (ADR-019/ADR-020)\n\nValidate before activating:  mneme protect validate <decision-id>\nActivate (explicit):         mneme protect activate <decision-id>\n"
+    },
+    "setup_cli": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Mneme setup\n\nRepository\n  OK repo (<WORK>)\n\nProject memory\n  Found <WORK>/.mneme/project_memory.json\n\nArchitecture baseline\n  Not connected (no audit reference provided)\n\nIntegrations\n  None detected\n\nProtection readiness\n  Protected: 1\n  Mneme-ready: 1\n  Requires modelling: 1\n  Guidance: 1\n\nEnforcement\n  Not enabled\n\nInitial check\n  OK (4 decisions)\n\nMneme is installed in setup mode.\n"
+    },
+    "setup_in_process_rerun": {
+      "created_memory": false,
+      "decision_count": 4,
+      "previous_state": "setup",
+      "readiness": {
+        "guidance": 1,
+        "mneme_ready": 1,
+        "protected": 1,
+        "requires_modelling": 1
+      },
+      "rerun": true,
+      "state": "setup"
+    }
+  },
+  "error_paths": {
+    "protect_list_invalid": {
+      "exit": 2,
+      "stderr": "ERROR: memory file broken.json failed validation: decision_index.decisions must be a list\n",
+      "stdout": ""
+    },
+    "protect_list_missing": {
+      "exit": 2,
+      "stderr": "ERROR: memory file missing.json does not exist\n",
+      "stdout": ""
+    }
+  },
+  "legacy_items": {
+    "audit_repo_root": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Audit report written: audit.json\n"
+    },
+    "audit_repo_root_json": "{\n  \"schema\": \"mneme.audit/v1\",\n  \"memory\": \"<WORK>/.mneme/project_memory.json\",\n  \"summary\": {\n    \"total_decisions\": 4,\n    \"protection_relevant\": 3,\n    \"protected\": 1,\n    \"mneme_ready\": 1,\n    \"requires_modelling\": 1,\n    \"guidance\": 0,\n    \"current_protection_pct\": 33.3,\n    \"identified_mneme_potential_pct\": 66.7,\n    \"protection_gap_pct\": 66.7\n  },\n  \"decisions\": [\n    {\n      \"id\": \"C2-LIT\",\n      \"decision\": \"Do not import psycopg2; the service uses SQLite.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"protected\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: psycopg2\",\n      \"evidence_confidence\": \"verified\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-OLD\",\n      \"decision\": \"Do not import mysqlclient.\",\n      \"status\": \"superseded\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"protected\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: mysqlclient\",\n      \"evidence_confidence\": \"verified\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-ITEM-RULE\",\n      \"decision\": \"No print debugging\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"requires_modelling\",\n      \"mneme_guardrail\": null,\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-ITEM-AP\",\n      \"decision\": \"Avoid: eval(\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"mneme_ready\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: eval\",\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    }\n  ]\n}\n",
+    "audit_repo_root_text": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Architecture Protection Audit\n============================================================\nDecisions discovered:         4\nProtection-relevant:          3\n\nCurrent Protection:           33.3%\nProtection Gap:               66.7%\n\nProtected today:              1\nMneme-ready:                  1\nRequires modelling:           1\nGuidance-only:                0\n\nPer-decision breakdown:\n  [protected] C2-LIT: Do not import psycopg2; the service uses SQLite.\n      guardrail: FORBID_LITERAL: psycopg2\n  [protected] C2-OLD: Do not import mysqlclient.\n      guardrail: FORBID_LITERAL: mysqlclient\n  [requires_modelling] C2-ITEM-RULE: No print debugging\n  [mneme_ready] C2-ITEM-AP: Avoid: eval(\n      guardrail: FORBID_LITERAL: eval\n\n"
+    },
+    "protect_list_repo_root": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Protection activation candidates\n============================================================\nProtected: 1  Mneme-ready: 1  Requires modelling: 1  Guidance: 0\nCandidates: 1\n\n[1] C2-ITEM-AP: Avoid: eval(\n    guardrail: FORBID_LITERAL: eval\n    rule to install: FORBID_LITERAL \"eval\"\n    applies to: global applicability (canonical policy sources exempt)\n    enforcement: FORBID_LITERAL fails on an exact case-sensitive match, enforced independently of retrieval score; canonical policy sources are exempt (ADR-019/ADR-020)\n\nValidate before activating:  mneme protect validate <decision-id>\nActivate (explicit):         mneme protect activate <decision-id>\n"
+    },
+    "setup_cli": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Mneme setup\n\nRepository\n  OK repo (<WORK>)\n\nProject memory\n  Found <WORK>/.mneme/project_memory.json\n\nArchitecture baseline\n  Not connected (no audit reference provided)\n\nIntegrations\n  None detected\n\nProtection readiness\n  Protected: 1\n  Mneme-ready: 1\n  Requires modelling: 1\n  Guidance: 0\n\nEnforcement\n  Not enabled\n\nInitial check\n  OK (4 decisions)\n\nMneme is installed in setup mode.\n"
+    },
+    "setup_in_process_rerun": {
+      "created_memory": false,
+      "decision_count": 4,
+      "previous_state": "setup",
+      "readiness": {
+        "guidance": 0,
+        "mneme_ready": 1,
+        "protected": 1,
+        "requires_modelling": 1
+      },
+      "rerun": true,
+      "state": "setup"
+    }
+  },
+  "legacy_sectionless": {
+    "audit_repo_root": {
+      "exit": 1,
+      "stderr": "",
+      "stdout": "Audit report written: audit.json\nWARN: candidate enforcement evidence found; the CI mention does not fail the build\n"
+    },
+    "audit_repo_root_json": "{\n  \"schema\": \"mneme.audit/v1\",\n  \"memory\": \"<WORK>/.mneme/project_memory.json\",\n  \"summary\": {\n    \"total_decisions\": 7,\n    \"protection_relevant\": 3,\n    \"protected\": 1,\n    \"mneme_ready\": 1,\n    \"requires_modelling\": 1,\n    \"guidance\": 1,\n    \"current_protection_pct\": 33.3,\n    \"identified_mneme_potential_pct\": 66.7,\n    \"protection_gap_pct\": 66.7\n  },\n  \"decisions\": [\n    {\n      \"id\": \"C2-LIT\",\n      \"decision\": \"Do not import psycopg2; the service uses SQLite.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"protected\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: psycopg2\",\n      \"evidence_confidence\": \"verified\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-PICKLE\",\n      \"decision\": \"Do not use pickle for persistence.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"mneme_ready\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: pickle\",\n      \"evidence_confidence\": \"candidate\",\n      \"evidence_sources\": [\n        \"ci:candidate:ci.yml\"\n      ]\n    },\n    {\n      \"id\": \"C2-READY\",\n      \"decision\": \"Never call requests.get without a timeout.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"requires_modelling\",\n      \"mneme_guardrail\": null,\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-GUIDE\",\n      \"decision\": \"Prefer small, composable modules.\",\n      \"status\": \"active\",\n      \"intent\": \"guidance\",\n      \"protection_tier\": \"guidance\",\n      \"mneme_guardrail\": null,\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-OLD\",\n      \"decision\": \"Do not import mysqlclient.\",\n      \"status\": \"superseded\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"protected\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: mysqlclient\",\n      \"evidence_confidence\": \"verified\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-DEP\",\n      \"decision\": \"Do not import cx_Oracle.\",\n      \"status\": \"deprecated\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"protected\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: cx_Oracle\",\n      \"evidence_confidence\": \"verified\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-OLDPICKLE\",\n      \"decision\": \"Do not use marshal for persistence.\",\n      \"status\": \"superseded\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"mneme_ready\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: marshal\",\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    }\n  ]\n}\n",
+    "audit_repo_root_text": {
+      "exit": 1,
+      "stderr": "",
+      "stdout": "Architecture Protection Audit\n============================================================\nDecisions discovered:         7\nProtection-relevant:          3\n\nCurrent Protection:           33.3%\nProtection Gap:               66.7%\n\nProtected today:              1\nMneme-ready:                  1\nRequires modelling:           1\nGuidance-only:                1\n\nPer-decision breakdown:\n  [protected] C2-LIT: Do not import psycopg2; the service uses SQLite.\n      guardrail: FORBID_LITERAL: psycopg2\n  [mneme_ready] C2-PICKLE: Do not use pickle for persistence.\n      guardrail: FORBID_LITERAL: pickle\n      evidence: ci:candidate:ci.yml\n  [requires_modelling] C2-READY: Never call requests.get without a timeout.\n  [guidance] C2-GUIDE: Prefer small, composable modules.\n  [protected] C2-OLD: Do not import mysqlclient.\n      guardrail: FORBID_LITERAL: mysqlclient\n  [protected] C2-DEP: Do not import cx_Oracle.\n      guardrail: FORBID_LITERAL: cx_Oracle\n  [mneme_ready] C2-OLDPICKLE: Do not use marshal for persistence.\n      guardrail: FORBID_LITERAL: marshal\n\nWARN: candidate enforcement evidence found; the CI mention does not fail the build\n"
+    },
+    "protect_list_repo_root": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Protection activation candidates\n============================================================\nProtected: 1  Mneme-ready: 1  Requires modelling: 1  Guidance: 1\nCandidates: 1\n\n[1] C2-PICKLE: Do not use pickle for persistence.\n    guardrail: FORBID_LITERAL: pickle\n    rule to install: FORBID_LITERAL \"pickle\"\n    applies to: global applicability (canonical policy sources exempt)\n    enforcement: FORBID_LITERAL fails on an exact case-sensitive match, enforced independently of retrieval score; canonical policy sources are exempt (ADR-019/ADR-020)\n\nValidate before activating:  mneme protect validate <decision-id>\nActivate (explicit):         mneme protect activate <decision-id>\n"
+    },
+    "setup_cli": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Mneme setup\n\nRepository\n  OK repo (<WORK>)\n\nProject memory\n  Found <WORK>/.mneme/project_memory.json\n\nArchitecture baseline\n  Not connected (no audit reference provided)\n\nIntegrations\n  None detected\n\nProtection readiness\n  Protected: 1\n  Mneme-ready: 1\n  Requires modelling: 1\n  Guidance: 1\n\nEnforcement\n  Not enabled\n\nInitial check\n  OK (7 decisions)\n\nMneme is installed in setup mode.\n"
+    },
+    "setup_in_process_rerun": {
+      "created_memory": false,
+      "decision_count": 7,
+      "previous_state": "setup",
+      "readiness": {
+        "guidance": 1,
+        "mneme_ready": 1,
+        "protected": 1,
+        "requires_modelling": 1
+      },
+      "rerun": true,
+      "state": "setup"
+    }
+  },
+  "new_memory": {
+    "created_memory_exists": true,
+    "setup_cli": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Mneme setup\n\nRepository\n  OK repo (<WORK>)\n\nProject memory\n  Created <WORK>/.mneme/project_memory.json\n\nArchitecture baseline\n  Not connected (no audit reference provided)\n\nIntegrations\n  None detected\n\nProtection readiness\n  Protected: 0\n  Mneme-ready: 0\n  Requires modelling: 0\n  Guidance: 0\n\nEnforcement\n  Not enabled\n\nInitial check\n  OK (0 decisions)\n\nMneme is installed in setup mode.\n"
+    },
+    "setup_in_process_rerun": {
+      "created_memory": false,
+      "decision_count": 0,
+      "previous_state": "setup",
+      "readiness": {
+        "guidance": 0,
+        "mneme_ready": 0,
+        "protected": 0,
+        "requires_modelling": 0
+      },
+      "rerun": true,
+      "state": "setup"
+    }
+  }
+}

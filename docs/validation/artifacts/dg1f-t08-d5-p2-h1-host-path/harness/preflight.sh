@@ -5,7 +5,9 @@
 # the MNEME_* guard is kept so no Mneme override can reach the session.
 set -u
 BASE=$(cd "$(dirname "$0")" && pwd)
-. "$BASE/pins.env"
+# An A1 pin set (A1_PINSET=A3, set by the A1 entry points) reads the A1 pins, which
+# source pins.env themselves; otherwise the H1 pins (including H1_PINSET=A2).
+if [ -n "${A1_PINSET+set}" ]; then . "$BASE/pins_a1.env"; else . "$BASE/pins.env"; fi
 fail=0
 say() { echo "[preflight] $*"; }
 bad() { echo "[preflight] MISMATCH: $*"; fail=1; }
@@ -17,6 +19,16 @@ else
 fi
 case "$PY" in *'<'*) bad "PY is still a placeholder"; echo "[preflight] FAILED"; exit 1;; esac
 say "setting sources for every probe: $SOURCES"
+if [ -n "${A1_PINSET+set}" ]; then say "pin set: $A1_PINSET (H1c, Amendment A3)"
+else say "pin set: ${H1_PINSET:-H1} (paths: $H1_PATHS)"; fi
+if [ "${H1_PINSET:-}" = A2 ]; then
+  [ "${DISABLE_AUTOUPDATER:-}" = 1 ] && say "DISABLE_AUTOUPDATER=1 (Amendment A2)" \
+    || bad "pin set A2 needs DISABLE_AUTOUPDATER=1 in this shell (Amendment A2)"
+fi
+if [ "${A1_PINSET:-}" = A3 ]; then
+  [ "${DISABLE_AUTOUPDATER:-}" = 1 ] && say "DISABLE_AUTOUPDATER=1 (Amendment A3)" \
+    || bad "pin set A3 needs DISABLE_AUTOUPDATER=1 in this shell (Amendment A3)"
+fi
 
 v=$(claude --version | tr -d '\r')
 [ "$v" = "$PIN_CLAUDE_VERSION" ] && say "claude: $v" || bad "claude '$v' != '$PIN_CLAUDE_VERSION'"
@@ -43,6 +55,10 @@ d="$LIVE"; while [ "$d" != "/" ] && [ "$d" != "." ]; do
   d=$(dirname "$d")
 done
 say "live root: $LIVE"
-say "model pin (checked from the first probe's init event): $PIN_MODEL"
+if [ -n "$PIN_MODEL_FLAG" ]; then
+  say "model pin (passed as --model, checked from the first probe's init event): $PIN_MODEL"
+else
+  say "model pin (checked from the first probe's init event): $PIN_MODEL"
+fi
 [ $fail -eq 0 ] && say "OK" || say "FAILED"
 exit $fail

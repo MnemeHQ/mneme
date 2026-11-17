@@ -83,16 +83,21 @@ Strict mode will not be applied globally.
 
 ### Local hook (Claude Code)
 
-If you use Claude Code with the Mneme `PreToolUse` hook installed, set the
-hook to warn mode while the rollout settles:
+The repo's tracked `.claude/settings.json` registers the Mneme hooks for
+every Claude Code session opened in this repo or any of its worktrees:
+`PreToolUse` (`Edit` / `Write` / `MultiEdit` / `Bash`), `SessionStart` and
+`Stop`. Each runs `python -m mneme.integrations.claude_code.hook` from the
+session's project directory, so a worktree is gated by its own checkout of
+the hook code and its own `.mneme/project_memory.json`. No `pip install`
+is needed beyond the repo's dependencies.
 
-```bash
-export MNEME_HOOK_MODE=warn
+The hooks run in strict mode (the default): a change that introduces a
+violation of a typed rule is blocked. To fall back to warnings locally,
+set the mode in your untracked `.claude/settings.local.json`:
+
+```json
+{ "env": { "MNEME_HOOK_MODE": "warn" } }
 ```
-
-This makes the hook surface drift as warnings without blocking
-`Edit` / `Write` / `MultiEdit` tool calls. Set `MNEME_HOOK_MODE=strict`
-(or unset it; strict is the default) once you are comfortable.
 
 If a warning ever feels wrong, the right move is to file an issue or open a
 `[memory]` PR. Do not silently disable the hook.

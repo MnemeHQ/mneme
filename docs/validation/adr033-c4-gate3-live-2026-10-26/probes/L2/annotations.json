@@ -1,0 +1,38 @@
+[
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/MnemeHQ/mneme-ci1-lab/blob/f7f6ed19c222168b792d6c0a67868e6fc51bad0d/.github",
+    "start_line": 30,
+    "start_column": null,
+    "end_line": 30,
+    "end_column": null,
+    "annotation_level": "failure",
+    "title": "",
+    "message": "Process completed with exit code 1.",
+    "raw_details": ""
+  },
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/MnemeHQ/mneme-ci1-lab/blob/f7f6ed19c222168b792d6c0a67868e6fc51bad0d/.github",
+    "start_line": 29,
+    "start_column": null,
+    "end_line": 29,
+    "end_column": null,
+    "annotation_level": "failure",
+    "title": "ADR-033 C4 decision",
+    "message": "required check fails: UNEVALUATED under availability closed",
+    "raw_details": ""
+  },
+  {
+    "path": ".github",
+    "blob_href": "https://github.com/MnemeHQ/mneme-ci1-lab/blob/f7f6ed19c222168b792d6c0a67868e6fc51bad0d/.github",
+    "start_line": 46,
+    "start_column": null,
+    "end_line": 46,
+    "end_column": null,
+    "annotation_level": "failure",
+    "title": "ADR-033 C4 UNEVALUATED",
+    "message": "docs/c4-l2-link.md: not a regular file (symlink)",
+    "raw_details": ""
+  }
+]

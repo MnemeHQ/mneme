@@ -13,6 +13,11 @@ scope: enforcement.availability_policy
 merge-gate semantics included. Acceptance confers **no** implementation
 authority, implementation charter or Layer 1 amendment.
 **Date:** 2026-10-13 (revised and accepted 2026-10-20)
+**Erratum:** 2026-11-16, `MNEME_MEMORY` precedence under T-08 P2-first (§4.1);
+revised 2026-11-16 for the `MEMORY_PATH_MISMATCH` remediation text.
+In effect from the squash merge of the P2-first implementation, PR
+[#815](https://github.com/MnemeHQ/mneme/pull/815), squash commit `59309fe7`; see
+[Erratum](#erratum-2026-11-16-mneme_memory-precedence-under-t-08-p2-first)
 **Deciders:** Theo Valmis
 **Charter:** none yet. The earlier bundled C0 charter was removed as stale. A
 bounded implementation charter, with its `[layer1-freeze]` amendment, is a
@@ -221,7 +226,10 @@ amendment.
   surface this ADR covers. It did not change `MNEME_MEMORY`, which still takes
   precedence in `find_memory`; an override pointing at other memory (T-08 V5)
   is handled only by the mismatch rule above, and only when authorization is
-  verified. Other hook seams (Bash, SessionStart, Stop) still select from
+  verified. (These two clauses about `MNEME_MEMORY` are superseded from the
+  squash merge of the T-08 P2-first implementation, PR #815, `59309fe7`: see the
+  [2026-11-16 erratum](#erratum-2026-11-16-mneme_memory-precedence-under-t-08-p2-first).)
+  Other hook seams (Bash, SessionStart, Stop) still select from
   `cwd` and stay outside this contract until their T-08 slices land.
 - The concrete schema, enrollment command and verifier belong to a **future
   bounded charter**, which must preserve these invariants.
@@ -467,6 +475,145 @@ different trust boundary.
 Every behavioral slice requires its own reviewed PR and tests; no direct writes
 to `main` (ADR-022).
 
+## Erratum (2026-11-16): `MNEME_MEMORY` precedence under T-08 P2-first
+
+**Defect (prospective).** §4.1 says two things that this erratum supersedes:
+- that `MNEME_MEMORY` "still takes precedence in `find_memory`";
+- that an override pointing at other memory (T-08 V5) "is handled only by the
+  mismatch rule above, and only when authorization is verified".
+
+Both are true at `84ee88b7`. The second is true as to **refusal** only: the
+SS-3 stderr line is emitted under every authorization state when a
+declaration exists (`availability.py:250`, `:280-281`), and the C2b Amendment 1
+proceed sentence under `AUTHORIZATION_UNVERIFIABLE` (`:260-261`).
+
+Both become false when the implementation of T-08 D5+P2 charter
+[Amendment A2](../plans/2026-10-17-t08-d5-p2-memory-resolution-charter.md)
+(P2-first, charter §5.2) lands. A2 applies the D6/Q2 P2 precedence rule on
+today's walk. The owner accepted it on 2026-11-16 at reviewed head `818a1dea`,
+and it merged in #809 (`84ee88b7`). That acceptance is recorded in the #809 PR
+record and squash commit; the charter's in-file status lines still read
+PROPOSED. Charter §5.2.7 step 2 requires this erratum before the
+implementation.
+
+**Effective date and pin.**
+- The erratum takes effect when the P2-first implementation PR merges. Until
+  then, §4.1 describes the shipped behavior and stays authoritative. The
+  erratum changes no code and no behavior.
+- It is pinned to the charter §5.2.2 rows as accepted at `818a1dea`.
+- **The implementation PR must:**
+  - record its merge commit in this ADR's header line and in the §4.1
+    pointer;
+  - revise this erratum, if the freeze or implementation review changes
+    those rows.
+
+**Correction (from that point on).**
+
+- `MNEME_MEMORY` no longer takes precedence over a memory that today's walk
+  discovers from the edited target (charter §5.2.2, rows 1 and 2). An override
+  **beside a discovered memory** is ignored if it differs from that memory or
+  names a missing file. The discovered memory is then the effective memory.
+- **When no memory is discovered,** two cases remain:
+  - an override naming an existing file becomes the effective memory (row 6:
+    the override fills an absence);
+  - an override naming a missing file selects nothing (row 7).
+- T-08 V5 is therefore handled by P2 precedence in every authorization state,
+  not only by the mismatch rule.
+
+**Consequences for this ADR's contract.** These were checked against
+`availability.py` and `hook.py` at `84ee88b7`. With a valid declaration at
+`R`, the declaration walk and the memory walk start from the same point. So if
+`R/.mneme/project_memory.json` is a file, the memory walk finds it, and
+`MNEME_MEMORY` matters only once the declared memory is missing.
+
+- **SS-3 through `MNEME_MEMORY`** occurs only in row 6. There the declared
+  memory is necessarily missing, and the override names a memory other than
+  the bound path. Beside a discovered memory, SS-3 through `MNEME_MEMORY` no
+  longer occurs.
+  - The charter's wording, "SS-3 through `MNEME_MEMORY` becomes unreachable",
+    appears in §5.2.3 and in the §5.2.6 freeze-list rationale.
+  - That wording holds only beside a discovered memory.
+  - The P2-first freeze amendment PR should carry this narrower wording.
+- **SS-3 through discovery becomes reachable more often.**
+  - Today, discovery-driven SS-3 needs `MNEME_MEMORY` unset, because
+    `find_memory` checks the environment first (`hook.py:202-206`).
+  - Under P2-first the walk always runs. Wherever the declared memory is
+    missing and an ancestor memory sits on the walk, the result is `MEMORY_PATH_MISMATCH`, whatever `MNEME_MEMORY` is
+    set to. `emit_availability` checks mismatch before missing memory
+    (`availability.py:193-196`).
+  - Example: authorization is AUTHORIZED, `R/.mneme/project_memory.json` has
+    been deleted, a memory exists at `P/.mneme/project_memory.json` above `R`,
+    and `MNEME_MEMORY` names a missing file.
+    - Today: `MEMORY_MISSING`.
+    - Under P2-first: `MEMORY_PATH_MISMATCH`.
+  - That layout moves from §4.4's missing-memory row to its "effective memory
+    differs from the bound path" row. Both rows refuse.
+- **`MEMORY_MISSING`.**
+  - It no longer arises from a missing override beside a discovered memory:
+    row 2 selects the discovered memory.
+  - It still occurs in row 7 and row 8.
+  - It is replaced by `MEMORY_PATH_MISMATCH` in the layout above.
+- **Remediation text.** The §4.4 matrix, the mismatch rule and the refusal
+  semantics are unchanged. The `MEMORY_PATH_MISMATCH` remediation string is
+  changed by the decision recorded below. Without that change, the string
+  would be **insufficient** in two layouts:
+  - **In row 6** the declared memory is always missing. Following "unset
+    MNEME_MEMORY or point it at the declared .mneme/project_memory.json" leads
+    to row 7 or row 8, and so to a `MEMORY_MISSING` refusal. That refusal's
+    own remediation ("restore .mneme/project_memory.json …") is then also
+    needed.
+  - **In the ancestor layout,** "unset MNEME_MEMORY …" changes nothing.
+    Restoring the declared memory is the fix.
+  - Changing that string is an ADR-033 behavior change at the diagnostic
+    level (§7).
+  - The same line is already wrong today when `MNEME_MEMORY` is unset, the
+    declared memory is missing and an ancestor memory exists.
+  - **Decision (revision, 2026-11-16):** see the
+    [remediation-text decision](../plans/2026-11-16-dg1f-t08-d5-p2-first-remediation-text-decision.md), option O4. The
+    `MEMORY_PATH_MISMATCH` remediation is chosen at emit time:
+    - when the declared memory is not a file, it reads "restore
+      .mneme/project_memory.json from the baseline branch, replacing anything
+      else at that path; while it is not a file, another memory is selected";
+    - otherwise, the existing line is kept.
+  - It lands with the P2-first implementation, under D5+P2 charter Amendment
+    A2-RT and the P2-first `[layer1-freeze]` amendment. Category, routing,
+    exit codes, the SS-3 line and the proceed sentence are unchanged.
+- **§4.3 default-open parity.** "Identical to current behavior" refers, once
+  P2-first merges, to post-P2-first behavior. That includes the H1a notice and
+  the row-2 selection change. Charter §5.2.6 supersedes the C2a, C2b and C2b
+  Amendment 1 preserved item 1 for this.
+- **The §4.0 non-guarantee for `MNEME_MEMORY` set through project settings
+  `env`** (BP-6, T-07) is unchanged.
+  - P2-first narrows what such a setting can do: it can fill an absence, but it
+    can no longer replace a discovered memory.
+  - This ADR still claims no protection against it.
+- **G3-1's `REFUSED_MEMORY_PATH_MISMATCH`** (#793) does not reproduce through
+  `MNEME_MEMORY` beside a discovered memory. The charter's G3 re-assessment
+  step (§5.2.7) will record this.
+
+**Unchanged.**
+
+- Architecture A: the §4.0 threat model and verification trigger, and the
+  binding of repository identity and exact effective memory path.
+- §4.2 to §4.5, apart from the §4.3 note above, and §5 to §7, apart from the
+  §7-level remediation change above.
+- ADR-030's sole canonical decision authority.
+- The "memory selection is a precondition" point in §4.1. Discovery start
+  points are unchanged. Bash, SessionStart and Stop still select from `cwd`,
+  and this ADR's contract still covers direct writes only.
+
+**Implementation obligation (not authorized here).** The tests listed in
+charter §5.2.6 are rewritten to reach the same outcomes either through
+parent-directory discovery or through row 6:
+- the C2a, C2b and C2b Amendment 1 tests that set `MNEME_MEMORY` beside a
+  declared memory;
+- the P1 no-declaration `incomplete` parity case.
+
+A new test asserts that `MNEME_MEMORY` alone, beside a discovered memory, no
+longer produces SS-3.
+
+---
+
 ## Related
 
 - Core #260 / merged PR #484: verdict coherence
@@ -475,7 +622,7 @@ to `main` (ADR-022).
 - DG1F `AUTHORIZATION_UNVERIFIABLE` architecture comparison and adversarial spec,
   merged PR #513 (`docs/plans/2026-10-15-dg1f-authorization-unverifiable-adversarial-spec.md`)
 - T-08 memory selection: evidence #513, slice 1 #517 (`2a445142`), live re-probe
-  #518
+  #518; D5+P2 charter Amendment A2 (P2-first), #809 (`84ee88b7`)
 - DG1F G2 CI-consumer coverage audit
 - CI1 (#540): CI1.4 record, C1 and V11 Option A lab results, production-readiness
   reconciliation (#569)

@@ -1,0 +1,1 @@
+0.10.0 /work/evaluator/lib/python3.12/site-packages/mneme/__init__.py

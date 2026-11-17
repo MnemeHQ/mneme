@@ -1,0 +1,55 @@
+CM-01 S1-A1 M6 exact commands
+
+Worktree:
+  C:\dev\mneme\.worktrees\feat-cm01-s1a1-e0-local-executor
+
+Directory:
+  validation/cm01/s1a-local/m6
+
+Commands:
+  npm install --ignore-scripts --no-audit --no-fund
+  npm run m6
+
+Observed:
+  npm install: 98 packages added
+  npm run m6: pass=true, failed=[]
+  M6-UPSTREAM-SIX-1: true
+  M6-UPSTREAM-SIX-2: true
+  M6-PARITY-1: true
+  M6-PARITY-2: true
+  M6-ACTIVE-TRACE: true
+  M6-DEPRECATED-TRACE: true
+  M6-MISSING-LINKS: true
+  M6-UNKNOWN: true
+  M6-DECLARED-EVIDENCE: true
+  M6-NO-PROPOSAL-CALLS: true
+  M6-REPEAT: true
+  M6-NO-MUTATION: true
+  M6-M4: true
+
+Cases:
+  active equal=true diffs=0
+  deprecated equal=true diffs=0
+  unknown equal=true diffs=0
+
+Versions:
+  Node 24.13.1
+  npm 11.8.0
+  @cloudflare/codemode 0.5.5
+  @modelcontextprotocol/sdk 1.32.2
+  ajv 8.17.1
+  zod 4.6.7
+  Python 3.12.10
+  mneme 0.10.0
+  mcp 2.2.0
+
+Fixture:
+  m4/fixture/canonical/project_memory.json
+  sha256 b4d83d0cc0f70f442e2a62bd0e527220ae99b07cba1238e39d0ad8c5685d4e7f
+
+Evidence:
+  evidence/m6.json
+  evidence/run1.json
+  evidence/run2.json
+  evidence/run1-stderr.log
+  evidence/run2-stderr.log

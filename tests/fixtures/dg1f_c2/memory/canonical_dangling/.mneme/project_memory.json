@@ -1,0 +1,420 @@
+{
+  "meta": {
+    "name": "dg1f-c2-goldens",
+    "description": "DG1F-C2 golden-output corpus (pre-change baseline)",
+    "version": "0.1.0"
+  },
+  "items": [],
+  "decisions": [
+    {
+      "id": "C2-LIT",
+      "decision": "Do not import psycopg2; the service uses SQLite.",
+      "rationale": "Single-file deployment.",
+      "scope": [
+        "database",
+        "storage"
+      ],
+      "constraints": [
+        "Use sqlite3 only"
+      ],
+      "anti_patterns": [
+        "psycopg2"
+      ],
+      "status": "active",
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "psycopg2"
+        }
+      ],
+      "test_evidence": [
+        {
+          "selector": "tests/test_storage.py::test_sqlite_only"
+        }
+      ]
+    },
+    {
+      "id": "C2-PICKLE",
+      "decision": "Do not use pickle for persistence.",
+      "rationale": "Untrusted input.",
+      "scope": [
+        "serialization"
+      ],
+      "constraints": [],
+      "anti_patterns": [
+        "pickle"
+      ],
+      "status": "active",
+      "rules": []
+    },
+    {
+      "id": "C2-READY",
+      "decision": "Never call requests.get without a timeout.",
+      "rationale": "Hung workers.",
+      "scope": [
+        "http",
+        "network"
+      ],
+      "constraints": [
+        "Always pass timeout="
+      ],
+      "anti_patterns": [
+        "requests.get(url)"
+      ],
+      "status": "active",
+      "rules": []
+    },
+    {
+      "id": "C2-GUIDE",
+      "decision": "Prefer small, composable modules.",
+      "rationale": "Readability.",
+      "scope": [
+        "architecture"
+      ],
+      "constraints": [],
+      "anti_patterns": [],
+      "status": "active",
+      "rules": []
+    }
+  ],
+  "decision_index": {
+    "schema": "mneme.decision-index/v1",
+    "decisions": [
+      {
+        "decision_id": "C2-LIT",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-b848f48f3aa5851448319e625d72c8ba",
+        "test_evidence": [
+          {
+            "selector": "tests/test_storage.py::test_sqlite_only",
+            "sha": ""
+          }
+        ],
+        "relationships": [
+          {
+            "type": "supersedes",
+            "target_decision_id": "GHOST-404"
+          }
+        ],
+        "updated_at": ""
+      },
+      {
+        "decision_id": "C2-PICKLE",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-917e0205a2db8478096812ccc69b5131",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": ""
+      },
+      {
+        "decision_id": "C2-READY",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-f5c60dbfe8de98ddf089d0f5c084c7ee",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": ""
+      },
+      {
+        "decision_id": "C2-GUIDE",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-4ae206768883ed34199063fc76935614",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": ""
+      },
+      {
+        "decision_id": "C2-OLD",
+        "decision_class": "architecture",
+        "lifecycle_status": "superseded",
+        "active_version_id": "dver-02c1d93e7212a044ef0238f23cb1ab15",
+        "test_evidence": [
+          {
+            "selector": "tests/test_storage.py::test_sqlite_only",
+            "sha": ""
+          }
+        ],
+        "relationships": [],
+        "updated_at": ""
+      },
+      {
+        "decision_id": "C2-DEP",
+        "decision_class": "architecture",
+        "lifecycle_status": "deprecated",
+        "active_version_id": "dver-4ae2cab7f77cf4839ac52347edd036a1",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": ""
+      },
+      {
+        "decision_id": "C2-OLDPICKLE",
+        "decision_class": "architecture",
+        "lifecycle_status": "superseded",
+        "active_version_id": "dver-9b0cd0b19382d45fa762466b06700c2a",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": ""
+      }
+    ],
+    "versions": [
+      {
+        "version_id": "dver-b848f48f3aa5851448319e625d72c8ba",
+        "decision_id": "C2-LIT",
+        "revision": "1",
+        "content_digest": "588b01004bf671c3cd0a5566610e02a54ca8ea85cafaa37dedb0775bbb154573",
+        "statement": "Do not import psycopg2; the service uses SQLite.",
+        "rationale": "Single-file deployment.",
+        "context_scope": [
+          "database",
+          "storage"
+        ],
+        "constraints": [
+          "Use sqlite3 only"
+        ],
+        "anti_patterns": [
+          "psycopg2"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "",
+            "observed_at": "",
+            "verification_status": ""
+          }
+        ],
+        "occurrence_source_identity": [
+          "legacy-decisions",
+          "C2-LIT"
+        ],
+        "supersedes_version_id": null,
+        "created_at": ""
+      },
+      {
+        "version_id": "dver-917e0205a2db8478096812ccc69b5131",
+        "decision_id": "C2-PICKLE",
+        "revision": "1",
+        "content_digest": "d8e0c1a764bd2b9d4bc15f7ae4d63735a4a59e08db1ad7217c5620f60842bf32",
+        "statement": "Do not use pickle for persistence.",
+        "rationale": "Untrusted input.",
+        "context_scope": [
+          "serialization"
+        ],
+        "constraints": [],
+        "anti_patterns": [
+          "pickle"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "",
+            "observed_at": "",
+            "verification_status": ""
+          }
+        ],
+        "occurrence_source_identity": [
+          "legacy-decisions",
+          "C2-PICKLE"
+        ],
+        "supersedes_version_id": null,
+        "created_at": ""
+      },
+      {
+        "version_id": "dver-f5c60dbfe8de98ddf089d0f5c084c7ee",
+        "decision_id": "C2-READY",
+        "revision": "1",
+        "content_digest": "b53663c6691d68b4c1d061d21409852ed07dd84c823f704e88bc893cafbe70a1",
+        "statement": "Never call requests.get without a timeout.",
+        "rationale": "Hung workers.",
+        "context_scope": [
+          "http",
+          "network"
+        ],
+        "constraints": [
+          "Always pass timeout="
+        ],
+        "anti_patterns": [
+          "requests.get(url)"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "",
+            "observed_at": "",
+            "verification_status": ""
+          }
+        ],
+        "occurrence_source_identity": [
+          "legacy-decisions",
+          "C2-READY"
+        ],
+        "supersedes_version_id": null,
+        "created_at": ""
+      },
+      {
+        "version_id": "dver-4ae206768883ed34199063fc76935614",
+        "decision_id": "C2-GUIDE",
+        "revision": "1",
+        "content_digest": "bb89d41d9804b731741280844155e2f0d7fe1a5077ce4c1d14b88e502812107c",
+        "statement": "Prefer small, composable modules.",
+        "rationale": "Readability.",
+        "context_scope": [
+          "architecture"
+        ],
+        "constraints": [],
+        "anti_patterns": [],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "",
+            "observed_at": "",
+            "verification_status": ""
+          }
+        ],
+        "occurrence_source_identity": [
+          "legacy-decisions",
+          "C2-GUIDE"
+        ],
+        "supersedes_version_id": null,
+        "created_at": ""
+      },
+      {
+        "version_id": "dver-02c1d93e7212a044ef0238f23cb1ab15",
+        "decision_id": "C2-OLD",
+        "revision": "1",
+        "content_digest": "32f79d18f54c87a8e318a345b1d5752f57fa54c3dab05af1f0ab2bdae58ac02b",
+        "statement": "Do not import mysqlclient.",
+        "rationale": "Superseded by C2-LIT.",
+        "context_scope": [
+          "database"
+        ],
+        "constraints": [],
+        "anti_patterns": [
+          "mysqlclient"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "",
+            "observed_at": "",
+            "verification_status": ""
+          }
+        ],
+        "occurrence_source_identity": [
+          "legacy-decisions",
+          "C2-OLD"
+        ],
+        "supersedes_version_id": null,
+        "created_at": ""
+      },
+      {
+        "version_id": "dver-4ae2cab7f77cf4839ac52347edd036a1",
+        "decision_id": "C2-DEP",
+        "revision": "1",
+        "content_digest": "fdcb746c28443154cc0b84f087937106cd3b2d74357d9cde62ec5f26ad97a340",
+        "statement": "Do not import cx_Oracle.",
+        "rationale": "Deprecated policy.",
+        "context_scope": [
+          "database"
+        ],
+        "constraints": [],
+        "anti_patterns": [
+          "cx_Oracle"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "",
+            "observed_at": "",
+            "verification_status": ""
+          }
+        ],
+        "occurrence_source_identity": [
+          "legacy-decisions",
+          "C2-DEP"
+        ],
+        "supersedes_version_id": null,
+        "created_at": ""
+      },
+      {
+        "version_id": "dver-9b0cd0b19382d45fa762466b06700c2a",
+        "decision_id": "C2-OLDPICKLE",
+        "revision": "1",
+        "content_digest": "a03918800ca6b95da53a2dbfc9566935a88705e5e41f9c0e4d4782d674c37940",
+        "statement": "Do not use marshal for persistence.",
+        "rationale": "Superseded.",
+        "context_scope": [
+          "serialization"
+        ],
+        "constraints": [],
+        "anti_patterns": [
+          "marshal"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "",
+            "observed_at": "",
+            "verification_status": ""
+          }
+        ],
+        "occurrence_source_identity": [
+          "legacy-decisions",
+          "C2-OLDPICKLE"
+        ],
+        "supersedes_version_id": null,
+        "created_at": ""
+      }
+    ],
+    "rules": [
+      {
+        "rule_id": "C2-LIT:FORBID_LITERAL:dce58d45cafc99df7c5c1df9642234d0",
+        "decision_id": "C2-LIT",
+        "decision_version_id": "dver-b848f48f3aa5851448319e625d72c8ba",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "psycopg2"
+        },
+        "applicability": {},
+        "binding_authority": "legacy_unknown"
+      },
+      {
+        "rule_id": "C2-OLD:FORBID_LITERAL:249c43426c1536005e35418815914275",
+        "decision_id": "C2-OLD",
+        "decision_version_id": "dver-02c1d93e7212a044ef0238f23cb1ab15",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "mysqlclient"
+        },
+        "applicability": {},
+        "binding_authority": "legacy_unknown"
+      },
+      {
+        "rule_id": "C2-DEP:FORBID_LITERAL:bd7396244d0c51b4cb07ef58dcc51558",
+        "decision_id": "C2-DEP",
+        "decision_version_id": "dver-4ae2cab7f77cf4839ac52347edd036a1",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "cx_Oracle"
+        },
+        "applicability": {},
+        "binding_authority": "legacy_unknown"
+      }
+    ]
+  }
+}

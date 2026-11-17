@@ -1,0 +1,3734 @@
+{
+  "schema": "mneme.cm01.p0-f1.verdict/v1",
+  "started_at": "2026-10-24T23:43:43.722Z",
+  "finished_at": "2026-10-24T23:45:33.613Z",
+  "baseline": "adf50933d0beac255ac2a134e00ee13d40442302",
+  "head": "adf50933d0beac255ac2a134e00ee13d40442302",
+  "versions": {
+    "node": "v24.13.1",
+    "npm": "11.8.0",
+    "codemode": "0.5.5",
+    "sdk": "1.32.2",
+    "ajv": "8.17.1",
+    "quickjs": "0.32.0",
+    "zod": "4.6.7",
+    "python": "3.12.10",
+    "mneme": "0.10.0",
+    "mcp": "2.2.0"
+  },
+  "identities": {
+    "fixture": {
+      "path": "C:\\dev\\mneme\\.worktrees\\feat-cm01-p0-f1-cancellation\\validation\\cm01\\s1a-local\\m4\\fixture\\canonical\\project_memory.json",
+      "sha256": "b4d83d0cc0f70f442e2a62bd0e527220ae99b07cba1238e39d0ad8c5685d4e7f"
+    },
+    "p0_fixture": {
+      "path": "C:\\dev\\mneme\\.worktrees\\feat-cm01-p0-f1-cancellation\\validation\\cm01\\s1a-local\\m1\\fixture\\canonical\\project_memory.json",
+      "sha256": "8f73429e70e04a6876b965bb00a1777fc90409f9da2889c72dab9ac26b9621ea"
+    },
+    "f1_executor": {
+      "path": "C:\\dev\\mneme\\.worktrees\\feat-cm01-p0-f1-cancellation\\validation\\cm01\\p0-f1\\quickjs-executor.mjs",
+      "sha256": "9046e931a5f3968accb2a72a33cf63cde79d1cdb48c05e6fb33cd3ded29c14bc"
+    },
+    "f1_adapter": {
+      "path": "C:\\dev\\mneme\\.worktrees\\feat-cm01-p0-f1-cancellation\\validation\\cm01\\p0-f1\\adapter.mjs",
+      "sha256": "3d8123975bc9f67147fec90ff3e6911a08e40a7f2dc4bd7b43da14b0530cb08c"
+    },
+    "f1_relay": {
+      "path": "C:\\dev\\mneme\\.worktrees\\feat-cm01-p0-f1-cancellation\\validation\\cm01\\p0-f1\\relay.mjs",
+      "sha256": "536f32e7869fc407782b1c1db7d55afc3bd383bc0ede405f40d6f08b45e0f5e5"
+    },
+    "f1_synthetic_server": {
+      "path": "C:\\dev\\mneme\\.worktrees\\feat-cm01-p0-f1-cancellation\\validation\\cm01\\p0-f1\\synthetic-server.mjs",
+      "sha256": "b1469f6ed676ab3b057a92e6329096336a62456f1604317c46d70f6941833063"
+    },
+    "f1_runner": {
+      "path": "C:\\dev\\mneme\\.worktrees\\feat-cm01-p0-f1-cancellation\\validation\\cm01\\p0-f1\\run-f1.mjs",
+      "sha256": "a036c9fdfc6e276330d94f3d895c14cb6a9c823ced98630715fee68d4a7470d4"
+    },
+    "package_lock": {
+      "path": "C:\\dev\\mneme\\.worktrees\\feat-cm01-p0-f1-cancellation\\validation\\cm01\\p0-f1\\package-lock.json",
+      "sha256": "4f4f81b24f31490ff1a1d3f5c1a33fd359d1545567f91daffaa56abaa8e63167"
+    },
+    "p0_verdict": {
+      "path": "C:\\dev\\mneme\\.worktrees\\feat-cm01-p0-f1-cancellation\\validation\\cm01\\p0-cancellation\\evidence\\verdict.json",
+      "sha256": "0917f33f66f9d92e6b639767b89c44af8c40cca9ab03c0e7fa3cb6d0ddabf46a"
+    },
+    "p0_run1": {
+      "path": "C:\\dev\\mneme\\.worktrees\\feat-cm01-p0-f1-cancellation\\validation\\cm01\\p0-cancellation\\evidence\\run1.json",
+      "sha256": "cd9360b21d8f6321dcb7c840b43bf1286ec841de055298a50ba7664900300492"
+    },
+    "p0_run2": {
+      "path": "C:\\dev\\mneme\\.worktrees\\feat-cm01-p0-f1-cancellation\\validation\\cm01\\p0-cancellation\\evidence\\run2.json",
+      "sha256": "49da740026fd2e8cc79c9cd8ef964bfa453e3fd49bfc9ae15a771df84b9cd826"
+    },
+    "frozen_executor": {
+      "path": "C:\\dev\\mneme\\.worktrees\\feat-cm01-p0-f1-cancellation\\validation\\cm01\\s1a-local\\e0\\quickjs-executor.mjs",
+      "sha256": "4b960124e9218ed124ed34e3b3595b648477b9dab6540c4ce1609d2efaf31313"
+    }
+  },
+  "host_cancellation_grace_ms": 100,
+  "cancellation_latency": {
+    "samples": 16,
+    "max_ms": 3,
+    "min_ms": 1,
+    "mean_ms": 1.875,
+    "values": [
+      {
+        "run": "run1",
+        "scenario": "timeout-withhold",
+        "abortToSettlementMs": 2
+      },
+      {
+        "run": "run1",
+        "scenario": "repeated-0",
+        "abortToSettlementMs": 2
+      },
+      {
+        "run": "run1",
+        "scenario": "repeated-1",
+        "abortToSettlementMs": 2
+      },
+      {
+        "run": "run1",
+        "scenario": "repeated-2",
+        "abortToSettlementMs": 2
+      },
+      {
+        "run": "run1",
+        "scenario": "parallel-search",
+        "abortToSettlementMs": 2
+      },
+      {
+        "run": "run1",
+        "scenario": "sequential-trace",
+        "abortToSettlementMs": 2
+      },
+      {
+        "run": "run1",
+        "scenario": "timeout-then-close",
+        "abortToSettlementMs": 1
+      },
+      {
+        "run": "run1",
+        "scenario": "synthetic",
+        "abortToSettlementMs": 2
+      },
+      {
+        "run": "run2",
+        "scenario": "timeout-withhold",
+        "abortToSettlementMs": 1
+      },
+      {
+        "run": "run2",
+        "scenario": "repeated-0",
+        "abortToSettlementMs": 2
+      },
+      {
+        "run": "run2",
+        "scenario": "repeated-1",
+        "abortToSettlementMs": 2
+      },
+      {
+        "run": "run2",
+        "scenario": "repeated-2",
+        "abortToSettlementMs": 2
+      },
+      {
+        "run": "run2",
+        "scenario": "parallel-search",
+        "abortToSettlementMs": 3
+      },
+      {
+        "run": "run2",
+        "scenario": "sequential-trace",
+        "abortToSettlementMs": 2
+      },
+      {
+        "run": "run2",
+        "scenario": "timeout-then-close",
+        "abortToSettlementMs": 2
+      },
+      {
+        "run": "run2",
+        "scenario": "synthetic",
+        "abortToSettlementMs": 1
+      }
+    ]
+  },
+  "runs": [
+    {
+      "run": "run1",
+      "verdict": "PASS",
+      "checks": [
+        {
+          "id": "F1-N1-CONTROL-DIRECT",
+          "pass": true,
+          "detail": {
+            "get": true,
+            "search": true,
+            "applicable": true,
+            "trace": true,
+            "capabilities": true
+          }
+        },
+        {
+          "id": "F1-N2-CONTROL-RELAY",
+          "pass": true,
+          "detail": {
+            "targetSeen": 4,
+            "targetForwarded": 4,
+            "upstreamResponses": 4,
+            "withheld": 0,
+            "cancellations": 0
+          }
+        },
+        {
+          "id": "F1-T1-TIMEOUT-SETTLES",
+          "pass": true,
+          "detail": {
+            "state": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-9901"
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-24T23:43:56.074Z",
+              "pending": false,
+              "outcome": "rejected",
+              "settledAt": "2026-10-24T23:43:56.389Z",
+              "errorName": "McpError",
+              "errorCode": -32001,
+              "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 300ms",
+              "cancellationSentAt": "2026-10-24T23:43:56.387Z",
+              "cancellationSeen": true,
+              "signalAborted": true
+            },
+            "cancel": {
+              "requestId": 2,
+              "count": 1,
+              "events": [
+                {
+                  "ts": "2026-10-24T23:43:56.387Z",
+                  "requestId": 2,
+                  "reason": "Error: Code Mode execution exceeded 300ms"
+                }
+              ]
+            },
+            "stats": {
+              "hostCalls": 1,
+              "resolvedCalls": 0,
+              "failedCalls": 0,
+              "rejectedCalls": 1,
+              "cancelledCalls": 1,
+              "cancelledRejections": 1,
+              "cancelledLateSuccess": 0,
+              "cancelledSettled": 1,
+              "cancelledUnsettled": 0,
+              "lateHostSettlements": 0,
+              "timedOut": true,
+              "interrupted": true,
+              "pendingAtEnd": 0,
+              "deferredDisposed": 1,
+              "drainMs": 1,
+              "hostCancellationGraceMs": 100,
+              "cleanupErrors": [],
+              "durationMs": 322
+            }
+          }
+        },
+        {
+          "id": "F1-T2-LATE-NO-REVIVAL",
+          "pass": true,
+          "detail": {
+            "stateAfterRelease": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-9901"
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-24T23:43:56.074Z",
+              "pending": false,
+              "outcome": "rejected",
+              "settledAt": "2026-10-24T23:43:56.389Z",
+              "errorName": "McpError",
+              "errorCode": -32001,
+              "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 300ms",
+              "cancellationSentAt": "2026-10-24T23:43:56.387Z",
+              "cancellationSeen": true,
+              "signalAborted": true
+            },
+            "late": 1,
+            "cancel": {
+              "requestId": 2,
+              "count": 1,
+              "events": [
+                {
+                  "ts": "2026-10-24T23:43:56.387Z",
+                  "requestId": 2,
+                  "reason": "Error: Code Mode execution exceeded 300ms"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "F1-C1-RACE-BEFORE",
+          "pass": true,
+          "detail": {
+            "label": "before",
+            "timeoutMs": 400,
+            "delayMs": 100,
+            "outcome": {
+              "result": {
+                "record_type": "canonical_decision",
+                "canonical_decision": {
+                  "decision_id": "ADR-9901",
+                  "version": "1",
+                  "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+                  "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+                  "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+                  "decision_class": "architecture",
+                  "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+                  "rationale": "Inventory and stdio handshake fixture only.",
+                  "lifecycle_status": "active",
+                  "owner": "",
+                  "decided_at": "2026-01-01T00:00:00Z",
+                  "updated_at": "2026-01-01T00:00:00Z",
+                  "context_scope": [
+                    "cache"
+                  ],
+                  "targets": [],
+                  "constraints": [
+                    "no external cache service"
+                  ],
+                  "anti_patterns": [
+                    "external_cache_client"
+                  ],
+                  "source_evidence": [
+                    {
+                      "source_type": "runtime",
+                      "source_locator": "",
+                      "source_revision": "",
+                      "observed_at": ""
+                    }
+                  ],
+                  "test_evidence": [],
+                  "relationships": [],
+                  "derived_rule_ids": [
+                    "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+                  ]
+                }
+              },
+              "error": null,
+              "stats": {
+                "hostCalls": 1,
+                "resolvedCalls": 1,
+                "failedCalls": 0,
+                "rejectedCalls": 0,
+                "cancelledCalls": 0,
+                "cancelledRejections": 0,
+                "cancelledLateSuccess": 0,
+                "cancelledSettled": 0,
+                "cancelledUnsettled": 0,
+                "lateHostSettlements": 0,
+                "timedOut": false,
+                "interrupted": false,
+                "pendingAtEnd": 0,
+                "deferredDisposed": 1,
+                "drainMs": 0,
+                "hostCancellationGraceMs": 100,
+                "cleanupErrors": [],
+                "durationMs": 134
+              }
+            },
+            "state": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-9901"
+              },
+              "options": {
+                "signal": {}
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-24T23:44:00.470Z",
+              "startedMs": 1792885440470,
+              "pending": false,
+              "outcome": "fulfilled",
+              "settledAt": "2026-10-24T23:44:00.595Z",
+              "settledMs": 1792885440595,
+              "errorName": null,
+              "errorCode": null,
+              "errorMessage": null,
+              "cancellationSentAt": null,
+              "cancellationSeen": false,
+              "promise": {},
+              "value": {
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "{\n  \"record_type\": \"canonical_decision\",\n  \"canonical_decision\": {\n    \"decision_id\": \"ADR-9901\",\n    \"version\": \"1\",\n    \"version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n    \"decision_version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n    \"content_digest\": \"662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650\",\n    \"decision_class\": \"architecture\",\n    \"statement\": \"Synthetic M1 cache adapter uses the in-memory backend.\",\n    \"rationale\": \"Inventory and stdio handshake fixture only.\",\n    \"lifecycle_status\": \"active\",\n    \"owner\": \"\",\n    \"decided_at\": \"2026-01-01T00:00:00Z\",\n    \"updated_at\": \"2026-01-01T00:00:00Z\",\n    \"context_scope\": [\n      \"cache\"\n    ],\n    \"targets\": [],\n    \"constraints\": [\n      \"no external cache service\"\n    ],\n    \"anti_patterns\": [\n      \"external_cache_client\"\n    ],\n    \"source_evidence\": [\n      {\n        \"source_type\": \"runtime\",\n        \"source_locator\": \"\",\n        \"source_revision\": \"\",\n        \"observed_at\": \"\"\n      }\n    ],\n    \"test_evidence\": [],\n    \"relationships\": [],\n    \"derived_rule_ids\": [\n      \"ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584\"\n    ]\n  }\n}"
+                  }
+                ],
+                "structuredContent": {
+                  "record_type": "canonical_decision",
+                  "canonical_decision": {
+                    "decision_id": "ADR-9901",
+                    "version": "1",
+                    "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+                    "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+                    "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+                    "decision_class": "architecture",
+                    "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+                    "rationale": "Inventory and stdio handshake fixture only.",
+                    "lifecycle_status": "active",
+                    "owner": "",
+                    "decided_at": "2026-01-01T00:00:00Z",
+                    "updated_at": "2026-01-01T00:00:00Z",
+                    "context_scope": [
+                      "cache"
+                    ],
+                    "targets": [],
+                    "constraints": [
+                      "no external cache service"
+                    ],
+                    "anti_patterns": [
+                      "external_cache_client"
+                    ],
+                    "source_evidence": [
+                      {
+                        "source_type": "runtime",
+                        "source_locator": "",
+                        "source_revision": "",
+                        "observed_at": ""
+                      }
+                    ],
+                    "test_evidence": [],
+                    "relationships": [],
+                    "derived_rule_ids": [
+                      "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+                    ]
+                  }
+                },
+                "isError": false
+              }
+            },
+            "settled": {
+              "found": true,
+              "state": {
+                "seq": 1,
+                "name": "decision.get",
+                "args": {
+                  "record_id": "ADR-9901"
+                },
+                "requestId": 2,
+                "startedAt": "2026-10-24T23:44:00.470Z",
+                "pending": false,
+                "outcome": "fulfilled",
+                "settledAt": "2026-10-24T23:44:00.595Z",
+                "errorName": null,
+                "errorCode": null,
+                "errorMessage": null,
+                "cancellationSentAt": null,
+                "cancellationSeen": false,
+                "signalAborted": false
+              },
+              "elapsedMs": 0
+            },
+            "forwarded": {
+              "seq": 9,
+              "ts": "2026-10-24T23:44:00.594Z",
+              "pid": 51176,
+              "type": "response_forwarded_downstream",
+              "requestId": 2,
+              "how": "delay"
+            },
+            "afterForward": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-9901"
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-24T23:44:00.470Z",
+              "pending": false,
+              "outcome": "fulfilled",
+              "settledAt": "2026-10-24T23:44:00.595Z",
+              "errorName": null,
+              "errorCode": null,
+              "errorMessage": null,
+              "cancellationSentAt": null,
+              "cancellationSeen": false,
+              "signalAborted": false
+            },
+            "cancel": {
+              "requestId": 2,
+              "count": 0,
+              "events": []
+            },
+            "hostEvents": [
+              {
+                "ts": "2026-10-24T23:44:00.468Z",
+                "type": "host_call_started",
+                "callId": 1,
+                "provider": "codemode",
+                "method": "decision_get"
+              },
+              {
+                "ts": "2026-10-24T23:44:00.596Z",
+                "type": "host_call_settled",
+                "callId": 1,
+                "provider": "codemode",
+                "method": "decision_get",
+                "outcome": "fulfilled"
+              }
+            ],
+            "stats": {
+              "hostCalls": 1,
+              "resolvedCalls": 1,
+              "failedCalls": 0,
+              "rejectedCalls": 0,
+              "cancelledCalls": 0,
+              "cancelledRejections": 0,
+              "cancelledLateSuccess": 0,
+              "cancelledSettled": 0,
+              "cancelledUnsettled": 0,
+              "lateHostSettlements": 0,
+              "timedOut": false,
+              "interrupted": false,
+              "pendingAtEnd": 0,
+              "deferredDisposed": 1,
+              "drainMs": 0,
+              "hostCancellationGraceMs": 100,
+              "cleanupErrors": [],
+              "durationMs": 134
+            },
+            "settlementLatencyMs": null
+          }
+        },
+        {
+          "id": "F1-C2-RACE-BOUNDARY",
+          "pass": true,
+          "detail": {
+            "invalid": 0,
+            "iterations": [
+              {
+                "outcome": "rejected",
+                "cancel": 1
+              },
+              {
+                "outcome": "rejected",
+                "cancel": 1
+              },
+              {
+                "outcome": "rejected",
+                "cancel": 1
+              }
+            ]
+          }
+        },
+        {
+          "id": "F1-C3-RACE-AFTER",
+          "pass": true,
+          "detail": {
+            "label": "after",
+            "timeoutMs": 300,
+            "delayMs": 700,
+            "outcome": {
+              "result": null,
+              "error": "Code execution failed: execution exceeded 300ms",
+              "errorName": "Error",
+              "stats": {
+                "hostCalls": 1,
+                "resolvedCalls": 0,
+                "failedCalls": 0,
+                "rejectedCalls": 1,
+                "cancelledCalls": 1,
+                "cancelledRejections": 1,
+                "cancelledLateSuccess": 0,
+                "cancelledSettled": 1,
+                "cancelledUnsettled": 0,
+                "lateHostSettlements": 0,
+                "timedOut": true,
+                "interrupted": true,
+                "pendingAtEnd": 0,
+                "deferredDisposed": 1,
+                "drainMs": 3,
+                "hostCancellationGraceMs": 100,
+                "cleanupErrors": [],
+                "durationMs": 322
+              }
+            },
+            "state": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-9901"
+              },
+              "options": {
+                "signal": {}
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-24T23:44:09.394Z",
+              "startedMs": 1792885449394,
+              "pending": false,
+              "outcome": "rejected",
+              "settledAt": "2026-10-24T23:44:09.706Z",
+              "settledMs": 1792885449706,
+              "errorName": "McpError",
+              "errorCode": -32001,
+              "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 300ms",
+              "cancellationSentAt": "2026-10-24T23:44:09.702Z",
+              "cancellationSeen": true,
+              "promise": {}
+            },
+            "settled": {
+              "found": true,
+              "state": {
+                "seq": 1,
+                "name": "decision.get",
+                "args": {
+                  "record_id": "ADR-9901"
+                },
+                "requestId": 2,
+                "startedAt": "2026-10-24T23:44:09.394Z",
+                "pending": false,
+                "outcome": "rejected",
+                "settledAt": "2026-10-24T23:44:09.706Z",
+                "errorName": "McpError",
+                "errorCode": -32001,
+                "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 300ms",
+                "cancellationSentAt": "2026-10-24T23:44:09.702Z",
+                "cancellationSeen": true,
+                "signalAborted": true
+              },
+              "elapsedMs": 0
+            },
+            "forwarded": {
+              "seq": 10,
+              "ts": "2026-10-24T23:44:10.185Z",
+              "pid": 74224,
+              "type": "response_forwarded_downstream",
+              "requestId": 2,
+              "how": "delay"
+            },
+            "afterForward": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-9901"
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-24T23:44:09.394Z",
+              "pending": false,
+              "outcome": "rejected",
+              "settledAt": "2026-10-24T23:44:09.706Z",
+              "errorName": "McpError",
+              "errorCode": -32001,
+              "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 300ms",
+              "cancellationSentAt": "2026-10-24T23:44:09.702Z",
+              "cancellationSeen": true,
+              "signalAborted": true
+            },
+            "cancel": {
+              "requestId": 2,
+              "count": 1,
+              "events": [
+                {
+                  "ts": "2026-10-24T23:44:09.702Z",
+                  "requestId": 2,
+                  "reason": "Error: Code Mode execution exceeded 300ms"
+                }
+              ]
+            },
+            "hostEvents": [
+              {
+                "ts": "2026-10-24T23:44:09.392Z",
+                "type": "host_call_started",
+                "callId": 1,
+                "provider": "codemode",
+                "method": "decision_get"
+              },
+              {
+                "ts": "2026-10-24T23:44:09.703Z",
+                "type": "host_call_aborted",
+                "callId": 1,
+                "provider": "codemode",
+                "method": "decision_get",
+                "abortedAt": 1792885449702,
+                "reason": "Error: Code Mode execution exceeded 300ms"
+              },
+              {
+                "ts": "2026-10-24T23:44:09.707Z",
+                "type": "host_call_settled_after_abort",
+                "callId": 1,
+                "provider": "codemode",
+                "method": "decision_get",
+                "outcome": "rejected",
+                "errorName": "HostCancelledError",
+                "errorMessage": "MCP decision.get cancelled: MCP error -32001: Error: Code Mode execution exceeded 300ms",
+                "afterAbortMs": 5
+              }
+            ],
+            "stats": {
+              "hostCalls": 1,
+              "resolvedCalls": 0,
+              "failedCalls": 0,
+              "rejectedCalls": 1,
+              "cancelledCalls": 1,
+              "cancelledRejections": 1,
+              "cancelledLateSuccess": 0,
+              "cancelledSettled": 1,
+              "cancelledUnsettled": 0,
+              "lateHostSettlements": 0,
+              "timedOut": true,
+              "interrupted": true,
+              "pendingAtEnd": 0,
+              "deferredDisposed": 1,
+              "drainMs": 3,
+              "hostCancellationGraceMs": 100,
+              "cleanupErrors": [],
+              "durationMs": 322
+            },
+            "settlementLatencyMs": 4
+          }
+        },
+        {
+          "id": "F1-C3-PARALLEL",
+          "pass": true,
+          "detail": {
+            "get": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-9901"
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-24T23:44:14.355Z",
+              "pending": false,
+              "outcome": "fulfilled",
+              "settledAt": "2026-10-24T23:44:14.378Z",
+              "errorName": null,
+              "errorCode": null,
+              "errorMessage": null,
+              "cancellationSentAt": null,
+              "cancellationSeen": false,
+              "signalAborted": false
+            },
+            "search": {
+              "seq": 2,
+              "name": "decision.search",
+              "args": {
+                "query": "cache",
+                "canonical_lifecycle_status": "active"
+              },
+              "requestId": 3,
+              "startedAt": "2026-10-24T23:44:14.355Z",
+              "pending": false,
+              "outcome": "rejected",
+              "settledAt": "2026-10-24T23:44:14.668Z",
+              "errorName": "McpError",
+              "errorCode": -32001,
+              "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 300ms",
+              "cancellationSentAt": "2026-10-24T23:44:14.666Z",
+              "cancellationSeen": true,
+              "signalAborted": true
+            },
+            "cancels": {
+              "get": {
+                "requestId": 2,
+                "count": 0,
+                "events": []
+              },
+              "search": {
+                "requestId": 3,
+                "count": 1,
+                "events": [
+                  {
+                    "ts": "2026-10-24T23:44:14.666Z",
+                    "requestId": 3,
+                    "reason": "Error: Code Mode execution exceeded 300ms"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "F1-R1-SEQUENTIAL",
+          "pass": true,
+          "detail": {
+            "states": {
+              "decision.get": {
+                "seq": 1,
+                "name": "decision.get",
+                "args": {
+                  "record_id": "ADR-9901"
+                },
+                "requestId": 2,
+                "startedAt": "2026-10-24T23:44:18.714Z",
+                "pending": false,
+                "outcome": "fulfilled",
+                "settledAt": "2026-10-24T23:44:18.724Z",
+                "errorName": null,
+                "errorCode": null,
+                "errorMessage": null,
+                "cancellationSentAt": null,
+                "cancellationSeen": false,
+                "signalAborted": false
+              },
+              "decision.search": {
+                "seq": 2,
+                "name": "decision.search",
+                "args": {
+                  "query": "cache",
+                  "canonical_lifecycle_status": "active"
+                },
+                "requestId": 3,
+                "startedAt": "2026-10-24T23:44:18.726Z",
+                "pending": false,
+                "outcome": "fulfilled",
+                "settledAt": "2026-10-24T23:44:18.737Z",
+                "errorName": null,
+                "errorCode": null,
+                "errorMessage": null,
+                "cancellationSentAt": null,
+                "cancellationSeen": false,
+                "signalAborted": false
+              },
+              "decision.applicable_to": {
+                "seq": 3,
+                "name": "decision.applicable_to",
+                "args": {
+                  "context": [
+                    "cache"
+                  ]
+                },
+                "requestId": 4,
+                "startedAt": "2026-10-24T23:44:18.740Z",
+                "pending": false,
+                "outcome": "fulfilled",
+                "settledAt": "2026-10-24T23:44:18.749Z",
+                "errorName": null,
+                "errorCode": null,
+                "errorMessage": null,
+                "cancellationSentAt": null,
+                "cancellationSeen": false,
+                "signalAborted": false
+              },
+              "decision.trace": {
+                "seq": 4,
+                "name": "decision.trace",
+                "args": {
+                  "record_id": "ADR-9901"
+                },
+                "requestId": 5,
+                "startedAt": "2026-10-24T23:44:18.751Z",
+                "pending": false,
+                "outcome": "rejected",
+                "settledAt": "2026-10-24T23:44:19.223Z",
+                "errorName": "McpError",
+                "errorCode": -32001,
+                "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 500ms",
+                "cancellationSentAt": "2026-10-24T23:44:19.221Z",
+                "cancellationSeen": true,
+                "signalAborted": true
+              }
+            },
+            "cancels": {
+              "decision.get": {
+                "requestId": 2,
+                "count": 0,
+                "events": []
+              },
+              "decision.search": {
+                "requestId": 3,
+                "count": 0,
+                "events": []
+              },
+              "decision.applicable_to": {
+                "requestId": 4,
+                "count": 0,
+                "events": []
+              },
+              "decision.trace": {
+                "requestId": 5,
+                "count": 1,
+                "events": [
+                  {
+                    "ts": "2026-10-24T23:44:19.221Z",
+                    "requestId": 5,
+                    "reason": "Error: Code Mode execution exceeded 500ms"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "F1-R2-REPEATED",
+          "pass": true,
+          "detail": [
+            {
+              "index": 0,
+              "withheld": {
+                "seq": 8,
+                "ts": "2026-10-24T23:44:23.909Z",
+                "pid": 65964,
+                "type": "response_withheld",
+                "requestId": 2,
+                "tool": "decision.get"
+              },
+              "outcome": {
+                "result": null,
+                "error": "Code execution failed: execution exceeded 250ms",
+                "errorName": "Error",
+                "stats": {
+                  "hostCalls": 1,
+                  "resolvedCalls": 0,
+                  "failedCalls": 0,
+                  "rejectedCalls": 1,
+                  "cancelledCalls": 1,
+                  "cancelledRejections": 1,
+                  "cancelledLateSuccess": 0,
+                  "cancelledSettled": 1,
+                  "cancelledUnsettled": 0,
+                  "lateHostSettlements": 0,
+                  "timedOut": true,
+                  "interrupted": true,
+                  "pendingAtEnd": 0,
+                  "deferredDisposed": 1,
+                  "drainMs": 1,
+                  "hostCancellationGraceMs": 100,
+                  "cleanupErrors": [],
+                  "durationMs": 265
+                }
+              },
+              "state": {
+                "seq": 1,
+                "name": "decision.get",
+                "args": {
+                  "record_id": "ADR-9901"
+                },
+                "requestId": 2,
+                "startedAt": "2026-10-24T23:44:23.896Z",
+                "pending": false,
+                "outcome": "rejected",
+                "settledAt": "2026-10-24T23:44:24.156Z",
+                "errorName": "McpError",
+                "errorCode": -32001,
+                "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 250ms",
+                "cancellationSentAt": "2026-10-24T23:44:24.154Z",
+                "cancellationSeen": true,
+                "signalAborted": true
+              },
+              "settled": {
+                "found": true,
+                "state": {
+                  "seq": 1,
+                  "name": "decision.get",
+                  "args": {
+                    "record_id": "ADR-9901"
+                  },
+                  "requestId": 2,
+                  "startedAt": "2026-10-24T23:44:23.896Z",
+                  "pending": false,
+                  "outcome": "rejected",
+                  "settledAt": "2026-10-24T23:44:24.156Z",
+                  "errorName": "McpError",
+                  "errorCode": -32001,
+                  "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 250ms",
+                  "cancellationSentAt": "2026-10-24T23:44:24.154Z",
+                  "cancellationSeen": true,
+                  "signalAborted": true
+                },
+                "elapsedMs": 0
+              },
+              "cancel": {
+                "requestId": 2,
+                "count": 1,
+                "events": [
+                  {
+                    "ts": "2026-10-24T23:44:24.154Z",
+                    "requestId": 2,
+                    "reason": "Error: Code Mode execution exceeded 250ms"
+                  }
+                ]
+              },
+              "released": {
+                "seq": 10,
+                "ts": "2026-10-24T23:44:24.159Z",
+                "pid": 65964,
+                "type": "response_released_downstream",
+                "requestId": 2,
+                "tool": "decision.get"
+              },
+              "hostEvents": [
+                {
+                  "ts": "2026-10-24T23:44:23.894Z",
+                  "type": "host_call_started",
+                  "callId": 1,
+                  "provider": "codemode",
+                  "method": "decision_get"
+                },
+                {
+                  "ts": "2026-10-24T23:44:24.154Z",
+                  "type": "host_call_aborted",
+                  "callId": 1,
+                  "provider": "codemode",
+                  "method": "decision_get",
+                  "abortedAt": 1792885464154,
+                  "reason": "Error: Code Mode execution exceeded 250ms"
+                },
+                {
+                  "ts": "2026-10-24T23:44:24.156Z",
+                  "type": "host_call_settled_after_abort",
+                  "callId": 1,
+                  "provider": "codemode",
+                  "method": "decision_get",
+                  "outcome": "rejected",
+                  "errorName": "HostCancelledError",
+                  "errorMessage": "MCP decision.get cancelled: MCP error -32001: Error: Code Mode execution exceeded 250ms",
+                  "afterAbortMs": 2
+                }
+              ],
+              "stats": {
+                "hostCalls": 1,
+                "resolvedCalls": 0,
+                "failedCalls": 0,
+                "rejectedCalls": 1,
+                "cancelledCalls": 1,
+                "cancelledRejections": 1,
+                "cancelledLateSuccess": 0,
+                "cancelledSettled": 1,
+                "cancelledUnsettled": 0,
+                "lateHostSettlements": 0,
+                "timedOut": true,
+                "interrupted": true,
+                "pendingAtEnd": 0,
+                "deferredDisposed": 1,
+                "drainMs": 1,
+                "hostCancellationGraceMs": 100,
+                "cleanupErrors": [],
+                "durationMs": 265
+              },
+              "settlementLatencyMs": 2
+            },
+            {
+              "index": 1,
+              "withheld": {
+                "seq": 16,
+                "ts": "2026-10-24T23:44:24.324Z",
+                "pid": 65964,
+                "type": "response_withheld",
+                "requestId": 3,
+                "tool": "decision.get"
+              },
+              "outcome": {
+                "result": null,
+                "error": "Code execution failed: execution exceeded 250ms",
+                "errorName": "Error",
+                "stats": {
+                  "hostCalls": 1,
+                  "resolvedCalls": 0,
+                  "failedCalls": 0,
+                  "rejectedCalls": 1,
+                  "cancelledCalls": 1,
+                  "cancelledRejections": 1,
+                  "cancelledLateSuccess": 0,
+                  "cancelledSettled": 1,
+                  "cancelledUnsettled": 0,
+                  "lateHostSettlements": 0,
+                  "timedOut": true,
+                  "interrupted": true,
+                  "pendingAtEnd": 0,
+                  "deferredDisposed": 1,
+                  "drainMs": 1,
+                  "hostCancellationGraceMs": 100,
+                  "cleanupErrors": [],
+                  "durationMs": 267
+                }
+              },
+              "state": {
+                "seq": 1,
+                "name": "decision.get",
+                "args": {
+                  "record_id": "ADR-9901"
+                },
+                "requestId": 3,
+                "startedAt": "2026-10-24T23:44:24.312Z",
+                "pending": false,
+                "outcome": "rejected",
+                "settledAt": "2026-10-24T23:44:24.574Z",
+                "errorName": "McpError",
+                "errorCode": -32001,
+                "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 250ms",
+                "cancellationSentAt": "2026-10-24T23:44:24.572Z",
+                "cancellationSeen": true,
+                "signalAborted": true
+              },
+              "settled": {
+                "found": true,
+                "state": {
+                  "seq": 1,
+                  "name": "decision.get",
+                  "args": {
+                    "record_id": "ADR-9901"
+                  },
+                  "requestId": 3,
+                  "startedAt": "2026-10-24T23:44:24.312Z",
+                  "pending": false,
+                  "outcome": "rejected",
+                  "settledAt": "2026-10-24T23:44:24.574Z",
+                  "errorName": "McpError",
+                  "errorCode": -32001,
+                  "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 250ms",
+                  "cancellationSentAt": "2026-10-24T23:44:24.572Z",
+                  "cancellationSeen": true,
+                  "signalAborted": true
+                },
+                "elapsedMs": 0
+              },
+              "cancel": {
+                "requestId": 3,
+                "count": 1,
+                "events": [
+                  {
+                    "ts": "2026-10-24T23:44:24.572Z",
+                    "requestId": 3,
+                    "reason": "Error: Code Mode execution exceeded 250ms"
+                  }
+                ]
+              },
+              "released": {
+                "seq": 18,
+                "ts": "2026-10-24T23:44:24.576Z",
+                "pid": 65964,
+                "type": "response_released_downstream",
+                "requestId": 3,
+                "tool": "decision.get"
+              },
+              "hostEvents": [
+                {
+                  "ts": "2026-10-24T23:44:24.310Z",
+                  "type": "host_call_started",
+                  "callId": 1,
+                  "provider": "codemode",
+                  "method": "decision_get"
+                },
+                {
+                  "ts": "2026-10-24T23:44:24.572Z",
+                  "type": "host_call_aborted",
+                  "callId": 1,
+                  "provider": "codemode",
+                  "method": "decision_get",
+                  "abortedAt": 1792885464571,
+                  "reason": "Error: Code Mode execution exceeded 250ms"
+                },
+                {
+                  "ts": "2026-10-24T23:44:24.574Z",
+                  "type": "host_call_settled_after_abort",
+                  "callId": 1,
+                  "provider": "codemode",
+                  "method": "decision_get",
+                  "outcome": "rejected",
+                  "errorName": "HostCancelledError",
+                  "errorMessage": "MCP decision.get cancelled: MCP error -32001: Error: Code Mode execution exceeded 250ms",
+                  "afterAbortMs": 3
+                }
+              ],
+              "stats": {
+                "hostCalls": 1,
+                "resolvedCalls": 0,
+                "failedCalls": 0,
+                "rejectedCalls": 1,
+                "cancelledCalls": 1,
+                "cancelledRejections": 1,
+                "cancelledLateSuccess": 0,
+                "cancelledSettled": 1,
+                "cancelledUnsettled": 0,
+                "lateHostSettlements": 0,
+                "timedOut": true,
+                "interrupted": true,
+                "pendingAtEnd": 0,
+                "deferredDisposed": 1,
+                "drainMs": 1,
+                "hostCancellationGraceMs": 100,
+                "cleanupErrors": [],
+                "durationMs": 267
+              },
+              "settlementLatencyMs": 2
+            },
+            {
+              "index": 2,
+              "withheld": {
+                "seq": 24,
+                "ts": "2026-10-24T23:44:24.755Z",
+                "pid": 65964,
+                "type": "response_withheld",
+                "requestId": 4,
+                "tool": "decision.get"
+              },
+              "outcome": {
+                "result": null,
+                "error": "Code execution failed: execution exceeded 250ms",
+                "errorName": "Error",
+                "stats": {
+                  "hostCalls": 1,
+                  "resolvedCalls": 0,
+                  "failedCalls": 0,
+                  "rejectedCalls": 1,
+                  "cancelledCalls": 1,
+                  "cancelledRejections": 1,
+                  "cancelledLateSuccess": 0,
+                  "cancelledSettled": 1,
+                  "cancelledUnsettled": 0,
+                  "lateHostSettlements": 0,
+                  "timedOut": true,
+                  "interrupted": true,
+                  "pendingAtEnd": 0,
+                  "deferredDisposed": 1,
+                  "drainMs": 2,
+                  "hostCancellationGraceMs": 100,
+                  "cleanupErrors": [],
+                  "durationMs": 272
+                }
+              },
+              "state": {
+                "seq": 1,
+                "name": "decision.get",
+                "args": {
+                  "record_id": "ADR-9901"
+                },
+                "requestId": 4,
+                "startedAt": "2026-10-24T23:44:24.736Z",
+                "pending": false,
+                "outcome": "rejected",
+                "settledAt": "2026-10-24T23:44:24.992Z",
+                "errorName": "McpError",
+                "errorCode": -32001,
+                "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 250ms",
+                "cancellationSentAt": "2026-10-24T23:44:24.990Z",
+                "cancellationSeen": true,
+                "signalAborted": true
+              },
+              "settled": {
+                "found": true,
+                "state": {
+                  "seq": 1,
+                  "name": "decision.get",
+                  "args": {
+                    "record_id": "ADR-9901"
+                  },
+                  "requestId": 4,
+                  "startedAt": "2026-10-24T23:44:24.736Z",
+                  "pending": false,
+                  "outcome": "rejected",
+                  "settledAt": "2026-10-24T23:44:24.992Z",
+                  "errorName": "McpError",
+                  "errorCode": -32001,
+                  "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 250ms",
+                  "cancellationSentAt": "2026-10-24T23:44:24.990Z",
+                  "cancellationSeen": true,
+                  "signalAborted": true
+                },
+                "elapsedMs": 0
+              },
+              "cancel": {
+                "requestId": 4,
+                "count": 1,
+                "events": [
+                  {
+                    "ts": "2026-10-24T23:44:24.990Z",
+                    "requestId": 4,
+                    "reason": "Error: Code Mode execution exceeded 250ms"
+                  }
+                ]
+              },
+              "released": {
+                "seq": 26,
+                "ts": "2026-10-24T23:44:24.995Z",
+                "pid": 65964,
+                "type": "response_released_downstream",
+                "requestId": 4,
+                "tool": "decision.get"
+              },
+              "hostEvents": [
+                {
+                  "ts": "2026-10-24T23:44:24.731Z",
+                  "type": "host_call_started",
+                  "callId": 1,
+                  "provider": "codemode",
+                  "method": "decision_get"
+                },
+                {
+                  "ts": "2026-10-24T23:44:24.990Z",
+                  "type": "host_call_aborted",
+                  "callId": 1,
+                  "provider": "codemode",
+                  "method": "decision_get",
+                  "abortedAt": 1792885464990,
+                  "reason": "Error: Code Mode execution exceeded 250ms"
+                },
+                {
+                  "ts": "2026-10-24T23:44:24.992Z",
+                  "type": "host_call_settled_after_abort",
+                  "callId": 1,
+                  "provider": "codemode",
+                  "method": "decision_get",
+                  "outcome": "rejected",
+                  "errorName": "HostCancelledError",
+                  "errorMessage": "MCP decision.get cancelled: MCP error -32001: Error: Code Mode execution exceeded 250ms",
+                  "afterAbortMs": 2
+                }
+              ],
+              "stats": {
+                "hostCalls": 1,
+                "resolvedCalls": 0,
+                "failedCalls": 0,
+                "rejectedCalls": 1,
+                "cancelledCalls": 1,
+                "cancelledRejections": 1,
+                "cancelledLateSuccess": 0,
+                "cancelledSettled": 1,
+                "cancelledUnsettled": 0,
+                "lateHostSettlements": 0,
+                "timedOut": true,
+                "interrupted": true,
+                "pendingAtEnd": 0,
+                "deferredDisposed": 1,
+                "drainMs": 2,
+                "hostCancellationGraceMs": 100,
+                "cleanupErrors": [],
+                "durationMs": 272
+              },
+              "settlementLatencyMs": 2
+            }
+          ]
+        },
+        {
+          "id": "F1-F1-TRANSPORT-CLOSE",
+          "pass": true,
+          "detail": {
+            "state": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-9901"
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-24T23:44:28.781Z",
+              "pending": false,
+              "outcome": "rejected",
+              "settledAt": "2026-10-24T23:44:29.288Z",
+              "errorName": "McpError",
+              "errorCode": -32000,
+              "errorMessage": "MCP error -32000: Connection closed",
+              "cancellationSentAt": null,
+              "cancellationSeen": false,
+              "signalAborted": false
+            },
+            "cancel": {
+              "requestId": 2,
+              "count": 0,
+              "events": []
+            },
+            "stats": {
+              "hostCalls": 1,
+              "resolvedCalls": 0,
+              "failedCalls": 1,
+              "rejectedCalls": 0,
+              "cancelledCalls": 0,
+              "cancelledRejections": 0,
+              "cancelledLateSuccess": 0,
+              "cancelledSettled": 0,
+              "cancelledUnsettled": 0,
+              "lateHostSettlements": 0,
+              "timedOut": false,
+              "interrupted": false,
+              "pendingAtEnd": 0,
+              "deferredDisposed": 1,
+              "drainMs": 0,
+              "hostCancellationGraceMs": 100,
+              "cleanupErrors": [],
+              "durationMs": 513
+            }
+          }
+        },
+        {
+          "id": "F1-F2-TIMEOUT-THEN-CLOSE",
+          "pass": true,
+          "detail": {
+            "state": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-9901"
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-24T23:44:32.376Z",
+              "pending": false,
+              "outcome": "rejected",
+              "settledAt": "2026-10-24T23:44:32.637Z",
+              "errorName": "McpError",
+              "errorCode": -32001,
+              "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 250ms",
+              "cancellationSentAt": "2026-10-24T23:44:32.636Z",
+              "cancellationSeen": true,
+              "signalAborted": true
+            },
+            "afterClose": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-9901"
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-24T23:44:32.376Z",
+              "pending": false,
+              "outcome": "rejected",
+              "settledAt": "2026-10-24T23:44:32.637Z",
+              "errorName": "McpError",
+              "errorCode": -32001,
+              "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 250ms",
+              "cancellationSentAt": "2026-10-24T23:44:32.636Z",
+              "cancellationSeen": true,
+              "signalAborted": true
+            },
+            "cancel": {
+              "requestId": 2,
+              "count": 1,
+              "events": [
+                {
+                  "ts": "2026-10-24T23:44:32.636Z",
+                  "requestId": 2,
+                  "reason": "Error: Code Mode execution exceeded 250ms"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "F1-A1-VALIDATION",
+          "pass": true,
+          "detail": {
+            "outcome": "Code execution failed: Error: Argument validation failed for decision.get: [{\"instancePath\":\"/record_id\",\"schemaPath\":\"#/properties/record_id/type\",\"keyword\":\"type\",\"params\":{\"type\":\"string\"},\"message\":\"must be string\"}]",
+            "tracked": [],
+            "stats": {
+              "hostCalls": 1,
+              "resolvedCalls": 0,
+              "failedCalls": 1,
+              "rejectedCalls": 0,
+              "cancelledCalls": 0,
+              "cancelledRejections": 0,
+              "cancelledLateSuccess": 0,
+              "cancelledSettled": 0,
+              "cancelledUnsettled": 0,
+              "lateHostSettlements": 0,
+              "timedOut": false,
+              "interrupted": false,
+              "pendingAtEnd": 0,
+              "deferredDisposed": 1,
+              "drainMs": 0,
+              "hostCancellationGraceMs": 100,
+              "cleanupErrors": [],
+              "durationMs": 7
+            }
+          }
+        },
+        {
+          "id": "F1-A2-MCP-ISERROR",
+          "pass": true,
+          "detail": {
+            "state": {
+              "seq": 1,
+              "name": "decision.search",
+              "args": {
+                "canonical_lifecycle_status": "bogus"
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-24T23:44:39.754Z",
+              "pending": false,
+              "outcome": "fulfilled",
+              "settledAt": "2026-10-24T23:44:39.765Z",
+              "errorName": null,
+              "errorCode": null,
+              "errorMessage": null,
+              "cancellationSentAt": null,
+              "cancellationSeen": false,
+              "signalAborted": false
+            },
+            "calls": [
+              {
+                "seq": 1,
+                "tool": "decision.search",
+                "args": {
+                  "canonical_lifecycle_status": "bogus"
+                },
+                "outcome": "fulfilled",
+                "cancelled": false,
+                "isError": true,
+                "structuredContent": null,
+                "toolResult": null,
+                "text": "Error executing tool decision.search: 1 validation error for decision_searchArguments\ncanonical_lifecycle_status\n  Input should be 'active', 'superseded', 'deprecated' or 'inactive' [type=literal_error, input_value='bogus', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/literal_error",
+                "signalAborted": false
+              }
+            ]
+          }
+        },
+        {
+          "id": "F1-A3-PROPOSALS",
+          "pass": true,
+          "detail": {
+            "propose": "undefined",
+            "propose_batch": "undefined"
+          }
+        },
+        {
+          "id": "F1-S2-SYNTHETIC-CANCEL",
+          "pass": true,
+          "detail": {
+            "state": {
+              "seq": 1,
+              "name": "slow.echo",
+              "args": {
+                "delay_ms": 1000
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-24T23:44:40.728Z",
+              "pending": false,
+              "outcome": "rejected",
+              "settledAt": "2026-10-24T23:44:40.890Z",
+              "errorName": "McpError",
+              "errorCode": -32001,
+              "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 150ms",
+              "cancellationSentAt": "2026-10-24T23:44:40.888Z",
+              "cancellationSeen": true,
+              "signalAborted": true
+            },
+            "server": {
+              "started": {
+                "seq": 2,
+                "ts": "2026-10-24T23:44:40.731Z",
+                "type": "tool_started",
+                "tool": "slow.echo",
+                "delayMs": 1000,
+                "requestId": 2
+              },
+              "aborted": {
+                "seq": 3,
+                "ts": "2026-10-24T23:44:40.891Z",
+                "type": "signal_aborted",
+                "tool": "slow.echo",
+                "requestId": 2,
+                "elapsedMs": 160
+              },
+              "returned": {
+                "seq": 4,
+                "ts": "2026-10-24T23:44:40.892Z",
+                "type": "handler_returned",
+                "tool": "slow.echo",
+                "requestId": 2,
+                "aborted": true,
+                "elapsedMs": 161,
+                "response_expected": false
+              }
+            },
+            "responseAfterCancel": 0
+          }
+        },
+        {
+          "id": "F1-P1-CLEANUP",
+          "pass": true,
+          "detail": {
+            "controlDirect": {
+              "kind": "direct",
+              "phase": "control-direct",
+              "errors": [],
+              "pid": 16012,
+              "server_exit_observed": true,
+              "server_alive_after": false
+            },
+            "controlRelay": {
+              "kind": "relay",
+              "phase": "control-relay",
+              "errors": [],
+              "relay_pid": 17636,
+              "upstream_pid": 68516,
+              "child_exit_event": {
+                "seq": 25,
+                "ts": "2026-10-24T23:43:53.150Z",
+                "pid": 17636,
+                "type": "child_exit",
+                "code": 0,
+                "signal": null,
+                "upstream_pid": 68516,
+                "observed_by": "top_level"
+              },
+              "child_exit_observed": true,
+              "relay_exit_observed": true,
+              "relay_alive_after": false,
+              "upstream_exit_observed": true,
+              "upstream_alive_after": false
+            },
+            "timeoutWithhold": {
+              "kind": "relay",
+              "phase": "timeout-withhold",
+              "errors": [],
+              "relay_pid": 5920,
+              "upstream_pid": 68004,
+              "child_exit_event": {
+                "seq": 14,
+                "ts": "2026-10-24T23:43:57.027Z",
+                "pid": 5920,
+                "type": "child_exit",
+                "code": 0,
+                "signal": null,
+                "upstream_pid": 68004,
+                "observed_by": "top_level"
+              },
+              "child_exit_observed": true,
+              "relay_exit_observed": true,
+              "relay_alive_after": false,
+              "upstream_exit_observed": true,
+              "upstream_alive_after": false
+            },
+            "raceBefore": {
+              "kind": "relay",
+              "phase": "race-before",
+              "errors": [],
+              "relay_pid": 51176,
+              "upstream_pid": 14928,
+              "child_exit_event": {
+                "seq": 11,
+                "ts": "2026-10-24T23:44:01.216Z",
+                "pid": 51176,
+                "type": "child_exit",
+                "code": 0,
+                "signal": null,
+                "upstream_pid": 14928,
+                "observed_by": "top_level"
+              },
+              "child_exit_observed": true,
+              "relay_exit_observed": true,
+              "relay_alive_after": false,
+              "upstream_exit_observed": true,
+              "upstream_alive_after": false
+            },
+            "raceBoundary": {
+              "kind": "relay",
+              "phase": "race-boundary",
+              "errors": [],
+              "relay_pid": 61220,
+              "upstream_pid": 28112,
+              "child_exit_event": {
+                "seq": 26,
+                "ts": "2026-10-24T23:44:06.115Z",
+                "pid": 61220,
+                "type": "child_exit",
+                "code": 0,
+                "signal": null,
+                "upstream_pid": 28112,
+                "observed_by": "top_level"
+              },
+              "child_exit_observed": true,
+              "relay_exit_observed": true,
+              "relay_alive_after": false,
+              "upstream_exit_observed": true,
+              "upstream_alive_after": false
+            },
+            "raceAfter": {
+              "kind": "relay",
+              "phase": "race-after",
+              "errors": [],
+              "relay_pid": 74224,
+              "upstream_pid": 19036,
+              "child_exit_event": {
+                "seq": 12,
+                "ts": "2026-10-24T23:44:11.043Z",
+                "pid": 74224,
+                "type": "child_exit",
+                "code": 0,
+                "signal": null,
+                "upstream_pid": 19036,
+                "observed_by": "top_level"
+              },
+              "child_exit_observed": true,
+              "relay_exit_observed": true,
+              "relay_alive_after": false,
+              "upstream_exit_observed": true,
+              "upstream_alive_after": false
+            },
+            "parallel": {
+              "kind": "relay",
+              "phase": "parallel",
+              "errors": [],
+              "relay_pid": 18900,
+              "upstream_pid": 63600,
+              "child_exit_event": {
+                "seq": 15,
+                "ts": "2026-10-24T23:44:15.254Z",
+                "pid": 18900,
+                "type": "child_exit",
+                "code": 0,
+                "signal": null,
+                "upstream_pid": 63600,
+                "observed_by": "top_level"
+              },
+              "child_exit_observed": true,
+              "relay_exit_observed": true,
+              "relay_alive_after": false,
+              "upstream_exit_observed": true,
+              "upstream_alive_after": false
+            },
+            "sequential": {
+              "kind": "relay",
+              "phase": "sequential-fourth",
+              "errors": [],
+              "relay_pid": 26392,
+              "upstream_pid": 25748,
+              "child_exit_event": {
+                "seq": 19,
+                "ts": "2026-10-24T23:44:19.805Z",
+                "pid": 26392,
+                "type": "child_exit",
+                "code": 0,
+                "signal": null,
+                "upstream_pid": 25748,
+                "observed_by": "top_level"
+              },
+              "child_exit_observed": true,
+              "relay_exit_observed": true,
+              "relay_alive_after": false,
+              "upstream_exit_observed": true,
+              "upstream_alive_after": false
+            },
+            "repeated": {
+              "kind": "relay",
+              "phase": "repeated",
+              "errors": [],
+              "relay_pid": 65964,
+              "upstream_pid": 25652,
+              "child_exit_event": {
+                "seq": 29,
+                "ts": "2026-10-24T23:44:25.517Z",
+                "pid": 65964,
+                "type": "child_exit",
+                "code": 0,
+                "signal": null,
+                "upstream_pid": 25652,
+                "observed_by": "top_level"
+              },
+              "child_exit_observed": true,
+              "relay_exit_observed": true,
+              "relay_alive_after": false,
+              "upstream_exit_observed": true,
+              "upstream_alive_after": false
+            },
+            "transportClose": {
+              "kind": "relay",
+              "phase": "transport-close",
+              "errors": [],
+              "relay_pid": 45604,
+              "upstream_pid": 32296,
+              "child_exit_event": {
+                "seq": 11,
+                "ts": "2026-10-24T23:44:29.204Z",
+                "pid": 45604,
+                "type": "child_exit",
+                "code": 0,
+                "signal": null,
+                "upstream_pid": 32296,
+                "observed_by": "top_level"
+              },
+              "child_exit_observed": true,
+              "relay_exit_observed": true,
+              "relay_alive_after": false,
+              "upstream_exit_observed": true,
+              "upstream_alive_after": false
+            },
+            "timeoutThenClose": {
+              "kind": "relay",
+              "phase": "timeout-then-close",
+              "errors": [],
+              "relay_pid": 39532,
+              "upstream_pid": 72140,
+              "child_exit_event": {
+                "seq": 12,
+                "ts": "2026-10-24T23:44:33.038Z",
+                "pid": 39532,
+                "type": "child_exit",
+                "code": 0,
+                "signal": null,
+                "upstream_pid": 72140,
+                "observed_by": "top_level"
+              },
+              "child_exit_observed": true,
+              "relay_exit_observed": true,
+              "relay_alive_after": false,
+              "upstream_exit_observed": true,
+              "upstream_alive_after": false
+            },
+            "validation": {
+              "kind": "direct",
+              "phase": "validation",
+              "errors": [],
+              "pid": 33432,
+              "server_exit_observed": true,
+              "server_alive_after": false
+            },
+            "mcpError": {
+              "kind": "direct",
+              "phase": "mcp-error",
+              "errors": [],
+              "pid": 36760,
+              "server_exit_observed": true,
+              "server_alive_after": false
+            },
+            "synthetic": {
+              "kind": "synthetic",
+              "phase": "synthetic-cancel",
+              "errors": [],
+              "pid": 22616,
+              "server_exit_observed": true,
+              "server_alive_after": false
+            }
+          }
+        },
+        {
+          "id": "F1-NO-UNHANDLED",
+          "pass": true,
+          "detail": []
+        }
+      ],
+      "p0_comparison": {
+        "original": {
+          "verdict": "FAIL",
+          "pending_at_timeout": true,
+          "pending_after_window": true,
+          "cancellation_notifications_sent": 0,
+          "late_response_settled_request": true
+        },
+        "corrected": {
+          "pending_at_timeout": false,
+          "pending_after_window": false,
+          "cancellation_notifications_sent": 1,
+          "late_response_settled_request": false,
+          "client_outcome": "rejected",
+          "client_error_code": -32001
+        }
+      }
+    },
+    {
+      "run": "run2",
+      "verdict": "PASS",
+      "checks": [
+        {
+          "id": "F1-N1-CONTROL-DIRECT",
+          "pass": true,
+          "detail": {
+            "get": true,
+            "search": true,
+            "applicable": true,
+            "trace": true,
+            "capabilities": true
+          }
+        },
+        {
+          "id": "F1-N2-CONTROL-RELAY",
+          "pass": true,
+          "detail": {
+            "targetSeen": 4,
+            "targetForwarded": 4,
+            "upstreamResponses": 4,
+            "withheld": 0,
+            "cancellations": 0
+          }
+        },
+        {
+          "id": "F1-T1-TIMEOUT-SETTLES",
+          "pass": true,
+          "detail": {
+            "state": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-9901"
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-24T23:44:51.240Z",
+              "pending": false,
+              "outcome": "rejected",
+              "settledAt": "2026-10-24T23:44:51.545Z",
+              "errorName": "McpError",
+              "errorCode": -32001,
+              "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 300ms",
+              "cancellationSentAt": "2026-10-24T23:44:51.544Z",
+              "cancellationSeen": true,
+              "signalAborted": true
+            },
+            "cancel": {
+              "requestId": 2,
+              "count": 1,
+              "events": [
+                {
+                  "ts": "2026-10-24T23:44:51.544Z",
+                  "requestId": 2,
+                  "reason": "Error: Code Mode execution exceeded 300ms"
+                }
+              ]
+            },
+            "stats": {
+              "hostCalls": 1,
+              "resolvedCalls": 0,
+              "failedCalls": 0,
+              "rejectedCalls": 1,
+              "cancelledCalls": 1,
+              "cancelledRejections": 1,
+              "cancelledLateSuccess": 0,
+              "cancelledSettled": 1,
+              "cancelledUnsettled": 0,
+              "lateHostSettlements": 0,
+              "timedOut": true,
+              "interrupted": true,
+              "pendingAtEnd": 0,
+              "deferredDisposed": 1,
+              "drainMs": 10,
+              "hostCancellationGraceMs": 100,
+              "cleanupErrors": [],
+              "durationMs": 320
+            }
+          }
+        },
+        {
+          "id": "F1-T2-LATE-NO-REVIVAL",
+          "pass": true,
+          "detail": {
+            "stateAfterRelease": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-9901"
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-24T23:44:51.240Z",
+              "pending": false,
+              "outcome": "rejected",
+              "settledAt": "2026-10-24T23:44:51.545Z",
+              "errorName": "McpError",
+              "errorCode": -32001,
+              "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 300ms",
+              "cancellationSentAt": "2026-10-24T23:44:51.544Z",
+              "cancellationSeen": true,
+              "signalAborted": true
+            },
+            "late": 1,
+            "cancel": {
+              "requestId": 2,
+              "count": 1,
+              "events": [
+                {
+                  "ts": "2026-10-24T23:44:51.544Z",
+                  "requestId": 2,
+                  "reason": "Error: Code Mode execution exceeded 300ms"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "F1-C1-RACE-BEFORE",
+          "pass": true,
+          "detail": {
+            "label": "before",
+            "timeoutMs": 400,
+            "delayMs": 100,
+            "outcome": {
+              "result": {
+                "record_type": "canonical_decision",
+                "canonical_decision": {
+                  "decision_id": "ADR-9901",
+                  "version": "1",
+                  "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+                  "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+                  "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+                  "decision_class": "architecture",
+                  "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+                  "rationale": "Inventory and stdio handshake fixture only.",
+                  "lifecycle_status": "active",
+                  "owner": "",
+                  "decided_at": "2026-01-01T00:00:00Z",
+                  "updated_at": "2026-01-01T00:00:00Z",
+                  "context_scope": [
+                    "cache"
+                  ],
+                  "targets": [],
+                  "constraints": [
+                    "no external cache service"
+                  ],
+                  "anti_patterns": [
+                    "external_cache_client"
+                  ],
+                  "source_evidence": [
+                    {
+                      "source_type": "runtime",
+                      "source_locator": "",
+                      "source_revision": "",
+                      "observed_at": ""
+                    }
+                  ],
+                  "test_evidence": [],
+                  "relationships": [],
+                  "derived_rule_ids": [
+                    "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+                  ]
+                }
+              },
+              "error": null,
+              "stats": {
+                "hostCalls": 1,
+                "resolvedCalls": 1,
+                "failedCalls": 0,
+                "rejectedCalls": 0,
+                "cancelledCalls": 0,
+                "cancelledRejections": 0,
+                "cancelledLateSuccess": 0,
+                "cancelledSettled": 0,
+                "cancelledUnsettled": 0,
+                "lateHostSettlements": 0,
+                "timedOut": false,
+                "interrupted": false,
+                "pendingAtEnd": 0,
+                "deferredDisposed": 1,
+                "drainMs": 0,
+                "hostCancellationGraceMs": 100,
+                "cleanupErrors": [],
+                "durationMs": 121
+              }
+            },
+            "state": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-9901"
+              },
+              "options": {
+                "signal": {}
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-24T23:44:55.524Z",
+              "startedMs": 1792885495524,
+              "pending": false,
+              "outcome": "fulfilled",
+              "settledAt": "2026-10-24T23:44:55.640Z",
+              "settledMs": 1792885495640,
+              "errorName": null,
+              "errorCode": null,
+              "errorMessage": null,
+              "cancellationSentAt": null,
+              "cancellationSeen": false,
+              "promise": {},
+              "value": {
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "{\n  \"record_type\": \"canonical_decision\",\n  \"canonical_decision\": {\n    \"decision_id\": \"ADR-9901\",\n    \"version\": \"1\",\n    \"version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n    \"decision_version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n    \"content_digest\": \"662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650\",\n    \"decision_class\": \"architecture\",\n    \"statement\": \"Synthetic M1 cache adapter uses the in-memory backend.\",\n    \"rationale\": \"Inventory and stdio handshake fixture only.\",\n    \"lifecycle_status\": \"active\",\n    \"owner\": \"\",\n    \"decided_at\": \"2026-01-01T00:00:00Z\",\n    \"updated_at\": \"2026-01-01T00:00:00Z\",\n    \"context_scope\": [\n      \"cache\"\n    ],\n    \"targets\": [],\n    \"constraints\": [\n      \"no external cache service\"\n    ],\n    \"anti_patterns\": [\n      \"external_cache_client\"\n    ],\n    \"source_evidence\": [\n      {\n        \"source_type\": \"runtime\",\n        \"source_locator\": \"\",\n        \"source_revision\": \"\",\n        \"observed_at\": \"\"\n      }\n    ],\n    \"test_evidence\": [],\n    \"relationships\": [],\n    \"derived_rule_ids\": [\n      \"ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584\"\n    ]\n  }\n}"
+                  }
+                ],
+                "structuredContent": {
+                  "record_type": "canonical_decision",
+                  "canonical_decision": {
+                    "decision_id": "ADR-9901",
+                    "version": "1",
+                    "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+                    "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+                    "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+                    "decision_class": "architecture",
+                    "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+                    "rationale": "Inventory and stdio handshake fixture only.",
+                    "lifecycle_status": "active",
+                    "owner": "",
+                    "decided_at": "2026-01-01T00:00:00Z",
+                    "updated_at": "2026-01-01T00:00:00Z",
+                    "context_scope": [
+                      "cache"
+                    ],
+                    "targets": [],
+                    "constraints": [
+                      "no external cache service"
+                    ],
+                    "anti_patterns": [
+                      "external_cache_client"
+                    ],
+                    "source_evidence": [
+                      {
+                        "source_type": "runtime",
+                        "source_locator": "",
+                        "source_revision": "",
+                        "observed_at": ""
+                      }
+                    ],
+                    "test_evidence": [],
+                    "relationships": [],
+                    "derived_rule_ids": [
+                      "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+                    ]
+                  }
+                },
+                "isError": false
+              }
+            },
+            "settled": {
+              "found": true,
+              "state": {
+                "seq": 1,
+                "name": "decision.get",
+                "args": {
+                  "record_id": "ADR-9901"
+                },
+                "requestId": 2,
+                "startedAt": "2026-10-24T23:44:55.524Z",
+                "pending": false,
+                "outcome": "fulfilled",
+                "settledAt": "2026-10-24T23:44:55.640Z",
+                "errorName": null,
+                "errorCode": null,
+                "errorMessage": null,
+                "cancellationSentAt": null,
+                "cancellationSeen": false,
+                "signalAborted": false
+              },
+              "elapsedMs": 0
+            },
+            "forwarded": {
+              "seq": 9,
+              "ts": "2026-10-24T23:44:55.640Z",
+              "pid": 51680,
+              "type": "response_forwarded_downstream",
+              "requestId": 2,
+              "how": "delay"
+            },
+            "afterForward": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-9901"
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-24T23:44:55.524Z",
+              "pending": false,
+              "outcome": "fulfilled",
+              "settledAt": "2026-10-24T23:44:55.640Z",
+              "errorName": null,
+              "errorCode": null,
+              "errorMessage": null,
+              "cancellationSentAt": null,
+              "cancellationSeen": false,
+              "signalAborted": false
+            },
+            "cancel": {
+              "requestId": 2,
+              "count": 0,
+              "events": []
+            },
+            "hostEvents": [
+              {
+                "ts": "2026-10-24T23:44:55.522Z",
+                "type": "host_call_started",
+                "callId": 1,
+                "provider": "codemode",
+                "method": "decision_get"
+              },
+              {
+                "ts": "2026-10-24T23:44:55.640Z",
+                "type": "host_call_settled",
+                "callId": 1,
+                "provider": "codemode",
+                "method": "decision_get",
+                "outcome": "fulfilled"
+              }
+            ],
+            "stats": {
+              "hostCalls": 1,
+              "resolvedCalls": 1,
+              "failedCalls": 0,
+              "rejectedCalls": 0,
+              "cancelledCalls": 0,
+              "cancelledRejections": 0,
+              "cancelledLateSuccess": 0,
+              "cancelledSettled": 0,
+              "cancelledUnsettled": 0,
+              "lateHostSettlements": 0,
+              "timedOut": false,
+              "interrupted": false,
+              "pendingAtEnd": 0,
+              "deferredDisposed": 1,
+              "drainMs": 0,
+              "hostCancellationGraceMs": 100,
+              "cleanupErrors": [],
+              "durationMs": 121
+            },
+            "settlementLatencyMs": null
+          }
+        },
+        {
+          "id": "F1-C2-RACE-BOUNDARY",
+          "pass": true,
+          "detail": {
+            "invalid": 0,
+            "iterations": [
+              {
+                "outcome": "rejected",
+                "cancel": 1
+              },
+              {
+                "outcome": "rejected",
+                "cancel": 1
+              },
+              {
+                "outcome": "rejected",
+                "cancel": 1
+              }
+            ]
+          }
+        },
+        {
+          "id": "F1-C3-RACE-AFTER",
+          "pass": true,
+          "detail": {
+            "label": "after",
+            "timeoutMs": 300,
+            "delayMs": 700,
+            "outcome": {
+              "result": null,
+              "error": "Code execution failed: execution exceeded 300ms",
+              "errorName": "Error",
+              "stats": {
+                "hostCalls": 1,
+                "resolvedCalls": 0,
+                "failedCalls": 0,
+                "rejectedCalls": 1,
+                "cancelledCalls": 1,
+                "cancelledRejections": 1,
+                "cancelledLateSuccess": 0,
+                "cancelledSettled": 1,
+                "cancelledUnsettled": 0,
+                "lateHostSettlements": 0,
+                "timedOut": true,
+                "interrupted": true,
+                "pendingAtEnd": 0,
+                "deferredDisposed": 1,
+                "drainMs": 2,
+                "hostCancellationGraceMs": 100,
+                "cleanupErrors": [],
+                "durationMs": 307
+              }
+            },
+            "state": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-9901"
+              },
+              "options": {
+                "signal": {}
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-24T23:45:04.704Z",
+              "startedMs": 1792885504704,
+              "pending": false,
+              "outcome": "rejected",
+              "settledAt": "2026-10-24T23:45:05.007Z",
+              "settledMs": 1792885505007,
+              "errorName": "McpError",
+              "errorCode": -32001,
+              "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 300ms",
+              "cancellationSentAt": "2026-10-24T23:45:05.006Z",
+              "cancellationSeen": true,
+              "promise": {}
+            },
+            "settled": {
+              "found": true,
+              "state": {
+                "seq": 1,
+                "name": "decision.get",
+                "args": {
+                  "record_id": "ADR-9901"
+                },
+                "requestId": 2,
+                "startedAt": "2026-10-24T23:45:04.704Z",
+                "pending": false,
+                "outcome": "rejected",
+                "settledAt": "2026-10-24T23:45:05.007Z",
+                "errorName": "McpError",
+                "errorCode": -32001,
+                "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 300ms",
+                "cancellationSentAt": "2026-10-24T23:45:05.006Z",
+                "cancellationSeen": true,
+                "signalAborted": true
+              },
+              "elapsedMs": 0
+            },
+            "forwarded": {
+              "seq": 10,
+              "ts": "2026-10-24T23:45:05.424Z",
+              "pid": 60396,
+              "type": "response_forwarded_downstream",
+              "requestId": 2,
+              "how": "delay"
+            },
+            "afterForward": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-9901"
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-24T23:45:04.704Z",
+              "pending": false,
+              "outcome": "rejected",
+              "settledAt": "2026-10-24T23:45:05.007Z",
+              "errorName": "McpError",
+              "errorCode": -32001,
+              "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 300ms",
+              "cancellationSentAt": "2026-10-24T23:45:05.006Z",
+              "cancellationSeen": true,
+              "signalAborted": true
+            },
+            "cancel": {
+              "requestId": 2,
+              "count": 1,
+              "events": [
+                {
+                  "ts": "2026-10-24T23:45:05.006Z",
+                  "requestId": 2,
+                  "reason": "Error: Code Mode execution exceeded 300ms"
+                }
+              ]
+            },
+            "hostEvents": [
+              {
+                "ts": "2026-10-24T23:45:04.703Z",
+                "type": "host_call_started",
+                "callId": 1,
+                "provider": "codemode",
+                "method": "decision_get"
+              },
+              {
+                "ts": "2026-10-24T23:45:05.006Z",
+                "type": "host_call_aborted",
+                "callId": 1,
+                "provider": "codemode",
+                "method": "decision_get",
+                "abortedAt": 1792885505006,
+                "reason": "Error: Code Mode execution exceeded 300ms"
+              },
+              {
+                "ts": "2026-10-24T23:45:05.007Z",
+                "type": "host_call_settled_after_abort",
+                "callId": 1,
+                "provider": "codemode",
+                "method": "decision_get",
+                "outcome": "rejected",
+                "errorName": "HostCancelledError",
+                "errorMessage": "MCP decision.get cancelled: MCP error -32001: Error: Code Mode execution exceeded 300ms",
+                "afterAbortMs": 1
+              }
+            ],
+            "stats": {
+              "hostCalls": 1,
+              "resolvedCalls": 0,
+              "failedCalls": 0,
+              "rejectedCalls": 1,
+              "cancelledCalls": 1,
+              "cancelledRejections": 1,
+              "cancelledLateSuccess": 0,
+              "cancelledSettled": 1,
+              "cancelledUnsettled": 0,
+              "lateHostSettlements": 0,
+              "timedOut": true,
+              "interrupted": true,
+              "pendingAtEnd": 0,
+              "deferredDisposed": 1,
+              "drainMs": 2,
+              "hostCancellationGraceMs": 100,
+              "cleanupErrors": [],
+              "durationMs": 307
+            },
+            "settlementLatencyMs": 1
+          }
+        },
+        {
+          "id": "F1-C3-PARALLEL",
+          "pass": true,
+          "detail": {
+            "get": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-9901"
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-24T23:45:08.835Z",
+              "pending": false,
+              "outcome": "fulfilled",
+              "settledAt": "2026-10-24T23:45:08.849Z",
+              "errorName": null,
+              "errorCode": null,
+              "errorMessage": null,
+              "cancellationSentAt": null,
+              "cancellationSeen": false,
+              "signalAborted": false
+            },
+            "search": {
+              "seq": 2,
+              "name": "decision.search",
+              "args": {
+                "query": "cache",
+                "canonical_lifecycle_status": "active"
+              },
+              "requestId": 3,
+              "startedAt": "2026-10-24T23:45:08.836Z",
+              "pending": false,
+              "outcome": "rejected",
+              "settledAt": "2026-10-24T23:45:09.138Z",
+              "errorName": "McpError",
+              "errorCode": -32001,
+              "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 300ms",
+              "cancellationSentAt": "2026-10-24T23:45:09.135Z",
+              "cancellationSeen": true,
+              "signalAborted": true
+            },
+            "cancels": {
+              "get": {
+                "requestId": 2,
+                "count": 0,
+                "events": []
+              },
+              "search": {
+                "requestId": 3,
+                "count": 1,
+                "events": [
+                  {
+                    "ts": "2026-10-24T23:45:09.135Z",
+                    "requestId": 3,
+                    "reason": "Error: Code Mode execution exceeded 300ms"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "F1-R1-SEQUENTIAL",
+          "pass": true,
+          "detail": {
+            "states": {
+              "decision.get": {
+                "seq": 1,
+                "name": "decision.get",
+                "args": {
+                  "record_id": "ADR-9901"
+                },
+                "requestId": 2,
+                "startedAt": "2026-10-24T23:45:12.565Z",
+                "pending": false,
+                "outcome": "fulfilled",
+                "settledAt": "2026-10-24T23:45:12.573Z",
+                "errorName": null,
+                "errorCode": null,
+                "errorMessage": null,
+                "cancellationSentAt": null,
+                "cancellationSeen": false,
+                "signalAborted": false
+              },
+              "decision.search": {
+                "seq": 2,
+                "name": "decision.search",
+                "args": {
+                  "query": "cache",
+                  "canonical_lifecycle_status": "active"
+                },
+                "requestId": 3,
+                "startedAt": "2026-10-24T23:45:12.575Z",
+                "pending": false,
+                "outcome": "fulfilled",
+                "settledAt": "2026-10-24T23:45:12.583Z",
+                "errorName": null,
+                "errorCode": null,
+                "errorMessage": null,
+                "cancellationSentAt": null,
+                "cancellationSeen": false,
+                "signalAborted": false
+              },
+              "decision.applicable_to": {
+                "seq": 3,
+                "name": "decision.applicable_to",
+                "args": {
+                  "context": [
+                    "cache"
+                  ]
+                },
+                "requestId": 4,
+                "startedAt": "2026-10-24T23:45:12.585Z",
+                "pending": false,
+                "outcome": "fulfilled",
+                "settledAt": "2026-10-24T23:45:12.593Z",
+                "errorName": null,
+                "errorCode": null,
+                "errorMessage": null,
+                "cancellationSentAt": null,
+                "cancellationSeen": false,
+                "signalAborted": false
+              },
+              "decision.trace": {
+                "seq": 4,
+                "name": "decision.trace",
+                "args": {
+                  "record_id": "ADR-9901"
+                },
+                "requestId": 5,
+                "startedAt": "2026-10-24T23:45:12.595Z",
+                "pending": false,
+                "outcome": "rejected",
+                "settledAt": "2026-10-24T23:45:13.069Z",
+                "errorName": "McpError",
+                "errorCode": -32001,
+                "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 500ms",
+                "cancellationSentAt": "2026-10-24T23:45:13.067Z",
+                "cancellationSeen": true,
+                "signalAborted": true
+              }
+            },
+            "cancels": {
+              "decision.get": {
+                "requestId": 2,
+                "count": 0,
+                "events": []
+              },
+              "decision.search": {
+                "requestId": 3,
+                "count": 0,
+                "events": []
+              },
+              "decision.applicable_to": {
+                "requestId": 4,
+                "count": 0,
+                "events": []
+              },
+              "decision.trace": {
+                "requestId": 5,
+                "count": 1,
+                "events": [
+                  {
+                    "ts": "2026-10-24T23:45:13.067Z",
+                    "requestId": 5,
+                    "reason": "Error: Code Mode execution exceeded 500ms"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "F1-R2-REPEATED",
+          "pass": true,
+          "detail": [
+            {
+              "index": 0,
+              "withheld": {
+                "seq": 8,
+                "ts": "2026-10-24T23:45:16.671Z",
+                "pid": 48320,
+                "type": "response_withheld",
+                "requestId": 2,
+                "tool": "decision.get"
+              },
+              "outcome": {
+                "result": null,
+                "error": "Code execution failed: execution exceeded 250ms",
+                "errorName": "Error",
+                "stats": {
+                  "hostCalls": 1,
+                  "resolvedCalls": 0,
+                  "failedCalls": 0,
+                  "rejectedCalls": 1,
+                  "cancelledCalls": 1,
+                  "cancelledRejections": 1,
+                  "cancelledLateSuccess": 0,
+                  "cancelledSettled": 1,
+                  "cancelledUnsettled": 0,
+                  "lateHostSettlements": 0,
+                  "timedOut": true,
+                  "interrupted": true,
+                  "pendingAtEnd": 0,
+                  "deferredDisposed": 1,
+                  "drainMs": 10,
+                  "hostCancellationGraceMs": 100,
+                  "cleanupErrors": [],
+                  "durationMs": 269
+                }
+              },
+              "state": {
+                "seq": 1,
+                "name": "decision.get",
+                "args": {
+                  "record_id": "ADR-9901"
+                },
+                "requestId": 2,
+                "startedAt": "2026-10-24T23:45:16.658Z",
+                "pending": false,
+                "outcome": "rejected",
+                "settledAt": "2026-10-24T23:45:16.913Z",
+                "errorName": "McpError",
+                "errorCode": -32001,
+                "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 250ms",
+                "cancellationSentAt": "2026-10-24T23:45:16.911Z",
+                "cancellationSeen": true,
+                "signalAborted": true
+              },
+              "settled": {
+                "found": true,
+                "state": {
+                  "seq": 1,
+                  "name": "decision.get",
+                  "args": {
+                    "record_id": "ADR-9901"
+                  },
+                  "requestId": 2,
+                  "startedAt": "2026-10-24T23:45:16.658Z",
+                  "pending": false,
+                  "outcome": "rejected",
+                  "settledAt": "2026-10-24T23:45:16.913Z",
+                  "errorName": "McpError",
+                  "errorCode": -32001,
+                  "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 250ms",
+                  "cancellationSentAt": "2026-10-24T23:45:16.911Z",
+                  "cancellationSeen": true,
+                  "signalAborted": true
+                },
+                "elapsedMs": 0
+              },
+              "cancel": {
+                "requestId": 2,
+                "count": 1,
+                "events": [
+                  {
+                    "ts": "2026-10-24T23:45:16.911Z",
+                    "requestId": 2,
+                    "reason": "Error: Code Mode execution exceeded 250ms"
+                  }
+                ]
+              },
+              "released": {
+                "seq": 10,
+                "ts": "2026-10-24T23:45:16.925Z",
+                "pid": 48320,
+                "type": "response_released_downstream",
+                "requestId": 2,
+                "tool": "decision.get"
+              },
+              "hostEvents": [
+                {
+                  "ts": "2026-10-24T23:45:16.656Z",
+                  "type": "host_call_started",
+                  "callId": 1,
+                  "provider": "codemode",
+                  "method": "decision_get"
+                },
+                {
+                  "ts": "2026-10-24T23:45:16.911Z",
+                  "type": "host_call_aborted",
+                  "callId": 1,
+                  "provider": "codemode",
+                  "method": "decision_get",
+                  "abortedAt": 1792885516911,
+                  "reason": "Error: Code Mode execution exceeded 250ms"
+                },
+                {
+                  "ts": "2026-10-24T23:45:16.913Z",
+                  "type": "host_call_settled_after_abort",
+                  "callId": 1,
+                  "provider": "codemode",
+                  "method": "decision_get",
+                  "outcome": "rejected",
+                  "errorName": "HostCancelledError",
+                  "errorMessage": "MCP decision.get cancelled: MCP error -32001: Error: Code Mode execution exceeded 250ms",
+                  "afterAbortMs": 2
+                }
+              ],
+              "stats": {
+                "hostCalls": 1,
+                "resolvedCalls": 0,
+                "failedCalls": 0,
+                "rejectedCalls": 1,
+                "cancelledCalls": 1,
+                "cancelledRejections": 1,
+                "cancelledLateSuccess": 0,
+                "cancelledSettled": 1,
+                "cancelledUnsettled": 0,
+                "lateHostSettlements": 0,
+                "timedOut": true,
+                "interrupted": true,
+                "pendingAtEnd": 0,
+                "deferredDisposed": 1,
+                "drainMs": 10,
+                "hostCancellationGraceMs": 100,
+                "cleanupErrors": [],
+                "durationMs": 269
+              },
+              "settlementLatencyMs": 2
+            },
+            {
+              "index": 1,
+              "withheld": {
+                "seq": 16,
+                "ts": "2026-10-24T23:45:17.065Z",
+                "pid": 48320,
+                "type": "response_withheld",
+                "requestId": 3,
+                "tool": "decision.get"
+              },
+              "outcome": {
+                "result": null,
+                "error": "Code execution failed: execution exceeded 250ms",
+                "errorName": "Error",
+                "stats": {
+                  "hostCalls": 1,
+                  "resolvedCalls": 0,
+                  "failedCalls": 0,
+                  "rejectedCalls": 1,
+                  "cancelledCalls": 1,
+                  "cancelledRejections": 1,
+                  "cancelledLateSuccess": 0,
+                  "cancelledSettled": 1,
+                  "cancelledUnsettled": 0,
+                  "lateHostSettlements": 0,
+                  "timedOut": true,
+                  "interrupted": true,
+                  "pendingAtEnd": 0,
+                  "deferredDisposed": 1,
+                  "drainMs": 3,
+                  "hostCancellationGraceMs": 100,
+                  "cleanupErrors": [],
+                  "durationMs": 269
+                }
+              },
+              "state": {
+                "seq": 1,
+                "name": "decision.get",
+                "args": {
+                  "record_id": "ADR-9901"
+                },
+                "requestId": 3,
+                "startedAt": "2026-10-24T23:45:17.054Z",
+                "pending": false,
+                "outcome": "rejected",
+                "settledAt": "2026-10-24T23:45:17.316Z",
+                "errorName": "McpError",
+                "errorCode": -32001,
+                "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 250ms",
+                "cancellationSentAt": "2026-10-24T23:45:17.314Z",
+                "cancellationSeen": true,
+                "signalAborted": true
+              },
+              "settled": {
+                "found": true,
+                "state": {
+                  "seq": 1,
+                  "name": "decision.get",
+                  "args": {
+                    "record_id": "ADR-9901"
+                  },
+                  "requestId": 3,
+                  "startedAt": "2026-10-24T23:45:17.054Z",
+                  "pending": false,
+                  "outcome": "rejected",
+                  "settledAt": "2026-10-24T23:45:17.316Z",
+                  "errorName": "McpError",
+                  "errorCode": -32001,
+                  "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 250ms",
+                  "cancellationSentAt": "2026-10-24T23:45:17.314Z",
+                  "cancellationSeen": true,
+                  "signalAborted": true
+                },
+                "elapsedMs": 0
+              },
+              "cancel": {
+                "requestId": 3,
+                "count": 1,
+                "events": [
+                  {
+                    "ts": "2026-10-24T23:45:17.314Z",
+                    "requestId": 3,
+                    "reason": "Error: Code Mode execution exceeded 250ms"
+                  }
+                ]
+              },
+              "released": {
+                "seq": 18,
+                "ts": "2026-10-24T23:45:17.320Z",
+                "pid": 48320,
+                "type": "response_released_downstream",
+                "requestId": 3,
+                "tool": "decision.get"
+              },
+              "hostEvents": [
+                {
+                  "ts": "2026-10-24T23:45:17.052Z",
+                  "type": "host_call_started",
+                  "callId": 1,
+                  "provider": "codemode",
+                  "method": "decision_get"
+                },
+                {
+                  "ts": "2026-10-24T23:45:17.314Z",
+                  "type": "host_call_aborted",
+                  "callId": 1,
+                  "provider": "codemode",
+                  "method": "decision_get",
+                  "abortedAt": 1792885517314,
+                  "reason": "Error: Code Mode execution exceeded 250ms"
+                },
+                {
+                  "ts": "2026-10-24T23:45:17.316Z",
+                  "type": "host_call_settled_after_abort",
+                  "callId": 1,
+                  "provider": "codemode",
+                  "method": "decision_get",
+                  "outcome": "rejected",
+                  "errorName": "HostCancelledError",
+                  "errorMessage": "MCP decision.get cancelled: MCP error -32001: Error: Code Mode execution exceeded 250ms",
+                  "afterAbortMs": 2
+                }
+              ],
+              "stats": {
+                "hostCalls": 1,
+                "resolvedCalls": 0,
+                "failedCalls": 0,
+                "rejectedCalls": 1,
+                "cancelledCalls": 1,
+                "cancelledRejections": 1,
+                "cancelledLateSuccess": 0,
+                "cancelledSettled": 1,
+                "cancelledUnsettled": 0,
+                "lateHostSettlements": 0,
+                "timedOut": true,
+                "interrupted": true,
+                "pendingAtEnd": 0,
+                "deferredDisposed": 1,
+                "drainMs": 3,
+                "hostCancellationGraceMs": 100,
+                "cleanupErrors": [],
+                "durationMs": 269
+              },
+              "settlementLatencyMs": 2
+            },
+            {
+              "index": 2,
+              "withheld": {
+                "seq": 24,
+                "ts": "2026-10-24T23:45:17.460Z",
+                "pid": 48320,
+                "type": "response_withheld",
+                "requestId": 4,
+                "tool": "decision.get"
+              },
+              "outcome": {
+                "result": null,
+                "error": "Code execution failed: execution exceeded 250ms",
+                "errorName": "Error",
+                "stats": {
+                  "hostCalls": 1,
+                  "resolvedCalls": 0,
+                  "failedCalls": 0,
+                  "rejectedCalls": 1,
+                  "cancelledCalls": 1,
+                  "cancelledRejections": 1,
+                  "cancelledLateSuccess": 0,
+                  "cancelledSettled": 1,
+                  "cancelledUnsettled": 0,
+                  "lateHostSettlements": 0,
+                  "timedOut": true,
+                  "interrupted": true,
+                  "pendingAtEnd": 0,
+                  "deferredDisposed": 1,
+                  "drainMs": 2,
+                  "hostCancellationGraceMs": 100,
+                  "cleanupErrors": [],
+                  "durationMs": 263
+                }
+              },
+              "state": {
+                "seq": 1,
+                "name": "decision.get",
+                "args": {
+                  "record_id": "ADR-9901"
+                },
+                "requestId": 4,
+                "startedAt": "2026-10-24T23:45:17.447Z",
+                "pending": false,
+                "outcome": "rejected",
+                "settledAt": "2026-10-24T23:45:17.705Z",
+                "errorName": "McpError",
+                "errorCode": -32001,
+                "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 250ms",
+                "cancellationSentAt": "2026-10-24T23:45:17.703Z",
+                "cancellationSeen": true,
+                "signalAborted": true
+              },
+              "settled": {
+                "found": true,
+                "state": {
+                  "seq": 1,
+                  "name": "decision.get",
+                  "args": {
+                    "record_id": "ADR-9901"
+                  },
+                  "requestId": 4,
+                  "startedAt": "2026-10-24T23:45:17.447Z",
+                  "pending": false,
+                  "outcome": "rejected",
+                  "settledAt": "2026-10-24T23:45:17.705Z",
+                  "errorName": "McpError",
+                  "errorCode": -32001,
+                  "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 250ms",
+                  "cancellationSentAt": "2026-10-24T23:45:17.703Z",
+                  "cancellationSeen": true,
+                  "signalAborted": true
+                },
+                "elapsedMs": 0
+              },
+              "cancel": {
+                "requestId": 4,
+                "count": 1,
+                "events": [
+                  {
+                    "ts": "2026-10-24T23:45:17.703Z",
+                    "requestId": 4,
+                    "reason": "Error: Code Mode execution exceeded 250ms"
+                  }
+                ]
+              },
+              "released": {
+                "seq": 26,
+                "ts": "2026-10-24T23:45:17.708Z",
+                "pid": 48320,
+                "type": "response_released_downstream",
+                "requestId": 4,
+                "tool": "decision.get"
+              },
+              "hostEvents": [
+                {
+                  "ts": "2026-10-24T23:45:17.446Z",
+                  "type": "host_call_started",
+                  "callId": 1,
+                  "provider": "codemode",
+                  "method": "decision_get"
+                },
+                {
+                  "ts": "2026-10-24T23:45:17.703Z",
+                  "type": "host_call_aborted",
+                  "callId": 1,
+                  "provider": "codemode",
+                  "method": "decision_get",
+                  "abortedAt": 1792885517703,
+                  "reason": "Error: Code Mode execution exceeded 250ms"
+                },
+                {
+                  "ts": "2026-10-24T23:45:17.705Z",
+                  "type": "host_call_settled_after_abort",
+                  "callId": 1,
+                  "provider": "codemode",
+                  "method": "decision_get",
+                  "outcome": "rejected",
+                  "errorName": "HostCancelledError",
+                  "errorMessage": "MCP decision.get cancelled: MCP error -32001: Error: Code Mode execution exceeded 250ms",
+                  "afterAbortMs": 2
+                }
+              ],
+              "stats": {
+                "hostCalls": 1,
+                "resolvedCalls": 0,
+                "failedCalls": 0,
+                "rejectedCalls": 1,
+                "cancelledCalls": 1,
+                "cancelledRejections": 1,
+                "cancelledLateSuccess": 0,
+                "cancelledSettled": 1,
+                "cancelledUnsettled": 0,
+                "lateHostSettlements": 0,
+                "timedOut": true,
+                "interrupted": true,
+                "pendingAtEnd": 0,
+                "deferredDisposed": 1,
+                "drainMs": 2,
+                "hostCancellationGraceMs": 100,
+                "cleanupErrors": [],
+                "durationMs": 263
+              },
+              "settlementLatencyMs": 2
+            }
+          ]
+        },
+        {
+          "id": "F1-F1-TRANSPORT-CLOSE",
+          "pass": true,
+          "detail": {
+            "state": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-9901"
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-24T23:45:21.044Z",
+              "pending": false,
+              "outcome": "rejected",
+              "settledAt": "2026-10-24T23:45:21.433Z",
+              "errorName": "McpError",
+              "errorCode": -32000,
+              "errorMessage": "MCP error -32000: Connection closed",
+              "cancellationSentAt": null,
+              "cancellationSeen": false,
+              "signalAborted": false
+            },
+            "cancel": {
+              "requestId": 2,
+              "count": 0,
+              "events": []
+            },
+            "stats": {
+              "hostCalls": 1,
+              "resolvedCalls": 0,
+              "failedCalls": 1,
+              "rejectedCalls": 0,
+              "cancelledCalls": 0,
+              "cancelledRejections": 0,
+              "cancelledLateSuccess": 0,
+              "cancelledSettled": 0,
+              "cancelledUnsettled": 0,
+              "lateHostSettlements": 0,
+              "timedOut": false,
+              "interrupted": false,
+              "pendingAtEnd": 0,
+              "deferredDisposed": 1,
+              "drainMs": 0,
+              "hostCancellationGraceMs": 100,
+              "cleanupErrors": [],
+              "durationMs": 394
+            }
+          }
+        },
+        {
+          "id": "F1-F2-TIMEOUT-THEN-CLOSE",
+          "pass": true,
+          "detail": {
+            "state": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-9901"
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-24T23:45:24.217Z",
+              "pending": false,
+              "outcome": "rejected",
+              "settledAt": "2026-10-24T23:45:24.480Z",
+              "errorName": "McpError",
+              "errorCode": -32001,
+              "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 250ms",
+              "cancellationSentAt": "2026-10-24T23:45:24.478Z",
+              "cancellationSeen": true,
+              "signalAborted": true
+            },
+            "afterClose": {
+              "seq": 1,
+              "name": "decision.get",
+              "args": {
+                "record_id": "ADR-9901"
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-24T23:45:24.217Z",
+              "pending": false,
+              "outcome": "rejected",
+              "settledAt": "2026-10-24T23:45:24.480Z",
+              "errorName": "McpError",
+              "errorCode": -32001,
+              "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 250ms",
+              "cancellationSentAt": "2026-10-24T23:45:24.478Z",
+              "cancellationSeen": true,
+              "signalAborted": true
+            },
+            "cancel": {
+              "requestId": 2,
+              "count": 1,
+              "events": [
+                {
+                  "ts": "2026-10-24T23:45:24.478Z",
+                  "requestId": 2,
+                  "reason": "Error: Code Mode execution exceeded 250ms"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "F1-A1-VALIDATION",
+          "pass": true,
+          "detail": {
+            "outcome": "Code execution failed: Error: Argument validation failed for decision.get: [{\"instancePath\":\"/record_id\",\"schemaPath\":\"#/properties/record_id/type\",\"keyword\":\"type\",\"params\":{\"type\":\"string\"},\"message\":\"must be string\"}]",
+            "tracked": [],
+            "stats": {
+              "hostCalls": 1,
+              "resolvedCalls": 0,
+              "failedCalls": 1,
+              "rejectedCalls": 0,
+              "cancelledCalls": 0,
+              "cancelledRejections": 0,
+              "cancelledLateSuccess": 0,
+              "cancelledSettled": 0,
+              "cancelledUnsettled": 0,
+              "lateHostSettlements": 0,
+              "timedOut": false,
+              "interrupted": false,
+              "pendingAtEnd": 0,
+              "deferredDisposed": 1,
+              "drainMs": 0,
+              "hostCancellationGraceMs": 100,
+              "cleanupErrors": [],
+              "durationMs": 5
+            }
+          }
+        },
+        {
+          "id": "F1-A2-MCP-ISERROR",
+          "pass": true,
+          "detail": {
+            "state": {
+              "seq": 1,
+              "name": "decision.search",
+              "args": {
+                "canonical_lifecycle_status": "bogus"
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-24T23:45:30.713Z",
+              "pending": false,
+              "outcome": "fulfilled",
+              "settledAt": "2026-10-24T23:45:30.726Z",
+              "errorName": null,
+              "errorCode": null,
+              "errorMessage": null,
+              "cancellationSentAt": null,
+              "cancellationSeen": false,
+              "signalAborted": false
+            },
+            "calls": [
+              {
+                "seq": 1,
+                "tool": "decision.search",
+                "args": {
+                  "canonical_lifecycle_status": "bogus"
+                },
+                "outcome": "fulfilled",
+                "cancelled": false,
+                "isError": true,
+                "structuredContent": null,
+                "toolResult": null,
+                "text": "Error executing tool decision.search: 1 validation error for decision_searchArguments\ncanonical_lifecycle_status\n  Input should be 'active', 'superseded', 'deprecated' or 'inactive' [type=literal_error, input_value='bogus', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/literal_error",
+                "signalAborted": false
+              }
+            ]
+          }
+        },
+        {
+          "id": "F1-A3-PROPOSALS",
+          "pass": true,
+          "detail": {
+            "propose": "undefined",
+            "propose_batch": "undefined"
+          }
+        },
+        {
+          "id": "F1-S2-SYNTHETIC-CANCEL",
+          "pass": true,
+          "detail": {
+            "state": {
+              "seq": 1,
+              "name": "slow.echo",
+              "args": {
+                "delay_ms": 1000
+              },
+              "requestId": 2,
+              "startedAt": "2026-10-24T23:45:31.648Z",
+              "pending": false,
+              "outcome": "rejected",
+              "settledAt": "2026-10-24T23:45:31.798Z",
+              "errorName": "McpError",
+              "errorCode": -32001,
+              "errorMessage": "MCP error -32001: Error: Code Mode execution exceeded 150ms",
+              "cancellationSentAt": "2026-10-24T23:45:31.797Z",
+              "cancellationSeen": true,
+              "signalAborted": true
+            },
+            "server": {
+              "started": {
+                "seq": 2,
+                "ts": "2026-10-24T23:45:31.650Z",
+                "type": "tool_started",
+                "tool": "slow.echo",
+                "delayMs": 1000,
+                "requestId": 2
+              },
+              "aborted": {
+                "seq": 3,
+                "ts": "2026-10-24T23:45:31.798Z",
+                "type": "signal_aborted",
+                "tool": "slow.echo",
+                "requestId": 2,
+                "elapsedMs": 148
+              },
+              "returned": {
+                "seq": 4,
+                "ts": "2026-10-24T23:45:31.799Z",
+                "type": "handler_returned",
+                "tool": "slow.echo",
+                "requestId": 2,
+                "aborted": true,
+                "elapsedMs": 149,
+                "response_expected": false
+              }
+            },
+            "responseAfterCancel": 0
+          }
+        },
+        {
+          "id": "F1-P1-CLEANUP",
+          "pass": true,
+          "detail": {
+            "controlDirect": {
+              "kind": "direct",
+              "phase": "control-direct",
+              "errors": [],
+              "pid": 65532,
+              "server_exit_observed": true,
+              "server_alive_after": false
+            },
+            "controlRelay": {
+              "kind": "relay",
+              "phase": "control-relay",
+              "errors": [],
+              "relay_pid": 4000,
+              "upstream_pid": 29184,
+              "child_exit_event": {
+                "seq": 25,
+                "ts": "2026-10-24T23:44:48.286Z",
+                "pid": 4000,
+                "type": "child_exit",
+                "code": 0,
+                "signal": null,
+                "upstream_pid": 29184,
+                "observed_by": "top_level"
+              },
+              "child_exit_observed": true,
+              "relay_exit_observed": true,
+              "relay_alive_after": false,
+              "upstream_exit_observed": true,
+              "upstream_alive_after": false
+            },
+            "timeoutWithhold": {
+              "kind": "relay",
+              "phase": "timeout-withhold",
+              "errors": [],
+              "relay_pid": 62948,
+              "upstream_pid": 6904,
+              "child_exit_event": {
+                "seq": 14,
+                "ts": "2026-10-24T23:44:52.268Z",
+                "pid": 62948,
+                "type": "child_exit",
+                "code": 0,
+                "signal": null,
+                "upstream_pid": 6904,
+                "observed_by": "top_level"
+              },
+              "child_exit_observed": true,
+              "relay_exit_observed": true,
+              "relay_alive_after": false,
+              "upstream_exit_observed": true,
+              "upstream_alive_after": false
+            },
+            "raceBefore": {
+              "kind": "relay",
+              "phase": "race-before",
+              "errors": [],
+              "relay_pid": 51680,
+              "upstream_pid": 40680,
+              "child_exit_event": {
+                "seq": 11,
+                "ts": "2026-10-24T23:44:56.167Z",
+                "pid": 51680,
+                "type": "child_exit",
+                "code": 0,
+                "signal": null,
+                "upstream_pid": 40680,
+                "observed_by": "top_level"
+              },
+              "child_exit_observed": true,
+              "relay_exit_observed": true,
+              "relay_alive_after": false,
+              "upstream_exit_observed": true,
+              "upstream_alive_after": false
+            },
+            "raceBoundary": {
+              "kind": "relay",
+              "phase": "race-boundary",
+              "errors": [],
+              "relay_pid": 27196,
+              "upstream_pid": 8964,
+              "child_exit_event": {
+                "seq": 26,
+                "ts": "2026-10-24T23:45:01.759Z",
+                "pid": 27196,
+                "type": "child_exit",
+                "code": 0,
+                "signal": null,
+                "upstream_pid": 8964,
+                "observed_by": "top_level"
+              },
+              "child_exit_observed": true,
+              "relay_exit_observed": true,
+              "relay_alive_after": false,
+              "upstream_exit_observed": true,
+              "upstream_alive_after": false
+            },
+            "raceAfter": {
+              "kind": "relay",
+              "phase": "race-after",
+              "errors": [],
+              "relay_pid": 60396,
+              "upstream_pid": 73960,
+              "child_exit_event": {
+                "seq": 12,
+                "ts": "2026-10-24T23:45:05.931Z",
+                "pid": 60396,
+                "type": "child_exit",
+                "code": 0,
+                "signal": null,
+                "upstream_pid": 73960,
+                "observed_by": "top_level"
+              },
+              "child_exit_observed": true,
+              "relay_exit_observed": true,
+              "relay_alive_after": false,
+              "upstream_exit_observed": true,
+              "upstream_alive_after": false
+            },
+            "parallel": {
+              "kind": "relay",
+              "phase": "parallel",
+              "errors": [],
+              "relay_pid": 15964,
+              "upstream_pid": 34000,
+              "child_exit_event": {
+                "seq": 15,
+                "ts": "2026-10-24T23:45:09.711Z",
+                "pid": 15964,
+                "type": "child_exit",
+                "code": 0,
+                "signal": null,
+                "upstream_pid": 34000,
+                "observed_by": "top_level"
+              },
+              "child_exit_observed": true,
+              "relay_exit_observed": true,
+              "relay_alive_after": false,
+              "upstream_exit_observed": true,
+              "upstream_alive_after": false
+            },
+            "sequential": {
+              "kind": "relay",
+              "phase": "sequential-fourth",
+              "errors": [],
+              "relay_pid": 74496,
+              "upstream_pid": 38120,
+              "child_exit_event": {
+                "seq": 19,
+                "ts": "2026-10-24T23:45:13.645Z",
+                "pid": 74496,
+                "type": "child_exit",
+                "code": 0,
+                "signal": null,
+                "upstream_pid": 38120,
+                "observed_by": "top_level"
+              },
+              "child_exit_observed": true,
+              "relay_exit_observed": true,
+              "relay_alive_after": false,
+              "upstream_exit_observed": true,
+              "upstream_alive_after": false
+            },
+            "repeated": {
+              "kind": "relay",
+              "phase": "repeated",
+              "errors": [],
+              "relay_pid": 48320,
+              "upstream_pid": 48592,
+              "child_exit_event": {
+                "seq": 29,
+                "ts": "2026-10-24T23:45:18.176Z",
+                "pid": 48320,
+                "type": "child_exit",
+                "code": 0,
+                "signal": null,
+                "upstream_pid": 48592,
+                "observed_by": "top_level"
+              },
+              "child_exit_observed": true,
+              "relay_exit_observed": true,
+              "relay_alive_after": false,
+              "upstream_exit_observed": true,
+              "upstream_alive_after": false
+            },
+            "transportClose": {
+              "kind": "relay",
+              "phase": "transport-close",
+              "errors": [],
+              "relay_pid": 59036,
+              "upstream_pid": 59360,
+              "child_exit_event": {
+                "seq": 11,
+                "ts": "2026-10-24T23:45:21.350Z",
+                "pid": 59036,
+                "type": "child_exit",
+                "code": 0,
+                "signal": null,
+                "upstream_pid": 59360,
+                "observed_by": "top_level"
+              },
+              "child_exit_observed": true,
+              "relay_exit_observed": true,
+              "relay_alive_after": false,
+              "upstream_exit_observed": true,
+              "upstream_alive_after": false
+            },
+            "timeoutThenClose": {
+              "kind": "relay",
+              "phase": "timeout-then-close",
+              "errors": [],
+              "relay_pid": 11044,
+              "upstream_pid": 42856,
+              "child_exit_event": {
+                "seq": 12,
+                "ts": "2026-10-24T23:45:24.819Z",
+                "pid": 11044,
+                "type": "child_exit",
+                "code": 0,
+                "signal": null,
+                "upstream_pid": 42856,
+                "observed_by": "top_level"
+              },
+              "child_exit_observed": true,
+              "relay_exit_observed": true,
+              "relay_alive_after": false,
+              "upstream_exit_observed": true,
+              "upstream_alive_after": false
+            },
+            "validation": {
+              "kind": "direct",
+              "phase": "validation",
+              "errors": [],
+              "pid": 49412,
+              "server_exit_observed": true,
+              "server_alive_after": false
+            },
+            "mcpError": {
+              "kind": "direct",
+              "phase": "mcp-error",
+              "errors": [],
+              "pid": 72032,
+              "server_exit_observed": true,
+              "server_alive_after": false
+            },
+            "synthetic": {
+              "kind": "synthetic",
+              "phase": "synthetic-cancel",
+              "errors": [],
+              "pid": 64872,
+              "server_exit_observed": true,
+              "server_alive_after": false
+            }
+          }
+        },
+        {
+          "id": "F1-NO-UNHANDLED",
+          "pass": true,
+          "detail": []
+        }
+      ],
+      "p0_comparison": {
+        "original": {
+          "verdict": "FAIL",
+          "pending_at_timeout": true,
+          "pending_after_window": true,
+          "cancellation_notifications_sent": 0,
+          "late_response_settled_request": true
+        },
+        "corrected": {
+          "pending_at_timeout": false,
+          "pending_after_window": false,
+          "cancellation_notifications_sent": 1,
+          "late_response_settled_request": false,
+          "client_outcome": "rejected",
+          "client_error_code": -32001
+        }
+      }
+    }
+  ],
+  "repeatable": true,
+  "preservation": {
+    "pass": true,
+    "s1a_digest_before": "cc7f884866e6e94255b100de57b82eec4a51660aadaf51c6464198131030af57",
+    "s1a_digest_after": "cc7f884866e6e94255b100de57b82eec4a51660aadaf51c6464198131030af57",
+    "frozen_status_before": [],
+    "frozen_status_after": [],
+    "frozen_diff": [],
+    "m4_guard_before": {
+      "schema": "mneme.cm01.s1a1.e0.m4-guard/v1",
+      "s0_sha": "9eb4057a290795883076ab05bf11c92038c6ca13",
+      "base_sha": "adf50933d0beac255ac2a134e00ee13d40442302",
+      "head_sha": "adf50933d0beac255ac2a134e00ee13d40442302",
+      "base_to_head_is_clean": true,
+      "inherited_m4_diff": "benchmarks/adr034_m4/README.md                     |  222 ++\n benchmarks/adr034_m4/harness.py                    | 2067 +++++++++++++++\n benchmarks/adr034_m4/m4_child.py                   |  153 ++\n ...eliable-enforcement-c3-live-validation-scope.md |   74 +-\n ...adr-034-g2-new-file-write-amendment-proposal.md |  392 +++\n .../adr-034-m4-heldout-scoring-2026-10-24.md       |  256 ++\n .../adr-034-m4-pre-scoring-record-2026-10-23.md    |  262 ++\n .../harness/README.md                              |    3 +-\n .../harness/selftest/run_selftest.sh               |   44 +-\n .../harness/setup_c3_probe.py                      |   50 +-\n scripts/run_test_battery.py                        |    9 +\n tests/adr034_m4_synthetic_corpus.py                |  226 ++\n tests/test_adr034_m4_harness.py                    |  926 +++++++\n tests/test_adr034_m4_harness_old_reader.py         |   47 +\n validation/cm01/p0-cancellation/.gitattributes     |    2 +\n validation/cm01/p0-cancellation/.gitignore         |    2 +\n validation/cm01/p0-cancellation/README.md          |  154 ++\n validation/cm01/p0-cancellation/VERIFICATION.md    |   86 +\n .../cm01/p0-cancellation/evidence/commands.txt     |   72 +\n .../raw/run1-control-direct-child-stderr.log       |    0\n .../raw/run1-control-relay-child-events.jsonl      |    9 +\n .../raw/run1-control-relay-child-stderr.log        |    0\n .../raw/run1-control-relay-relay-stderr.log        |   12 +\n .../evidence/raw/run1-control-relay-relay.jsonl    |   12 +\n .../evidence/raw/run1-fault-child-events.jsonl     |    9 +\n .../evidence/raw/run1-fault-child-stderr.log       |    0\n .../evidence/raw/run1-fault-relay-stderr.log       |   13 +\n .../evidence/raw/run1-fault-relay.jsonl            |   13 +\n .../evidence/raw/run1-harness-events.jsonl         |   30 +\n .../raw/run2-control-direct-child-stderr.log       |    0\n .../raw/run2-control-relay-child-events.jsonl      |    9 +\n .../raw/run2-control-relay-child-stderr.log        |    0\n .../raw/run2-control-relay-relay-stderr.log        |   12 +\n .../evidence/raw/run2-control-relay-relay.jsonl    |   12 +\n .../evidence/raw/run2-fault-child-events.jsonl     |    9 +\n .../evidence/raw/run2-fault-child-stderr.log       |    0\n .../evidence/raw/run2-fault-relay-stderr.log       |   13 +\n .../evidence/raw/run2-fault-relay.jsonl            |   13 +\n .../evidence/raw/run2-harness-events.jsonl         |   30 +\n .../evidence/raw/runner-console.log                |  Bin 0 -> 7756 bytes\n validation/cm01/p0-cancellation/evidence/run1.json |  567 +++++\n validation/cm01/p0-cancellation/evidence/run2.json |  567 +++++\n .../cm01/p0-cancellation/evidence/verdict.json     |  325 +++\n .../p0-cancellation/evidence/verification.json     | 1342 ++++++++++\n .../cm01/p0-cancellation/evidence/versions.json    |   45 +\n validation/cm01/p0-cancellation/package-lock.json  | 1341 ++++++++++\n validation/cm01/p0-cancellation/package.json       |   20 +\n validation/cm01/p0-cancellation/relay.mjs          |  337 +++\n .../cm01/p0-cancellation/run-cancellation.mjs      | 1446 +++++++++++\n .../cm01/p0-cancellation/verify-evidence.mjs       |  872 +++++++\n validation/cm01/s1a-local/.gitattributes           |    3 +\n validation/cm01/s1a-local/.gitignore               |    2 +\n validation/cm01/s1a-local/INCLUSION-MANIFEST.txt   |  123 +\n validation/cm01/s1a-local/README.md                |  107 +\n validation/cm01/s1a-local/S1-A1-SUMMARY.md         |  133 +\n .../cm01/s1a-local/e0/probe-native-promise.mjs     |   47 +\n validation/cm01/s1a-local/e0/quickjs-executor.mjs  |  309 +++\n validation/cm01/s1a-local/e0/run-e0.mjs            |  295 +++\n validation/cm01/s1a-local/e0/synthetic-host.mjs    |   66 +\n validation/cm01/s1a-local/evidence/commands.txt    |   35 +\n validation/cm01/s1a-local/evidence/e0-run1.json    |  492 ++++\n validation/cm01/s1a-local/evidence/e0-run2.json    |  494 ++++\n validation/cm01/s1a-local/evidence/e0.json         |  494 ++++\n validation/cm01/s1a-local/evidence/raw/e0.log      |   75 +\n .../cm01/s1a-local/evidence/repeatability.json     |   19 +\n validation/cm01/s1a-local/m1/README.md             |   84 +\n validation/cm01/s1a-local/m1/evidence/commands.txt |   48 +\n validation/cm01/s1a-local/m1/evidence/m1.json      | 2473 ++++++++++++++++++\n .../cm01/s1a-local/m1/evidence/run1-stderr.log     |    1 +\n .../cm01/s1a-local/m1/evidence/run1-tools.json     |  558 +++++\n .../cm01/s1a-local/m1/evidence/run2-stderr.log     |    1 +\n .../cm01/s1a-local/m1/evidence/run2-tools.json     |  558 +++++\n .../m1/fixture/canonical/project_memory.json       |   97 +\n .../cm01/s1a-local/m1/fixture/pre_migration.json   |   27 +\n .../s1a-local/m1/fixture/work/project_memory.json  |   97 +\n validation/cm01/s1a-local/m1/package-lock.json     | 1223 +++++++++\n validation/cm01/s1a-local/m1/package.json          |   17 +\n validation/cm01/s1a-local/m1/run-m1.mjs            |  296 +++\n validation/cm01/s1a-local/m2/README.md             |   91 +\n validation/cm01/s1a-local/m2/evidence/commands.txt |   50 +\n validation/cm01/s1a-local/m2/evidence/m2.json      | 2628 ++++++++++++++++++++\n .../cm01/s1a-local/m2/evidence/run1-stderr.log     |    4 +\n validation/cm01/s1a-local/m2/evidence/run1.json    | 1199 +++++++++\n .../cm01/s1a-local/m2/evidence/run2-stderr.log     |    4 +\n validation/cm01/s1a-local/m2/evidence/run2.json    | 1199 +++++++++\n validation/cm01/s1a-local/m2/package-lock.json     | 1273 ++++++++++\n validation/cm01/s1a-local/m2/package.json          |   19 +\n validation/cm01/s1a-local/m2/run-m2.mjs            |  561 +++++\n validation/cm01/s1a-local/m3/README.md             |   88 +\n validation/cm01/s1a-local/m3/evidence/commands.txt |   49 +\n validation/cm01/s1a-local/m3/evidence/m3.json      |  961 +++++++\n .../cm01/s1a-local/m3/evidence/run1-stderr.log     |    1 +\n validation/cm01/s1a-local/m3/evidence/run1.json    |  362 +++\n .../cm01/s1a-local/m3/evidence/run2-stderr.log     |    1 +\n validation/cm01/s1a-local/m3/evidence/run2.json    |  362 +++\n validation/cm01/s1a-local/m3/package-lock.json     | 1273 ++++++++++\n validation/cm01/s1a-local/m3/package.json          |   19 +\n validation/cm01/s1a-local/m3/run-m3.mjs            |  484 ++++\n validation/cm01/s1a-local/m4-guard.mjs             |   70 +\n validation/cm01/s1a-local/m4/README.md             |   78 +\n validation/cm01/s1a-local/m4/evidence/commands.txt |   54 +\n validation/cm01/s1a-local/m4/evidence/m4.json      | 1467 +++++++++++\n .../cm01/s1a-local/m4/evidence/run1-stderr.log     |    1 +\n validation/cm01/s1a-local/m4/evidence/run1.json    |  608 +++++\n .../cm01/s1a-local/m4/evidence/run2-stderr.log     |    1 +\n validation/cm01/s1a-local/m4/evidence/run2.json    |  608 +++++\n validation/cm01/s1a-local/m4/f1/README.md          |  116 +\n .../cm01/s1a-local/m4/f1/evidence/commands.txt     |   55 +\n .../cm01/s1a-local/m4/f1/evidence/m4-f1.json       | 2348 +++++++++++++++++\n .../cm01/s1a-local/m4/f1/evidence/run1-stderr.log  |    1 +\n validation/cm01/s1a-local/m4/f1/evidence/run1.json | 1035 ++++++++\n .../cm01/s1a-local/m4/f1/evidence/run2-stderr.log  |    1 +\n validation/cm01/s1a-local/m4/f1/evidence/run2.json | 1035 ++++++++\n validation/cm01/s1a-local/m4/f1/run-m4-f1.mjs      |  623 +++++\n validation/cm01/s1a-local/m4/fixture/SHA256SUMS    |    2 +\n .../m4/fixture/canonical/project_memory.json       |  134 +\n .../cm01/s1a-local/m4/fixture/pre_migration.json   |   39 +\n .../s1a-local/m4/fixture/work/project_memory.json  |  134 +\n validation/cm01/s1a-local/m4/package-lock.json     | 1273 ++++++++++\n validation/cm01/s1a-local/m4/package.json          |   19 +\n validation/cm01/s1a-local/m4/run-m4.mjs            |  547 ++++\n validation/cm01/s1a-local/m5/README.md             |  116 +\n validation/cm01/s1a-local/m5/evidence/commands.txt |   58 +\n validation/cm01/s1a-local/m5/evidence/m5.json      | 1125 +++++++++\n .../cm01/s1a-local/m5/evidence/run1-stderr.log     |    1 +\n validation/cm01/s1a-local/m5/evidence/run1.json    |  405 +++\n .../cm01/s1a-local/m5/evidence/run2-stderr.log     |    1 +\n validation/cm01/s1a-local/m5/evidence/run2.json    |  405 +++\n validation/cm01/s1a-local/m5/package-lock.json     | 1273 ++++++++++\n validation/cm01/s1a-local/m5/package.json          |   19 +\n validation/cm01/s1a-local/m5/run-m5.mjs            |  583 +++++\n validation/cm01/s1a-local/m6/README.md             |  108 +\n validation/cm01/s1a-local/m6/evidence/commands.txt |   55 +\n validation/cm01/s1a-local/m6/evidence/m6.json      | 1925 ++++++++++++++\n .../cm01/s1a-local/m6/evidence/run1-stderr.log     |    1 +\n validation/cm01/s1a-local/m6/evidence/run1.json    |  800 ++++++\n .../cm01/s1a-local/m6/evidence/run2-stderr.log     |    1 +\n validation/cm01/s1a-local/m6/evidence/run2.json    |  800 ++++++\n validation/cm01/s1a-local/m6/package-lock.json     | 1273 ++++++++++\n validation/cm01/s1a-local/m6/package.json          |   19 +\n validation/cm01/s1a-local/m6/run-m6.mjs            |  618 +++++\n validation/cm01/s1a-local/m7/README.md             |  105 +\n validation/cm01/s1a-local/m7/evidence/commands.txt |   60 +\n validation/cm01/s1a-local/m7/evidence/m7.json      | 2256 +++++++++++++++++\n .../cm01/s1a-local/m7/evidence/run1-stderr.log     |    1 +\n validation/cm01/s1a-local/m7/evidence/run1.json    |  958 +++++++\n .../cm01/s1a-local/m7/evidence/run2-stderr.log     |    1 +\n validation/cm01/s1a-local/m7/evidence/run2.json    |  958 +++++++\n validation/cm01/s1a-local/m7/package-lock.json     | 1273 ++++++++++\n validation/cm01/s1a-local/m7/package.json          |   19 +\n validation/cm01/s1a-local/m7/run-m7.mjs            |  630 +++++\n validation/cm01/s1a-local/m8/README.md             |   90 +\n validation/cm01/s1a-local/m8/evidence/commands.txt |   62 +\n .../cm01/s1a-local/m8/evidence/e4-run1-stderr.log  |    1 +\n .../cm01/s1a-local/m8/evidence/e4-run2-stderr.log  |    1 +\n .../cm01/s1a-local/m8/evidence/e5-run1-stderr.log  |    4 +\n .../cm01/s1a-local/m8/evidence/e5-run2-stderr.log  |    4 +\n validation/cm01/s1a-local/m8/evidence/m8.json      |  884 +++++++\n .../cm01/s1a-local/m8/evidence/run1-stderr.log     |    7 +\n validation/cm01/s1a-local/m8/evidence/run1.json    |  258 ++\n .../cm01/s1a-local/m8/evidence/run2-stderr.log     |    7 +\n validation/cm01/s1a-local/m8/evidence/run2.json    |  258 ++\n .../cm01/s1a-local/m8/fixture/sectionless.json     |    9 +\n validation/cm01/s1a-local/m8/package-lock.json     | 1273 ++++++++++\n validation/cm01/s1a-local/m8/package.json          |   19 +\n validation/cm01/s1a-local/m8/run-m8.mjs            |  782 ++++++\n validation/cm01/s1a-local/package-lock.json        |  134 +\n validation/cm01/s1a-local/package.json             |   19 +\n 168 files changed, 60809 insertions(+), 6 deletions(-)",
+      "groups": {
+        "committed_vs_base": [],
+        "staged": [],
+        "unstaged": [],
+        "untracked": [
+          "validation/cm01/p0-f1/.gitattributes",
+          "validation/cm01/p0-f1/.gitignore",
+          "validation/cm01/p0-f1/adapter.mjs",
+          "validation/cm01/p0-f1/harness.mjs",
+          "validation/cm01/p0-f1/package-lock.json",
+          "validation/cm01/p0-f1/package.json",
+          "validation/cm01/p0-f1/quickjs-executor.mjs",
+          "validation/cm01/p0-f1/relay.mjs",
+          "validation/cm01/p0-f1/run-f1.mjs",
+          "validation/cm01/p0-f1/synthetic-server.mjs"
+        ]
+      },
+      "protected_patterns": [
+        "^benchmarks\\/adr034_m4\\/",
+        "^tests\\/adr034_m4_",
+        "^tests\\/test_adr034_m4_",
+        "^scripts\\/run_test_battery\\.py$",
+        "^docs\\/validation\\/adr-034-m4-",
+        "^docs\\/plans\\/.*adr-034-m4"
+      ],
+      "violations": [],
+      "pass": true
+    },
+    "m4_guard_after": {
+      "schema": "mneme.cm01.s1a1.e0.m4-guard/v1",
+      "s0_sha": "9eb4057a290795883076ab05bf11c92038c6ca13",
+      "base_sha": "adf50933d0beac255ac2a134e00ee13d40442302",
+      "head_sha": "adf50933d0beac255ac2a134e00ee13d40442302",
+      "base_to_head_is_clean": true,
+      "inherited_m4_diff": "benchmarks/adr034_m4/README.md                     |  222 ++\n benchmarks/adr034_m4/harness.py                    | 2067 +++++++++++++++\n benchmarks/adr034_m4/m4_child.py                   |  153 ++\n ...eliable-enforcement-c3-live-validation-scope.md |   74 +-\n ...adr-034-g2-new-file-write-amendment-proposal.md |  392 +++\n .../adr-034-m4-heldout-scoring-2026-10-24.md       |  256 ++\n .../adr-034-m4-pre-scoring-record-2026-10-23.md    |  262 ++\n .../harness/README.md                              |    3 +-\n .../harness/selftest/run_selftest.sh               |   44 +-\n .../harness/setup_c3_probe.py                      |   50 +-\n scripts/run_test_battery.py                        |    9 +\n tests/adr034_m4_synthetic_corpus.py                |  226 ++\n tests/test_adr034_m4_harness.py                    |  926 +++++++\n tests/test_adr034_m4_harness_old_reader.py         |   47 +\n validation/cm01/p0-cancellation/.gitattributes     |    2 +\n validation/cm01/p0-cancellation/.gitignore         |    2 +\n validation/cm01/p0-cancellation/README.md          |  154 ++\n validation/cm01/p0-cancellation/VERIFICATION.md    |   86 +\n .../cm01/p0-cancellation/evidence/commands.txt     |   72 +\n .../raw/run1-control-direct-child-stderr.log       |    0\n .../raw/run1-control-relay-child-events.jsonl      |    9 +\n .../raw/run1-control-relay-child-stderr.log        |    0\n .../raw/run1-control-relay-relay-stderr.log        |   12 +\n .../evidence/raw/run1-control-relay-relay.jsonl    |   12 +\n .../evidence/raw/run1-fault-child-events.jsonl     |    9 +\n .../evidence/raw/run1-fault-child-stderr.log       |    0\n .../evidence/raw/run1-fault-relay-stderr.log       |   13 +\n .../evidence/raw/run1-fault-relay.jsonl            |   13 +\n .../evidence/raw/run1-harness-events.jsonl         |   30 +\n .../raw/run2-control-direct-child-stderr.log       |    0\n .../raw/run2-control-relay-child-events.jsonl      |    9 +\n .../raw/run2-control-relay-child-stderr.log        |    0\n .../raw/run2-control-relay-relay-stderr.log        |   12 +\n .../evidence/raw/run2-control-relay-relay.jsonl    |   12 +\n .../evidence/raw/run2-fault-child-events.jsonl     |    9 +\n .../evidence/raw/run2-fault-child-stderr.log       |    0\n .../evidence/raw/run2-fault-relay-stderr.log       |   13 +\n .../evidence/raw/run2-fault-relay.jsonl            |   13 +\n .../evidence/raw/run2-harness-events.jsonl         |   30 +\n .../evidence/raw/runner-console.log                |  Bin 0 -> 7756 bytes\n validation/cm01/p0-cancellation/evidence/run1.json |  567 +++++\n validation/cm01/p0-cancellation/evidence/run2.json |  567 +++++\n .../cm01/p0-cancellation/evidence/verdict.json     |  325 +++\n .../p0-cancellation/evidence/verification.json     | 1342 ++++++++++\n .../cm01/p0-cancellation/evidence/versions.json    |   45 +\n validation/cm01/p0-cancellation/package-lock.json  | 1341 ++++++++++\n validation/cm01/p0-cancellation/package.json       |   20 +\n validation/cm01/p0-cancellation/relay.mjs          |  337 +++\n .../cm01/p0-cancellation/run-cancellation.mjs      | 1446 +++++++++++\n .../cm01/p0-cancellation/verify-evidence.mjs       |  872 +++++++\n validation/cm01/s1a-local/.gitattributes           |    3 +\n validation/cm01/s1a-local/.gitignore               |    2 +\n validation/cm01/s1a-local/INCLUSION-MANIFEST.txt   |  123 +\n validation/cm01/s1a-local/README.md                |  107 +\n validation/cm01/s1a-local/S1-A1-SUMMARY.md         |  133 +\n .../cm01/s1a-local/e0/probe-native-promise.mjs     |   47 +\n validation/cm01/s1a-local/e0/quickjs-executor.mjs  |  309 +++\n validation/cm01/s1a-local/e0/run-e0.mjs            |  295 +++\n validation/cm01/s1a-local/e0/synthetic-host.mjs    |   66 +\n validation/cm01/s1a-local/evidence/commands.txt    |   35 +\n validation/cm01/s1a-local/evidence/e0-run1.json    |  492 ++++\n validation/cm01/s1a-local/evidence/e0-run2.json    |  494 ++++\n validation/cm01/s1a-local/evidence/e0.json         |  494 ++++\n validation/cm01/s1a-local/evidence/raw/e0.log      |   75 +\n .../cm01/s1a-local/evidence/repeatability.json     |   19 +\n validation/cm01/s1a-local/m1/README.md             |   84 +\n validation/cm01/s1a-local/m1/evidence/commands.txt |   48 +\n validation/cm01/s1a-local/m1/evidence/m1.json      | 2473 ++++++++++++++++++\n .../cm01/s1a-local/m1/evidence/run1-stderr.log     |    1 +\n .../cm01/s1a-local/m1/evidence/run1-tools.json     |  558 +++++\n .../cm01/s1a-local/m1/evidence/run2-stderr.log     |    1 +\n .../cm01/s1a-local/m1/evidence/run2-tools.json     |  558 +++++\n .../m1/fixture/canonical/project_memory.json       |   97 +\n .../cm01/s1a-local/m1/fixture/pre_migration.json   |   27 +\n .../s1a-local/m1/fixture/work/project_memory.json  |   97 +\n validation/cm01/s1a-local/m1/package-lock.json     | 1223 +++++++++\n validation/cm01/s1a-local/m1/package.json          |   17 +\n validation/cm01/s1a-local/m1/run-m1.mjs            |  296 +++\n validation/cm01/s1a-local/m2/README.md             |   91 +\n validation/cm01/s1a-local/m2/evidence/commands.txt |   50 +\n validation/cm01/s1a-local/m2/evidence/m2.json      | 2628 ++++++++++++++++++++\n .../cm01/s1a-local/m2/evidence/run1-stderr.log     |    4 +\n validation/cm01/s1a-local/m2/evidence/run1.json    | 1199 +++++++++\n .../cm01/s1a-local/m2/evidence/run2-stderr.log     |    4 +\n validation/cm01/s1a-local/m2/evidence/run2.json    | 1199 +++++++++\n validation/cm01/s1a-local/m2/package-lock.json     | 1273 ++++++++++\n validation/cm01/s1a-local/m2/package.json          |   19 +\n validation/cm01/s1a-local/m2/run-m2.mjs            |  561 +++++\n validation/cm01/s1a-local/m3/README.md             |   88 +\n validation/cm01/s1a-local/m3/evidence/commands.txt |   49 +\n validation/cm01/s1a-local/m3/evidence/m3.json      |  961 +++++++\n .../cm01/s1a-local/m3/evidence/run1-stderr.log     |    1 +\n validation/cm01/s1a-local/m3/evidence/run1.json    |  362 +++\n .../cm01/s1a-local/m3/evidence/run2-stderr.log     |    1 +\n validation/cm01/s1a-local/m3/evidence/run2.json    |  362 +++\n validation/cm01/s1a-local/m3/package-lock.json     | 1273 ++++++++++\n validation/cm01/s1a-local/m3/package.json          |   19 +\n validation/cm01/s1a-local/m3/run-m3.mjs            |  484 ++++\n validation/cm01/s1a-local/m4-guard.mjs             |   70 +\n validation/cm01/s1a-local/m4/README.md             |   78 +\n validation/cm01/s1a-local/m4/evidence/commands.txt |   54 +\n validation/cm01/s1a-local/m4/evidence/m4.json      | 1467 +++++++++++\n .../cm01/s1a-local/m4/evidence/run1-stderr.log     |    1 +\n validation/cm01/s1a-local/m4/evidence/run1.json    |  608 +++++\n .../cm01/s1a-local/m4/evidence/run2-stderr.log     |    1 +\n validation/cm01/s1a-local/m4/evidence/run2.json    |  608 +++++\n validation/cm01/s1a-local/m4/f1/README.md          |  116 +\n .../cm01/s1a-local/m4/f1/evidence/commands.txt     |   55 +\n .../cm01/s1a-local/m4/f1/evidence/m4-f1.json       | 2348 +++++++++++++++++\n .../cm01/s1a-local/m4/f1/evidence/run1-stderr.log  |    1 +\n validation/cm01/s1a-local/m4/f1/evidence/run1.json | 1035 ++++++++\n .../cm01/s1a-local/m4/f1/evidence/run2-stderr.log  |    1 +\n validation/cm01/s1a-local/m4/f1/evidence/run2.json | 1035 ++++++++\n validation/cm01/s1a-local/m4/f1/run-m4-f1.mjs      |  623 +++++\n validation/cm01/s1a-local/m4/fixture/SHA256SUMS    |    2 +\n .../m4/fixture/canonical/project_memory.json       |  134 +\n .../cm01/s1a-local/m4/fixture/pre_migration.json   |   39 +\n .../s1a-local/m4/fixture/work/project_memory.json  |  134 +\n validation/cm01/s1a-local/m4/package-lock.json     | 1273 ++++++++++\n validation/cm01/s1a-local/m4/package.json          |   19 +\n validation/cm01/s1a-local/m4/run-m4.mjs            |  547 ++++\n validation/cm01/s1a-local/m5/README.md             |  116 +\n validation/cm01/s1a-local/m5/evidence/commands.txt |   58 +\n validation/cm01/s1a-local/m5/evidence/m5.json      | 1125 +++++++++\n .../cm01/s1a-local/m5/evidence/run1-stderr.log     |    1 +\n validation/cm01/s1a-local/m5/evidence/run1.json    |  405 +++\n .../cm01/s1a-local/m5/evidence/run2-stderr.log     |    1 +\n validation/cm01/s1a-local/m5/evidence/run2.json    |  405 +++\n validation/cm01/s1a-local/m5/package-lock.json     | 1273 ++++++++++\n validation/cm01/s1a-local/m5/package.json          |   19 +\n validation/cm01/s1a-local/m5/run-m5.mjs            |  583 +++++\n validation/cm01/s1a-local/m6/README.md             |  108 +\n validation/cm01/s1a-local/m6/evidence/commands.txt |   55 +\n validation/cm01/s1a-local/m6/evidence/m6.json      | 1925 ++++++++++++++\n .../cm01/s1a-local/m6/evidence/run1-stderr.log     |    1 +\n validation/cm01/s1a-local/m6/evidence/run1.json    |  800 ++++++\n .../cm01/s1a-local/m6/evidence/run2-stderr.log     |    1 +\n validation/cm01/s1a-local/m6/evidence/run2.json    |  800 ++++++\n validation/cm01/s1a-local/m6/package-lock.json     | 1273 ++++++++++\n validation/cm01/s1a-local/m6/package.json          |   19 +\n validation/cm01/s1a-local/m6/run-m6.mjs            |  618 +++++\n validation/cm01/s1a-local/m7/README.md             |  105 +\n validation/cm01/s1a-local/m7/evidence/commands.txt |   60 +\n validation/cm01/s1a-local/m7/evidence/m7.json      | 2256 +++++++++++++++++\n .../cm01/s1a-local/m7/evidence/run1-stderr.log     |    1 +\n validation/cm01/s1a-local/m7/evidence/run1.json    |  958 +++++++\n .../cm01/s1a-local/m7/evidence/run2-stderr.log     |    1 +\n validation/cm01/s1a-local/m7/evidence/run2.json    |  958 +++++++\n validation/cm01/s1a-local/m7/package-lock.json     | 1273 ++++++++++\n validation/cm01/s1a-local/m7/package.json          |   19 +\n validation/cm01/s1a-local/m7/run-m7.mjs            |  630 +++++\n validation/cm01/s1a-local/m8/README.md             |   90 +\n validation/cm01/s1a-local/m8/evidence/commands.txt |   62 +\n .../cm01/s1a-local/m8/evidence/e4-run1-stderr.log  |    1 +\n .../cm01/s1a-local/m8/evidence/e4-run2-stderr.log  |    1 +\n .../cm01/s1a-local/m8/evidence/e5-run1-stderr.log  |    4 +\n .../cm01/s1a-local/m8/evidence/e5-run2-stderr.log  |    4 +\n validation/cm01/s1a-local/m8/evidence/m8.json      |  884 +++++++\n .../cm01/s1a-local/m8/evidence/run1-stderr.log     |    7 +\n validation/cm01/s1a-local/m8/evidence/run1.json    |  258 ++\n .../cm01/s1a-local/m8/evidence/run2-stderr.log     |    7 +\n validation/cm01/s1a-local/m8/evidence/run2.json    |  258 ++\n .../cm01/s1a-local/m8/fixture/sectionless.json     |    9 +\n validation/cm01/s1a-local/m8/package-lock.json     | 1273 ++++++++++\n validation/cm01/s1a-local/m8/package.json          |   19 +\n validation/cm01/s1a-local/m8/run-m8.mjs            |  782 ++++++\n validation/cm01/s1a-local/package-lock.json        |  134 +\n validation/cm01/s1a-local/package.json             |   19 +\n 168 files changed, 60809 insertions(+), 6 deletions(-)",
+      "groups": {
+        "committed_vs_base": [],
+        "staged": [],
+        "unstaged": [],
+        "untracked": [
+          "validation/cm01/p0-f1/.gitattributes",
+          "validation/cm01/p0-f1/.gitignore",
+          "validation/cm01/p0-f1/adapter.mjs",
+          "validation/cm01/p0-f1/evidence/raw/run1-control-direct-child-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run1-control-direct-harness.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-control-direct-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-control-relay-child-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-control-relay-child-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run1-control-relay-harness.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-control-relay-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-control-relay-relay-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run1-control-relay-relay.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-mcp-error-child-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run1-mcp-error-harness.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-mcp-error-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-parallel-child-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-parallel-child-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run1-parallel-harness.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-parallel-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-parallel-relay-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run1-parallel-relay.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-race-after-child-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-race-after-child-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run1-race-after-harness.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-race-after-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-race-after-relay-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run1-race-after-relay.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-race-before-child-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-race-before-child-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run1-race-before-harness.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-race-before-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-race-before-relay-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run1-race-before-relay.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-race-boundary-0-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-race-boundary-1-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-race-boundary-2-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-race-boundary-child-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-race-boundary-child-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run1-race-boundary-harness.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-race-boundary-relay-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run1-race-boundary-relay.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-repeated-0-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-repeated-1-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-repeated-2-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-repeated-child-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-repeated-child-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run1-repeated-harness.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-repeated-relay-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run1-repeated-relay.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-sequential-fourth-child-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-sequential-fourth-child-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run1-sequential-fourth-harness.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-sequential-fourth-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-sequential-fourth-relay-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run1-sequential-fourth-relay.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-synthetic-cancel-harness.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-synthetic-cancel-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-synthetic-cancel-server.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-timeout-then-close-child-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-timeout-then-close-child-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run1-timeout-then-close-harness.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-timeout-then-close-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-timeout-then-close-relay-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run1-timeout-then-close-relay.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-timeout-withhold-child-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-timeout-withhold-child-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run1-timeout-withhold-harness.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-timeout-withhold-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-timeout-withhold-relay-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run1-timeout-withhold-relay.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-transport-close-child-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-transport-close-child-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run1-transport-close-harness.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-transport-close-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-transport-close-relay-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run1-transport-close-relay.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-validation-child-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run1-validation-harness.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run1-validation-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-control-direct-child-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run2-control-direct-harness.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-control-direct-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-control-relay-child-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-control-relay-child-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run2-control-relay-harness.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-control-relay-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-control-relay-relay-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run2-control-relay-relay.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-mcp-error-child-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run2-mcp-error-harness.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-mcp-error-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-parallel-child-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-parallel-child-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run2-parallel-harness.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-parallel-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-parallel-relay-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run2-parallel-relay.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-race-after-child-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-race-after-child-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run2-race-after-harness.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-race-after-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-race-after-relay-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run2-race-after-relay.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-race-before-child-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-race-before-child-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run2-race-before-harness.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-race-before-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-race-before-relay-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run2-race-before-relay.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-race-boundary-0-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-race-boundary-1-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-race-boundary-2-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-race-boundary-child-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-race-boundary-child-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run2-race-boundary-harness.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-race-boundary-relay-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run2-race-boundary-relay.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-repeated-0-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-repeated-1-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-repeated-2-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-repeated-child-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-repeated-child-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run2-repeated-harness.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-repeated-relay-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run2-repeated-relay.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-sequential-fourth-child-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-sequential-fourth-child-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run2-sequential-fourth-harness.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-sequential-fourth-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-sequential-fourth-relay-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run2-sequential-fourth-relay.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-synthetic-cancel-harness.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-synthetic-cancel-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-synthetic-cancel-server.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-timeout-then-close-child-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-timeout-then-close-child-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run2-timeout-then-close-harness.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-timeout-then-close-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-timeout-then-close-relay-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run2-timeout-then-close-relay.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-timeout-withhold-child-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-timeout-withhold-child-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run2-timeout-withhold-harness.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-timeout-withhold-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-timeout-withhold-relay-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run2-timeout-withhold-relay.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-transport-close-child-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-transport-close-child-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run2-transport-close-harness.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-transport-close-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-transport-close-relay-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run2-transport-close-relay.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-validation-child-stderr.log",
+          "validation/cm01/p0-f1/evidence/raw/run2-validation-harness.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/run2-validation-host-events.jsonl",
+          "validation/cm01/p0-f1/evidence/raw/runner-console.log",
+          "validation/cm01/p0-f1/evidence/run1.json",
+          "validation/cm01/p0-f1/evidence/run2.json",
+          "validation/cm01/p0-f1/harness.mjs",
+          "validation/cm01/p0-f1/package-lock.json",
+          "validation/cm01/p0-f1/package.json",
+          "validation/cm01/p0-f1/quickjs-executor.mjs",
+          "validation/cm01/p0-f1/relay.mjs",
+          "validation/cm01/p0-f1/run-f1.mjs",
+          "validation/cm01/p0-f1/synthetic-server.mjs"
+        ]
+      },
+      "protected_patterns": [
+        "^benchmarks\\/adr034_m4\\/",
+        "^tests\\/adr034_m4_",
+        "^tests\\/test_adr034_m4_",
+        "^scripts\\/run_test_battery\\.py$",
+        "^docs\\/validation\\/adr-034-m4-",
+        "^docs\\/plans\\/.*adr-034-m4"
+      ],
+      "violations": [],
+      "pass": true
+    }
+  },
+  "p0_comparison_pass": true,
+  "unhandled": [],
+  "verdict": "PASS",
+  "failed_checks": [],
+  "limitations": [
+    "Client settlement and cancellation dispatch are proven; server-side thread termination is not claimed.",
+    "The genuine Decision MCP tools are synchronous and fast; in-progress server cancellation is observed only with the synthetic async server.",
+    "MCP cancellation notification delivery is fire-and-forget; evidence records transport dispatch and server receipt, not an acknowledgement.",
+    "No production code, S1-A2, Cloudflare Workers, or ADR-034 M4 work is included."
+  ]
+}

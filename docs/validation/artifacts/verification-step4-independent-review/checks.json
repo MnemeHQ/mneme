@@ -1,0 +1,1399 @@
+{
+  "checks": [
+    {
+      "actual": "619d5405e80da61788448a7a0eeacc7c5eb3d0c0",
+      "claim": "619d5405 resolves to a commit",
+      "expected": "619d5405e80da61788448a7a0eeacc7c5eb3d0c0",
+      "id": "commit:v0.11.0",
+      "ok": true,
+      "section": "pins"
+    },
+    {
+      "actual": "101f3f427901c01fa4330e4add62af6ba8057a51",
+      "claim": "101f3f42 resolves to a commit",
+      "expected": "101f3f427901c01fa4330e4add62af6ba8057a51",
+      "id": "commit:step2_impl",
+      "ok": true,
+      "section": "pins"
+    },
+    {
+      "actual": "c51729f78199203fe12fcbc5c678b89a2c4f7d3e",
+      "claim": "c51729f7 resolves to a commit",
+      "expected": "c51729f78199203fe12fcbc5c678b89a2c4f7d3e",
+      "id": "commit:adapter_commit",
+      "ok": true,
+      "section": "pins"
+    },
+    {
+      "actual": "0b74d410b45e7b3efcf08d00ce58e7bd7017b757",
+      "claim": "0b74d410 resolves to a commit",
+      "expected": "0b74d410b45e7b3efcf08d00ce58e7bd7017b757",
+      "id": "commit:evaluator_commit",
+      "ok": true,
+      "section": "pins"
+    },
+    {
+      "actual": "619d5405e80da61788448a7a0eeacc7c5eb3d0c0",
+      "claim": "tag v0.11.0 is 619d5405",
+      "expected": "619d5405e80da61788448a7a0eeacc7c5eb3d0c0",
+      "id": "tag:v0.11.0",
+      "ok": true,
+      "section": "pins"
+    },
+    {
+      "actual": "84133a42e61c3075a4d5ff6bea0dbe688a85fbd0",
+      "claim": "mneme/ tree at 101f3f42 is the v0.11.0 tree",
+      "expected": "84133a42e61c3075a4d5ff6bea0dbe688a85fbd0",
+      "id": "tree:101f3f42=v0.11.0",
+      "ok": true,
+      "section": "pins"
+    },
+    {
+      "actual": "0632b00ebdb2da074ff52533dda9d0258346e4a2",
+      "claim": "tests/canonical_fixtures.py blob identical at 101f3f42 and v0.11.0",
+      "expected": "0632b00ebdb2da074ff52533dda9d0258346e4a2",
+      "id": "tree:fixture-builder",
+      "ok": true,
+      "section": "pins"
+    },
+    {
+      "actual": "84133a42e61c3075a4d5ff6bea0dbe688a85fbd0",
+      "claim": "runtime root HEAD carries the v0.11.0 mneme/ tree",
+      "expected": "84133a42e61c3075a4d5ff6bea0dbe688a85fbd0",
+      "id": "runtime-root:tree",
+      "ok": true,
+      "section": "pins"
+    },
+    {
+      "actual": "",
+      "claim": "runtime root has no changes or untracked files under mneme/ or tests/",
+      "expected": "",
+      "id": "runtime-root:clean",
+      "ok": true,
+      "section": "pins"
+    },
+    {
+      "actual": "4c669436199643458ae11fe7991ccfaa5b1a6e03",
+      "claim": "fixture memory file hashes to blob 4c669436",
+      "expected": "4c669436199643458ae11fe7991ccfaa5b1a6e03",
+      "id": "memory:blob",
+      "ok": true,
+      "section": "pins"
+    },
+    {
+      "actual": "4c669436199643458ae11fe7991ccfaa5b1a6e03",
+      "claim": "the committed tree carries the same blob",
+      "expected": "4c669436199643458ae11fe7991ccfaa5b1a6e03",
+      "id": "memory:committed",
+      "ok": true,
+      "section": "pins"
+    },
+    {
+      "actual": "5feedf60ce1a67b2bb85673354c8b8b367a87d06",
+      "claim": "adapter blob at c51729f7",
+      "expected": "5feedf60ce1a67b2bb85673354c8b8b367a87d06",
+      "id": "adapter:blob",
+      "ok": true,
+      "section": "pins"
+    },
+    {
+      "actual": "afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9",
+      "claim": "adapter blob content sha256",
+      "expected": "afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9",
+      "id": "adapter:sha256",
+      "ok": true,
+      "section": "pins"
+    },
+    {
+      "actual": 0,
+      "claim": "0b74d410 is an ancestor of v0.11.0 (older evaluator)",
+      "expected": 0,
+      "id": "evaluator:ancestor",
+      "ok": true,
+      "section": "pins"
+    },
+    {
+      "actual": "e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51",
+      "claim": "preserved wheel sha256 equals the approved pin",
+      "expected": "e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51",
+      "id": "wheel:sha256",
+      "ok": true,
+      "section": "pins"
+    },
+    {
+      "actual": {
+        "members": 108,
+        "mismatched": [],
+        "set_equal": true
+      },
+      "claim": "every mneme/ file in the wheel is byte-identical to the 0b74d410 tree, and the sets match",
+      "expected": {
+        "members": 108,
+        "mismatched": [],
+        "set_equal": true
+      },
+      "id": "wheel:source-tree",
+      "ok": true,
+      "section": "pins"
+    },
+    {
+      "actual": "0.10.0",
+      "claim": "wheel metadata version",
+      "expected": "0.10.0",
+      "id": "wheel:version",
+      "ok": true,
+      "section": "pins"
+    },
+    {
+      "actual": true,
+      "claim": "local image is addressed by the pinned digest",
+      "expected": true,
+      "id": "image:digest",
+      "ok": true,
+      "section": "pins"
+    },
+    {
+      "actual": [
+        "Ubuntu 24.04.5 LTS",
+        "no-python3"
+      ],
+      "claim": "pinned image OS, and whether it ships Python itself",
+      "expected": [
+        "Ubuntu 24.04.5 LTS",
+        "no-python3"
+      ],
+      "id": "image:os",
+      "note": "python3/git come from the live Ubuntu archive at run time (not hash-pinned)",
+      "ok": true,
+      "section": "pins"
+    },
+    {
+      "actual": true,
+      "claim": "mneme imported from the pinned runtime root",
+      "expected": true,
+      "id": "import:in-process",
+      "ok": true,
+      "section": "A"
+    },
+    {
+      "actual": true,
+      "claim": "checker subprocess imports the pinned runtime from a neutral cwd",
+      "expected": true,
+      "id": "import:checker-subprocess",
+      "ok": true,
+      "section": "A"
+    },
+    {
+      "actual": true,
+      "claim": "from a cwd that contains a mneme/ package, the checker subprocess imports THAT package",
+      "expected": true,
+      "id": "O-3:shadowing",
+      "note": "O-3 reproduced as an observation; no runtime change",
+      "ok": true,
+      "section": "A"
+    },
+    {
+      "actual": {
+        "action": "allow",
+        "after": "37c6e073132ff07d89b1bb134cb04647ba1fa8bc93af0420a5a7ea4a6b82c314",
+        "handler_called": true,
+        "subject_in_payload": false
+      },
+      "claim": "neutral content is allowed, handler runs, file holds exactly the attempted bytes",
+      "expected": {
+        "action": "allow",
+        "after": "37c6e073132ff07d89b1bb134cb04647ba1fa8bc93af0420a5a7ea4a6b82c314",
+        "handler_called": true,
+        "subject_in_payload": false
+      },
+      "id": "A1:allow",
+      "ok": true,
+      "section": "A"
+    },
+    {
+      "actual": {
+        "action": "deny",
+        "after": null,
+        "applicability": "APPLIED",
+        "handler_called": false,
+        "marker": "[mneme] DENIED",
+        "verdict": "FAIL"
+      },
+      "claim": "forbidden new file is denied before the handler; target stays absent",
+      "expected": {
+        "action": "deny",
+        "after": null,
+        "applicability": "APPLIED",
+        "handler_called": false,
+        "marker": "[mneme] DENIED",
+        "verdict": "FAIL"
+      },
+      "id": "A2:deny",
+      "ok": true,
+      "section": "A"
+    },
+    {
+      "actual": false,
+      "claim": "the pre-mutation payload carries no subject record (dimension 2 not bound by Mneme)",
+      "expected": false,
+      "id": "A2:no-subject",
+      "ok": true,
+      "section": "A"
+    },
+    {
+      "actual": {
+        "action": "fail_open",
+        "after": "04f345752c8bda683102c0a6140347d117b7f223b85b58a093f13635c7bd735a",
+        "applicability": "UNKNOWN",
+        "evaluation_complete": false,
+        "handler_called": true,
+        "marker": "[mneme] UNEVALUATED"
+      },
+      "claim": "target outside the policy root: UNKNOWN, fail_open, the forbidden write proceeds (O-1, unchanged)",
+      "expected": {
+        "action": "fail_open",
+        "after": "04f345752c8bda683102c0a6140347d117b7f223b85b58a093f13635c7bd735a",
+        "applicability": "UNKNOWN",
+        "evaluation_complete": false,
+        "handler_called": true,
+        "marker": "[mneme] UNEVALUATED"
+      },
+      "id": "A4:O-1",
+      "ok": true,
+      "section": "A"
+    },
+    {
+      "actual": true,
+      "claim": "the checker DID run and returned a payload (so 'not executed' is a label, not a fact)",
+      "expected": true,
+      "id": "A4:payload",
+      "ok": true,
+      "section": "A"
+    },
+    {
+      "actual": {
+        "base": "978de46e3e3223b466ed3b0667f37d11296796ee",
+        "file_sha256": "37c6e073132ff07d89b1bb134cb04647ba1fa8bc93af0420a5a7ea4a6b82c314",
+        "head": "e7b90432d1fc63592f80ed7bc01e2ca920342ae5",
+        "memory": [
+          "4c669436199643458ae11fe7991ccfaa5b1a6e03",
+          "978de46e3e3223b466ed3b0667f37d11296796ee",
+          "62f8eae564731e733ad95c97c048a84b2a1c9b9b12bb42cc8fdcf432c75abec7"
+        ],
+        "merge_base": "978de46e3e3223b466ed3b0667f37d11296796ee",
+        "mode": "100644",
+        "path": "docs/guide.md"
+      },
+      "claim": "report SHAs, path, mode, content digest and memory blob agree with the independently rebuilt repo",
+      "expected": {
+        "base": "978de46e3e3223b466ed3b0667f37d11296796ee",
+        "file_sha256": "37c6e073132ff07d89b1bb134cb04647ba1fa8bc93af0420a5a7ea4a6b82c314",
+        "head": "e7b90432d1fc63592f80ed7bc01e2ca920342ae5",
+        "memory": [
+          "4c669436199643458ae11fe7991ccfaa5b1a6e03",
+          "978de46e3e3223b466ed3b0667f37d11296796ee",
+          "62f8eae564731e733ad95c97c048a84b2a1c9b9b12bb42cc8fdcf432c75abec7"
+        ],
+        "merge_base": "978de46e3e3223b466ed3b0667f37d11296796ee",
+        "mode": "100644",
+        "path": "docs/guide.md"
+      },
+      "id": "B1_allow:git-binding",
+      "ok": true,
+      "section": "F"
+    },
+    {
+      "actual": [
+        "afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9",
+        "0b74d410b45e7b3efcf08d00ce58e7bd7017b757",
+        "e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51",
+        "closed",
+        "strict"
+      ],
+      "claim": "report carries the pinned adapter and evaluator",
+      "expected": [
+        "afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9",
+        "0b74d410b45e7b3efcf08d00ce58e7bd7017b757",
+        "e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51",
+        "closed",
+        "strict"
+      ],
+      "id": "B1_allow:pins",
+      "ok": true,
+      "section": "F"
+    },
+    {
+      "actual": {
+        "base": "978de46e3e3223b466ed3b0667f37d11296796ee",
+        "file_sha256": "04f345752c8bda683102c0a6140347d117b7f223b85b58a093f13635c7bd735a",
+        "head": "99bdbccb6386da15d53e37308e7ac9dba753a770",
+        "memory": [
+          "4c669436199643458ae11fe7991ccfaa5b1a6e03",
+          "978de46e3e3223b466ed3b0667f37d11296796ee",
+          "62f8eae564731e733ad95c97c048a84b2a1c9b9b12bb42cc8fdcf432c75abec7"
+        ],
+        "merge_base": "978de46e3e3223b466ed3b0667f37d11296796ee",
+        "mode": "100644",
+        "path": "docs/install.md"
+      },
+      "claim": "report SHAs, path, mode, content digest and memory blob agree with the independently rebuilt repo",
+      "expected": {
+        "base": "978de46e3e3223b466ed3b0667f37d11296796ee",
+        "file_sha256": "04f345752c8bda683102c0a6140347d117b7f223b85b58a093f13635c7bd735a",
+        "head": "99bdbccb6386da15d53e37308e7ac9dba753a770",
+        "memory": [
+          "4c669436199643458ae11fe7991ccfaa5b1a6e03",
+          "978de46e3e3223b466ed3b0667f37d11296796ee",
+          "62f8eae564731e733ad95c97c048a84b2a1c9b9b12bb42cc8fdcf432c75abec7"
+        ],
+        "merge_base": "978de46e3e3223b466ed3b0667f37d11296796ee",
+        "mode": "100644",
+        "path": "docs/install.md"
+      },
+      "id": "B2_bypass_violation:git-binding",
+      "ok": true,
+      "section": "F"
+    },
+    {
+      "actual": [
+        "afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9",
+        "0b74d410b45e7b3efcf08d00ce58e7bd7017b757",
+        "e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51",
+        "closed",
+        "strict"
+      ],
+      "claim": "report carries the pinned adapter and evaluator",
+      "expected": [
+        "afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9",
+        "0b74d410b45e7b3efcf08d00ce58e7bd7017b757",
+        "e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51",
+        "closed",
+        "strict"
+      ],
+      "id": "B2_bypass_violation:pins",
+      "ok": true,
+      "section": "F"
+    },
+    {
+      "actual": {
+        "base": "978de46e3e3223b466ed3b0667f37d11296796ee",
+        "head": "1729a0ab8a62ba3e70f424119b56ae24e81eeafa",
+        "merge_base": "978de46e3e3223b466ed3b0667f37d11296796ee",
+        "mode": "120000",
+        "path": "docs/link.md"
+      },
+      "claim": "report SHAs, path, mode, content digest and memory blob agree with the independently rebuilt repo",
+      "expected": {
+        "base": "978de46e3e3223b466ed3b0667f37d11296796ee",
+        "head": "1729a0ab8a62ba3e70f424119b56ae24e81eeafa",
+        "merge_base": "978de46e3e3223b466ed3b0667f37d11296796ee",
+        "mode": "120000",
+        "path": "docs/link.md"
+      },
+      "id": "B3_incomplete_symlink:git-binding",
+      "ok": true,
+      "section": "F"
+    },
+    {
+      "actual": [
+        "afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9",
+        "0b74d410b45e7b3efcf08d00ce58e7bd7017b757",
+        "e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51",
+        "closed",
+        "strict"
+      ],
+      "claim": "report carries the pinned adapter and evaluator",
+      "expected": [
+        "afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9",
+        "0b74d410b45e7b3efcf08d00ce58e7bd7017b757",
+        "e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51",
+        "closed",
+        "strict"
+      ],
+      "id": "B3_incomplete_symlink:pins",
+      "ok": true,
+      "section": "F"
+    },
+    {
+      "actual": {
+        "base": "cff670b109e47884675de511b04f1a1ab89c815f",
+        "file_sha256": "04f345752c8bda683102c0a6140347d117b7f223b85b58a093f13635c7bd735a",
+        "head": "d7e9451f6483b1b6dbd9a804334bbd577324dac0",
+        "memory": [
+          "65d9f95daa5b146564638ca7c67eea0281ea9fcf",
+          "cff670b109e47884675de511b04f1a1ab89c815f",
+          "2982e94aa794c1c9ef8d1551964de71cdfd48ecde87024e6f2081d32519ad065"
+        ],
+        "merge_base": "cff670b109e47884675de511b04f1a1ab89c815f",
+        "mode": "100644",
+        "path": "docs/install.md"
+      },
+      "claim": "report SHAs, path, mode, content digest and memory blob agree with the independently rebuilt repo",
+      "expected": {
+        "base": "cff670b109e47884675de511b04f1a1ab89c815f",
+        "file_sha256": "04f345752c8bda683102c0a6140347d117b7f223b85b58a093f13635c7bd735a",
+        "head": "d7e9451f6483b1b6dbd9a804334bbd577324dac0",
+        "memory": [
+          "65d9f95daa5b146564638ca7c67eea0281ea9fcf",
+          "cff670b109e47884675de511b04f1a1ab89c815f",
+          "2982e94aa794c1c9ef8d1551964de71cdfd48ecde87024e6f2081d32519ad065"
+        ],
+        "merge_base": "cff670b109e47884675de511b04f1a1ab89c815f",
+        "mode": "100644",
+        "path": "docs/install.md"
+      },
+      "id": "B4_missing_identity:git-binding",
+      "ok": true,
+      "section": "F"
+    },
+    {
+      "actual": [
+        "afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9",
+        "0b74d410b45e7b3efcf08d00ce58e7bd7017b757",
+        "e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51",
+        "closed",
+        "strict"
+      ],
+      "claim": "report carries the pinned adapter and evaluator",
+      "expected": [
+        "afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9",
+        "0b74d410b45e7b3efcf08d00ce58e7bd7017b757",
+        "e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51",
+        "closed",
+        "strict"
+      ],
+      "id": "B4_missing_identity:pins",
+      "ok": true,
+      "section": "F"
+    },
+    {
+      "actual": {
+        "base": "e7b90432d1fc63592f80ed7bc01e2ca920342ae5",
+        "file_sha256": "424fb9f4eaaf742b24a30dfd3b62cbacbc02f31cfeca011690696830d2e343f5",
+        "head": "f77bd0f8ed87cc61eff0aa7b04d10355e3ac7e30",
+        "memory": [
+          "4c669436199643458ae11fe7991ccfaa5b1a6e03",
+          "e7b90432d1fc63592f80ed7bc01e2ca920342ae5",
+          "62f8eae564731e733ad95c97c048a84b2a1c9b9b12bb42cc8fdcf432c75abec7"
+        ],
+        "merge_base": "e7b90432d1fc63592f80ed7bc01e2ca920342ae5",
+        "mode": "100644",
+        "path": "docs/guide.md"
+      },
+      "claim": "report SHAs, path, mode, content digest and memory blob agree with the independently rebuilt repo",
+      "expected": {
+        "base": "e7b90432d1fc63592f80ed7bc01e2ca920342ae5",
+        "file_sha256": "424fb9f4eaaf742b24a30dfd3b62cbacbc02f31cfeca011690696830d2e343f5",
+        "head": "f77bd0f8ed87cc61eff0aa7b04d10355e3ac7e30",
+        "memory": [
+          "4c669436199643458ae11fe7991ccfaa5b1a6e03",
+          "e7b90432d1fc63592f80ed7bc01e2ca920342ae5",
+          "62f8eae564731e733ad95c97c048a84b2a1c9b9b12bb42cc8fdcf432c75abec7"
+        ],
+        "merge_base": "e7b90432d1fc63592f80ed7bc01e2ca920342ae5",
+        "mode": "100644",
+        "path": "docs/guide.md"
+      },
+      "id": "B5_later_revision:git-binding",
+      "ok": true,
+      "section": "F"
+    },
+    {
+      "actual": [
+        "afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9",
+        "0b74d410b45e7b3efcf08d00ce58e7bd7017b757",
+        "e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51",
+        "closed",
+        "strict"
+      ],
+      "claim": "report carries the pinned adapter and evaluator",
+      "expected": [
+        "afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9",
+        "0b74d410b45e7b3efcf08d00ce58e7bd7017b757",
+        "e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51",
+        "closed",
+        "strict"
+      ],
+      "id": "B5_later_revision:pins",
+      "ok": true,
+      "section": "F"
+    },
+    {
+      "actual": [
+        "ADR-901",
+        "dver-d3d431ff6d5edba8b555a040a7b85f9b",
+        "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b"
+      ],
+      "claim": "checkpoint A (v0.11.0) and the CI report (0b74d410) name the same full identity",
+      "expected": [
+        "ADR-901",
+        "dver-d3d431ff6d5edba8b555a040a7b85f9b",
+        "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b"
+      ],
+      "id": "identity:cross-evaluator",
+      "ok": true,
+      "section": "F"
+    },
+    {
+      "actual": [
+        0,
+        "{\"schema\": \"mneme.check/v1\", \"verdict\": \"PASS\", \"mode\": \"strict\", \"evaluation_complete\": true, \"applicability\": [{\"decision_id\": \"ADR-901\", \"rule_type\": \"FORBID_LITERAL\", \"rule_value\": \"install legacy-client\", \"rule_index\": 0, \"path_scoped\": true, \"input_path\": \"docs/guide.md\", \"outcome\": \"APPLIED\", \"selector\": \"docs/**\", \"reason\": \"an include selector matched\", \"rule_id\": \"ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b\", \"decision_version_id\": \"dver-d3d431ff6d5edba8b555a040a7b85f9b\"}], \"violations\": [], \"freshness\": [{\"code\": \"ADR_MISSING\", \"adr_id\": \"ADR-901\", \"message\": \"Decision ADR-901 references ADR source adr/ADR-901-ci1-fixture-scoped-installer.md but that file does not exist. Either restore the file or remove the decision.\", \"path\": \"adr/ADR-901-ci1-fixture-scoped-installer.md\"}]}\n"
+      ],
+      "claim": "a fresh 0b74d410 evaluator run reproduces the report's raw stdout and exit",
+      "expected": [
+        0,
+        "{\"schema\": \"mneme.check/v1\", \"verdict\": \"PASS\", \"mode\": \"strict\", \"evaluation_complete\": true, \"applicability\": [{\"decision_id\": \"ADR-901\", \"rule_type\": \"FORBID_LITERAL\", \"rule_value\": \"install legacy-client\", \"rule_index\": 0, \"path_scoped\": true, \"input_path\": \"docs/guide.md\", \"outcome\": \"APPLIED\", \"selector\": \"docs/**\", \"reason\": \"an include selector matched\", \"rule_id\": \"ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b\", \"decision_version_id\": \"dver-d3d431ff6d5edba8b555a040a7b85f9b\"}], \"violations\": [], \"freshness\": [{\"code\": \"ADR_MISSING\", \"adr_id\": \"ADR-901\", \"message\": \"Decision ADR-901 references ADR source adr/ADR-901-ci1-fixture-scoped-installer.md but that file does not exist. Either restore the file or remove the decision.\", \"path\": \"adr/ADR-901-ci1-fixture-scoped-installer.md\"}]}\n"
+      ],
+      "id": "B1_allow:0b74d410-stdout",
+      "ok": true,
+      "section": "E"
+    },
+    {
+      "actual": [
+        "PASS",
+        [
+          [
+            "ADR-901",
+            "dver-d3d431ff6d5edba8b555a040a7b85f9b",
+            "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b",
+            "APPLIED"
+          ]
+        ],
+        false
+      ],
+      "claim": "v0.11.0 gives the same verdict, identity and applicability (this memory only)",
+      "expected": [
+        "PASS",
+        [
+          [
+            "ADR-901",
+            "dver-d3d431ff6d5edba8b555a040a7b85f9b",
+            "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b",
+            "APPLIED"
+          ]
+        ],
+        false
+      ],
+      "id": "B1_allow:v0.11.0-agrees",
+      "ok": true,
+      "section": "E"
+    },
+    {
+      "actual": [
+        2,
+        "{\"schema\": \"mneme.check/v1\", \"verdict\": \"FAIL\", \"mode\": \"strict\", \"evaluation_complete\": true, \"applicability\": [{\"decision_id\": \"ADR-901\", \"rule_type\": \"FORBID_LITERAL\", \"rule_value\": \"install legacy-client\", \"rule_index\": 0, \"path_scoped\": true, \"input_path\": \"docs/install.md\", \"outcome\": \"APPLIED\", \"selector\": \"docs/**\", \"reason\": \"an include selector matched\", \"rule_id\": \"ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b\", \"decision_version_id\": \"dver-d3d431ff6d5edba8b555a040a7b85f9b\"}], \"violations\": [{\"decision_id\": \"ADR-901\", \"decision_text\": \"CI1 fixture - forbid the legacy client installer in documentation\", \"severity\": \"FAIL\", \"rule\": \"install legacy-client\", \"trigger\": \"install legacy-client\", \"kind\": \"typed_rule\", \"rule_type\": \"FORBID_LITERAL\", \"input_path\": \"docs/install.md\", \"selector\": \"docs/**\", \"rule_id\": \"ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b\", \"decision_version_id\": \"dver-d3d431ff6d5edba8b555a040a7b85f9b\"}], \"freshness\": [{\"code\": \"ADR_MISSING\", \"adr_id\": \"ADR-901\", \"message\": \"Decision ADR-901 references ADR source adr/ADR-901-ci1-fixture-scoped-installer.md but that file does not exist. Either restore the file or remove the decision.\", \"path\": \"adr/ADR-901-ci1-fixture-scoped-installer.md\"}]}\n"
+      ],
+      "claim": "a fresh 0b74d410 evaluator run reproduces the report's raw stdout and exit",
+      "expected": [
+        2,
+        "{\"schema\": \"mneme.check/v1\", \"verdict\": \"FAIL\", \"mode\": \"strict\", \"evaluation_complete\": true, \"applicability\": [{\"decision_id\": \"ADR-901\", \"rule_type\": \"FORBID_LITERAL\", \"rule_value\": \"install legacy-client\", \"rule_index\": 0, \"path_scoped\": true, \"input_path\": \"docs/install.md\", \"outcome\": \"APPLIED\", \"selector\": \"docs/**\", \"reason\": \"an include selector matched\", \"rule_id\": \"ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b\", \"decision_version_id\": \"dver-d3d431ff6d5edba8b555a040a7b85f9b\"}], \"violations\": [{\"decision_id\": \"ADR-901\", \"decision_text\": \"CI1 fixture - forbid the legacy client installer in documentation\", \"severity\": \"FAIL\", \"rule\": \"install legacy-client\", \"trigger\": \"install legacy-client\", \"kind\": \"typed_rule\", \"rule_type\": \"FORBID_LITERAL\", \"input_path\": \"docs/install.md\", \"selector\": \"docs/**\", \"rule_id\": \"ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b\", \"decision_version_id\": \"dver-d3d431ff6d5edba8b555a040a7b85f9b\"}], \"freshness\": [{\"code\": \"ADR_MISSING\", \"adr_id\": \"ADR-901\", \"message\": \"Decision ADR-901 references ADR source adr/ADR-901-ci1-fixture-scoped-installer.md but that file does not exist. Either restore the file or remove the decision.\", \"path\": \"adr/ADR-901-ci1-fixture-scoped-installer.md\"}]}\n"
+      ],
+      "id": "B2_bypass_violation:0b74d410-stdout",
+      "ok": true,
+      "section": "E"
+    },
+    {
+      "actual": [
+        "FAIL",
+        [
+          [
+            "ADR-901",
+            "dver-d3d431ff6d5edba8b555a040a7b85f9b",
+            "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b",
+            "APPLIED"
+          ]
+        ],
+        false
+      ],
+      "claim": "v0.11.0 gives the same verdict, identity and applicability (this memory only)",
+      "expected": [
+        "FAIL",
+        [
+          [
+            "ADR-901",
+            "dver-d3d431ff6d5edba8b555a040a7b85f9b",
+            "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b",
+            "APPLIED"
+          ]
+        ],
+        false
+      ],
+      "id": "B2_bypass_violation:v0.11.0-agrees",
+      "ok": true,
+      "section": "E"
+    },
+    {
+      "actual": "UNEVALUATED",
+      "claim": "the gate classified the entry before any evaluation",
+      "expected": "UNEVALUATED",
+      "id": "B3_incomplete_symlink:not-evaluated",
+      "ok": true,
+      "section": "E"
+    },
+    {
+      "actual": [
+        2,
+        "{\"schema\": \"mneme.check/v1\", \"verdict\": \"FAIL\", \"mode\": \"strict\", \"evaluation_complete\": true, \"applicability\": [{\"decision_id\": \"ADR-901\", \"rule_type\": \"FORBID_LITERAL\", \"rule_value\": \"install legacy-client\", \"rule_index\": 0, \"path_scoped\": true, \"input_path\": \"docs/install.md\", \"outcome\": \"APPLIED\", \"selector\": \"docs/**\", \"reason\": \"an include selector matched\", \"rule_id\": \"ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b\", \"decision_version_id\": \"\"}], \"violations\": [{\"decision_id\": \"ADR-901\", \"decision_text\": \"CI1 fixture - forbid the legacy client installer in documentation\", \"severity\": \"FAIL\", \"rule\": \"install legacy-client\", \"trigger\": \"install legacy-client\", \"kind\": \"typed_rule\", \"rule_type\": \"FORBID_LITERAL\", \"input_path\": \"docs/install.md\", \"selector\": \"docs/**\", \"rule_id\": \"ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b\", \"decision_version_id\": \"\"}], \"freshness\": [{\"code\": \"ADR_MISSING\", \"adr_id\": \"ADR-901\", \"message\": \"Decision ADR-901 references ADR source adr/ADR-901-ci1-fixture-scoped-installer.md but that file does not exist. Either restore the file or remove the decision.\", \"path\": \"adr/ADR-901-ci1-fixture-scoped-installer.md\"}]}\n"
+      ],
+      "claim": "a fresh 0b74d410 evaluator run reproduces the report's raw stdout and exit",
+      "expected": [
+        2,
+        "{\"schema\": \"mneme.check/v1\", \"verdict\": \"FAIL\", \"mode\": \"strict\", \"evaluation_complete\": true, \"applicability\": [{\"decision_id\": \"ADR-901\", \"rule_type\": \"FORBID_LITERAL\", \"rule_value\": \"install legacy-client\", \"rule_index\": 0, \"path_scoped\": true, \"input_path\": \"docs/install.md\", \"outcome\": \"APPLIED\", \"selector\": \"docs/**\", \"reason\": \"an include selector matched\", \"rule_id\": \"ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b\", \"decision_version_id\": \"\"}], \"violations\": [{\"decision_id\": \"ADR-901\", \"decision_text\": \"CI1 fixture - forbid the legacy client installer in documentation\", \"severity\": \"FAIL\", \"rule\": \"install legacy-client\", \"trigger\": \"install legacy-client\", \"kind\": \"typed_rule\", \"rule_type\": \"FORBID_LITERAL\", \"input_path\": \"docs/install.md\", \"selector\": \"docs/**\", \"rule_id\": \"ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b\", \"decision_version_id\": \"\"}], \"freshness\": [{\"code\": \"ADR_MISSING\", \"adr_id\": \"ADR-901\", \"message\": \"Decision ADR-901 references ADR source adr/ADR-901-ci1-fixture-scoped-installer.md but that file does not exist. Either restore the file or remove the decision.\", \"path\": \"adr/ADR-901-ci1-fixture-scoped-installer.md\"}]}\n"
+      ],
+      "id": "B4_missing_identity:0b74d410-stdout",
+      "ok": true,
+      "section": "E"
+    },
+    {
+      "actual": [
+        "FAIL",
+        [
+          [
+            "ADR-901",
+            "",
+            "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b",
+            "APPLIED"
+          ]
+        ],
+        false
+      ],
+      "claim": "v0.11.0 gives the same verdict, identity and applicability (this memory only)",
+      "expected": [
+        "FAIL",
+        [
+          [
+            "ADR-901",
+            "",
+            "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b",
+            "APPLIED"
+          ]
+        ],
+        false
+      ],
+      "id": "B4_missing_identity:v0.11.0-agrees",
+      "ok": true,
+      "section": "E"
+    },
+    {
+      "actual": [
+        0,
+        "{\"schema\": \"mneme.check/v1\", \"verdict\": \"PASS\", \"mode\": \"strict\", \"evaluation_complete\": true, \"applicability\": [{\"decision_id\": \"ADR-901\", \"rule_type\": \"FORBID_LITERAL\", \"rule_value\": \"install legacy-client\", \"rule_index\": 0, \"path_scoped\": true, \"input_path\": \"docs/guide.md\", \"outcome\": \"APPLIED\", \"selector\": \"docs/**\", \"reason\": \"an include selector matched\", \"rule_id\": \"ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b\", \"decision_version_id\": \"dver-d3d431ff6d5edba8b555a040a7b85f9b\"}], \"violations\": [], \"freshness\": [{\"code\": \"ADR_MISSING\", \"adr_id\": \"ADR-901\", \"message\": \"Decision ADR-901 references ADR source adr/ADR-901-ci1-fixture-scoped-installer.md but that file does not exist. Either restore the file or remove the decision.\", \"path\": \"adr/ADR-901-ci1-fixture-scoped-installer.md\"}]}\n"
+      ],
+      "claim": "a fresh 0b74d410 evaluator run reproduces the report's raw stdout and exit",
+      "expected": [
+        0,
+        "{\"schema\": \"mneme.check/v1\", \"verdict\": \"PASS\", \"mode\": \"strict\", \"evaluation_complete\": true, \"applicability\": [{\"decision_id\": \"ADR-901\", \"rule_type\": \"FORBID_LITERAL\", \"rule_value\": \"install legacy-client\", \"rule_index\": 0, \"path_scoped\": true, \"input_path\": \"docs/guide.md\", \"outcome\": \"APPLIED\", \"selector\": \"docs/**\", \"reason\": \"an include selector matched\", \"rule_id\": \"ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b\", \"decision_version_id\": \"dver-d3d431ff6d5edba8b555a040a7b85f9b\"}], \"violations\": [], \"freshness\": [{\"code\": \"ADR_MISSING\", \"adr_id\": \"ADR-901\", \"message\": \"Decision ADR-901 references ADR source adr/ADR-901-ci1-fixture-scoped-installer.md but that file does not exist. Either restore the file or remove the decision.\", \"path\": \"adr/ADR-901-ci1-fixture-scoped-installer.md\"}]}\n"
+      ],
+      "id": "B5_later_revision:0b74d410-stdout",
+      "ok": true,
+      "section": "E"
+    },
+    {
+      "actual": [
+        "PASS",
+        [
+          [
+            "ADR-901",
+            "dver-d3d431ff6d5edba8b555a040a7b85f9b",
+            "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b",
+            "APPLIED"
+          ]
+        ],
+        false
+      ],
+      "claim": "v0.11.0 gives the same verdict, identity and applicability (this memory only)",
+      "expected": [
+        "PASS",
+        [
+          [
+            "ADR-901",
+            "dver-d3d431ff6d5edba8b555a040a7b85f9b",
+            "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b",
+            "APPLIED"
+          ]
+        ],
+        false
+      ],
+      "id": "B5_later_revision:v0.11.0-agrees",
+      "ok": true,
+      "section": "E"
+    },
+    {
+      "actual": 0,
+      "claim": "own container replay completed",
+      "expected": 0,
+      "id": "container:ran",
+      "ok": true,
+      "section": "R"
+    },
+    {
+      "actual": "Python 3.12.3",
+      "claim": "gate Python and apt packages actually used (unpinned, recorded)",
+      "expected": "Python 3.12.3",
+      "id": "container:runtime",
+      "note": "git 1:2.43.0-1ubuntu7.4\npython3.12 3.12.3-1ubuntu0.17\npython3.12-venv 3.12.3-1ubuntu0.17",
+      "ok": true,
+      "section": "R"
+    },
+    {
+      "actual": [
+        "aa20080ca873aa9c783c2df541374a5f58315b2570820932f619a126a49c8c53",
+        []
+      ],
+      "claim": "own container replay report is byte-identical to the committed raw report (venv path /tmp/evaluator/bin/python is a recorded input)",
+      "expected": [
+        "aa20080ca873aa9c783c2df541374a5f58315b2570820932f619a126a49c8c53",
+        []
+      ],
+      "id": "B1_allow:byte-identical",
+      "ok": true,
+      "section": "R"
+    },
+    {
+      "actual": [
+        0,
+        0,
+        0,
+        []
+      ],
+      "claim": "verify-report on the committed report, inside the pinned image with the gate's own Python",
+      "expected": [
+        0,
+        0,
+        0,
+        []
+      ],
+      "id": "B1_allow:verify-in-gate-python",
+      "ok": true,
+      "section": "R"
+    },
+    {
+      "actual": [
+        "1e6a548a9936a4774ee6444756bd0e58bf1c78a0dc056e1b6827eaf9ee3f02eb",
+        []
+      ],
+      "claim": "own container replay report is byte-identical to the committed raw report (venv path /tmp/evaluator/bin/python is a recorded input)",
+      "expected": [
+        "1e6a548a9936a4774ee6444756bd0e58bf1c78a0dc056e1b6827eaf9ee3f02eb",
+        []
+      ],
+      "id": "B2_bypass_violation:byte-identical",
+      "ok": true,
+      "section": "R"
+    },
+    {
+      "actual": [
+        1,
+        1,
+        1,
+        [
+          "required check fails: VIOLATION under availability closed"
+        ]
+      ],
+      "claim": "verify-report on the committed report, inside the pinned image with the gate's own Python",
+      "expected": [
+        1,
+        1,
+        1,
+        [
+          "required check fails: VIOLATION under availability closed"
+        ]
+      ],
+      "id": "B2_bypass_violation:verify-in-gate-python",
+      "ok": true,
+      "section": "R"
+    },
+    {
+      "actual": [
+        "828fda97d73303bcb37b71d14c4541b45e05da58d3795a3bc1b14be50e8e3cb2",
+        []
+      ],
+      "claim": "own container replay report is byte-identical to the committed raw report (venv path /tmp/evaluator/bin/python is a recorded input)",
+      "expected": [
+        "828fda97d73303bcb37b71d14c4541b45e05da58d3795a3bc1b14be50e8e3cb2",
+        []
+      ],
+      "id": "B3_incomplete_symlink:byte-identical",
+      "ok": true,
+      "section": "R"
+    },
+    {
+      "actual": [
+        1,
+        1,
+        1,
+        [
+          "required check fails: UNEVALUATED under availability closed"
+        ]
+      ],
+      "claim": "verify-report on the committed report, inside the pinned image with the gate's own Python",
+      "expected": [
+        1,
+        1,
+        1,
+        [
+          "required check fails: UNEVALUATED under availability closed"
+        ]
+      ],
+      "id": "B3_incomplete_symlink:verify-in-gate-python",
+      "ok": true,
+      "section": "R"
+    },
+    {
+      "actual": [
+        "b5165cae433f37c876893b8a6c68d5f07d6d57628e38c1da24915bb8724f8b68",
+        []
+      ],
+      "claim": "own container replay report is byte-identical to the committed raw report (venv path /tmp/evaluator/bin/python is a recorded input)",
+      "expected": [
+        "b5165cae433f37c876893b8a6c68d5f07d6d57628e38c1da24915bb8724f8b68",
+        []
+      ],
+      "id": "B4_missing_identity:byte-identical",
+      "ok": true,
+      "section": "R"
+    },
+    {
+      "actual": [
+        1,
+        1,
+        1,
+        [
+          "required check fails: VIOLATION under availability closed"
+        ]
+      ],
+      "claim": "verify-report on the committed report, inside the pinned image with the gate's own Python",
+      "expected": [
+        1,
+        1,
+        1,
+        [
+          "required check fails: VIOLATION under availability closed"
+        ]
+      ],
+      "id": "B4_missing_identity:verify-in-gate-python",
+      "ok": true,
+      "section": "R"
+    },
+    {
+      "actual": [
+        "4b1ad542718dbba6dfff327c7eea86c6698dcd246e117db59a2960c39308c0af",
+        []
+      ],
+      "claim": "own container replay report is byte-identical to the committed raw report (venv path /tmp/evaluator/bin/python is a recorded input)",
+      "expected": [
+        "4b1ad542718dbba6dfff327c7eea86c6698dcd246e117db59a2960c39308c0af",
+        []
+      ],
+      "id": "B5_later_revision:byte-identical",
+      "ok": true,
+      "section": "R"
+    },
+    {
+      "actual": [
+        0,
+        0,
+        0,
+        []
+      ],
+      "claim": "verify-report on the committed report, inside the pinned image with the gate's own Python",
+      "expected": [
+        0,
+        0,
+        0,
+        []
+      ],
+      "id": "B5_later_revision:verify-in-gate-python",
+      "ok": true,
+      "section": "R"
+    },
+    {
+      "actual": [
+        0,
+        []
+      ],
+      "claim": "pinned adapter verify-report on the committed raw report: exit and exact problems",
+      "expected": [
+        0,
+        []
+      ],
+      "id": "B1_allow:verify-report",
+      "note": "adapter exit from own container run",
+      "ok": true,
+      "section": "C"
+    },
+    {
+      "actual": [
+        1,
+        [
+          "required check fails: VIOLATION under availability closed"
+        ]
+      ],
+      "claim": "pinned adapter verify-report on the committed raw report: exit and exact problems",
+      "expected": [
+        1,
+        [
+          "required check fails: VIOLATION under availability closed"
+        ]
+      ],
+      "id": "B2_bypass_violation:verify-report",
+      "note": "adapter exit from own container run",
+      "ok": true,
+      "section": "C"
+    },
+    {
+      "actual": [
+        1,
+        [
+          "required check fails: UNEVALUATED under availability closed"
+        ]
+      ],
+      "claim": "pinned adapter verify-report on the committed raw report: exit and exact problems",
+      "expected": [
+        1,
+        [
+          "required check fails: UNEVALUATED under availability closed"
+        ]
+      ],
+      "id": "B3_incomplete_symlink:verify-report",
+      "note": "adapter exit from own container run",
+      "ok": true,
+      "section": "C"
+    },
+    {
+      "actual": [
+        1,
+        [
+          "required check fails: VIOLATION under availability closed"
+        ]
+      ],
+      "claim": "pinned adapter verify-report on the committed raw report: exit and exact problems",
+      "expected": [
+        1,
+        [
+          "required check fails: VIOLATION under availability closed"
+        ]
+      ],
+      "id": "B4_missing_identity:verify-report",
+      "note": "adapter exit from own container run",
+      "ok": true,
+      "section": "C"
+    },
+    {
+      "actual": [
+        0,
+        []
+      ],
+      "claim": "pinned adapter verify-report on the committed raw report: exit and exact problems",
+      "expected": [
+        0,
+        []
+      ],
+      "id": "B5_later_revision:verify-report",
+      "note": "adapter exit from own container run",
+      "ok": true,
+      "section": "C"
+    },
+    {
+      "actual": [
+        1,
+        [
+          "report head_sha '99bdbccb6386da15d53e37308e7ac9dba753a770' != trusted 'e7b90432d1fc63592f80ed7bc01e2ca920342ae5'"
+        ]
+      ],
+      "claim": "B1 report presented for another head: refused",
+      "expected": [
+        1,
+        [
+          "report head_sha '99bdbccb6386da15d53e37308e7ac9dba753a770' != trusted 'e7b90432d1fc63592f80ed7bc01e2ca920342ae5'"
+        ]
+      ],
+      "id": "tamper:head",
+      "ok": true,
+      "section": "C"
+    },
+    {
+      "actual": [
+        1,
+        [
+          "report posture 'closed' != trusted posture 'open'"
+        ]
+      ],
+      "claim": "B1 report checked under trusted posture open: refused (posture mismatch)",
+      "expected": [
+        1,
+        [
+          "report posture 'closed' != trusted posture 'open'"
+        ]
+      ],
+      "id": "tamper:posture",
+      "ok": true,
+      "section": "C"
+    },
+    {
+      "actual": [
+        1,
+        [
+          "report evaluator_wheel_sha256 '0000000000000000000000000000000000000000000000000000000000000000' != trusted 'e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51'"
+        ]
+      ],
+      "claim": "B1 report claiming another wheel: refused",
+      "expected": [
+        1,
+        [
+          "report evaluator_wheel_sha256 '0000000000000000000000000000000000000000000000000000000000000000' != trusted 'e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51'"
+        ]
+      ],
+      "id": "tamper:wheel",
+      "ok": true,
+      "section": "C"
+    },
+    {
+      "actual": [
+        0,
+        []
+      ],
+      "claim": "B1 report with a different memory blob: ACCEPTED (verify-report does not bind configuration)",
+      "expected": [
+        0,
+        []
+      ],
+      "id": "tamper:memory",
+      "ok": true,
+      "section": "C"
+    },
+    {
+      "actual": [
+        0,
+        []
+      ],
+      "claim": "B1 report with a different file digest: ACCEPTED (verify-report does not bind the subject)",
+      "expected": [
+        0,
+        []
+      ],
+      "id": "tamper:subject",
+      "ok": true,
+      "section": "C"
+    },
+    {
+      "actual": [
+        0,
+        []
+      ],
+      "claim": "B2 report rewritten coherently to PASS while its raw stdout still says FAIL: ACCEPTED (verify-report recomputes from per-file classifications, not from evaluator output)",
+      "expected": [
+        0,
+        []
+      ],
+      "id": "tamper:flip",
+      "ok": true,
+      "section": "C"
+    },
+    {
+      "actual": "subprocess",
+      "claim": "the hook's default check transport is subprocess (step 2 used inprocess)",
+      "expected": "subprocess",
+      "id": "transport:default",
+      "ok": true,
+      "section": "H"
+    },
+    {
+      "actual": [
+        "S4-NUM:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096",
+        "dver-74d95a98c2ebc02c13090034b391d4ae",
+        "2bf5e8cf65512f96995f33b31aa23d647eba8095061a22ea910f4ce387a1b794"
+      ],
+      "claim": "a fresh `mneme check --proposed-new-file` names the same rule, version and subject",
+      "expected": [
+        "S4-NUM:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096",
+        "dver-74d95a98c2ebc02c13090034b391d4ae",
+        "2bf5e8cf65512f96995f33b31aa23d647eba8095061a22ea910f4ce387a1b794"
+      ],
+      "id": "H1:cli-cross-surface",
+      "ok": true,
+      "section": "H"
+    },
+    {
+      "actual": {
+        "1_control_provenance": true,
+        "2_subject": true,
+        "3_decision": true,
+        "4_rule": true,
+        "5_applicability": true,
+        "6_outcome": true
+      },
+      "claim": "subprocess-transport hook record binds all six dimensions for the numeric rule",
+      "expected": {
+        "1_control_provenance": true,
+        "2_subject": true,
+        "3_decision": true,
+        "4_rule": true,
+        "5_applicability": true,
+        "6_outcome": true
+      },
+      "id": "H1:dimensions",
+      "ok": true,
+      "section": "H"
+    },
+    {
+      "actual": [
+        2,
+        "refused",
+        {
+          "S4-NUM:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096": true
+        }
+      ],
+      "claim": "the hook itself refused (exit 2) and the function agrees",
+      "expected": [
+        2,
+        "refused",
+        {
+          "S4-NUM:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096": true
+        }
+      ],
+      "id": "H1:refusal",
+      "ok": true,
+      "section": "H"
+    },
+    {
+      "actual": [
+        0,
+        true,
+        {
+          "S4-NUM:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096": true
+        }
+      ],
+      "claim": "numeric allow is attributable: all six dimensions, function True, write proceeds",
+      "expected": [
+        0,
+        true,
+        {
+          "S4-NUM:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096": true
+        }
+      ],
+      "id": "H1b:allow",
+      "ok": true,
+      "section": "H"
+    },
+    {
+      "actual": [
+        true,
+        true
+      ],
+      "claim": "a revised decision text keeps rule_id and changes decision_version_id",
+      "expected": [
+        true,
+        true
+      ],
+      "id": "N-2:setup",
+      "ok": true,
+      "section": "H"
+    },
+    {
+      "actual": [
+        true,
+        false
+      ],
+      "claim": "claim names V2; function alone says True, full-identity reading fails (dim 3)",
+      "expected": [
+        true,
+        false
+      ],
+      "id": "N-2:wrong-version",
+      "note": "dimensions failing: ['3_decision']",
+      "ok": true,
+      "section": "H"
+    },
+    {
+      "actual": [
+        true,
+        false
+      ],
+      "claim": "claim about later content; function alone says True, subject reading fails (dim 2)",
+      "expected": [
+        true,
+        false
+      ],
+      "id": "N-2:stale-subject",
+      "note": "dimensions failing: ['2_subject']",
+      "ok": true,
+      "section": "H"
+    },
+    {
+      "actual": [
+        true,
+        false
+      ],
+      "claim": "record version rewritten to a malformed value: function still True (non-empty check only)",
+      "expected": [
+        true,
+        false
+      ],
+      "id": "N-2:malformed-version",
+      "note": "dimensions failing: ['3_decision']",
+      "ok": true,
+      "section": "H"
+    },
+    {
+      "actual": [
+        true,
+        false
+      ],
+      "claim": "record mneme_version rewritten: function still True (provenance version not compared)",
+      "expected": [
+        true,
+        false
+      ],
+      "id": "N-2:mneme-version",
+      "note": "dimensions failing: ['1_control_provenance']",
+      "ok": true,
+      "section": "H"
+    },
+    {
+      "actual": [
+        false,
+        true
+      ],
+      "claim": "consumer pins a different host: function False",
+      "expected": [
+        false,
+        true
+      ],
+      "id": "N-2:host-pin",
+      "ok": true,
+      "section": "H"
+    },
+    {
+      "actual": [
+        false,
+        false
+      ],
+      "claim": "carrier digest rewritten alone: function False (internal consistency check)",
+      "expected": [
+        false,
+        false
+      ],
+      "id": "N-2:carrier",
+      "note": "dimensions failing: ['2_subject']",
+      "ok": true,
+      "section": "H"
+    },
+    {
+      "actual": [
+        0,
+        false,
+        [],
+        "proceeded",
+        "fail_open",
+        {}
+      ],
+      "claim": "section-less memory with a numeric rule: untrusted record, no rules, proceeds (fail_open)",
+      "expected": [
+        0,
+        false,
+        [],
+        "proceeded",
+        "fail_open",
+        {}
+      ],
+      "id": "C:missing-identity",
+      "ok": true,
+      "section": "H"
+    },
+    {
+      "actual": [
+        "EXCLUDED",
+        0,
+        [],
+        "no_violation",
+        {}
+      ],
+      "claim": "EXCLUDED numeric rule: CLI shows EXCLUDED, hook record has no rule entry, function {}",
+      "expected": [
+        "EXCLUDED",
+        0,
+        [],
+        "no_violation",
+        {}
+      ],
+      "id": "C:excluded",
+      "ok": true,
+      "section": "H"
+    },
+    {
+      "actual": [
+        0,
+        "APPLIED",
+        "MATCHER_UNEVALUATED",
+        "proceeded",
+        "fail_open",
+        {
+          "S4-NUM:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096": false
+        }
+      ],
+      "claim": "undecidable value: APPLIED + MATCHER_UNEVALUATED, proceeds fail_open, function False",
+      "expected": [
+        0,
+        "APPLIED",
+        "MATCHER_UNEVALUATED",
+        "proceeded",
+        "fail_open",
+        {
+          "S4-NUM:FORBID_NUMERIC_ABOVE:29b880066c98c7db4abb997f7cbbb096": false
+        }
+      ],
+      "id": "C:incomplete",
+      "ok": true,
+      "section": "H"
+    },
+    {
+      "actual": [
+        2,
+        "refused",
+        "other_rule",
+        true,
+        false,
+        false
+      ],
+      "claim": "literal violation via the hook (file also under the numeric rule's src/**): refused and attributed to the literal rule, which gets no rule entry; the co-applied numeric rule does not inherit relevance",
+      "expected": [
+        2,
+        "refused",
+        "other_rule",
+        true,
+        false,
+        false
+      ],
+      "id": "C:literal-ceiling",
+      "note": "numeric entry present: [('MATCHER_UNEVALUATED', 'SOURCE_NOT_FOUND')]",
+      "ok": true,
+      "section": "H"
+    },
+    {
+      "actual": [
+        false,
+        0,
+        false
+      ],
+      "claim": "numeric content via Edit of an existing file: no relevance (E-1 is new-file Write only); observed: the edit proceeds and no evidence record is written",
+      "expected": [
+        false,
+        0,
+        false
+      ],
+      "id": "C:edit-scope",
+      "note": "hook exit 0, outcome None, cause None",
+      "ok": true,
+      "section": "H"
+    }
+  ],
+  "container": true,
+  "python": "3.12.10",
+  "runtime_mneme_tree": "84133a42e61c3075a4d5ff6bea0dbe688a85fbd0",
+  "summary": {
+    "checks": 87,
+    "failed": [],
+    "ok": 87
+  }
+}

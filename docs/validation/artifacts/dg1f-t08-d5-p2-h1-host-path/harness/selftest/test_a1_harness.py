@@ -48,10 +48,12 @@ def _arm(live, arm, knobs):
     return pdir / "out"
 
 
-def _headless(tmp_path, knobs=None, ctl_knobs=None):
+def _headless(tmp_path, knobs=None, ctl_knobs=None, version=PIN_VERSION):
     live = tmp_path / "live"
-    _arm(live, "H1c-sm-ctl", ctl_knobs or {})
-    _arm(live, "H1c-sm", knobs or {})
+    for arm, k in (("H1c-sm-ctl", ctl_knobs), ("H1c-sm", knobs)):
+        out = _arm(live, arm, k or {})
+        if version is not None:  # run_a1_probe.sh always records the host version (A3 combine needs it)
+            (out / "observer.txt").write_text(f"arm={arm}\nclaude_version={version}\n", encoding="utf-8")
     return A1.headless(live, PIN)
 
 
@@ -371,8 +373,8 @@ def test_r4_hook_system_message_for_probed_event_is_host_output(tmp_path):
     assert {l["category"] for l in r["nonce_locations"]} == {"host_output"}  # R2 + R4
     assert r["label"] == "NOT_DELIVERED", r
     assert r["a1"]["host_interference"] == []
-    assert r["rules"] == A1.C.RULES_ID == "as-run table + R1-R4 (#551, #561)"
-    assert r["a1"]["rules"] == "A1 (#555) on as-run table + R1-R4 (#551, #561)"
+    assert r["rules"] == A1.C.RULES_ID == "as-run table + R1-R6 (#551, #561, #796, #805)"
+    assert r["a1"]["rules"] == "A1 (#555) on as-run table + R1-R6 (#551, #561, #796, #805)"
 
 
 def test_r4_wrong_hook_event_stays_unclassified(tmp_path):

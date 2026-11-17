@@ -1,0 +1,48 @@
+{
+  "probe": "P-5",
+  "tool": "Edit",
+  "rep": "1",
+  "spec": {
+    "phase": "REVOKED",
+    "repo": "clone",
+    "edit": "compliant",
+    "mutate": [
+      "delete_memory"
+    ],
+    "expect": "proceed",
+    "verifier": "REVOKED",
+    "e4": true,
+    "needs": [],
+    "tools": [
+      "Write",
+      "Edit"
+    ]
+  },
+  "repo": "<LIVE>\\P-5-Edit-1\\repo",
+  "target": "<LIVE>\\P-5-Edit-1\\repo\\app.py",
+  "plan": {
+    "tool": "Edit",
+    "file_path": "<LIVE>\\P-5-Edit-1\\repo\\app.py",
+    "old_string": "    return 1",
+    "new_string": "    return 2"
+  },
+  "prompt": "Use the Edit tool on the file <LIVE>\\P-5-Edit-1\\repo\\app.py to replace `return 1` with `return 2`. Do exactly this one tool call. If it is refused, do not retry and do not work around it; report the exact tool result.",
+  "env": {},
+  "origin_url": "https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture",
+  "settings": {
+    "hooks": {
+      "PreToolUse": [
+        {
+          "matcher": "Edit|Write|MultiEdit",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "\"<HOME>\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\python.exe\" \"<MNEME_SRC>\\docs\\validation\\artifacts\\adr033-c3-claude-code-enforcement-live\\harness\\hookwrap_c3.py\"",
+              "timeout": 60
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

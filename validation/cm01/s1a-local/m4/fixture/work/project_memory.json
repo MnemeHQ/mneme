@@ -1,0 +1,134 @@
+{
+  "meta": {
+    "name": "cm01-m4-f1-synthetic",
+    "description": "M4-F1 synthetic fixture. ADR-9901 is copied unchanged from the frozen M1 fixture; ADR-9902 is a deprecated lifecycle control. Not repository project memory."
+  },
+  "items": [],
+  "examples": [],
+  "decisions": [
+    {
+      "id": "ADR-9901",
+      "decision": "Synthetic M1 cache adapter uses the in-memory backend.",
+      "rationale": "Inventory and stdio handshake fixture only.",
+      "scope": [
+        "cache"
+      ],
+      "constraints": [
+        "no external cache service"
+      ],
+      "anti_patterns": [
+        "external_cache_client"
+      ],
+      "rules": [
+        {
+          "type": "FORBID_LITERAL",
+          "value": "external_cache_client"
+        }
+      ],
+      "created_at": "2026-01-01T00:00:00Z",
+      "updated_at": "2026-01-01T00:00:00Z",
+      "status": "active"
+    }
+  ],
+  "decision_index": {
+    "schema": "mneme.decision-index/v2",
+    "semantic_features": [],
+    "decisions": [
+      {
+        "decision_id": "ADR-9901",
+        "decision_class": "architecture",
+        "lifecycle_status": "active",
+        "active_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": "2026-01-01T00:00:00Z"
+      },
+      {
+        "decision_id": "ADR-9902",
+        "decision_class": "architecture",
+        "lifecycle_status": "deprecated",
+        "active_version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+        "test_evidence": [],
+        "relationships": [],
+        "updated_at": "2026-01-01T00:00:00Z"
+      }
+    ],
+    "versions": [
+      {
+        "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+        "decision_id": "ADR-9901",
+        "revision": "1",
+        "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+        "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+        "rationale": "Inventory and stdio handshake fixture only.",
+        "context_scope": [
+          "cache"
+        ],
+        "constraints": [
+          "no external cache service"
+        ],
+        "anti_patterns": [
+          "external_cache_client"
+        ],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "",
+            "observed_at": "",
+            "verification_status": ""
+          }
+        ],
+        "occurrence_source_identity": [
+          "legacy-decisions",
+          "ADR-9901"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-01-01T00:00:00Z"
+      },
+      {
+        "version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+        "decision_id": "ADR-9902",
+        "revision": "1",
+        "content_digest": "ee82d7d1d19eec5d43fbd5814ba8e6ad9032ea589e66f0da53784c898e72de58",
+        "statement": "Synthetic deprecated cache policy for M4-F1 lifecycle coverage.",
+        "rationale": "Deprecated lifecycle control only; no typed rules.",
+        "context_scope": [
+          "cache"
+        ],
+        "constraints": [],
+        "anti_patterns": [],
+        "source_evidence": [
+          {
+            "source_type": "runtime",
+            "source_locator": "",
+            "source_revision": "",
+            "observed_at": "",
+            "verification_status": ""
+          }
+        ],
+        "occurrence_source_identity": [
+          "legacy-decisions",
+          "ADR-9902"
+        ],
+        "supersedes_version_id": null,
+        "created_at": "2026-01-01T00:00:00Z"
+      }
+    ],
+    "rules": [
+      {
+        "rule_id": "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584",
+        "decision_id": "ADR-9901",
+        "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+        "decision_version": "1",
+        "sequence": 0,
+        "rule_type": "FORBID_LITERAL",
+        "rule_payload": {
+          "value": "external_cache_client"
+        },
+        "applicability": {},
+        "binding_authority": "legacy_unknown"
+      }
+    ]
+  }
+}

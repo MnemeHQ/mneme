@@ -1,0 +1,107 @@
+{
+  "probe": "L4",
+  "planned": {
+    "posture": "open",
+    "change": [
+      "file",
+      "gate/c4-l4-note.txt"
+    ],
+    "aggregate": "REFUSED",
+    "check_conclusion": "failure",
+    "merge_http": 405
+  },
+  "posture_variable": {
+    "value": "open",
+    "updated_at": "2026-10-26T22:09:50Z"
+  },
+  "base_main": "9137c93b66c2b8534f2222f125378b6761f6aae3",
+  "head_sha": "fbcf70e35d664482e1e8a8743cc3cfc1b91c1aa1",
+  "branch": "c4/gate3-l4",
+  "pr": 38,
+  "pr_url": "https://github.com/MnemeHQ/mneme-ci1-lab/pull/38",
+  "check_runs": [
+    {
+      "id": 121879653262,
+      "name": "CI1 trusted gate",
+      "head_sha": "fbcf70e35d664482e1e8a8743cc3cfc1b91c1aa1",
+      "status": "completed",
+      "conclusion": "failure",
+      "html_url": "https://github.com/MnemeHQ/mneme-ci1-lab/actions/runs/40410488717/job/121879653262",
+      "started_at": "2026-10-26T22:11:31Z",
+      "completed_at": "2026-10-26T22:12:03Z",
+      "app_id": 15368
+    }
+  ],
+  "workflow_run_id": 40410488717,
+  "workflow_run": {
+    "id": 40410488717,
+    "event": "pull_request_target",
+    "head_sha": "fbcf70e35d664482e1e8a8743cc3cfc1b91c1aa1",
+    "status": "completed",
+    "conclusion": "failure",
+    "path": ".github/workflows/ci1-trusted-gate.yml",
+    "run_attempt": 1,
+    "html_url": "https://github.com/MnemeHQ/mneme-ci1-lab/actions/runs/40410488717"
+  },
+  "report": {
+    "aggregate": {
+      "classification": "REFUSED",
+      "reason": "gate/c4-l4-note.txt: trusted surface: PR changes never reach the gate's own inputs",
+      "partly_unevaluated": false,
+      "counts": {
+        "REFUSED": 1
+      }
+    },
+    "disposition": "failure",
+    "posture": {
+      "effective": "open",
+      "source": "vars.MNEME_CI_AVAILABILITY",
+      "fallback": null
+    },
+    "requested_mode": "strict",
+    "base_sha": "9137c93b66c2b8534f2222f125378b6761f6aae3",
+    "head_sha": "fbcf70e35d664482e1e8a8743cc3cfc1b91c1aa1",
+    "adapter": {
+      "path": "scripts/ci/adr033_c4_gate.py",
+      "sha256": "afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9"
+    },
+    "evaluator": {
+      "commit": "0b74d410b45e7b3efcf08d00ce58e7bd7017b757",
+      "wheel_sha256": "e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51",
+      "python": "/home/runner/work/_temp/evaluator/bin/python"
+    },
+    "memory": null,
+    "files": [
+      {
+        "path": "gate/c4-l4-note.txt",
+        "status": "A",
+        "mode": "100644",
+        "classification": "REFUSED",
+        "kind": "trusted_surface",
+        "reason": "trusted surface: PR changes never reach the gate's own inputs"
+      }
+    ],
+    "annotations": [
+      "::error title=ADR-033 C4 REFUSED::gate/c4-l4-note.txt: trusted surface: PR changes never reach the gate's own inputs"
+    ]
+  },
+  "merge": {
+    "status_line": "HTTP/2.0 405 Method Not Allowed",
+    "request_id": "E27D:2E74FA:2CA0B0:94CE55:6ADFD047",
+    "body": " (HTTP 405)"
+  },
+  "checks": {
+    "check run on PR head": true,
+    "genuine app": true,
+    "single check run": true,
+    "event pull_request_target": true,
+    "check conclusion": true,
+    "report head/base": true,
+    "report adapter sha256": true,
+    "report posture": true,
+    "report mode strict": true,
+    "report aggregate": true,
+    "merge http": true
+  },
+  "outcome": "AS_PLANNED"
+}

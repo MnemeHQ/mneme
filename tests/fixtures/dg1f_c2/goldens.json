@@ -1,0 +1,1100 @@
+{
+  "canonical_conflict": {
+    "audit": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Audit report written: audit.json\n"
+    },
+    "audit_json": "{\n  \"schema\": \"mneme.audit/v1\",\n  \"memory\": \"<WORK>/.mneme/project_memory.json\",\n  \"summary\": {\n    \"total_decisions\": 4,\n    \"protection_relevant\": 3,\n    \"protected\": 1,\n    \"mneme_ready\": 1,\n    \"requires_modelling\": 1,\n    \"guidance\": 1,\n    \"current_protection_pct\": 33.3,\n    \"identified_mneme_potential_pct\": 66.7,\n    \"protection_gap_pct\": 66.7\n  },\n  \"decisions\": [\n    {\n      \"id\": \"C2-LIT\",\n      \"decision\": \"Do not import psycopg2; the service uses SQLite.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"protected\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: psycopg2\",\n      \"evidence_confidence\": \"verified\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-PICKLE\",\n      \"decision\": \"Do not use pickle for persistence.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"mneme_ready\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: pickle\",\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-READY\",\n      \"decision\": \"Never call requests.get without a timeout.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"requires_modelling\",\n      \"mneme_guardrail\": null,\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-GUIDE\",\n      \"decision\": \"Prefer small, composable modules.\",\n      \"status\": \"active\",\n      \"intent\": \"guidance\",\n      \"protection_tier\": \"guidance\",\n      \"mneme_guardrail\": null,\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    }\n  ]\n}\n",
+    "check:strict": {
+      "exit": 2,
+      "stderr": "",
+      "stdout": "FAIL  [C2-LIT] FORBID_LITERAL \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\n      path: app.py\nFAIL  [C2-LIT] anti_pattern \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\nFAIL  [C2-PICKLE] anti_pattern \"pickle\" -- trigger: pickle\n      Do not use pickle for persistence.\n\nResult: FAIL\n"
+    },
+    "check:warn": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "FAIL  [C2-LIT] FORBID_LITERAL \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\n      path: app.py\nFAIL  [C2-LIT] anti_pattern \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\nFAIL  [C2-PICKLE] anti_pattern \"pickle\" -- trigger: pickle\n      Do not use pickle for persistence.\n\nResult: FAIL\n"
+    },
+    "check_json:strict": {
+      "exit": 2,
+      "stderr": "",
+      "stdout": "{\"schema\": \"mneme.check/v1\", \"verdict\": \"FAIL\", \"mode\": \"strict\", \"evaluation_complete\": true, \"applicability\": [{\"decision_id\": \"C2-LIT\", \"rule_type\": \"FORBID_LITERAL\", \"rule_value\": \"psycopg2\", \"rule_index\": 0, \"path_scoped\": false, \"input_path\": \"app.py\", \"outcome\": \"APPLIED\", \"selector\": null, \"reason\": \"the rule has global applicability\", \"rule_id\": \"C2-LIT:FORBID_LITERAL:dce58d45cafc99df7c5c1df9642234d0\", \"decision_version_id\": \"dver-b848f48f3aa5851448319e625d72c8ba\"}], \"violations\": [{\"decision_id\": \"C2-LIT\", \"decision_text\": \"Do not import psycopg2; the service uses SQLite.\", \"severity\": \"FAIL\", \"rule\": \"psycopg2\", \"trigger\": \"psycopg2\", \"kind\": \"typed_rule\", \"rule_type\": \"FORBID_LITERAL\", \"input_path\": \"app.py\", \"selector\": null, \"rule_id\": \"C2-LIT:FORBID_LITERAL:dce58d45cafc99df7c5c1df9642234d0\", \"decision_version_id\": \"dver-b848f48f3aa5851448319e625d72c8ba\"}, {\"decision_id\": \"C2-LIT\", \"decision_text\": \"Do not import psycopg2; the service uses SQLite.\", \"severity\": \"FAIL\", \"rule\": \"psycopg2\", \"trigger\": \"psycopg2\", \"kind\": \"anti_pattern\", \"rule_type\": null, \"input_path\": null, \"selector\": null, \"rule_id\": null, \"decision_version_id\": null}, {\"decision_id\": \"C2-PICKLE\", \"decision_text\": \"Do not use pickle for persistence.\", \"severity\": \"FAIL\", \"rule\": \"pickle\", \"trigger\": \"pickle\", \"kind\": \"anti_pattern\", \"rule_type\": null, \"input_path\": null, \"selector\": null, \"rule_id\": null, \"decision_version_id\": null}], \"freshness\": [], \"subject\": {\"input_kind\": \"complete_source_file\", \"subject_sha256\": \"13e1707cf48141c2892f81a392ee771f943c2dbf04c69b967ac5316e06b52c52\", \"source_path\": \"<WORK>/app.py\", \"memory_path\": \"<WORK>/.mneme/project_memory.json\", \"governed_path\": \"app.py\", \"surface\": \"mneme check\", \"surface_version\": \"0.11.0\", \"runtime\": \"<RUNTIME>\"}}\n"
+    },
+    "check_json:warn": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "{\"schema\": \"mneme.check/v1\", \"verdict\": \"FAIL\", \"mode\": \"warn\", \"evaluation_complete\": true, \"applicability\": [{\"decision_id\": \"C2-LIT\", \"rule_type\": \"FORBID_LITERAL\", \"rule_value\": \"psycopg2\", \"rule_index\": 0, \"path_scoped\": false, \"input_path\": \"app.py\", \"outcome\": \"APPLIED\", \"selector\": null, \"reason\": \"the rule has global applicability\", \"rule_id\": \"C2-LIT:FORBID_LITERAL:dce58d45cafc99df7c5c1df9642234d0\", \"decision_version_id\": \"dver-b848f48f3aa5851448319e625d72c8ba\"}], \"violations\": [{\"decision_id\": \"C2-LIT\", \"decision_text\": \"Do not import psycopg2; the service uses SQLite.\", \"severity\": \"FAIL\", \"rule\": \"psycopg2\", \"trigger\": \"psycopg2\", \"kind\": \"typed_rule\", \"rule_type\": \"FORBID_LITERAL\", \"input_path\": \"app.py\", \"selector\": null, \"rule_id\": \"C2-LIT:FORBID_LITERAL:dce58d45cafc99df7c5c1df9642234d0\", \"decision_version_id\": \"dver-b848f48f3aa5851448319e625d72c8ba\"}, {\"decision_id\": \"C2-LIT\", \"decision_text\": \"Do not import psycopg2; the service uses SQLite.\", \"severity\": \"FAIL\", \"rule\": \"psycopg2\", \"trigger\": \"psycopg2\", \"kind\": \"anti_pattern\", \"rule_type\": null, \"input_path\": null, \"selector\": null, \"rule_id\": null, \"decision_version_id\": null}, {\"decision_id\": \"C2-PICKLE\", \"decision_text\": \"Do not use pickle for persistence.\", \"severity\": \"FAIL\", \"rule\": \"pickle\", \"trigger\": \"pickle\", \"kind\": \"anti_pattern\", \"rule_type\": null, \"input_path\": null, \"selector\": null, \"rule_id\": null, \"decision_version_id\": null}], \"freshness\": [], \"subject\": {\"input_kind\": \"complete_source_file\", \"subject_sha256\": \"13e1707cf48141c2892f81a392ee771f943c2dbf04c69b967ac5316e06b52c52\", \"source_path\": \"<WORK>/app.py\", \"memory_path\": \"<WORK>/.mneme/project_memory.json\", \"governed_path\": \"app.py\", \"surface\": \"mneme check\", \"surface_version\": \"0.11.0\", \"runtime\": \"<RUNTIME>\"}}\n"
+    },
+    "check_preview": {
+      "exit": 2,
+      "stderr": "NON-AUTHORITATIVE applicability preview: PREVIEW UNAVAILABLE\n",
+      "stdout": "FAIL  [C2-LIT] FORBID_LITERAL \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\n      path: app.py\nFAIL  [C2-LIT] anti_pattern \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\nFAIL  [C2-PICKLE] anti_pattern \"pickle\" -- trigger: pickle\n      Do not use pickle for persistence.\n\nResult: FAIL\n"
+    },
+    "in_process": {
+      "build_report": {
+        "decisions": [
+          {
+            "decision": "Do not import psycopg2; the service uses SQLite.",
+            "evidence_confidence": "verified",
+            "evidence_sources": [],
+            "id": "C2-LIT",
+            "intent": "deterministic",
+            "mneme_guardrail": "FORBID_LITERAL: psycopg2",
+            "protection_tier": "protected",
+            "status": "active"
+          },
+          {
+            "decision": "Do not use pickle for persistence.",
+            "evidence_confidence": "none",
+            "evidence_sources": [],
+            "id": "C2-PICKLE",
+            "intent": "deterministic",
+            "mneme_guardrail": "FORBID_LITERAL: pickle",
+            "protection_tier": "mneme_ready",
+            "status": "active"
+          },
+          {
+            "decision": "Never call requests.get without a timeout.",
+            "evidence_confidence": "none",
+            "evidence_sources": [],
+            "id": "C2-READY",
+            "intent": "deterministic",
+            "mneme_guardrail": null,
+            "protection_tier": "requires_modelling",
+            "status": "active"
+          },
+          {
+            "decision": "Prefer small, composable modules.",
+            "evidence_confidence": "none",
+            "evidence_sources": [],
+            "id": "C2-GUIDE",
+            "intent": "guidance",
+            "mneme_guardrail": null,
+            "protection_tier": "guidance",
+            "status": "active"
+          }
+        ],
+        "memory": "<WORK>/.mneme/project_memory.json",
+        "schema": "mneme.audit/v1",
+        "summary": {
+          "current_protection_pct": 33.3,
+          "guidance": 1,
+          "identified_mneme_potential_pct": 66.7,
+          "mneme_ready": 1,
+          "protected": 1,
+          "protection_gap_pct": 66.7,
+          "protection_relevant": 3,
+          "requires_modelling": 1,
+          "total_decisions": 4
+        }
+      },
+      "match_ci_evidence": {
+        "C2-LIT": [
+          "tests/test_storage.py::test_sqlite_only"
+        ]
+      },
+      "readiness_counts": {
+        "guidance": 1,
+        "mneme_ready": 1,
+        "protected": 1,
+        "requires_modelling": 1
+      },
+      "runtime_decisions": [
+        [
+          "C2-LIT",
+          "active"
+        ],
+        [
+          "C2-PICKLE",
+          "active"
+        ],
+        [
+          "C2-READY",
+          "active"
+        ],
+        [
+          "C2-GUIDE",
+          "active"
+        ]
+      ]
+    },
+    "protect_list": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Protection activation candidates\n============================================================\nProtected: 1  Mneme-ready: 1  Requires modelling: 1  Guidance: 1\nCandidates: 1\n\n[1] C2-PICKLE: Do not use pickle for persistence.\n    guardrail: FORBID_LITERAL: pickle\n    rule to install: FORBID_LITERAL \"pickle\"\n    applies to: global applicability (canonical policy sources exempt)\n    enforcement: FORBID_LITERAL fails on an exact case-sensitive match, enforced independently of retrieval score; canonical policy sources are exempt (ADR-019/ADR-020)\n\nValidate before activating:  mneme protect validate <decision-id>\nActivate (explicit):         mneme protect activate <decision-id>\n"
+    },
+    "protect_status:C2-LIT": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Decision [C2-LIT] Do not import psycopg2; the service uses SQLite.\n  lifecycle status: active\n  protection tier:  protected\n  guardrail:        FORBID_LITERAL: psycopg2\n  evidence:         verified\n  rule installed:   yes\n"
+    },
+    "protect_status:C2-OLD": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'C2-OLD' not found in .mneme/project_memory.json\n",
+      "stdout": ""
+    },
+    "protect_status:C2-OLDPICKLE": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'C2-OLDPICKLE' not found in .mneme/project_memory.json\n",
+      "stdout": ""
+    },
+    "protect_status:C2-PICKLE": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Decision [C2-PICKLE] Do not use pickle for persistence.\n  lifecycle status: active\n  protection tier:  mneme_ready\n  guardrail:        FORBID_LITERAL: pickle\n  evidence:         none\n  rule installed:   no\n  proposal:         FORBID_LITERAL \"pickle\"\n"
+    },
+    "protect_status:GHOST-404": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'GHOST-404' not found in .mneme/project_memory.json\n",
+      "stdout": ""
+    },
+    "protect_validate:C2-LIT": {
+      "exit": 1,
+      "stderr": "",
+      "stdout": "NOT ELIGIBLE: [C2-LIT] already Protected under the canonical assessment\nProtection was not validated and nothing was activated.\n"
+    },
+    "protect_validate:C2-OLD": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'C2-OLD' not found\n",
+      "stdout": ""
+    },
+    "protect_validate:C2-OLDPICKLE": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'C2-OLDPICKLE' not found\n",
+      "stdout": ""
+    },
+    "protect_validate:C2-PICKLE": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Validating proposed protection for [C2-PICKLE]\n  decision:  Do not use pickle for persistence.\n  proposal:  FORBID_LITERAL \"pickle\"\n  checks:\n    PASS prohibited_detected: input containing 'pickle' is a typed FAIL\n    PASS permitted_allowed: permitted input without 'pickle' is not blocked\n    PASS path_scope_respected: artifact path enforced=True, canonical policy source exempt=True\n    PASS unrelated_paths_unaffected: unrelated artifact path enforced=True, permitted content blocked=False\nResult: VALID\nValidation never activates protection.\n"
+    },
+    "protect_validate:GHOST-404": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'GHOST-404' not found\n",
+      "stdout": ""
+    }
+  },
+  "canonical_dangling": {
+    "audit": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Audit report written: audit.json\n"
+    },
+    "audit_json": "{\n  \"schema\": \"mneme.audit/v1\",\n  \"memory\": \"<WORK>/.mneme/project_memory.json\",\n  \"summary\": {\n    \"total_decisions\": 4,\n    \"protection_relevant\": 3,\n    \"protected\": 1,\n    \"mneme_ready\": 1,\n    \"requires_modelling\": 1,\n    \"guidance\": 1,\n    \"current_protection_pct\": 33.3,\n    \"identified_mneme_potential_pct\": 66.7,\n    \"protection_gap_pct\": 66.7\n  },\n  \"decisions\": [\n    {\n      \"id\": \"C2-LIT\",\n      \"decision\": \"Do not import psycopg2; the service uses SQLite.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"protected\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: psycopg2\",\n      \"evidence_confidence\": \"verified\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-PICKLE\",\n      \"decision\": \"Do not use pickle for persistence.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"mneme_ready\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: pickle\",\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-READY\",\n      \"decision\": \"Never call requests.get without a timeout.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"requires_modelling\",\n      \"mneme_guardrail\": null,\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-GUIDE\",\n      \"decision\": \"Prefer small, composable modules.\",\n      \"status\": \"active\",\n      \"intent\": \"guidance\",\n      \"protection_tier\": \"guidance\",\n      \"mneme_guardrail\": null,\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    }\n  ]\n}\n",
+    "check:strict": {
+      "exit": 2,
+      "stderr": "",
+      "stdout": "FAIL  [C2-LIT] FORBID_LITERAL \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\n      path: app.py\nFAIL  [C2-LIT] anti_pattern \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\nFAIL  [C2-PICKLE] anti_pattern \"pickle\" -- trigger: pickle\n      Do not use pickle for persistence.\n\nResult: FAIL\n"
+    },
+    "check:warn": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "FAIL  [C2-LIT] FORBID_LITERAL \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\n      path: app.py\nFAIL  [C2-LIT] anti_pattern \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\nFAIL  [C2-PICKLE] anti_pattern \"pickle\" -- trigger: pickle\n      Do not use pickle for persistence.\n\nResult: FAIL\n"
+    },
+    "check_json:strict": {
+      "exit": 2,
+      "stderr": "",
+      "stdout": "{\"schema\": \"mneme.check/v1\", \"verdict\": \"FAIL\", \"mode\": \"strict\", \"evaluation_complete\": true, \"applicability\": [{\"decision_id\": \"C2-LIT\", \"rule_type\": \"FORBID_LITERAL\", \"rule_value\": \"psycopg2\", \"rule_index\": 0, \"path_scoped\": false, \"input_path\": \"app.py\", \"outcome\": \"APPLIED\", \"selector\": null, \"reason\": \"the rule has global applicability\", \"rule_id\": \"C2-LIT:FORBID_LITERAL:dce58d45cafc99df7c5c1df9642234d0\", \"decision_version_id\": \"dver-b848f48f3aa5851448319e625d72c8ba\"}], \"violations\": [{\"decision_id\": \"C2-LIT\", \"decision_text\": \"Do not import psycopg2; the service uses SQLite.\", \"severity\": \"FAIL\", \"rule\": \"psycopg2\", \"trigger\": \"psycopg2\", \"kind\": \"typed_rule\", \"rule_type\": \"FORBID_LITERAL\", \"input_path\": \"app.py\", \"selector\": null, \"rule_id\": \"C2-LIT:FORBID_LITERAL:dce58d45cafc99df7c5c1df9642234d0\", \"decision_version_id\": \"dver-b848f48f3aa5851448319e625d72c8ba\"}, {\"decision_id\": \"C2-LIT\", \"decision_text\": \"Do not import psycopg2; the service uses SQLite.\", \"severity\": \"FAIL\", \"rule\": \"psycopg2\", \"trigger\": \"psycopg2\", \"kind\": \"anti_pattern\", \"rule_type\": null, \"input_path\": null, \"selector\": null, \"rule_id\": null, \"decision_version_id\": null}, {\"decision_id\": \"C2-PICKLE\", \"decision_text\": \"Do not use pickle for persistence.\", \"severity\": \"FAIL\", \"rule\": \"pickle\", \"trigger\": \"pickle\", \"kind\": \"anti_pattern\", \"rule_type\": null, \"input_path\": null, \"selector\": null, \"rule_id\": null, \"decision_version_id\": null}], \"freshness\": [], \"subject\": {\"input_kind\": \"complete_source_file\", \"subject_sha256\": \"13e1707cf48141c2892f81a392ee771f943c2dbf04c69b967ac5316e06b52c52\", \"source_path\": \"<WORK>/app.py\", \"memory_path\": \"<WORK>/.mneme/project_memory.json\", \"governed_path\": \"app.py\", \"surface\": \"mneme check\", \"surface_version\": \"0.11.0\", \"runtime\": \"<RUNTIME>\"}}\n"
+    },
+    "check_json:warn": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "{\"schema\": \"mneme.check/v1\", \"verdict\": \"FAIL\", \"mode\": \"warn\", \"evaluation_complete\": true, \"applicability\": [{\"decision_id\": \"C2-LIT\", \"rule_type\": \"FORBID_LITERAL\", \"rule_value\": \"psycopg2\", \"rule_index\": 0, \"path_scoped\": false, \"input_path\": \"app.py\", \"outcome\": \"APPLIED\", \"selector\": null, \"reason\": \"the rule has global applicability\", \"rule_id\": \"C2-LIT:FORBID_LITERAL:dce58d45cafc99df7c5c1df9642234d0\", \"decision_version_id\": \"dver-b848f48f3aa5851448319e625d72c8ba\"}], \"violations\": [{\"decision_id\": \"C2-LIT\", \"decision_text\": \"Do not import psycopg2; the service uses SQLite.\", \"severity\": \"FAIL\", \"rule\": \"psycopg2\", \"trigger\": \"psycopg2\", \"kind\": \"typed_rule\", \"rule_type\": \"FORBID_LITERAL\", \"input_path\": \"app.py\", \"selector\": null, \"rule_id\": \"C2-LIT:FORBID_LITERAL:dce58d45cafc99df7c5c1df9642234d0\", \"decision_version_id\": \"dver-b848f48f3aa5851448319e625d72c8ba\"}, {\"decision_id\": \"C2-LIT\", \"decision_text\": \"Do not import psycopg2; the service uses SQLite.\", \"severity\": \"FAIL\", \"rule\": \"psycopg2\", \"trigger\": \"psycopg2\", \"kind\": \"anti_pattern\", \"rule_type\": null, \"input_path\": null, \"selector\": null, \"rule_id\": null, \"decision_version_id\": null}, {\"decision_id\": \"C2-PICKLE\", \"decision_text\": \"Do not use pickle for persistence.\", \"severity\": \"FAIL\", \"rule\": \"pickle\", \"trigger\": \"pickle\", \"kind\": \"anti_pattern\", \"rule_type\": null, \"input_path\": null, \"selector\": null, \"rule_id\": null, \"decision_version_id\": null}], \"freshness\": [], \"subject\": {\"input_kind\": \"complete_source_file\", \"subject_sha256\": \"13e1707cf48141c2892f81a392ee771f943c2dbf04c69b967ac5316e06b52c52\", \"source_path\": \"<WORK>/app.py\", \"memory_path\": \"<WORK>/.mneme/project_memory.json\", \"governed_path\": \"app.py\", \"surface\": \"mneme check\", \"surface_version\": \"0.11.0\", \"runtime\": \"<RUNTIME>\"}}\n"
+    },
+    "check_preview": {
+      "exit": 2,
+      "stderr": "NON-AUTHORITATIVE applicability preview: PREVIEW UNAVAILABLE\n",
+      "stdout": "FAIL  [C2-LIT] FORBID_LITERAL \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\n      path: app.py\nFAIL  [C2-LIT] anti_pattern \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\nFAIL  [C2-PICKLE] anti_pattern \"pickle\" -- trigger: pickle\n      Do not use pickle for persistence.\n\nResult: FAIL\n"
+    },
+    "in_process": {
+      "build_report": {
+        "decisions": [
+          {
+            "decision": "Do not import psycopg2; the service uses SQLite.",
+            "evidence_confidence": "verified",
+            "evidence_sources": [],
+            "id": "C2-LIT",
+            "intent": "deterministic",
+            "mneme_guardrail": "FORBID_LITERAL: psycopg2",
+            "protection_tier": "protected",
+            "status": "active"
+          },
+          {
+            "decision": "Do not use pickle for persistence.",
+            "evidence_confidence": "none",
+            "evidence_sources": [],
+            "id": "C2-PICKLE",
+            "intent": "deterministic",
+            "mneme_guardrail": "FORBID_LITERAL: pickle",
+            "protection_tier": "mneme_ready",
+            "status": "active"
+          },
+          {
+            "decision": "Never call requests.get without a timeout.",
+            "evidence_confidence": "none",
+            "evidence_sources": [],
+            "id": "C2-READY",
+            "intent": "deterministic",
+            "mneme_guardrail": null,
+            "protection_tier": "requires_modelling",
+            "status": "active"
+          },
+          {
+            "decision": "Prefer small, composable modules.",
+            "evidence_confidence": "none",
+            "evidence_sources": [],
+            "id": "C2-GUIDE",
+            "intent": "guidance",
+            "mneme_guardrail": null,
+            "protection_tier": "guidance",
+            "status": "active"
+          }
+        ],
+        "memory": "<WORK>/.mneme/project_memory.json",
+        "schema": "mneme.audit/v1",
+        "summary": {
+          "current_protection_pct": 33.3,
+          "guidance": 1,
+          "identified_mneme_potential_pct": 66.7,
+          "mneme_ready": 1,
+          "protected": 1,
+          "protection_gap_pct": 66.7,
+          "protection_relevant": 3,
+          "requires_modelling": 1,
+          "total_decisions": 4
+        }
+      },
+      "match_ci_evidence": {
+        "C2-LIT": [
+          "tests/test_storage.py::test_sqlite_only"
+        ]
+      },
+      "readiness_counts": {
+        "guidance": 1,
+        "mneme_ready": 1,
+        "protected": 1,
+        "requires_modelling": 1
+      },
+      "runtime_decisions": [
+        [
+          "C2-LIT",
+          "active"
+        ],
+        [
+          "C2-PICKLE",
+          "active"
+        ],
+        [
+          "C2-READY",
+          "active"
+        ],
+        [
+          "C2-GUIDE",
+          "active"
+        ]
+      ]
+    },
+    "protect_list": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Protection activation candidates\n============================================================\nProtected: 1  Mneme-ready: 1  Requires modelling: 1  Guidance: 1\nCandidates: 1\n\n[1] C2-PICKLE: Do not use pickle for persistence.\n    guardrail: FORBID_LITERAL: pickle\n    rule to install: FORBID_LITERAL \"pickle\"\n    applies to: global applicability (canonical policy sources exempt)\n    enforcement: FORBID_LITERAL fails on an exact case-sensitive match, enforced independently of retrieval score; canonical policy sources are exempt (ADR-019/ADR-020)\n\nValidate before activating:  mneme protect validate <decision-id>\nActivate (explicit):         mneme protect activate <decision-id>\n"
+    },
+    "protect_status:C2-LIT": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Decision [C2-LIT] Do not import psycopg2; the service uses SQLite.\n  lifecycle status: active\n  protection tier:  protected\n  guardrail:        FORBID_LITERAL: psycopg2\n  evidence:         verified\n  rule installed:   yes\n"
+    },
+    "protect_status:C2-OLD": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'C2-OLD' not found in .mneme/project_memory.json\n",
+      "stdout": ""
+    },
+    "protect_status:C2-OLDPICKLE": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'C2-OLDPICKLE' not found in .mneme/project_memory.json\n",
+      "stdout": ""
+    },
+    "protect_status:C2-PICKLE": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Decision [C2-PICKLE] Do not use pickle for persistence.\n  lifecycle status: active\n  protection tier:  mneme_ready\n  guardrail:        FORBID_LITERAL: pickle\n  evidence:         none\n  rule installed:   no\n  proposal:         FORBID_LITERAL \"pickle\"\n"
+    },
+    "protect_status:GHOST-404": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'GHOST-404' not found in .mneme/project_memory.json\n",
+      "stdout": ""
+    },
+    "protect_validate:C2-LIT": {
+      "exit": 1,
+      "stderr": "",
+      "stdout": "NOT ELIGIBLE: [C2-LIT] already Protected under the canonical assessment\nProtection was not validated and nothing was activated.\n"
+    },
+    "protect_validate:C2-OLD": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'C2-OLD' not found\n",
+      "stdout": ""
+    },
+    "protect_validate:C2-OLDPICKLE": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'C2-OLDPICKLE' not found\n",
+      "stdout": ""
+    },
+    "protect_validate:C2-PICKLE": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Validating proposed protection for [C2-PICKLE]\n  decision:  Do not use pickle for persistence.\n  proposal:  FORBID_LITERAL \"pickle\"\n  checks:\n    PASS prohibited_detected: input containing 'pickle' is a typed FAIL\n    PASS permitted_allowed: permitted input without 'pickle' is not blocked\n    PASS path_scope_respected: artifact path enforced=True, canonical policy source exempt=True\n    PASS unrelated_paths_unaffected: unrelated artifact path enforced=True, permitted content blocked=False\nResult: VALID\nValidation never activates protection.\n"
+    },
+    "protect_validate:GHOST-404": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'GHOST-404' not found\n",
+      "stdout": ""
+    }
+  },
+  "canonical_v1": {
+    "audit": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Audit report written: audit.json\n"
+    },
+    "audit_json": "{\n  \"schema\": \"mneme.audit/v1\",\n  \"memory\": \"<WORK>/.mneme/project_memory.json\",\n  \"summary\": {\n    \"total_decisions\": 4,\n    \"protection_relevant\": 3,\n    \"protected\": 1,\n    \"mneme_ready\": 1,\n    \"requires_modelling\": 1,\n    \"guidance\": 1,\n    \"current_protection_pct\": 33.3,\n    \"identified_mneme_potential_pct\": 66.7,\n    \"protection_gap_pct\": 66.7\n  },\n  \"decisions\": [\n    {\n      \"id\": \"C2-LIT\",\n      \"decision\": \"Do not import psycopg2; the service uses SQLite.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"protected\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: psycopg2\",\n      \"evidence_confidence\": \"verified\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-PICKLE\",\n      \"decision\": \"Do not use pickle for persistence.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"mneme_ready\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: pickle\",\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-READY\",\n      \"decision\": \"Never call requests.get without a timeout.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"requires_modelling\",\n      \"mneme_guardrail\": null,\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-GUIDE\",\n      \"decision\": \"Prefer small, composable modules.\",\n      \"status\": \"active\",\n      \"intent\": \"guidance\",\n      \"protection_tier\": \"guidance\",\n      \"mneme_guardrail\": null,\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    }\n  ]\n}\n",
+    "check:strict": {
+      "exit": 2,
+      "stderr": "",
+      "stdout": "FAIL  [C2-LIT] FORBID_LITERAL \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\n      path: app.py\nFAIL  [C2-LIT] anti_pattern \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\nFAIL  [C2-PICKLE] anti_pattern \"pickle\" -- trigger: pickle\n      Do not use pickle for persistence.\n\nResult: FAIL\n"
+    },
+    "check:warn": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "FAIL  [C2-LIT] FORBID_LITERAL \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\n      path: app.py\nFAIL  [C2-LIT] anti_pattern \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\nFAIL  [C2-PICKLE] anti_pattern \"pickle\" -- trigger: pickle\n      Do not use pickle for persistence.\n\nResult: FAIL\n"
+    },
+    "check_json:strict": {
+      "exit": 2,
+      "stderr": "",
+      "stdout": "{\"schema\": \"mneme.check/v1\", \"verdict\": \"FAIL\", \"mode\": \"strict\", \"evaluation_complete\": true, \"applicability\": [{\"decision_id\": \"C2-LIT\", \"rule_type\": \"FORBID_LITERAL\", \"rule_value\": \"psycopg2\", \"rule_index\": 0, \"path_scoped\": false, \"input_path\": \"app.py\", \"outcome\": \"APPLIED\", \"selector\": null, \"reason\": \"the rule has global applicability\", \"rule_id\": \"C2-LIT:FORBID_LITERAL:dce58d45cafc99df7c5c1df9642234d0\", \"decision_version_id\": \"dver-b848f48f3aa5851448319e625d72c8ba\"}], \"violations\": [{\"decision_id\": \"C2-LIT\", \"decision_text\": \"Do not import psycopg2; the service uses SQLite.\", \"severity\": \"FAIL\", \"rule\": \"psycopg2\", \"trigger\": \"psycopg2\", \"kind\": \"typed_rule\", \"rule_type\": \"FORBID_LITERAL\", \"input_path\": \"app.py\", \"selector\": null, \"rule_id\": \"C2-LIT:FORBID_LITERAL:dce58d45cafc99df7c5c1df9642234d0\", \"decision_version_id\": \"dver-b848f48f3aa5851448319e625d72c8ba\"}, {\"decision_id\": \"C2-LIT\", \"decision_text\": \"Do not import psycopg2; the service uses SQLite.\", \"severity\": \"FAIL\", \"rule\": \"psycopg2\", \"trigger\": \"psycopg2\", \"kind\": \"anti_pattern\", \"rule_type\": null, \"input_path\": null, \"selector\": null, \"rule_id\": null, \"decision_version_id\": null}, {\"decision_id\": \"C2-PICKLE\", \"decision_text\": \"Do not use pickle for persistence.\", \"severity\": \"FAIL\", \"rule\": \"pickle\", \"trigger\": \"pickle\", \"kind\": \"anti_pattern\", \"rule_type\": null, \"input_path\": null, \"selector\": null, \"rule_id\": null, \"decision_version_id\": null}], \"freshness\": [], \"subject\": {\"input_kind\": \"complete_source_file\", \"subject_sha256\": \"13e1707cf48141c2892f81a392ee771f943c2dbf04c69b967ac5316e06b52c52\", \"source_path\": \"<WORK>/app.py\", \"memory_path\": \"<WORK>/.mneme/project_memory.json\", \"governed_path\": \"app.py\", \"surface\": \"mneme check\", \"surface_version\": \"0.11.0\", \"runtime\": \"<RUNTIME>\"}}\n"
+    },
+    "check_json:warn": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "{\"schema\": \"mneme.check/v1\", \"verdict\": \"FAIL\", \"mode\": \"warn\", \"evaluation_complete\": true, \"applicability\": [{\"decision_id\": \"C2-LIT\", \"rule_type\": \"FORBID_LITERAL\", \"rule_value\": \"psycopg2\", \"rule_index\": 0, \"path_scoped\": false, \"input_path\": \"app.py\", \"outcome\": \"APPLIED\", \"selector\": null, \"reason\": \"the rule has global applicability\", \"rule_id\": \"C2-LIT:FORBID_LITERAL:dce58d45cafc99df7c5c1df9642234d0\", \"decision_version_id\": \"dver-b848f48f3aa5851448319e625d72c8ba\"}], \"violations\": [{\"decision_id\": \"C2-LIT\", \"decision_text\": \"Do not import psycopg2; the service uses SQLite.\", \"severity\": \"FAIL\", \"rule\": \"psycopg2\", \"trigger\": \"psycopg2\", \"kind\": \"typed_rule\", \"rule_type\": \"FORBID_LITERAL\", \"input_path\": \"app.py\", \"selector\": null, \"rule_id\": \"C2-LIT:FORBID_LITERAL:dce58d45cafc99df7c5c1df9642234d0\", \"decision_version_id\": \"dver-b848f48f3aa5851448319e625d72c8ba\"}, {\"decision_id\": \"C2-LIT\", \"decision_text\": \"Do not import psycopg2; the service uses SQLite.\", \"severity\": \"FAIL\", \"rule\": \"psycopg2\", \"trigger\": \"psycopg2\", \"kind\": \"anti_pattern\", \"rule_type\": null, \"input_path\": null, \"selector\": null, \"rule_id\": null, \"decision_version_id\": null}, {\"decision_id\": \"C2-PICKLE\", \"decision_text\": \"Do not use pickle for persistence.\", \"severity\": \"FAIL\", \"rule\": \"pickle\", \"trigger\": \"pickle\", \"kind\": \"anti_pattern\", \"rule_type\": null, \"input_path\": null, \"selector\": null, \"rule_id\": null, \"decision_version_id\": null}], \"freshness\": [], \"subject\": {\"input_kind\": \"complete_source_file\", \"subject_sha256\": \"13e1707cf48141c2892f81a392ee771f943c2dbf04c69b967ac5316e06b52c52\", \"source_path\": \"<WORK>/app.py\", \"memory_path\": \"<WORK>/.mneme/project_memory.json\", \"governed_path\": \"app.py\", \"surface\": \"mneme check\", \"surface_version\": \"0.11.0\", \"runtime\": \"<RUNTIME>\"}}\n"
+    },
+    "check_preview": {
+      "exit": 2,
+      "stderr": "NON-AUTHORITATIVE applicability preview (caller-asserted labels; no effect on enforcement)\n  labels: [\"windows\"]\n  [C2-DEP] ineffective (cause=lifecycle_deprecated; version=dver-4ae2cab7f77cf4839ac52347edd036a1)\n  [C2-GUIDE] effective (cause=effective; version=dver-4ae206768883ed34199063fc76935614)\n  [C2-LIT] effective (cause=effective; version=dver-b848f48f3aa5851448319e625d72c8ba)\n  [C2-OLD] ineffective (cause=lifecycle_superseded; version=dver-02c1d93e7212a044ef0238f23cb1ab15)\n  [C2-OLDPICKLE] ineffective (cause=lifecycle_superseded; version=dver-9b0cd0b19382d45fa762466b06700c2a)\n  [C2-PICKLE] effective (cause=effective; version=dver-917e0205a2db8478096812ccc69b5131)\n  [C2-READY] effective (cause=effective; version=dver-f5c60dbfe8de98ddf089d0f5c084c7ee)\n",
+      "stdout": "FAIL  [C2-LIT] FORBID_LITERAL \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\n      path: app.py\nFAIL  [C2-LIT] anti_pattern \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\nFAIL  [C2-PICKLE] anti_pattern \"pickle\" -- trigger: pickle\n      Do not use pickle for persistence.\n\nResult: FAIL\n"
+    },
+    "in_process": {
+      "build_report": {
+        "decisions": [
+          {
+            "decision": "Do not import psycopg2; the service uses SQLite.",
+            "evidence_confidence": "verified",
+            "evidence_sources": [],
+            "id": "C2-LIT",
+            "intent": "deterministic",
+            "mneme_guardrail": "FORBID_LITERAL: psycopg2",
+            "protection_tier": "protected",
+            "status": "active"
+          },
+          {
+            "decision": "Do not use pickle for persistence.",
+            "evidence_confidence": "none",
+            "evidence_sources": [],
+            "id": "C2-PICKLE",
+            "intent": "deterministic",
+            "mneme_guardrail": "FORBID_LITERAL: pickle",
+            "protection_tier": "mneme_ready",
+            "status": "active"
+          },
+          {
+            "decision": "Never call requests.get without a timeout.",
+            "evidence_confidence": "none",
+            "evidence_sources": [],
+            "id": "C2-READY",
+            "intent": "deterministic",
+            "mneme_guardrail": null,
+            "protection_tier": "requires_modelling",
+            "status": "active"
+          },
+          {
+            "decision": "Prefer small, composable modules.",
+            "evidence_confidence": "none",
+            "evidence_sources": [],
+            "id": "C2-GUIDE",
+            "intent": "guidance",
+            "mneme_guardrail": null,
+            "protection_tier": "guidance",
+            "status": "active"
+          }
+        ],
+        "memory": "<WORK>/.mneme/project_memory.json",
+        "schema": "mneme.audit/v1",
+        "summary": {
+          "current_protection_pct": 33.3,
+          "guidance": 1,
+          "identified_mneme_potential_pct": 66.7,
+          "mneme_ready": 1,
+          "protected": 1,
+          "protection_gap_pct": 66.7,
+          "protection_relevant": 3,
+          "requires_modelling": 1,
+          "total_decisions": 4
+        }
+      },
+      "match_ci_evidence": {
+        "C2-LIT": [
+          "tests/test_storage.py::test_sqlite_only"
+        ]
+      },
+      "readiness_counts": {
+        "guidance": 1,
+        "mneme_ready": 1,
+        "protected": 1,
+        "requires_modelling": 1
+      },
+      "runtime_decisions": [
+        [
+          "C2-LIT",
+          "active"
+        ],
+        [
+          "C2-PICKLE",
+          "active"
+        ],
+        [
+          "C2-READY",
+          "active"
+        ],
+        [
+          "C2-GUIDE",
+          "active"
+        ]
+      ]
+    },
+    "protect_list": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Protection activation candidates\n============================================================\nProtected: 1  Mneme-ready: 1  Requires modelling: 1  Guidance: 1\nCandidates: 1\n\n[1] C2-PICKLE: Do not use pickle for persistence.\n    guardrail: FORBID_LITERAL: pickle\n    rule to install: FORBID_LITERAL \"pickle\"\n    applies to: global applicability (canonical policy sources exempt)\n    enforcement: FORBID_LITERAL fails on an exact case-sensitive match, enforced independently of retrieval score; canonical policy sources are exempt (ADR-019/ADR-020)\n\nValidate before activating:  mneme protect validate <decision-id>\nActivate (explicit):         mneme protect activate <decision-id>\n"
+    },
+    "protect_status:C2-LIT": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Decision [C2-LIT] Do not import psycopg2; the service uses SQLite.\n  lifecycle status: active\n  protection tier:  protected\n  guardrail:        FORBID_LITERAL: psycopg2\n  evidence:         verified\n  rule installed:   yes\n"
+    },
+    "protect_status:C2-OLD": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'C2-OLD' not found in .mneme/project_memory.json\n",
+      "stdout": ""
+    },
+    "protect_status:C2-OLDPICKLE": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'C2-OLDPICKLE' not found in .mneme/project_memory.json\n",
+      "stdout": ""
+    },
+    "protect_status:C2-PICKLE": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Decision [C2-PICKLE] Do not use pickle for persistence.\n  lifecycle status: active\n  protection tier:  mneme_ready\n  guardrail:        FORBID_LITERAL: pickle\n  evidence:         none\n  rule installed:   no\n  proposal:         FORBID_LITERAL \"pickle\"\n"
+    },
+    "protect_status:GHOST-404": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'GHOST-404' not found in .mneme/project_memory.json\n",
+      "stdout": ""
+    },
+    "protect_validate:C2-LIT": {
+      "exit": 1,
+      "stderr": "",
+      "stdout": "NOT ELIGIBLE: [C2-LIT] already Protected under the canonical assessment\nProtection was not validated and nothing was activated.\n"
+    },
+    "protect_validate:C2-OLD": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'C2-OLD' not found\n",
+      "stdout": ""
+    },
+    "protect_validate:C2-OLDPICKLE": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'C2-OLDPICKLE' not found\n",
+      "stdout": ""
+    },
+    "protect_validate:C2-PICKLE": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Validating proposed protection for [C2-PICKLE]\n  decision:  Do not use pickle for persistence.\n  proposal:  FORBID_LITERAL \"pickle\"\n  checks:\n    PASS prohibited_detected: input containing 'pickle' is a typed FAIL\n    PASS permitted_allowed: permitted input without 'pickle' is not blocked\n    PASS path_scope_respected: artifact path enforced=True, canonical policy source exempt=True\n    PASS unrelated_paths_unaffected: unrelated artifact path enforced=True, permitted content blocked=False\nResult: VALID\nValidation never activates protection.\n"
+    },
+    "protect_validate:GHOST-404": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'GHOST-404' not found\n",
+      "stdout": ""
+    }
+  },
+  "canonical_v2_applicability": {
+    "audit": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Audit report written: audit.json\n"
+    },
+    "audit_json": "{\n  \"schema\": \"mneme.audit/v1\",\n  \"memory\": \"<WORK>/.mneme/project_memory.json\",\n  \"summary\": {\n    \"total_decisions\": 4,\n    \"protection_relevant\": 3,\n    \"protected\": 1,\n    \"mneme_ready\": 1,\n    \"requires_modelling\": 1,\n    \"guidance\": 1,\n    \"current_protection_pct\": 33.3,\n    \"identified_mneme_potential_pct\": 66.7,\n    \"protection_gap_pct\": 66.7\n  },\n  \"decisions\": [\n    {\n      \"id\": \"C2-LIT\",\n      \"decision\": \"Do not import psycopg2; the service uses SQLite.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"protected\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: psycopg2\",\n      \"evidence_confidence\": \"verified\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-PICKLE\",\n      \"decision\": \"Do not use pickle for persistence.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"mneme_ready\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: pickle\",\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-READY\",\n      \"decision\": \"Never call requests.get without a timeout.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"requires_modelling\",\n      \"mneme_guardrail\": null,\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-GUIDE\",\n      \"decision\": \"Prefer small, composable modules.\",\n      \"status\": \"active\",\n      \"intent\": \"guidance\",\n      \"protection_tier\": \"guidance\",\n      \"mneme_guardrail\": null,\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    }\n  ]\n}\n",
+    "check:strict": {
+      "exit": 2,
+      "stderr": "",
+      "stdout": "FAIL  [C2-LIT] FORBID_LITERAL \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\n      path: app.py\nFAIL  [C2-LIT] anti_pattern \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\nFAIL  [C2-PICKLE] anti_pattern \"pickle\" -- trigger: pickle\n      Do not use pickle for persistence.\n\nResult: FAIL\n"
+    },
+    "check:warn": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "FAIL  [C2-LIT] FORBID_LITERAL \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\n      path: app.py\nFAIL  [C2-LIT] anti_pattern \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\nFAIL  [C2-PICKLE] anti_pattern \"pickle\" -- trigger: pickle\n      Do not use pickle for persistence.\n\nResult: FAIL\n"
+    },
+    "check_json:strict": {
+      "exit": 2,
+      "stderr": "",
+      "stdout": "{\"schema\": \"mneme.check/v1\", \"verdict\": \"FAIL\", \"mode\": \"strict\", \"evaluation_complete\": true, \"applicability\": [{\"decision_id\": \"C2-LIT\", \"rule_type\": \"FORBID_LITERAL\", \"rule_value\": \"psycopg2\", \"rule_index\": 0, \"path_scoped\": false, \"input_path\": \"app.py\", \"outcome\": \"APPLIED\", \"selector\": null, \"reason\": \"the rule has global applicability\", \"rule_id\": \"C2-LIT:FORBID_LITERAL:dce58d45cafc99df7c5c1df9642234d0\", \"decision_version_id\": \"dver-b848f48f3aa5851448319e625d72c8ba\"}], \"violations\": [{\"decision_id\": \"C2-LIT\", \"decision_text\": \"Do not import psycopg2; the service uses SQLite.\", \"severity\": \"FAIL\", \"rule\": \"psycopg2\", \"trigger\": \"psycopg2\", \"kind\": \"typed_rule\", \"rule_type\": \"FORBID_LITERAL\", \"input_path\": \"app.py\", \"selector\": null, \"rule_id\": \"C2-LIT:FORBID_LITERAL:dce58d45cafc99df7c5c1df9642234d0\", \"decision_version_id\": \"dver-b848f48f3aa5851448319e625d72c8ba\"}, {\"decision_id\": \"C2-LIT\", \"decision_text\": \"Do not import psycopg2; the service uses SQLite.\", \"severity\": \"FAIL\", \"rule\": \"psycopg2\", \"trigger\": \"psycopg2\", \"kind\": \"anti_pattern\", \"rule_type\": null, \"input_path\": null, \"selector\": null, \"rule_id\": null, \"decision_version_id\": null}, {\"decision_id\": \"C2-PICKLE\", \"decision_text\": \"Do not use pickle for persistence.\", \"severity\": \"FAIL\", \"rule\": \"pickle\", \"trigger\": \"pickle\", \"kind\": \"anti_pattern\", \"rule_type\": null, \"input_path\": null, \"selector\": null, \"rule_id\": null, \"decision_version_id\": null}], \"freshness\": [], \"subject\": {\"input_kind\": \"complete_source_file\", \"subject_sha256\": \"13e1707cf48141c2892f81a392ee771f943c2dbf04c69b967ac5316e06b52c52\", \"source_path\": \"<WORK>/app.py\", \"memory_path\": \"<WORK>/.mneme/project_memory.json\", \"governed_path\": \"app.py\", \"surface\": \"mneme check\", \"surface_version\": \"0.11.0\", \"runtime\": \"<RUNTIME>\"}}\n"
+    },
+    "check_json:warn": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "{\"schema\": \"mneme.check/v1\", \"verdict\": \"FAIL\", \"mode\": \"warn\", \"evaluation_complete\": true, \"applicability\": [{\"decision_id\": \"C2-LIT\", \"rule_type\": \"FORBID_LITERAL\", \"rule_value\": \"psycopg2\", \"rule_index\": 0, \"path_scoped\": false, \"input_path\": \"app.py\", \"outcome\": \"APPLIED\", \"selector\": null, \"reason\": \"the rule has global applicability\", \"rule_id\": \"C2-LIT:FORBID_LITERAL:dce58d45cafc99df7c5c1df9642234d0\", \"decision_version_id\": \"dver-b848f48f3aa5851448319e625d72c8ba\"}], \"violations\": [{\"decision_id\": \"C2-LIT\", \"decision_text\": \"Do not import psycopg2; the service uses SQLite.\", \"severity\": \"FAIL\", \"rule\": \"psycopg2\", \"trigger\": \"psycopg2\", \"kind\": \"typed_rule\", \"rule_type\": \"FORBID_LITERAL\", \"input_path\": \"app.py\", \"selector\": null, \"rule_id\": \"C2-LIT:FORBID_LITERAL:dce58d45cafc99df7c5c1df9642234d0\", \"decision_version_id\": \"dver-b848f48f3aa5851448319e625d72c8ba\"}, {\"decision_id\": \"C2-LIT\", \"decision_text\": \"Do not import psycopg2; the service uses SQLite.\", \"severity\": \"FAIL\", \"rule\": \"psycopg2\", \"trigger\": \"psycopg2\", \"kind\": \"anti_pattern\", \"rule_type\": null, \"input_path\": null, \"selector\": null, \"rule_id\": null, \"decision_version_id\": null}, {\"decision_id\": \"C2-PICKLE\", \"decision_text\": \"Do not use pickle for persistence.\", \"severity\": \"FAIL\", \"rule\": \"pickle\", \"trigger\": \"pickle\", \"kind\": \"anti_pattern\", \"rule_type\": null, \"input_path\": null, \"selector\": null, \"rule_id\": null, \"decision_version_id\": null}], \"freshness\": [], \"subject\": {\"input_kind\": \"complete_source_file\", \"subject_sha256\": \"13e1707cf48141c2892f81a392ee771f943c2dbf04c69b967ac5316e06b52c52\", \"source_path\": \"<WORK>/app.py\", \"memory_path\": \"<WORK>/.mneme/project_memory.json\", \"governed_path\": \"app.py\", \"surface\": \"mneme check\", \"surface_version\": \"0.11.0\", \"runtime\": \"<RUNTIME>\"}}\n"
+    },
+    "check_preview": {
+      "exit": 2,
+      "stderr": "NON-AUTHORITATIVE applicability preview (caller-asserted labels; no effect on enforcement)\n  labels: [\"windows\"]\n  [C2-DEP] ineffective (cause=lifecycle_deprecated; version=dver-4ae2cab7f77cf4839ac52347edd036a1)\n  [C2-GUIDE] effective (cause=effective; version=dver-4ae206768883ed34199063fc76935614)\n  [C2-LIT] effective (cause=effective; version=dver-b848f48f3aa5851448319e625d72c8ba)\n  [C2-OLD] ineffective (cause=lifecycle_superseded; version=dver-02c1d93e7212a044ef0238f23cb1ab15)\n  [C2-OLDPICKLE] ineffective (cause=lifecycle_superseded; version=dver-9b0cd0b19382d45fa762466b06700c2a)\n  [C2-PICKLE] effective (cause=effective; version=dver-917e0205a2db8478096812ccc69b5131)\n  [C2-READY] effective (cause=effective; version=dver-f5c60dbfe8de98ddf089d0f5c084c7ee)\n",
+      "stdout": "FAIL  [C2-LIT] FORBID_LITERAL \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\n      path: app.py\nFAIL  [C2-LIT] anti_pattern \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\nFAIL  [C2-PICKLE] anti_pattern \"pickle\" -- trigger: pickle\n      Do not use pickle for persistence.\n\nResult: FAIL\n"
+    },
+    "in_process": {
+      "build_report": {
+        "decisions": [
+          {
+            "decision": "Do not import psycopg2; the service uses SQLite.",
+            "evidence_confidence": "verified",
+            "evidence_sources": [],
+            "id": "C2-LIT",
+            "intent": "deterministic",
+            "mneme_guardrail": "FORBID_LITERAL: psycopg2",
+            "protection_tier": "protected",
+            "status": "active"
+          },
+          {
+            "decision": "Do not use pickle for persistence.",
+            "evidence_confidence": "none",
+            "evidence_sources": [],
+            "id": "C2-PICKLE",
+            "intent": "deterministic",
+            "mneme_guardrail": "FORBID_LITERAL: pickle",
+            "protection_tier": "mneme_ready",
+            "status": "active"
+          },
+          {
+            "decision": "Never call requests.get without a timeout.",
+            "evidence_confidence": "none",
+            "evidence_sources": [],
+            "id": "C2-READY",
+            "intent": "deterministic",
+            "mneme_guardrail": null,
+            "protection_tier": "requires_modelling",
+            "status": "active"
+          },
+          {
+            "decision": "Prefer small, composable modules.",
+            "evidence_confidence": "none",
+            "evidence_sources": [],
+            "id": "C2-GUIDE",
+            "intent": "guidance",
+            "mneme_guardrail": null,
+            "protection_tier": "guidance",
+            "status": "active"
+          }
+        ],
+        "memory": "<WORK>/.mneme/project_memory.json",
+        "schema": "mneme.audit/v1",
+        "summary": {
+          "current_protection_pct": 33.3,
+          "guidance": 1,
+          "identified_mneme_potential_pct": 66.7,
+          "mneme_ready": 1,
+          "protected": 1,
+          "protection_gap_pct": 66.7,
+          "protection_relevant": 3,
+          "requires_modelling": 1,
+          "total_decisions": 4
+        }
+      },
+      "match_ci_evidence": {
+        "C2-LIT": [
+          "tests/test_storage.py::test_sqlite_only"
+        ]
+      },
+      "readiness_counts": {
+        "guidance": 1,
+        "mneme_ready": 1,
+        "protected": 1,
+        "requires_modelling": 1
+      },
+      "runtime_decisions": [
+        [
+          "C2-LIT",
+          "active"
+        ],
+        [
+          "C2-PICKLE",
+          "active"
+        ],
+        [
+          "C2-READY",
+          "active"
+        ],
+        [
+          "C2-GUIDE",
+          "active"
+        ]
+      ]
+    },
+    "protect_list": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Protection activation candidates\n============================================================\nProtected: 1  Mneme-ready: 1  Requires modelling: 1  Guidance: 1\nCandidates: 1\n\n[1] C2-PICKLE: Do not use pickle for persistence.\n    guardrail: FORBID_LITERAL: pickle\n    rule to install: FORBID_LITERAL \"pickle\"\n    applies to: global applicability (canonical policy sources exempt)\n    enforcement: FORBID_LITERAL fails on an exact case-sensitive match, enforced independently of retrieval score; canonical policy sources are exempt (ADR-019/ADR-020)\n\nValidate before activating:  mneme protect validate <decision-id>\nActivate (explicit):         mneme protect activate <decision-id>\n"
+    },
+    "protect_status:C2-LIT": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Decision [C2-LIT] Do not import psycopg2; the service uses SQLite.\n  lifecycle status: active\n  protection tier:  protected\n  guardrail:        FORBID_LITERAL: psycopg2\n  evidence:         verified\n  rule installed:   yes\n"
+    },
+    "protect_status:C2-OLD": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'C2-OLD' not found in .mneme/project_memory.json\n",
+      "stdout": ""
+    },
+    "protect_status:C2-OLDPICKLE": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'C2-OLDPICKLE' not found in .mneme/project_memory.json\n",
+      "stdout": ""
+    },
+    "protect_status:C2-PICKLE": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Decision [C2-PICKLE] Do not use pickle for persistence.\n  lifecycle status: active\n  protection tier:  mneme_ready\n  guardrail:        FORBID_LITERAL: pickle\n  evidence:         none\n  rule installed:   no\n  proposal:         FORBID_LITERAL \"pickle\"\n"
+    },
+    "protect_status:GHOST-404": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'GHOST-404' not found in .mneme/project_memory.json\n",
+      "stdout": ""
+    },
+    "protect_validate:C2-LIT": {
+      "exit": 1,
+      "stderr": "",
+      "stdout": "NOT ELIGIBLE: [C2-LIT] already Protected under the canonical assessment\nProtection was not validated and nothing was activated.\n"
+    },
+    "protect_validate:C2-OLD": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'C2-OLD' not found\n",
+      "stdout": ""
+    },
+    "protect_validate:C2-OLDPICKLE": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'C2-OLDPICKLE' not found\n",
+      "stdout": ""
+    },
+    "protect_validate:C2-PICKLE": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Validating proposed protection for [C2-PICKLE]\n  decision:  Do not use pickle for persistence.\n  proposal:  FORBID_LITERAL \"pickle\"\n  checks:\n    PASS prohibited_detected: input containing 'pickle' is a typed FAIL\n    PASS permitted_allowed: permitted input without 'pickle' is not blocked\n    PASS path_scope_respected: artifact path enforced=True, canonical policy source exempt=True\n    PASS unrelated_paths_unaffected: unrelated artifact path enforced=True, permitted content blocked=False\nResult: VALID\nValidation never activates protection.\n"
+    },
+    "protect_validate:GHOST-404": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'GHOST-404' not found\n",
+      "stdout": ""
+    }
+  },
+  "legacy_items": {
+    "audit": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Audit report written: audit.json\n"
+    },
+    "audit_json": "{\n  \"schema\": \"mneme.audit/v1\",\n  \"memory\": \"<WORK>/.mneme/project_memory.json\",\n  \"summary\": {\n    \"total_decisions\": 4,\n    \"protection_relevant\": 3,\n    \"protected\": 1,\n    \"mneme_ready\": 1,\n    \"requires_modelling\": 1,\n    \"guidance\": 0,\n    \"current_protection_pct\": 33.3,\n    \"identified_mneme_potential_pct\": 66.7,\n    \"protection_gap_pct\": 66.7\n  },\n  \"decisions\": [\n    {\n      \"id\": \"C2-LIT\",\n      \"decision\": \"Do not import psycopg2; the service uses SQLite.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"protected\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: psycopg2\",\n      \"evidence_confidence\": \"verified\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-OLD\",\n      \"decision\": \"Do not import mysqlclient.\",\n      \"status\": \"superseded\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"protected\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: mysqlclient\",\n      \"evidence_confidence\": \"verified\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-ITEM-RULE\",\n      \"decision\": \"No print debugging\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"requires_modelling\",\n      \"mneme_guardrail\": null,\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-ITEM-AP\",\n      \"decision\": \"Avoid: eval(\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"mneme_ready\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: eval\",\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    }\n  ]\n}\n",
+    "check:strict": {
+      "exit": 2,
+      "stderr": "",
+      "stdout": "FAIL  [C2-LIT] FORBID_LITERAL \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\n      path: app.py\nFAIL  [C2-LIT] anti_pattern \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\nFAIL  [C2-OLD] FORBID_LITERAL \"mysqlclient\" -- trigger: mysqlclient\n      Do not import mysqlclient.\n      path: app.py\nFAIL  [C2-OLD] anti_pattern \"mysqlclient\" -- trigger: mysqlclient\n      Do not import mysqlclient.\n\nResult: FAIL\n"
+    },
+    "check:warn": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "FAIL  [C2-LIT] FORBID_LITERAL \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\n      path: app.py\nFAIL  [C2-LIT] anti_pattern \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\nFAIL  [C2-OLD] FORBID_LITERAL \"mysqlclient\" -- trigger: mysqlclient\n      Do not import mysqlclient.\n      path: app.py\nFAIL  [C2-OLD] anti_pattern \"mysqlclient\" -- trigger: mysqlclient\n      Do not import mysqlclient.\n\nResult: FAIL\n"
+    },
+    "check_json:strict": {
+      "exit": 2,
+      "stderr": "",
+      "stdout": "{\"schema\": \"mneme.check/v1\", \"verdict\": \"FAIL\", \"mode\": \"strict\", \"evaluation_complete\": true, \"applicability\": [{\"decision_id\": \"C2-LIT\", \"rule_type\": \"FORBID_LITERAL\", \"rule_value\": \"psycopg2\", \"rule_index\": 0, \"path_scoped\": false, \"input_path\": \"app.py\", \"outcome\": \"APPLIED\", \"selector\": null, \"reason\": \"the rule has global applicability\", \"rule_id\": \"C2-LIT:FORBID_LITERAL:dce58d45cafc99df7c5c1df9642234d0\", \"decision_version_id\": \"\"}, {\"decision_id\": \"C2-OLD\", \"rule_type\": \"FORBID_LITERAL\", \"rule_value\": \"mysqlclient\", \"rule_index\": 0, \"path_scoped\": false, \"input_path\": \"app.py\", \"outcome\": \"APPLIED\", \"selector\": null, \"reason\": \"the rule has global applicability\", \"rule_id\": \"C2-OLD:FORBID_LITERAL:249c43426c1536005e35418815914275\", \"decision_version_id\": \"\"}], \"violations\": [{\"decision_id\": \"C2-LIT\", \"decision_text\": \"Do not import psycopg2; the service uses SQLite.\", \"severity\": \"FAIL\", \"rule\": \"psycopg2\", \"trigger\": \"psycopg2\", \"kind\": \"typed_rule\", \"rule_type\": \"FORBID_LITERAL\", \"input_path\": \"app.py\", \"selector\": null, \"rule_id\": \"C2-LIT:FORBID_LITERAL:dce58d45cafc99df7c5c1df9642234d0\", \"decision_version_id\": \"\"}, {\"decision_id\": \"C2-LIT\", \"decision_text\": \"Do not import psycopg2; the service uses SQLite.\", \"severity\": \"FAIL\", \"rule\": \"psycopg2\", \"trigger\": \"psycopg2\", \"kind\": \"anti_pattern\", \"rule_type\": null, \"input_path\": null, \"selector\": null, \"rule_id\": null, \"decision_version_id\": null}, {\"decision_id\": \"C2-OLD\", \"decision_text\": \"Do not import mysqlclient.\", \"severity\": \"FAIL\", \"rule\": \"mysqlclient\", \"trigger\": \"mysqlclient\", \"kind\": \"typed_rule\", \"rule_type\": \"FORBID_LITERAL\", \"input_path\": \"app.py\", \"selector\": null, \"rule_id\": \"C2-OLD:FORBID_LITERAL:249c43426c1536005e35418815914275\", \"decision_version_id\": \"\"}, {\"decision_id\": \"C2-OLD\", \"decision_text\": \"Do not import mysqlclient.\", \"severity\": \"FAIL\", \"rule\": \"mysqlclient\", \"trigger\": \"mysqlclient\", \"kind\": \"anti_pattern\", \"rule_type\": null, \"input_path\": null, \"selector\": null, \"rule_id\": null, \"decision_version_id\": null}], \"freshness\": [], \"subject\": {\"input_kind\": \"complete_source_file\", \"subject_sha256\": \"13e1707cf48141c2892f81a392ee771f943c2dbf04c69b967ac5316e06b52c52\", \"source_path\": \"<WORK>/app.py\", \"memory_path\": \"<WORK>/.mneme/project_memory.json\", \"governed_path\": \"app.py\", \"surface\": \"mneme check\", \"surface_version\": \"0.11.0\", \"runtime\": \"<RUNTIME>\"}}\n"
+    },
+    "check_json:warn": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "{\"schema\": \"mneme.check/v1\", \"verdict\": \"FAIL\", \"mode\": \"warn\", \"evaluation_complete\": true, \"applicability\": [{\"decision_id\": \"C2-LIT\", \"rule_type\": \"FORBID_LITERAL\", \"rule_value\": \"psycopg2\", \"rule_index\": 0, \"path_scoped\": false, \"input_path\": \"app.py\", \"outcome\": \"APPLIED\", \"selector\": null, \"reason\": \"the rule has global applicability\", \"rule_id\": \"C2-LIT:FORBID_LITERAL:dce58d45cafc99df7c5c1df9642234d0\", \"decision_version_id\": \"\"}, {\"decision_id\": \"C2-OLD\", \"rule_type\": \"FORBID_LITERAL\", \"rule_value\": \"mysqlclient\", \"rule_index\": 0, \"path_scoped\": false, \"input_path\": \"app.py\", \"outcome\": \"APPLIED\", \"selector\": null, \"reason\": \"the rule has global applicability\", \"rule_id\": \"C2-OLD:FORBID_LITERAL:249c43426c1536005e35418815914275\", \"decision_version_id\": \"\"}], \"violations\": [{\"decision_id\": \"C2-LIT\", \"decision_text\": \"Do not import psycopg2; the service uses SQLite.\", \"severity\": \"FAIL\", \"rule\": \"psycopg2\", \"trigger\": \"psycopg2\", \"kind\": \"typed_rule\", \"rule_type\": \"FORBID_LITERAL\", \"input_path\": \"app.py\", \"selector\": null, \"rule_id\": \"C2-LIT:FORBID_LITERAL:dce58d45cafc99df7c5c1df9642234d0\", \"decision_version_id\": \"\"}, {\"decision_id\": \"C2-LIT\", \"decision_text\": \"Do not import psycopg2; the service uses SQLite.\", \"severity\": \"FAIL\", \"rule\": \"psycopg2\", \"trigger\": \"psycopg2\", \"kind\": \"anti_pattern\", \"rule_type\": null, \"input_path\": null, \"selector\": null, \"rule_id\": null, \"decision_version_id\": null}, {\"decision_id\": \"C2-OLD\", \"decision_text\": \"Do not import mysqlclient.\", \"severity\": \"FAIL\", \"rule\": \"mysqlclient\", \"trigger\": \"mysqlclient\", \"kind\": \"typed_rule\", \"rule_type\": \"FORBID_LITERAL\", \"input_path\": \"app.py\", \"selector\": null, \"rule_id\": \"C2-OLD:FORBID_LITERAL:249c43426c1536005e35418815914275\", \"decision_version_id\": \"\"}, {\"decision_id\": \"C2-OLD\", \"decision_text\": \"Do not import mysqlclient.\", \"severity\": \"FAIL\", \"rule\": \"mysqlclient\", \"trigger\": \"mysqlclient\", \"kind\": \"anti_pattern\", \"rule_type\": null, \"input_path\": null, \"selector\": null, \"rule_id\": null, \"decision_version_id\": null}], \"freshness\": [], \"subject\": {\"input_kind\": \"complete_source_file\", \"subject_sha256\": \"13e1707cf48141c2892f81a392ee771f943c2dbf04c69b967ac5316e06b52c52\", \"source_path\": \"<WORK>/app.py\", \"memory_path\": \"<WORK>/.mneme/project_memory.json\", \"governed_path\": \"app.py\", \"surface\": \"mneme check\", \"surface_version\": \"0.11.0\", \"runtime\": \"<RUNTIME>\"}}\n"
+    },
+    "check_preview": {
+      "exit": 2,
+      "stderr": "NON-AUTHORITATIVE applicability preview: PREVIEW UNAVAILABLE\n",
+      "stdout": "FAIL  [C2-LIT] FORBID_LITERAL \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\n      path: app.py\nFAIL  [C2-LIT] anti_pattern \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\nFAIL  [C2-OLD] FORBID_LITERAL \"mysqlclient\" -- trigger: mysqlclient\n      Do not import mysqlclient.\n      path: app.py\nFAIL  [C2-OLD] anti_pattern \"mysqlclient\" -- trigger: mysqlclient\n      Do not import mysqlclient.\n\nResult: FAIL\n"
+    },
+    "in_process": {
+      "build_report": {
+        "decisions": [
+          {
+            "decision": "Do not import psycopg2; the service uses SQLite.",
+            "evidence_confidence": "verified",
+            "evidence_sources": [],
+            "id": "C2-LIT",
+            "intent": "deterministic",
+            "mneme_guardrail": "FORBID_LITERAL: psycopg2",
+            "protection_tier": "protected",
+            "status": "active"
+          },
+          {
+            "decision": "Do not import mysqlclient.",
+            "evidence_confidence": "verified",
+            "evidence_sources": [],
+            "id": "C2-OLD",
+            "intent": "deterministic",
+            "mneme_guardrail": "FORBID_LITERAL: mysqlclient",
+            "protection_tier": "protected",
+            "status": "superseded"
+          },
+          {
+            "decision": "No print debugging",
+            "evidence_confidence": "none",
+            "evidence_sources": [],
+            "id": "C2-ITEM-RULE",
+            "intent": "deterministic",
+            "mneme_guardrail": null,
+            "protection_tier": "requires_modelling",
+            "status": "active"
+          },
+          {
+            "decision": "Avoid: eval(",
+            "evidence_confidence": "none",
+            "evidence_sources": [],
+            "id": "C2-ITEM-AP",
+            "intent": "deterministic",
+            "mneme_guardrail": "FORBID_LITERAL: eval",
+            "protection_tier": "mneme_ready",
+            "status": "active"
+          }
+        ],
+        "memory": "<WORK>/.mneme/project_memory.json",
+        "schema": "mneme.audit/v1",
+        "summary": {
+          "current_protection_pct": 33.3,
+          "guidance": 0,
+          "identified_mneme_potential_pct": 66.7,
+          "mneme_ready": 1,
+          "protected": 1,
+          "protection_gap_pct": 66.7,
+          "protection_relevant": 3,
+          "requires_modelling": 1,
+          "total_decisions": 4
+        }
+      },
+      "match_ci_evidence": {
+        "C2-LIT": [
+          "tests/test_storage.py::test_sqlite_only"
+        ]
+      },
+      "readiness_counts": {
+        "guidance": 0,
+        "mneme_ready": 1,
+        "protected": 1,
+        "requires_modelling": 1
+      },
+      "runtime_decisions": [
+        [
+          "C2-LIT",
+          "active"
+        ],
+        [
+          "C2-OLD",
+          "superseded"
+        ],
+        [
+          "C2-ITEM-RULE",
+          "active"
+        ],
+        [
+          "C2-ITEM-AP",
+          "active"
+        ]
+      ]
+    },
+    "protect_list": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Protection activation candidates\n============================================================\nProtected: 1  Mneme-ready: 1  Requires modelling: 1  Guidance: 0\nCandidates: 1\n\n[1] C2-ITEM-AP: Avoid: eval(\n    guardrail: FORBID_LITERAL: eval\n    rule to install: FORBID_LITERAL \"eval\"\n    applies to: global applicability (canonical policy sources exempt)\n    enforcement: FORBID_LITERAL fails on an exact case-sensitive match, enforced independently of retrieval score; canonical policy sources are exempt (ADR-019/ADR-020)\n\nValidate before activating:  mneme protect validate <decision-id>\nActivate (explicit):         mneme protect activate <decision-id>\n"
+    },
+    "protect_status:C2-LIT": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Decision [C2-LIT] Do not import psycopg2; the service uses SQLite.\n  lifecycle status: active\n  protection tier:  protected\n  guardrail:        FORBID_LITERAL: psycopg2\n  evidence:         verified\n  rule installed:   yes\n"
+    },
+    "protect_status:C2-OLD": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Decision [C2-OLD] Do not import mysqlclient.\n  lifecycle status: superseded\n  protection tier:  protected\n  guardrail:        FORBID_LITERAL: mysqlclient\n  evidence:         verified\n  rule installed:   yes\n"
+    },
+    "protect_status:C2-OLDPICKLE": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'C2-OLDPICKLE' not found in .mneme/project_memory.json\n",
+      "stdout": ""
+    },
+    "protect_status:C2-PICKLE": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'C2-PICKLE' not found in .mneme/project_memory.json\n",
+      "stdout": ""
+    },
+    "protect_status:GHOST-404": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'GHOST-404' not found in .mneme/project_memory.json\n",
+      "stdout": ""
+    },
+    "protect_validate:C2-LIT": {
+      "exit": 1,
+      "stderr": "",
+      "stdout": "NOT ELIGIBLE: [C2-LIT] already Protected under the canonical assessment\nProtection was not validated and nothing was activated.\n"
+    },
+    "protect_validate:C2-OLD": {
+      "exit": 1,
+      "stderr": "",
+      "stdout": "NOT ELIGIBLE: [C2-OLD] decision status is 'superseded'; only active decisions can be activated\nProtection was not validated and nothing was activated.\n"
+    },
+    "protect_validate:C2-OLDPICKLE": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'C2-OLDPICKLE' not found\n",
+      "stdout": ""
+    },
+    "protect_validate:C2-PICKLE": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'C2-PICKLE' not found\n",
+      "stdout": ""
+    },
+    "protect_validate:GHOST-404": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'GHOST-404' not found\n",
+      "stdout": ""
+    }
+  },
+  "legacy_sectionless": {
+    "audit": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Audit report written: audit.json\n"
+    },
+    "audit_json": "{\n  \"schema\": \"mneme.audit/v1\",\n  \"memory\": \"<WORK>/.mneme/project_memory.json\",\n  \"summary\": {\n    \"total_decisions\": 7,\n    \"protection_relevant\": 3,\n    \"protected\": 1,\n    \"mneme_ready\": 1,\n    \"requires_modelling\": 1,\n    \"guidance\": 1,\n    \"current_protection_pct\": 33.3,\n    \"identified_mneme_potential_pct\": 66.7,\n    \"protection_gap_pct\": 66.7\n  },\n  \"decisions\": [\n    {\n      \"id\": \"C2-LIT\",\n      \"decision\": \"Do not import psycopg2; the service uses SQLite.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"protected\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: psycopg2\",\n      \"evidence_confidence\": \"verified\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-PICKLE\",\n      \"decision\": \"Do not use pickle for persistence.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"mneme_ready\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: pickle\",\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-READY\",\n      \"decision\": \"Never call requests.get without a timeout.\",\n      \"status\": \"active\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"requires_modelling\",\n      \"mneme_guardrail\": null,\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-GUIDE\",\n      \"decision\": \"Prefer small, composable modules.\",\n      \"status\": \"active\",\n      \"intent\": \"guidance\",\n      \"protection_tier\": \"guidance\",\n      \"mneme_guardrail\": null,\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-OLD\",\n      \"decision\": \"Do not import mysqlclient.\",\n      \"status\": \"superseded\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"protected\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: mysqlclient\",\n      \"evidence_confidence\": \"verified\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-DEP\",\n      \"decision\": \"Do not import cx_Oracle.\",\n      \"status\": \"deprecated\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"protected\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: cx_Oracle\",\n      \"evidence_confidence\": \"verified\",\n      \"evidence_sources\": []\n    },\n    {\n      \"id\": \"C2-OLDPICKLE\",\n      \"decision\": \"Do not use marshal for persistence.\",\n      \"status\": \"superseded\",\n      \"intent\": \"deterministic\",\n      \"protection_tier\": \"mneme_ready\",\n      \"mneme_guardrail\": \"FORBID_LITERAL: marshal\",\n      \"evidence_confidence\": \"none\",\n      \"evidence_sources\": []\n    }\n  ]\n}\n",
+    "check:strict": {
+      "exit": 2,
+      "stderr": "",
+      "stdout": "FAIL  [C2-LIT] FORBID_LITERAL \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\n      path: app.py\nFAIL  [C2-LIT] anti_pattern \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\nFAIL  [C2-PICKLE] anti_pattern \"pickle\" -- trigger: pickle\n      Do not use pickle for persistence.\nFAIL  [C2-OLD] FORBID_LITERAL \"mysqlclient\" -- trigger: mysqlclient\n      Do not import mysqlclient.\n      path: app.py\nFAIL  [C2-OLD] anti_pattern \"mysqlclient\" -- trigger: mysqlclient\n      Do not import mysqlclient.\nFAIL  [C2-DEP] FORBID_LITERAL \"cx_Oracle\" -- trigger: cx_Oracle\n      Do not import cx_Oracle.\n      path: app.py\n\nResult: FAIL\n"
+    },
+    "check:warn": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "FAIL  [C2-LIT] FORBID_LITERAL \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\n      path: app.py\nFAIL  [C2-LIT] anti_pattern \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\nFAIL  [C2-PICKLE] anti_pattern \"pickle\" -- trigger: pickle\n      Do not use pickle for persistence.\nFAIL  [C2-OLD] FORBID_LITERAL \"mysqlclient\" -- trigger: mysqlclient\n      Do not import mysqlclient.\n      path: app.py\nFAIL  [C2-OLD] anti_pattern \"mysqlclient\" -- trigger: mysqlclient\n      Do not import mysqlclient.\nFAIL  [C2-DEP] FORBID_LITERAL \"cx_Oracle\" -- trigger: cx_Oracle\n      Do not import cx_Oracle.\n      path: app.py\n\nResult: FAIL\n"
+    },
+    "check_json:strict": {
+      "exit": 2,
+      "stderr": "",
+      "stdout": "{\"schema\": \"mneme.check/v1\", \"verdict\": \"FAIL\", \"mode\": \"strict\", \"evaluation_complete\": true, \"applicability\": [{\"decision_id\": \"C2-LIT\", \"rule_type\": \"FORBID_LITERAL\", \"rule_value\": \"psycopg2\", \"rule_index\": 0, \"path_scoped\": false, \"input_path\": \"app.py\", \"outcome\": \"APPLIED\", \"selector\": null, \"reason\": \"the rule has global applicability\", \"rule_id\": \"C2-LIT:FORBID_LITERAL:dce58d45cafc99df7c5c1df9642234d0\", \"decision_version_id\": \"\"}, {\"decision_id\": \"C2-OLD\", \"rule_type\": \"FORBID_LITERAL\", \"rule_value\": \"mysqlclient\", \"rule_index\": 0, \"path_scoped\": false, \"input_path\": \"app.py\", \"outcome\": \"APPLIED\", \"selector\": null, \"reason\": \"the rule has global applicability\", \"rule_id\": \"C2-OLD:FORBID_LITERAL:249c43426c1536005e35418815914275\", \"decision_version_id\": \"\"}, {\"decision_id\": \"C2-DEP\", \"rule_type\": \"FORBID_LITERAL\", \"rule_value\": \"cx_Oracle\", \"rule_index\": 0, \"path_scoped\": false, \"input_path\": \"app.py\", \"outcome\": \"APPLIED\", \"selector\": null, \"reason\": \"the rule has global applicability\", \"rule_id\": \"C2-DEP:FORBID_LITERAL:bd7396244d0c51b4cb07ef58dcc51558\", \"decision_version_id\": \"\"}], \"violations\": [{\"decision_id\": \"C2-LIT\", \"decision_text\": \"Do not import psycopg2; the service uses SQLite.\", \"severity\": \"FAIL\", \"rule\": \"psycopg2\", \"trigger\": \"psycopg2\", \"kind\": \"typed_rule\", \"rule_type\": \"FORBID_LITERAL\", \"input_path\": \"app.py\", \"selector\": null, \"rule_id\": \"C2-LIT:FORBID_LITERAL:dce58d45cafc99df7c5c1df9642234d0\", \"decision_version_id\": \"\"}, {\"decision_id\": \"C2-LIT\", \"decision_text\": \"Do not import psycopg2; the service uses SQLite.\", \"severity\": \"FAIL\", \"rule\": \"psycopg2\", \"trigger\": \"psycopg2\", \"kind\": \"anti_pattern\", \"rule_type\": null, \"input_path\": null, \"selector\": null, \"rule_id\": null, \"decision_version_id\": null}, {\"decision_id\": \"C2-PICKLE\", \"decision_text\": \"Do not use pickle for persistence.\", \"severity\": \"FAIL\", \"rule\": \"pickle\", \"trigger\": \"pickle\", \"kind\": \"anti_pattern\", \"rule_type\": null, \"input_path\": null, \"selector\": null, \"rule_id\": null, \"decision_version_id\": null}, {\"decision_id\": \"C2-OLD\", \"decision_text\": \"Do not import mysqlclient.\", \"severity\": \"FAIL\", \"rule\": \"mysqlclient\", \"trigger\": \"mysqlclient\", \"kind\": \"typed_rule\", \"rule_type\": \"FORBID_LITERAL\", \"input_path\": \"app.py\", \"selector\": null, \"rule_id\": \"C2-OLD:FORBID_LITERAL:249c43426c1536005e35418815914275\", \"decision_version_id\": \"\"}, {\"decision_id\": \"C2-OLD\", \"decision_text\": \"Do not import mysqlclient.\", \"severity\": \"FAIL\", \"rule\": \"mysqlclient\", \"trigger\": \"mysqlclient\", \"kind\": \"anti_pattern\", \"rule_type\": null, \"input_path\": null, \"selector\": null, \"rule_id\": null, \"decision_version_id\": null}, {\"decision_id\": \"C2-DEP\", \"decision_text\": \"Do not import cx_Oracle.\", \"severity\": \"FAIL\", \"rule\": \"cx_Oracle\", \"trigger\": \"cx_Oracle\", \"kind\": \"typed_rule\", \"rule_type\": \"FORBID_LITERAL\", \"input_path\": \"app.py\", \"selector\": null, \"rule_id\": \"C2-DEP:FORBID_LITERAL:bd7396244d0c51b4cb07ef58dcc51558\", \"decision_version_id\": \"\"}], \"freshness\": [], \"subject\": {\"input_kind\": \"complete_source_file\", \"subject_sha256\": \"13e1707cf48141c2892f81a392ee771f943c2dbf04c69b967ac5316e06b52c52\", \"source_path\": \"<WORK>/app.py\", \"memory_path\": \"<WORK>/.mneme/project_memory.json\", \"governed_path\": \"app.py\", \"surface\": \"mneme check\", \"surface_version\": \"0.11.0\", \"runtime\": \"<RUNTIME>\"}}\n"
+    },
+    "check_json:warn": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "{\"schema\": \"mneme.check/v1\", \"verdict\": \"FAIL\", \"mode\": \"warn\", \"evaluation_complete\": true, \"applicability\": [{\"decision_id\": \"C2-LIT\", \"rule_type\": \"FORBID_LITERAL\", \"rule_value\": \"psycopg2\", \"rule_index\": 0, \"path_scoped\": false, \"input_path\": \"app.py\", \"outcome\": \"APPLIED\", \"selector\": null, \"reason\": \"the rule has global applicability\", \"rule_id\": \"C2-LIT:FORBID_LITERAL:dce58d45cafc99df7c5c1df9642234d0\", \"decision_version_id\": \"\"}, {\"decision_id\": \"C2-OLD\", \"rule_type\": \"FORBID_LITERAL\", \"rule_value\": \"mysqlclient\", \"rule_index\": 0, \"path_scoped\": false, \"input_path\": \"app.py\", \"outcome\": \"APPLIED\", \"selector\": null, \"reason\": \"the rule has global applicability\", \"rule_id\": \"C2-OLD:FORBID_LITERAL:249c43426c1536005e35418815914275\", \"decision_version_id\": \"\"}, {\"decision_id\": \"C2-DEP\", \"rule_type\": \"FORBID_LITERAL\", \"rule_value\": \"cx_Oracle\", \"rule_index\": 0, \"path_scoped\": false, \"input_path\": \"app.py\", \"outcome\": \"APPLIED\", \"selector\": null, \"reason\": \"the rule has global applicability\", \"rule_id\": \"C2-DEP:FORBID_LITERAL:bd7396244d0c51b4cb07ef58dcc51558\", \"decision_version_id\": \"\"}], \"violations\": [{\"decision_id\": \"C2-LIT\", \"decision_text\": \"Do not import psycopg2; the service uses SQLite.\", \"severity\": \"FAIL\", \"rule\": \"psycopg2\", \"trigger\": \"psycopg2\", \"kind\": \"typed_rule\", \"rule_type\": \"FORBID_LITERAL\", \"input_path\": \"app.py\", \"selector\": null, \"rule_id\": \"C2-LIT:FORBID_LITERAL:dce58d45cafc99df7c5c1df9642234d0\", \"decision_version_id\": \"\"}, {\"decision_id\": \"C2-LIT\", \"decision_text\": \"Do not import psycopg2; the service uses SQLite.\", \"severity\": \"FAIL\", \"rule\": \"psycopg2\", \"trigger\": \"psycopg2\", \"kind\": \"anti_pattern\", \"rule_type\": null, \"input_path\": null, \"selector\": null, \"rule_id\": null, \"decision_version_id\": null}, {\"decision_id\": \"C2-PICKLE\", \"decision_text\": \"Do not use pickle for persistence.\", \"severity\": \"FAIL\", \"rule\": \"pickle\", \"trigger\": \"pickle\", \"kind\": \"anti_pattern\", \"rule_type\": null, \"input_path\": null, \"selector\": null, \"rule_id\": null, \"decision_version_id\": null}, {\"decision_id\": \"C2-OLD\", \"decision_text\": \"Do not import mysqlclient.\", \"severity\": \"FAIL\", \"rule\": \"mysqlclient\", \"trigger\": \"mysqlclient\", \"kind\": \"typed_rule\", \"rule_type\": \"FORBID_LITERAL\", \"input_path\": \"app.py\", \"selector\": null, \"rule_id\": \"C2-OLD:FORBID_LITERAL:249c43426c1536005e35418815914275\", \"decision_version_id\": \"\"}, {\"decision_id\": \"C2-OLD\", \"decision_text\": \"Do not import mysqlclient.\", \"severity\": \"FAIL\", \"rule\": \"mysqlclient\", \"trigger\": \"mysqlclient\", \"kind\": \"anti_pattern\", \"rule_type\": null, \"input_path\": null, \"selector\": null, \"rule_id\": null, \"decision_version_id\": null}, {\"decision_id\": \"C2-DEP\", \"decision_text\": \"Do not import cx_Oracle.\", \"severity\": \"FAIL\", \"rule\": \"cx_Oracle\", \"trigger\": \"cx_Oracle\", \"kind\": \"typed_rule\", \"rule_type\": \"FORBID_LITERAL\", \"input_path\": \"app.py\", \"selector\": null, \"rule_id\": \"C2-DEP:FORBID_LITERAL:bd7396244d0c51b4cb07ef58dcc51558\", \"decision_version_id\": \"\"}], \"freshness\": [], \"subject\": {\"input_kind\": \"complete_source_file\", \"subject_sha256\": \"13e1707cf48141c2892f81a392ee771f943c2dbf04c69b967ac5316e06b52c52\", \"source_path\": \"<WORK>/app.py\", \"memory_path\": \"<WORK>/.mneme/project_memory.json\", \"governed_path\": \"app.py\", \"surface\": \"mneme check\", \"surface_version\": \"0.11.0\", \"runtime\": \"<RUNTIME>\"}}\n"
+    },
+    "check_preview": {
+      "exit": 2,
+      "stderr": "NON-AUTHORITATIVE applicability preview: PREVIEW UNAVAILABLE\n",
+      "stdout": "FAIL  [C2-LIT] FORBID_LITERAL \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\n      path: app.py\nFAIL  [C2-LIT] anti_pattern \"psycopg2\" -- trigger: psycopg2\n      Do not import psycopg2; the service uses SQLite.\nFAIL  [C2-PICKLE] anti_pattern \"pickle\" -- trigger: pickle\n      Do not use pickle for persistence.\nFAIL  [C2-OLD] FORBID_LITERAL \"mysqlclient\" -- trigger: mysqlclient\n      Do not import mysqlclient.\n      path: app.py\nFAIL  [C2-OLD] anti_pattern \"mysqlclient\" -- trigger: mysqlclient\n      Do not import mysqlclient.\nFAIL  [C2-DEP] FORBID_LITERAL \"cx_Oracle\" -- trigger: cx_Oracle\n      Do not import cx_Oracle.\n      path: app.py\n\nResult: FAIL\n"
+    },
+    "in_process": {
+      "build_report": {
+        "decisions": [
+          {
+            "decision": "Do not import psycopg2; the service uses SQLite.",
+            "evidence_confidence": "verified",
+            "evidence_sources": [],
+            "id": "C2-LIT",
+            "intent": "deterministic",
+            "mneme_guardrail": "FORBID_LITERAL: psycopg2",
+            "protection_tier": "protected",
+            "status": "active"
+          },
+          {
+            "decision": "Do not use pickle for persistence.",
+            "evidence_confidence": "none",
+            "evidence_sources": [],
+            "id": "C2-PICKLE",
+            "intent": "deterministic",
+            "mneme_guardrail": "FORBID_LITERAL: pickle",
+            "protection_tier": "mneme_ready",
+            "status": "active"
+          },
+          {
+            "decision": "Never call requests.get without a timeout.",
+            "evidence_confidence": "none",
+            "evidence_sources": [],
+            "id": "C2-READY",
+            "intent": "deterministic",
+            "mneme_guardrail": null,
+            "protection_tier": "requires_modelling",
+            "status": "active"
+          },
+          {
+            "decision": "Prefer small, composable modules.",
+            "evidence_confidence": "none",
+            "evidence_sources": [],
+            "id": "C2-GUIDE",
+            "intent": "guidance",
+            "mneme_guardrail": null,
+            "protection_tier": "guidance",
+            "status": "active"
+          },
+          {
+            "decision": "Do not import mysqlclient.",
+            "evidence_confidence": "verified",
+            "evidence_sources": [],
+            "id": "C2-OLD",
+            "intent": "deterministic",
+            "mneme_guardrail": "FORBID_LITERAL: mysqlclient",
+            "protection_tier": "protected",
+            "status": "superseded"
+          },
+          {
+            "decision": "Do not import cx_Oracle.",
+            "evidence_confidence": "verified",
+            "evidence_sources": [],
+            "id": "C2-DEP",
+            "intent": "deterministic",
+            "mneme_guardrail": "FORBID_LITERAL: cx_Oracle",
+            "protection_tier": "protected",
+            "status": "deprecated"
+          },
+          {
+            "decision": "Do not use marshal for persistence.",
+            "evidence_confidence": "none",
+            "evidence_sources": [],
+            "id": "C2-OLDPICKLE",
+            "intent": "deterministic",
+            "mneme_guardrail": "FORBID_LITERAL: marshal",
+            "protection_tier": "mneme_ready",
+            "status": "superseded"
+          }
+        ],
+        "memory": "<WORK>/.mneme/project_memory.json",
+        "schema": "mneme.audit/v1",
+        "summary": {
+          "current_protection_pct": 33.3,
+          "guidance": 1,
+          "identified_mneme_potential_pct": 66.7,
+          "mneme_ready": 1,
+          "protected": 1,
+          "protection_gap_pct": 66.7,
+          "protection_relevant": 3,
+          "requires_modelling": 1,
+          "total_decisions": 7
+        }
+      },
+      "match_ci_evidence": {
+        "C2-LIT": [
+          "tests/test_storage.py::test_sqlite_only"
+        ]
+      },
+      "readiness_counts": {
+        "guidance": 1,
+        "mneme_ready": 1,
+        "protected": 1,
+        "requires_modelling": 1
+      },
+      "runtime_decisions": [
+        [
+          "C2-LIT",
+          "active"
+        ],
+        [
+          "C2-PICKLE",
+          "active"
+        ],
+        [
+          "C2-READY",
+          "active"
+        ],
+        [
+          "C2-GUIDE",
+          "active"
+        ],
+        [
+          "C2-OLD",
+          "superseded"
+        ],
+        [
+          "C2-DEP",
+          "deprecated"
+        ],
+        [
+          "C2-OLDPICKLE",
+          "superseded"
+        ]
+      ]
+    },
+    "protect_list": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Protection activation candidates\n============================================================\nProtected: 1  Mneme-ready: 1  Requires modelling: 1  Guidance: 1\nCandidates: 1\n\n[1] C2-PICKLE: Do not use pickle for persistence.\n    guardrail: FORBID_LITERAL: pickle\n    rule to install: FORBID_LITERAL \"pickle\"\n    applies to: global applicability (canonical policy sources exempt)\n    enforcement: FORBID_LITERAL fails on an exact case-sensitive match, enforced independently of retrieval score; canonical policy sources are exempt (ADR-019/ADR-020)\n\nValidate before activating:  mneme protect validate <decision-id>\nActivate (explicit):         mneme protect activate <decision-id>\n"
+    },
+    "protect_status:C2-LIT": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Decision [C2-LIT] Do not import psycopg2; the service uses SQLite.\n  lifecycle status: active\n  protection tier:  protected\n  guardrail:        FORBID_LITERAL: psycopg2\n  evidence:         verified\n  rule installed:   yes\n"
+    },
+    "protect_status:C2-OLD": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Decision [C2-OLD] Do not import mysqlclient.\n  lifecycle status: superseded\n  protection tier:  protected\n  guardrail:        FORBID_LITERAL: mysqlclient\n  evidence:         verified\n  rule installed:   yes\n"
+    },
+    "protect_status:C2-OLDPICKLE": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Decision [C2-OLDPICKLE] Do not use marshal for persistence.\n  lifecycle status: superseded\n  protection tier:  mneme_ready\n  guardrail:        FORBID_LITERAL: marshal\n  evidence:         none\n  rule installed:   no\n  proposal:         FORBID_LITERAL \"marshal\"\n"
+    },
+    "protect_status:C2-PICKLE": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Decision [C2-PICKLE] Do not use pickle for persistence.\n  lifecycle status: active\n  protection tier:  mneme_ready\n  guardrail:        FORBID_LITERAL: pickle\n  evidence:         none\n  rule installed:   no\n  proposal:         FORBID_LITERAL \"pickle\"\n"
+    },
+    "protect_status:GHOST-404": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'GHOST-404' not found in .mneme/project_memory.json\n",
+      "stdout": ""
+    },
+    "protect_validate:C2-LIT": {
+      "exit": 1,
+      "stderr": "",
+      "stdout": "NOT ELIGIBLE: [C2-LIT] already Protected under the canonical assessment\nProtection was not validated and nothing was activated.\n"
+    },
+    "protect_validate:C2-OLD": {
+      "exit": 1,
+      "stderr": "",
+      "stdout": "NOT ELIGIBLE: [C2-OLD] decision status is 'superseded'; only active decisions can be activated\nProtection was not validated and nothing was activated.\n"
+    },
+    "protect_validate:C2-OLDPICKLE": {
+      "exit": 1,
+      "stderr": "",
+      "stdout": "NOT ELIGIBLE: [C2-OLDPICKLE] decision status is 'superseded'; only active decisions can be activated\nProtection was not validated and nothing was activated.\n"
+    },
+    "protect_validate:C2-PICKLE": {
+      "exit": 0,
+      "stderr": "",
+      "stdout": "Validating proposed protection for [C2-PICKLE]\n  decision:  Do not use pickle for persistence.\n  proposal:  FORBID_LITERAL \"pickle\"\n  checks:\n    PASS prohibited_detected: input containing 'pickle' is a typed FAIL\n    PASS permitted_allowed: permitted input without 'pickle' is not blocked\n    PASS path_scope_respected: artifact path enforced=True, canonical policy source exempt=True\n    PASS unrelated_paths_unaffected: unrelated artifact path enforced=True, permitted content blocked=False\nResult: VALID\nValidation never activates protection.\n"
+    },
+    "protect_validate:GHOST-404": {
+      "exit": 2,
+      "stderr": "ERROR: decision 'GHOST-404' not found\n",
+      "stdout": ""
+    }
+  }
+}

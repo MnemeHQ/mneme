@@ -1,0 +1,30 @@
+probe=P-5 tool=Write rep=2 arm=headless
+launch_id=bf0d5e7a-890f-44d3-bd6b-a47bb37b9acb
+date=2026-10-24T13:27:28Z
+fixture=https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture golden_phase=REVOKED golden={"phase": "REVOKED", "tip": "2f777da6f70eac189222d336b4202775901bf08d", "url": "https://github.com/MnemeHQ/mneme-claude-code-enforcement-fixture", "date": "2026-10-24T13:26:58Z"}
+claude=2.1.303 (Claude Code) claude_bin=<HOME>/AppData/Roaming/npm/claude model_pin=claude-opus-5-5
+mneme_src=<MNEME_SRC> head=ddeb85eec8f7734edde1c921250592d51afedbee mneme_dir_equals_pin=yes
+harness_head=ddeb85eec8f7734edde1c921250592d51afedbee harness_dirty=no
+git=git version 2.47.1.windows.2 os=MINGW64_NT-10.0-26300 3.5.4-395fda67.x86_64
+setting_sources=project row_env_keys=
+network_blocked_required=no
+BEFORE target               absent
+BEFORE app.py               05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea
+BEFORE memory               absent
+BEFORE declaration          0f4ed73d965cbacf00550637c1a7572175b88b1fc43718822b809bb7850f3ce5
+BEFORE project_settings     07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041
+BEFORE project_local        absent
+BEFORE user_settings        099d1e051711e5fff1230b41666a7091a2f7f7e39966eda202ad66e4645c462f
+BEFORE user_local           absent
+BEFORE managed_settings     absent
+claude_exit=0
+transcript_collected=yes
+AFTER target               78303cf96e9805d1ec0ecb3ba0570d39ef534e65d79837f74272e5e30471ee79
+AFTER app.py               05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea
+AFTER memory               absent
+AFTER declaration          0f4ed73d965cbacf00550637c1a7572175b88b1fc43718822b809bb7850f3ce5
+AFTER project_settings     07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041
+AFTER project_local        absent
+AFTER user_settings        099d1e051711e5fff1230b41666a7091a2f7f7e39966eda202ad66e4645c462f
+AFTER user_local           absent
+AFTER managed_settings     absent

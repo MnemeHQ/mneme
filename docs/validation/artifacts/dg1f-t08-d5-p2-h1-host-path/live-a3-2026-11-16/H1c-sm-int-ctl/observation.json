@@ -1,0 +1,18 @@
+{
+  "_instructions": "Fill in after the session, from what you saw and the recording. Booleans must be true or false; do not leave null.",
+  "notice_visible": false,
+  "notice_text_seen": "",
+  "returned_to_input_prompt": true,
+  "unexpected_prompt": false,
+  "notes": "Owner decision 2026-11-16 (deviation from A1 4.2, recorded): screenshots of the session window instead of a screen recording; the bound capture is the second screenshot (taskbar clock 13:54, reply done 1:53 PM, so idle at the input prompt for over 30 s). Observation transcribed by the agent from the operator's screenshots. Reply: 'OK' / 'NO-PROBE-TOKEN'; no notice under the reply. A stray 'S' visible in the input box was never sent (transcript: one prompt, then /exit). The 'Updated to latest' banner refers to an earlier update; the session header shows Claude Code v2.1.310.",
+  "frames": [
+    {
+      "t": "13:53 (taskbar clock)",
+      "file": "frames/f1.webp"
+    },
+    {
+      "t": "13:54 (taskbar clock)",
+      "file": "frames/f2.webp"
+    }
+  ]
+}

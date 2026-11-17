@@ -1,0 +1,9 @@
+{
+  "diagnostic": "D-2-Edit-1",
+  "control": "P-1-Edit-1",
+  "rules": "R3 (#551)",
+  "label": "PAIR_MISMATCH",
+  "problems": [
+    "D-2 Edit 1 is EVIDENCE_INCOMPLETE"
+  ]
+}

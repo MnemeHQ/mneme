@@ -1,0 +1,907 @@
+{
+  "generated_at": "2026-10-26T21:46:11Z",
+  "work_dir": "/work/ci1-replay-work",
+  "version": "0.10.0",
+  "source": {
+    "kind": "preserved-artifact",
+    "artifact": "CI1 lab run 39055862171 p2-evaluator-preflight",
+    "commit": "0b74d410b45e7b3efcf08d00ce58e7bd7017b757"
+  },
+  "host": "see environment.txt",
+  "harness": {
+    "python": "/work/harness/bin/python",
+    "pytest": "9.1.1"
+  },
+  "identity": {
+    "wheel_filename": "mneme_hq-0.10.0-py3-none-any.whl",
+    "wheel_sha256": "e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51",
+    "lock": [],
+    "pip": "see pip-freeze-evaluator.txt",
+    "probe": {
+      "executable": "/work/evaluator/bin/python",
+      "prefix": "/work/evaluator",
+      "base_prefix": "/usr",
+      "python_version": "3.12.3",
+      "isolated": 1,
+      "cwd": "/work/ci1-replay-work",
+      "sys_path": [
+        "/usr/lib/python312.zip",
+        "/usr/lib/python3.12",
+        "/usr/lib/python3.12/lib-dynload",
+        "/work/evaluator/lib/python3.12/site-packages"
+      ],
+      "purelib": "/work/evaluator/lib/python3.12/site-packages",
+      "mneme_file": "/work/evaluator/lib/python3.12/site-packages/mneme/__init__.py",
+      "mneme_cli_file": "/work/evaluator/lib/python3.12/site-packages/mneme/cli.py",
+      "version": "0.10.0",
+      "console_scripts": {
+        "mneme": "mneme.cli:main",
+        "mneme-hook": "mneme.integrations.claude_code.hook:cli_main",
+        "mneme-kiro-hook": "mneme.integrations.kiro.hook:cli_main"
+      }
+    },
+    "record_files_verified": 113,
+    "entry_point": [
+      "<venv python>",
+      "-I",
+      "-m",
+      "mneme.cli"
+    ],
+    "rechecked": true
+  },
+  "corpus_provenance": {
+    "commit": "c51729f78199203fe12fcbc5c678b89a2c4f7d3e",
+    "corpus_tree": "c8ee9e3988210c3ad6f961f54e58d968eb40e6cb",
+    "canonical_memory_blob": "5002a6c0b92e8bca873d1aa354d199223c2599b8",
+    "matrix_tests_blob": "1646e1bd07ccf7306b70473b32c4f8ab2255bb15",
+    "clean": true,
+    "dirty": ""
+  },
+  "corpus_versions": [
+    "incomplete_evaluation/v1",
+    "memory_errors/v1",
+    "path_scoped_forbid_literal/v1",
+    "warn_verdict/v1"
+  ],
+  "sections": {
+    "replay": {
+      "label": "Manifest replay (cases.json x query variants / modes)",
+      "total": 46,
+      "passed": 46,
+      "failed": 0,
+      "results": [
+        {
+          "corpus": "incomplete_evaluation",
+          "version": "v1",
+          "case": "complete_pass",
+          "variant": "'sync' top=1",
+          "expected": "expected/complete_pass.json, exit 0, VERIFIED_PASS",
+          "exit": 0,
+          "classification": "VERIFIED_PASS",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "incomplete_evaluation",
+          "version": "v1",
+          "case": "complete_pass",
+          "variant": "'staging documentation hostname' top=1",
+          "expected": "expected/complete_pass.json, exit 0, VERIFIED_PASS",
+          "exit": 0,
+          "classification": "VERIFIED_PASS",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "incomplete_evaluation",
+          "version": "v1",
+          "case": "complete_pass",
+          "variant": "'unrelated words entirely' top=3",
+          "expected": "expected/complete_pass.json, exit 0, VERIFIED_PASS",
+          "exit": 0,
+          "classification": "VERIFIED_PASS",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "incomplete_evaluation",
+          "version": "v1",
+          "case": "complete_fail",
+          "variant": "'sync' top=1",
+          "expected": "expected/complete_fail.json, exit 2, VIOLATION",
+          "exit": 2,
+          "classification": "VIOLATION",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "incomplete_evaluation",
+          "version": "v1",
+          "case": "complete_fail",
+          "variant": "'staging documentation hostname' top=1",
+          "expected": "expected/complete_fail.json, exit 2, VIOLATION",
+          "exit": 2,
+          "classification": "VIOLATION",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "incomplete_evaluation",
+          "version": "v1",
+          "case": "complete_fail",
+          "variant": "'unrelated words entirely' top=3",
+          "expected": "expected/complete_fail.json, exit 2, VIOLATION",
+          "exit": 2,
+          "classification": "VIOLATION",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "incomplete_evaluation",
+          "version": "v1",
+          "case": "unknown_target_is_policy_root",
+          "variant": "'sync' top=1",
+          "expected": "expected/unknown_target_is_policy_root.json, exit 2, UNEVALUATED",
+          "exit": 2,
+          "classification": "UNEVALUATED",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "incomplete_evaluation",
+          "version": "v1",
+          "case": "unknown_target_is_policy_root",
+          "variant": "'staging documentation hostname' top=1",
+          "expected": "expected/unknown_target_is_policy_root.json, exit 2, UNEVALUATED",
+          "exit": 2,
+          "classification": "UNEVALUATED",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "incomplete_evaluation",
+          "version": "v1",
+          "case": "unknown_target_is_policy_root",
+          "variant": "'unrelated words entirely' top=3",
+          "expected": "expected/unknown_target_is_policy_root.json, exit 2, UNEVALUATED",
+          "exit": 2,
+          "classification": "UNEVALUATED",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "incomplete_evaluation",
+          "version": "v1",
+          "case": "unknown_in_warn_mode",
+          "variant": "'sync' top=1",
+          "expected": "expected/unknown_in_warn_mode.json, exit 2, UNEVALUATED",
+          "exit": 2,
+          "classification": "UNEVALUATED",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "incomplete_evaluation",
+          "version": "v1",
+          "case": "unknown_in_warn_mode",
+          "variant": "'staging documentation hostname' top=1",
+          "expected": "expected/unknown_in_warn_mode.json, exit 2, UNEVALUATED",
+          "exit": 2,
+          "classification": "UNEVALUATED",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "incomplete_evaluation",
+          "version": "v1",
+          "case": "unknown_in_warn_mode",
+          "variant": "'unrelated words entirely' top=3",
+          "expected": "expected/unknown_in_warn_mode.json, exit 2, UNEVALUATED",
+          "exit": 2,
+          "classification": "UNEVALUATED",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "incomplete_evaluation",
+          "version": "v1",
+          "case": "unknown_with_global_fail",
+          "variant": "'sync' top=1",
+          "expected": "expected/unknown_with_global_fail.json, exit 2, UNEVALUATED",
+          "exit": 2,
+          "classification": "UNEVALUATED",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "incomplete_evaluation",
+          "version": "v1",
+          "case": "unknown_with_global_fail",
+          "variant": "'staging documentation hostname' top=1",
+          "expected": "expected/unknown_with_global_fail.json, exit 2, UNEVALUATED",
+          "exit": 2,
+          "classification": "UNEVALUATED",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "incomplete_evaluation",
+          "version": "v1",
+          "case": "unknown_with_global_fail",
+          "variant": "'unrelated words entirely' top=3",
+          "expected": "expected/unknown_with_global_fail.json, exit 2, UNEVALUATED",
+          "exit": 2,
+          "classification": "UNEVALUATED",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "memory_errors",
+          "version": "v1",
+          "case": "memory_missing",
+          "variant": "mode=strict",
+          "expected": "empty stdout, stderr error_line, exit 2, UNEVALUATED",
+          "exit": 2,
+          "classification": "UNEVALUATED",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "memory_errors",
+          "version": "v1",
+          "case": "memory_missing",
+          "variant": "mode=warn",
+          "expected": "empty stdout, stderr error_line, exit 2, UNEVALUATED",
+          "exit": 2,
+          "classification": "UNEVALUATED",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "memory_errors",
+          "version": "v1",
+          "case": "memory_truncated_json",
+          "variant": "mode=strict",
+          "expected": "empty stdout, stderr traceback, exit 1, UNEVALUATED",
+          "exit": 1,
+          "classification": "UNEVALUATED",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "memory_errors",
+          "version": "v1",
+          "case": "memory_truncated_json",
+          "variant": "mode=warn",
+          "expected": "empty stdout, stderr traceback, exit 1, UNEVALUATED",
+          "exit": 1,
+          "classification": "UNEVALUATED",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "memory_errors",
+          "version": "v1",
+          "case": "memory_empty_file",
+          "variant": "mode=strict",
+          "expected": "empty stdout, stderr traceback, exit 1, UNEVALUATED",
+          "exit": 1,
+          "classification": "UNEVALUATED",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "memory_errors",
+          "version": "v1",
+          "case": "memory_empty_file",
+          "variant": "mode=warn",
+          "expected": "empty stdout, stderr traceback, exit 1, UNEVALUATED",
+          "exit": 1,
+          "classification": "UNEVALUATED",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "memory_errors",
+          "version": "v1",
+          "case": "memory_json_array",
+          "variant": "mode=strict",
+          "expected": "empty stdout, stderr traceback, exit 1, UNEVALUATED",
+          "exit": 1,
+          "classification": "UNEVALUATED",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "memory_errors",
+          "version": "v1",
+          "case": "memory_json_array",
+          "variant": "mode=warn",
+          "expected": "empty stdout, stderr traceback, exit 1, UNEVALUATED",
+          "exit": 1,
+          "classification": "UNEVALUATED",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "memory_errors",
+          "version": "v1",
+          "case": "memory_missing_required_keys",
+          "variant": "mode=strict",
+          "expected": "empty stdout, stderr traceback, exit 1, UNEVALUATED",
+          "exit": 1,
+          "classification": "UNEVALUATED",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "memory_errors",
+          "version": "v1",
+          "case": "memory_missing_required_keys",
+          "variant": "mode=warn",
+          "expected": "empty stdout, stderr traceback, exit 1, UNEVALUATED",
+          "exit": 1,
+          "classification": "UNEVALUATED",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "memory_errors",
+          "version": "v1",
+          "case": "memory_malformed_decision",
+          "variant": "mode=strict",
+          "expected": "empty stdout, stderr traceback, exit 1, UNEVALUATED",
+          "exit": 1,
+          "classification": "UNEVALUATED",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "memory_errors",
+          "version": "v1",
+          "case": "memory_malformed_decision",
+          "variant": "mode=warn",
+          "expected": "empty stdout, stderr traceback, exit 1, UNEVALUATED",
+          "exit": 1,
+          "classification": "UNEVALUATED",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "path_scoped_forbid_literal",
+          "version": "v1",
+          "case": "applied_pass",
+          "variant": "'storage caching database' top=1",
+          "expected": "expected/applied_pass.json, exit 0, VERIFIED_PASS",
+          "exit": 0,
+          "classification": "VERIFIED_PASS",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "path_scoped_forbid_literal",
+          "version": "v1",
+          "case": "applied_pass",
+          "variant": "'install legacy-client documentation' top=3",
+          "expected": "expected/applied_pass.json, exit 0, VERIFIED_PASS",
+          "exit": 0,
+          "classification": "VERIFIED_PASS",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "path_scoped_forbid_literal",
+          "version": "v1",
+          "case": "applied_pass",
+          "variant": "'unrelated words entirely' top=1",
+          "expected": "expected/applied_pass.json, exit 0, VERIFIED_PASS",
+          "exit": 0,
+          "classification": "VERIFIED_PASS",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "path_scoped_forbid_literal",
+          "version": "v1",
+          "case": "applied_fail",
+          "variant": "'storage caching database' top=1",
+          "expected": "expected/applied_fail.json, exit 2, VIOLATION",
+          "exit": 2,
+          "classification": "VIOLATION",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "path_scoped_forbid_literal",
+          "version": "v1",
+          "case": "applied_fail",
+          "variant": "'install legacy-client documentation' top=3",
+          "expected": "expected/applied_fail.json, exit 2, VIOLATION",
+          "exit": 2,
+          "classification": "VIOLATION",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "path_scoped_forbid_literal",
+          "version": "v1",
+          "case": "applied_fail",
+          "variant": "'unrelated words entirely' top=1",
+          "expected": "expected/applied_fail.json, exit 2, VIOLATION",
+          "exit": 2,
+          "classification": "VIOLATION",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "path_scoped_forbid_literal",
+          "version": "v1",
+          "case": "excluded_by_exclude_selector",
+          "variant": "'storage caching database' top=1",
+          "expected": "expected/excluded_by_exclude_selector.json, exit 0, VERIFIED_PASS",
+          "exit": 0,
+          "classification": "VERIFIED_PASS",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "path_scoped_forbid_literal",
+          "version": "v1",
+          "case": "excluded_by_exclude_selector",
+          "variant": "'install legacy-client documentation' top=3",
+          "expected": "expected/excluded_by_exclude_selector.json, exit 0, VERIFIED_PASS",
+          "exit": 0,
+          "classification": "VERIFIED_PASS",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "path_scoped_forbid_literal",
+          "version": "v1",
+          "case": "excluded_by_exclude_selector",
+          "variant": "'unrelated words entirely' top=1",
+          "expected": "expected/excluded_by_exclude_selector.json, exit 0, VERIFIED_PASS",
+          "exit": 0,
+          "classification": "VERIFIED_PASS",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "path_scoped_forbid_literal",
+          "version": "v1",
+          "case": "excluded_by_no_include_match",
+          "variant": "'storage caching database' top=1",
+          "expected": "expected/excluded_by_no_include_match.json, exit 0, VERIFIED_PASS",
+          "exit": 0,
+          "classification": "VERIFIED_PASS",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "path_scoped_forbid_literal",
+          "version": "v1",
+          "case": "excluded_by_no_include_match",
+          "variant": "'install legacy-client documentation' top=3",
+          "expected": "expected/excluded_by_no_include_match.json, exit 0, VERIFIED_PASS",
+          "exit": 0,
+          "classification": "VERIFIED_PASS",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "path_scoped_forbid_literal",
+          "version": "v1",
+          "case": "excluded_by_no_include_match",
+          "variant": "'unrelated words entirely' top=1",
+          "expected": "expected/excluded_by_no_include_match.json, exit 0, VERIFIED_PASS",
+          "exit": 0,
+          "classification": "VERIFIED_PASS",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "path_scoped_forbid_literal",
+          "version": "v1",
+          "case": "unknown_target_outside_policy_root",
+          "variant": "'storage caching database' top=1",
+          "expected": "expected/unknown_target_outside_policy_root.json, exit 2, UNEVALUATED",
+          "exit": 2,
+          "classification": "UNEVALUATED",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "path_scoped_forbid_literal",
+          "version": "v1",
+          "case": "unknown_target_outside_policy_root",
+          "variant": "'install legacy-client documentation' top=3",
+          "expected": "expected/unknown_target_outside_policy_root.json, exit 2, UNEVALUATED",
+          "exit": 2,
+          "classification": "UNEVALUATED",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "path_scoped_forbid_literal",
+          "version": "v1",
+          "case": "unknown_target_outside_policy_root",
+          "variant": "'unrelated words entirely' top=1",
+          "expected": "expected/unknown_target_outside_policy_root.json, exit 2, UNEVALUATED",
+          "exit": 2,
+          "classification": "UNEVALUATED",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "warn_verdict",
+          "version": "v1",
+          "case": "pass_strict",
+          "variant": "'storage' top=3",
+          "expected": "expected/pass_strict.json, exit 0, VERIFIED_PASS",
+          "exit": 0,
+          "classification": "VERIFIED_PASS",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "warn_verdict",
+          "version": "v1",
+          "case": "warn_strict",
+          "variant": "'storage' top=3",
+          "expected": "expected/warn_strict.json, exit 1, VIOLATION",
+          "exit": 1,
+          "classification": "VIOLATION",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "warn_verdict",
+          "version": "v1",
+          "case": "warn_warn_mode",
+          "variant": "'storage' top=3",
+          "expected": "expected/warn_warn_mode.json, exit 0, VIOLATION",
+          "exit": 0,
+          "classification": "VIOLATION",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "corpus": "warn_verdict",
+          "version": "v1",
+          "case": "fail_warn_mode",
+          "variant": "'storage' top=3",
+          "expected": "expected/fail_warn_mode.json, exit 0, VIOLATION",
+          "exit": 0,
+          "classification": "VIOLATION",
+          "parity": true,
+          "diffs": []
+        }
+      ]
+    },
+    "adr005": {
+      "label": "ADR-005 global-rule cross-check",
+      "total": 13,
+      "passed": 13,
+      "failed": 0,
+      "results": [
+        {
+          "check": "canonical rule is a global FORBID_LITERAL",
+          "variant": "",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "violation FAILs on every path and query",
+          "variant": "target=None query='pip install package name' top=3",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "violation FAILs on every path and query",
+          "variant": "target=README.md query='pip install package name' top=3",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "violation FAILs on every path and query",
+          "variant": "target=docs/history/archived.md query='pip install package name' top=3",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "violation FAILs on every path and query",
+          "variant": "target=../outside-repo.md query='pip install package name' top=3",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "violation FAILs on every path and query",
+          "variant": "target=None query='unrelated words entirely' top=1",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "violation FAILs on every path and query",
+          "variant": "target=README.md query='unrelated words entirely' top=1",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "violation FAILs on every path and query",
+          "variant": "target=docs/history/archived.md query='unrelated words entirely' top=1",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "violation FAILs on every path and query",
+          "variant": "target=../outside-repo.md query='unrelated words entirely' top=1",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "correct distribution name is not flagged",
+          "variant": "target=None",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "correct distribution name is not flagged",
+          "variant": "target=README.md",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "correct distribution name is not flagged",
+          "variant": "target=docs/history/archived.md",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "correct distribution name is not flagged",
+          "variant": "target=../outside-repo.md",
+          "parity": true,
+          "diffs": []
+        }
+      ]
+    },
+    "regeneration": {
+      "label": "Corpus memory regeneration",
+      "total": 2,
+      "passed": 2,
+      "failed": 0,
+      "results": [
+        {
+          "check": "memory regenerates from source ADRs",
+          "variant": "incomplete_evaluation/v1",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "memory regenerates from source ADRs",
+          "variant": "path_scoped_forbid_literal/v1",
+          "parity": true,
+          "diffs": []
+        }
+      ]
+    },
+    "classifier": {
+      "label": "Classifier stub checks",
+      "total": 35,
+      "passed": 35,
+      "failed": 0,
+      "results": [
+        {
+          "check": "contradictory or unparseable stub",
+          "variant": "pass_exit_1",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "contradictory or unparseable stub",
+          "variant": "pass_exit_2",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "contradictory or unparseable stub",
+          "variant": "pass_exit_negative",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "contradictory or unparseable stub",
+          "variant": "pass_warn_mode_exit_2",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "contradictory or unparseable stub",
+          "variant": "pass_with_violations",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "contradictory or unparseable stub",
+          "variant": "pass_incomplete",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "contradictory or unparseable stub",
+          "variant": "pass_complete_missing",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "contradictory or unparseable stub",
+          "variant": "pass_complete_as_string",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "contradictory or unparseable stub",
+          "variant": "pass_complete_as_int",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "contradictory or unparseable stub",
+          "variant": "pass_unknown_schema",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "contradictory or unparseable stub",
+          "variant": "pass_schema_missing",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "contradictory or unparseable stub",
+          "variant": "pass_unknown_mode",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "contradictory or unparseable stub",
+          "variant": "pass_violations_not_list",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "contradictory or unparseable stub",
+          "variant": "verdict_lowercase",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "contradictory or unparseable stub",
+          "variant": "verdict_unknown",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "contradictory or unparseable stub",
+          "variant": "verdict_missing",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "contradictory or unparseable stub",
+          "variant": "fail_exit_0_strict",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "contradictory or unparseable stub",
+          "variant": "fail_without_violations",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "contradictory or unparseable stub",
+          "variant": "non_json_stdout",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "contradictory or unparseable stub",
+          "variant": "empty_stdout",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "contradictory or unparseable stub",
+          "variant": "whitespace_stdout",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "contradictory or unparseable stub",
+          "variant": "payload_then_text",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "contradictory or unparseable stub",
+          "variant": "text_then_payload",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "contradictory or unparseable stub",
+          "variant": "two_payloads",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "contradictory or unparseable stub",
+          "variant": "truncated_payload",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "contradictory or unparseable stub",
+          "variant": "json_array",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "contradictory or unparseable stub",
+          "variant": "json_string",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "contradictory or unparseable stub",
+          "variant": "json_null",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "contradictory or unparseable stub",
+          "variant": "exit_code_not_int",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "consistent stub",
+          "variant": "strict PASS exit 0",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "consistent stub",
+          "variant": "warn PASS exit 0",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "consistent stub",
+          "variant": "strict WARN exit 1",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "consistent stub",
+          "variant": "warn WARN exit 0",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "consistent stub",
+          "variant": "strict FAIL exit 2",
+          "parity": true,
+          "diffs": []
+        },
+        {
+          "check": "consistent stub",
+          "variant": "warn FAIL exit 0",
+          "parity": true,
+          "diffs": []
+        }
+      ]
+    }
+  },
+  "passed": true
+}

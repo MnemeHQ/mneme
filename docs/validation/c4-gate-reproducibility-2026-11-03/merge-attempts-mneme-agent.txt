@@ -1,0 +1,28 @@
+Merge attempts on MnemeHQ/mneme-gate-repro, run by the owner from the MnemeAgent
+Windows account (2026-11-03). Trimmed from the owner-supplied terminal output to
+the status line, date, request id, token scopes and response body of each call.
+
+gh api user --jq .login                      -> mneme-agent
+gh api -X PATCH user/repository_invitations/341290089   (accepted, no output)
+collaborators/mneme-agent/permission         -> write
+
+--- PR #2 (T1 prohibited)
+HTTP/2.0 405 Method Not Allowed
+Date: Tue, 03 Nov 2026 19:01:09 GMT
+X-Github-Request-Id: F9A1:5A97D:7A7E12:1904172:6AEA2F73
+X-Oauth-Scopes: gist, read:org, repo
+{"message": "Repository rule violations found\n\nRequired status check \"mneme trusted gate\" is failing.\n\n", "status": "405"}
+
+--- PR #4 (T3 unavailable)
+HTTP/2.0 405 Method Not Allowed
+Date: Tue, 03 Nov 2026 19:01:11 GMT
+X-Github-Request-Id: F9A3:1B5317:7C0AF2:193AA21:6AEA2F75
+X-Oauth-Scopes: gist, read:org, repo
+{"message": "Repository rule violations found\n\nRequired status check \"mneme trusted gate\" is failing.\n\n", "status": "405"}
+
+--- PR #3 (T2 compliant)
+HTTP/2.0 200 OK
+Date: Tue, 03 Nov 2026 19:01:15 GMT
+X-Github-Request-Id: F9A4:F3DC6:7AEB4F:1902228:6AEA2F78
+X-Oauth-Scopes: gist, read:org, repo
+{"sha": "5335c722b5a82ca43328e5b907efbbef5be18766", "merged": true, "message": "Pull Request successfully merged"}

@@ -40,9 +40,18 @@ Prefer frozen fixtures, deterministic scoring, clear treatment/control boundarie
 
 ### P0 — Four-layer decision-conformance validation
 
-Validate the **existing** governance model end to end: **Guidance → Pre-mutation enforcement → CI checks → Evidence**. This is a cross-cutting acceptance test for the current benchmark, DG1, integration and CI assurance work, **not** a fifth layer, a new policy engine, or DG2 scope.
+Validate the **existing** governance model end to end: **Governance → Guidance → Enforcement → Verification**. This is a cross-cutting acceptance test for the current benchmark, DG1, integration and CI assurance work, **not** a fifth layer, a new policy engine, or DG2 scope.
 
-The Decision Index supplies the common decision authority and applicability semantics to each layer. A process or ADR-acknowledgment marker may be useful workflow evidence, but must not count as proof that code conforms to an architectural decision.
+| Layer | Question | Existing work |
+|---|---|---|
+| **Governance** | Which decisions are authoritative? | Decision Index (ADR-023, ADR-030), decision governance (ADR-031, DG1) |
+| **Guidance** | What should the agent do? | Decision retrieval and context injection before work (ADR-017) |
+| **Enforcement** | Are prohibited changes prevented or rejected? | Two distinct checkpoints: **pre-mutation** (agent-host hooks and adapters) and **CI checks** (CI1, the trusted gate). They evaluate different subjects at different points, and their verdicts are never conflated |
+| **Verification** | Can we prove what was evaluated and enforced? | ADR-029 binding assessment ([#761](https://github.com/MnemeHQ/mneme/pull/761) audit) |
+
+Evidence records are produced across all layers. Verification is a claim-assessment capability, not an evidence-capture or storage subsystem: it assesses those records for binding completeness under ADR-029 and states which claims they support. It never decides which decisions are authoritative; that is Governance.
+
+A process or ADR-acknowledgment marker may be useful workflow evidence, but must not count as proof that code conforms to an architectural decision.
 
 **Minimum reproducible test**
 
@@ -53,6 +62,29 @@ The Decision Index supplies the common decision authority and applicability sema
 - Produce decision-linked evidence: effective decision and source/version, target scope, rule lineage, enforcement surface, evaluated input/revision, verdict, reasons and limitations. Measure architectural compliance **and** functional completion, false blocks and setup friction.
 
 **Exit evidence:** a repeatable trace showing permitted work succeeds, a documented-but-noncompliant change is caught at each *supported* control point, and a complete record of unevaluated or unsupported surfaces. Reuse the production governance trace (#282), DG1 tracker (#497) and separate CI1 enforcement-assurance tracker (#540). Do not claim universal mutation coverage or directly compare an external product without a reproduced baseline.
+
+#### Bounded Verification slice (P0, OSS; proposed, reconciled to v0.11.0)
+
+**Purpose:** Verify, rather than merely capture, the decision-linked evidence from pre-mutation enforcement and CI. Establish which claims the evidence supports under the existing four-layer validation programme, across both Enforcement checkpoints. Reuse ADR-029's six binding dimensions and D1/DG1 canonical decision-version and rule identity; this is **not** a new evidence subsystem, policy engine, or workstream. Pre-mutation and CI evaluate different subjects at different checkpoints and their verdicts must not be conflated.
+
+**Baseline (done):** the read-only ADR-029 evidence completeness audit against v0.11.0 ([record](../validation/adr029-evidence-completeness-audit-2026-11-08.md), [#761](https://github.com/MnemeHQ/mneme/pull/761)) maps the CLI `mneme.check/v1` payload, the Claude Code hook evidence record and the CI trusted-gate report to ADR-029's six bindings. Its results set this slice's scope:
+
+- **Relevant enforcement observed** is reachable on one v0.11.0 path only: the pre-write hook, a `FORBID_NUMERIC_ABOVE` rule, a new-file `Write` and a pinned host (`relevant_enforcement_per_rule`). Every literal-rule observation, on every surface, is execution observed.
+- **Configuration is bound per rule** by the content-derived `rule_id` and `decision_version_id` (owner ruling 2026-11-08). A digest of the whole decision memory is not required, and its absence outside CI is a documented limitation, not a blocker. A version-specific claim must match the full `(decision_id, decision_version_id, rule_id)` identity, with `decision_id` taken from the `rule_id` prefix. A standalone relevance boolean never establishes it.
+- **The CI trusted gate does not run v0.11.0:** its evaluator is pinned to the CI1-approved build of `0b74d410`.
+
+**Remaining scope (planning estimate: 2–3.5 engineering days):**
+
+1. **Residual mapping (0.5 day):** map the Agent SDK and LangChain gate traces, which the audit did not cover, to the same six bindings. Record missing or untrusted fields; do not infer their values.
+2. **Negative controls on v0.11.0 (0.5–1 day, no runtime change):** missing decision identity (section-less memory, `--adr-dir`), mismatched `decision_version_id` or `rule_id`, an `EXCLUDED` rule, `evaluation_complete: false`, and a stale subject digest on the hook numeric path. Each must stay at or below execution observed. Waiver evidence waits for DG1B2 semantics.
+3. **Frozen validation fixture (1–1.5 days):** one reviewed decision and typed rule; one supported proposed file mutation and one independent CI evaluation of the resulting revision. Test allow, deny with observed non-mutation, incomplete evaluation, missing decision/rule identity and stale subject or rule version. **State which evaluator build each checkpoint runs**; a CI checkpoint on the pinned `0b74d410` build is not v0.11.0 evidence. Record the distinct attempted-action digest and CI-evaluated revision, supported coverage, functional completion and negative space. A gate returning `deny` without proving non-mutation is not proof of prevention.
+4. **Independent review (0.5 day):** replay artifacts, check hashes and provenance, run existing test gates and document which of ADR-029's bindings are actually established.
+
+**Not in this slice:** literal-rule relevance. It needs the bindings literal rules lack today: control/provenance and subject in the CLI payload for literal-only checks, a per-rule allow record, and a literal applicability record on the hook. Enforcing the full-identity comparison inside `relevant_enforcement_per_rule`, and re-pinning the CI evaluator, are also out. Each is a runtime or CI change that needs its own reviewed charter.
+
+**Exit evidence:** a reproducible report showing which authoritative decision/rule revision governed each checkpoint, its exact evaluated subject, applicable rule, verified verdict and control outcome, plus explicit unproven bindings. Do not claim a unified enforcement event or end-to-end protection where the traces cannot establish it. Reuse CI1.4 in [#540](https://github.com/MnemeHQ/mneme/issues/540), the [#282](https://github.com/MnemeHQ/mneme/issues/282) governance trace and the custom-tool coverage assessment [#577](https://github.com/MnemeHQ/mneme/pull/577); do not duplicate their implementation. Decision governance (ADR-031) determines which decisions are authoritative; this slice only verifies and records what ran under them.
+
+**Ownership and boundaries:** fully **public OSS Core**: evidence semantics, identity/provenance binding, completeness assessment and reproducible validation. Organization-wide evidence collection, cross-system reconciliation, retained fleet history and fleet analytics remain enterprise decision operations. No Core runtime, CLI, DecisionRetriever, ConflictDetector, frozen benchmark or enforcement-behavior changes are authorized by this roadmap entry. If the mapping exposes a missing runtime field or requires an API change, stop and seek a separate reviewed charter and Layer 1 freeze amendment as applicable.
 
 ### P0 — Decision Index authority completion (D1)
 
@@ -82,7 +114,9 @@ See accepted [ADR-023](../adr/ADR-023-canonical-decision-index-and-runtime-proje
 
 DG1 is now partly implemented. DG1A, DG1C, DG1E, DG1D, DG1P and DG1B1 have landed: the governance contract is accepted, the effective-decision resolver matches v1 projection, canonical evidence identity is threaded through enforcement traces, snapshot-to-snapshot governance change is available, ADR `date` no longer carries precedence authority, and canonical decision applicability now resolves deterministically under `mneme.decision-index/v2`.
 
-The governing architecture remains accepted [ADR-031](../adr/ADR-031-decision-governance-semantics.md). Decision applicability (DG1B1) landed under its [merged charter](../plans/2026-10-08-dg1b1-decision-applicability-charter.md) and [Layer 1 freeze amendment](../architecture/layer1-freeze-e73ff7d.md): optional exact project-local `required_labels` persist under `mneme.decision-index/v2`, an explicit v1 → v2 migration preserves global eligibility, and the shared resolver gains a `not_applicable` cause. Waivers (DG1B2) remain evidence- and target-binding-gated. DG1F then converges runtime consumers onto the shared governance result, followed by DG1G adversarial closeout. Until DG1F lands, no runtime consumer changes which decisions it enforces.
+The governing architecture remains accepted [ADR-031](../adr/ADR-031-decision-governance-semantics.md). Decision applicability (DG1B1) landed under its [merged charter](../plans/2026-10-08-dg1b1-decision-applicability-charter.md) and [Layer 1 freeze amendment](../architecture/layer1-freeze-e73ff7d.md): optional exact project-local `required_labels` persist under `mneme.decision-index/v2`, an explicit v1 → v2 migration preserves global eligibility, and the shared resolver gains a `not_applicable` cause. Waivers (DG1B2) remain evidence- and target-binding-gated.
+
+DG1F runtime convergence is under way, in separately chartered increments. **Shipped in 0.11.0:** the report-only applicability preview (DG1F-C1a). **Merged on `main`, not yet released:** lifecycle-authority consolidation (DG1F-C2, #770: one lifecycle rule shared by projection, the resolver and the Audit, protection and evidence checks, plus a three-state governance context) and resolver-result consumption by `mneme audit`, setup readiness and `protect list` (DG1F-C3a, #777). Frozen runtime outputs and enforcement inputs are unchanged by both; C2 does change public library behavior (`GovernanceContext()` now means labels not supplied; see `CHANGELOG.md`). Still open: `audit_with_github_claim` (feasibility assessed, deferred until a consumer needs it), `protect status/validate/activate`, evidence APIs, every enforcement input, explanation output, enforcement-changing applicability (C1b), and then DG1G adversarial closeout. No runtime consumer changes which decisions it enforces until a chartered, freeze-amended increment says so.
 
 DG1 defines a public, versioned semantic contract for:
 
@@ -226,6 +260,28 @@ This surface remains distinct from the generic hosted MCP / HTTP control plane l
 
 See proposed [ADR-027](../adr/ADR-027-decision-mcp-proposal-ingestion-and-authority-boundary.md) and issue #362.
 
+### P1 (parallel) — Code Mode orchestration and software-factory interoperability (CM-01)
+
+Maintain **Code Mode as a parallel, optional Decision MCP consumer integration** for orchestration efficiency, programmable decision-context composition, and software-factory interoperability. This workstream supports—not gates or replaces—the Decision Index, `DecisionRetriever`, `ConflictDetector`, deterministic enforcement, or independent architecture benchmarks. See [CM-01 tracker #640](https://github.com/MnemeHQ/mneme/issues/640).
+
+**Recorded status (2026-10-25):**
+
+- **S1-A1:** merged local OSS compatibility experiment using a sandboxed QuickJS executor and the four read-only Decision MCP methods. M7 demonstrated data-dependent `search → get → trace` composition within one Code Mode execution with output parity; model-turn, token and end-to-end efficiency gains are **not yet measured**.
+- **P0-01:** genuine MCP cancellation defect reproduced; original **FAIL** preserved with independently verified evidence, merged in [PR #633](https://github.com/MnemeHQ/mneme/pull/633) (`adf50933`).
+- **P0-01-F1:** isolated per-call cancellation correction **PASS** (20/20 checks in each of two local runs); independent evidence verification **VERIFIED** (32 static and 5 reproduction checks, zero discrepancies). F1 evidence is merged in [PR #642](https://github.com/MnemeHQ/mneme/pull/642) at `f8591102` and remains independently **VERIFIED**. Its 50 ms cleanup grace is a tested-environment result, not a cross-platform guarantee. The original P0 FAIL remains unchanged. **S1-A2 stays blocked** until separately authorized.
+- **CM-01-B0-M:** model-free mechanical benchmark **PASS** (39/39 checks in each original run), merged in [PR #650](https://github.com/MnemeHQ/mneme/pull/650) at `34d75bec`. The original evidence manifest `94dd0ee381fba2e9775634e0fc8f005dfeb59c9b874fd022227c6fcb92ed17ac` is preserved and supplemental raw-transport verification is **VERIFIED** (98/98). B0-M is mechanical only: model turns, tokens, model-visible context and efficiency remain **not measured**. **B0-A is not authorized.**
+
+**Sequential gates (authorize one at a time):**
+
+1. **Complete.** F1 verified evidence was recorded in [PR #642](https://github.com/MnemeHQ/mneme/pull/642) at `f8591102`, preserving frozen S1-A1/P0 files, hashes and the original failure.
+2. Benchmark direct MCP versus Code Mode on pinned, representative read-only decision workflows. Measure **model turns, tokens/context transferred, wall-clock latency, MCP requests, correctness/decision identity, error recovery, and cleanup**; retain a no-benefit outcome if overhead outweighs gains.
+   - **Mechanical foundation complete:** B0-M is merged in [PR #650](https://github.com/MnemeHQ/mneme/pull/650) at `34d75bec`; original verdict PASS (39/39 in each run), supplemental verification VERIFIED (98/98), original evidence manifest preserved. B0-M used 24 deterministic synthetic decisions and does not establish B0-A dataset adequacy or sample size.
+   - **Next authorization:** B0-A remains unauthorized. Before model API calls, finalize its primary metric, sample size, model selection, approved endpoint/budget and evidence plan. B0-M does not demonstrate model-mediated benefit.
+3. Evaluate one portable agent-orchestrator/software-factory reference integration only after the benchmark shows a defensible benefit. Validate reliable cancellation, method allowlisting, argument checks, parity, and host isolation. No support or production-readiness claim from local compatibility alone.
+4. Reassess MCP capability gaps as DG1/DG2 and decision-linked evidence mature (for example effective-decision explanations, protection/evidence reads, version history, or read-only conflict findings). **Prefer composition of existing tools** first; any new MCP method requires an independent, versioned ADR-027 authority/capability review and protocol validation.
+
+**Architectural constraints:** ADR-023 keeps the Decision Index canonical; ADR-027 freezes the **current six-tool** MCP capability inventory (four reads and two non-authoritative proposal methods). Code Mode cannot accept/activate/supersede decisions, grant waivers, create trusted evidence, or become a second resolver/enforcer. Existing CLI, hook, CI and direct MCP flows remain authoritative and usable without Code Mode. No implication of server-side execution termination, hosted Workers compatibility, mutation enforcement, or universal sandbox/process isolation.
+
 ### P1 — Reference review consumer validation
 
 Validate one external review system against the Decision MCP surface after the surface exists. CodeRabbit is a strong candidate because its current product supports custom MCP context during code review.
@@ -240,7 +296,7 @@ Do not add CodeRabbit-specific logic to the Decision Index or enforcement core.
 
 Improve the existing Audit, enforcement evidence and readiness reporting without duplicating the Core evaluator. A blocked change should identify the actual violated decision/rule and offer a compliant path or an authorized, scoped waiver route—not an untracked bypass. Expose coverage and **negative space**: applicable decisions evaluated and not evaluated, failed and passed checks, supported pre-mutation versus CI-only detection, benign false blocks, waiver validity, stale policy and unsupported operations. Process-marker compliance and retrieval success are distinct from semantic conformance.
 
-Use version-pinned decisions and rule/evaluator contracts across supported surfaces. Maintain a tested compatibility matrix, explicit timeout/failure behavior and rollback guidance; do not silently alter active enforcement via tool updates. This work refines the existing four layers (especially Enforcement, CI and Evidence) and builds on CI1 (#540), rather than adding a new layer.
+Use version-pinned decisions and rule/evaluator contracts across supported surfaces. Maintain a tested compatibility matrix, explicit timeout/failure behavior and rollback guidance; do not silently alter active enforcement via tool updates. This work refines the existing four layers (especially Enforcement, at both its pre-mutation and CI checkpoints, and Verification) and builds on CI1 (#540), rather than adding a new layer.
 
 ### P1 — Migration-aware Architecture Audit
 

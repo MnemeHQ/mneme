@@ -66,11 +66,13 @@ import tempfile
 from pathlib import Path
 from typing import Callable, Dict, Optional, TextIO
 
+from mneme.integrations.memory_selection import (
+    resolve_memory,
+)
 from mneme.integrations.claude_code.hook import (
     ToolEvent,
     _CHECK_TIMEOUT_SECONDS,
     _child_env,
-    find_memory,
     format_applicability_reason,
     format_reason,
     introduced_content,
@@ -239,7 +241,7 @@ def main(
         emit({}, stdout)
         return 0
 
-    memory = find_memory(Path(event.cwd or "."))
+    memory = resolve_memory(Path(event.cwd or ".")).path
     if memory is None:
         # Same policy as every other integration: outside any governed
         # project, the gate has no opinion.

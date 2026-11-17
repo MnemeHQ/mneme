@@ -1,0 +1,1037 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "strict_pass",
+      "mode": "strict",
+      "exit": 0,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "PASS",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [
+          {
+            "decision_id": "ADR-901",
+            "rule_id": "ADR-901:FORBID_LITERAL:x",
+            "outcome": "APPLIED"
+          }
+        ],
+        "violations": [],
+        "freshness": []
+      },
+      "expected": "VERIFIED_PASS",
+      "assess": "agree"
+    },
+    {
+      "id": "strict_pass_excluded",
+      "mode": "strict",
+      "exit": 0,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "PASS",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [
+          {
+            "decision_id": "ADR-901",
+            "rule_id": "ADR-901:FORBID_LITERAL:x",
+            "outcome": "EXCLUDED"
+          }
+        ],
+        "violations": [],
+        "freshness": []
+      },
+      "expected": "VERIFIED_PASS",
+      "assess": "agree"
+    },
+    {
+      "id": "strict_pass_no_applicability_key",
+      "mode": "strict",
+      "exit": 0,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "PASS",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "violations": [],
+        "freshness": []
+      },
+      "expected": "VERIFIED_PASS",
+      "assess": "agree"
+    },
+    {
+      "id": "strict_warn",
+      "mode": "strict",
+      "exit": 1,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "WARN",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [
+          {
+            "decision_id": "ADR-901",
+            "rule_id": "ADR-901:FORBID_LITERAL:x",
+            "outcome": "APPLIED"
+          }
+        ],
+        "violations": [
+          {
+            "decision_id": "ADR-901",
+            "decision_text": "Do not document the legacy installer.",
+            "severity": "WARN",
+            "rule": "install legacy-client",
+            "trigger": "install legacy-client",
+            "rule_id": "ADR-901:FORBID_LITERAL:x"
+          }
+        ],
+        "freshness": []
+      },
+      "expected": "WARN",
+      "assess": "agree"
+    },
+    {
+      "id": "strict_fail",
+      "mode": "strict",
+      "exit": 2,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "FAIL",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [
+          {
+            "decision_id": "ADR-901",
+            "rule_id": "ADR-901:FORBID_LITERAL:x",
+            "outcome": "APPLIED"
+          }
+        ],
+        "violations": [
+          {
+            "decision_id": "ADR-901",
+            "decision_text": "Do not document the legacy installer.",
+            "severity": "FAIL",
+            "rule": "install legacy-client",
+            "trigger": "install legacy-client",
+            "rule_id": "ADR-901:FORBID_LITERAL:x"
+          }
+        ],
+        "freshness": []
+      },
+      "expected": "VIOLATION",
+      "assess": "agree"
+    },
+    {
+      "id": "strict_fail_mixed_severity",
+      "mode": "strict",
+      "exit": 2,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "FAIL",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [
+          {
+            "decision_id": "ADR-901",
+            "decision_text": "Do not document the legacy installer.",
+            "severity": "WARN",
+            "rule": "install legacy-client",
+            "trigger": "install legacy-client",
+            "rule_id": "ADR-901:FORBID_LITERAL:x"
+          },
+          {
+            "decision_id": "ADR-901",
+            "decision_text": "Do not document the legacy installer.",
+            "severity": "FAIL",
+            "rule": "install legacy-client",
+            "trigger": "install legacy-client",
+            "rule_id": "ADR-901:FORBID_LITERAL:x"
+          }
+        ],
+        "freshness": []
+      },
+      "expected": "VIOLATION",
+      "assess": "agree"
+    },
+    {
+      "id": "warn_pass",
+      "mode": "warn",
+      "exit": 0,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "PASS",
+        "mode": "warn",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [],
+        "freshness": []
+      },
+      "expected": "VERIFIED_PASS",
+      "assess": "agree"
+    },
+    {
+      "id": "warn_warn",
+      "mode": "warn",
+      "exit": 0,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "WARN",
+        "mode": "warn",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [
+          {
+            "decision_id": "ADR-901",
+            "decision_text": "Do not document the legacy installer.",
+            "severity": "WARN",
+            "rule": "install legacy-client",
+            "trigger": "install legacy-client",
+            "rule_id": "ADR-901:FORBID_LITERAL:x"
+          }
+        ],
+        "freshness": []
+      },
+      "expected": "WARN",
+      "assess": "agree"
+    },
+    {
+      "id": "warn_fail",
+      "mode": "warn",
+      "exit": 0,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "FAIL",
+        "mode": "warn",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [
+          {
+            "decision_id": "ADR-901",
+            "decision_text": "Do not document the legacy installer.",
+            "severity": "FAIL",
+            "rule": "install legacy-client",
+            "trigger": "install legacy-client",
+            "rule_id": "ADR-901:FORBID_LITERAL:x"
+          }
+        ],
+        "freshness": []
+      },
+      "expected": "VIOLATION",
+      "assess": "agree"
+    },
+    {
+      "id": "strict_incomplete",
+      "mode": "strict",
+      "exit": 2,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "PASS",
+        "mode": "strict",
+        "evaluation_complete": false,
+        "applicability": [
+          {
+            "decision_id": "ADR-901",
+            "rule_id": "ADR-901:FORBID_LITERAL:x",
+            "outcome": "UNKNOWN"
+          }
+        ],
+        "violations": [],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "stricter"
+    },
+    {
+      "id": "warn_incomplete",
+      "mode": "warn",
+      "exit": 2,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "PASS",
+        "mode": "warn",
+        "evaluation_complete": false,
+        "applicability": [
+          {
+            "decision_id": "ADR-901",
+            "rule_id": "ADR-901:FORBID_LITERAL:x",
+            "outcome": "UNKNOWN"
+          }
+        ],
+        "violations": [],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "stricter"
+    },
+    {
+      "id": "strict_incomplete_with_fail",
+      "mode": "strict",
+      "exit": 2,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "FAIL",
+        "mode": "strict",
+        "evaluation_complete": false,
+        "applicability": [
+          {
+            "decision_id": "ADR-901",
+            "rule_id": "ADR-901:FORBID_LITERAL:x",
+            "outcome": "UNKNOWN"
+          }
+        ],
+        "violations": [
+          {
+            "decision_id": "ADR-901",
+            "decision_text": "Do not document the legacy installer.",
+            "severity": "FAIL",
+            "rule": "install legacy-client",
+            "trigger": "install legacy-client",
+            "rule_id": "ADR-901:FORBID_LITERAL:x"
+          }
+        ],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "stricter"
+    },
+    {
+      "id": "legacy_no_completeness",
+      "mode": "strict",
+      "exit": 0,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "PASS",
+        "mode": "strict",
+        "applicability": [],
+        "violations": [],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "stricter"
+    },
+    {
+      "id": "subject_record",
+      "mode": "strict",
+      "exit": 0,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "PASS",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [],
+        "freshness": [],
+        "subject": {
+          "input_kind": "unverified_input"
+        }
+      },
+      "expected": "UNEVALUATED",
+      "assess": "stricter"
+    },
+    {
+      "id": "numeric_applicability",
+      "mode": "strict",
+      "exit": 0,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "PASS",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [
+          {
+            "decision_id": "ADR-901",
+            "rule_id": "ADR-901:FORBID_LITERAL:x",
+            "outcome": "APPLIED",
+            "rule_type": "FORBID_NUMERIC_ABOVE",
+            "matcher_status": "COMPLETE"
+          }
+        ],
+        "violations": [],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "strict_pass_exit_1",
+      "mode": "strict",
+      "exit": 1,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "PASS",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "strict_pass_exit_2",
+      "mode": "strict",
+      "exit": 2,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "PASS",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "strict_warn_exit_0",
+      "mode": "strict",
+      "exit": 0,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "WARN",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [
+          {
+            "decision_id": "ADR-901",
+            "decision_text": "Do not document the legacy installer.",
+            "severity": "WARN",
+            "rule": "install legacy-client",
+            "trigger": "install legacy-client",
+            "rule_id": "ADR-901:FORBID_LITERAL:x"
+          }
+        ],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "strict_fail_exit_0",
+      "mode": "strict",
+      "exit": 0,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "FAIL",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [
+          {
+            "decision_id": "ADR-901",
+            "decision_text": "Do not document the legacy installer.",
+            "severity": "FAIL",
+            "rule": "install legacy-client",
+            "trigger": "install legacy-client",
+            "rule_id": "ADR-901:FORBID_LITERAL:x"
+          }
+        ],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "strict_fail_exit_1",
+      "mode": "strict",
+      "exit": 1,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "FAIL",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [
+          {
+            "decision_id": "ADR-901",
+            "decision_text": "Do not document the legacy installer.",
+            "severity": "FAIL",
+            "rule": "install legacy-client",
+            "trigger": "install legacy-client",
+            "rule_id": "ADR-901:FORBID_LITERAL:x"
+          }
+        ],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "warn_fail_exit_2",
+      "mode": "warn",
+      "exit": 2,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "FAIL",
+        "mode": "warn",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [
+          {
+            "decision_id": "ADR-901",
+            "decision_text": "Do not document the legacy installer.",
+            "severity": "FAIL",
+            "rule": "install legacy-client",
+            "trigger": "install legacy-client",
+            "rule_id": "ADR-901:FORBID_LITERAL:x"
+          }
+        ],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "warn_warn_exit_1",
+      "mode": "warn",
+      "exit": 1,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "WARN",
+        "mode": "warn",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [
+          {
+            "decision_id": "ADR-901",
+            "decision_text": "Do not document the legacy installer.",
+            "severity": "WARN",
+            "rule": "install legacy-client",
+            "trigger": "install legacy-client",
+            "rule_id": "ADR-901:FORBID_LITERAL:x"
+          }
+        ],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "mode_mismatch_warn_for_strict",
+      "mode": "strict",
+      "exit": 0,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "PASS",
+        "mode": "warn",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "mode_unknown",
+      "mode": "strict",
+      "exit": 0,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "PASS",
+        "mode": "advisory",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "schema_v2",
+      "mode": "strict",
+      "exit": 0,
+      "payload": {
+        "schema": "mneme.check/v2",
+        "verdict": "PASS",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "schema_missing",
+      "mode": "strict",
+      "exit": 0,
+      "payload": {
+        "verdict": "PASS",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "verdict_lowercase",
+      "mode": "strict",
+      "exit": 0,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "pass",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "verdict_missing",
+      "mode": "strict",
+      "exit": 0,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "verdict_list",
+      "mode": "strict",
+      "exit": 0,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": [
+          "PASS"
+        ],
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "complete_as_string",
+      "mode": "strict",
+      "exit": 0,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "PASS",
+        "mode": "strict",
+        "evaluation_complete": "true",
+        "applicability": [],
+        "violations": [],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "complete_as_int",
+      "mode": "strict",
+      "exit": 0,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "PASS",
+        "mode": "strict",
+        "evaluation_complete": 1,
+        "applicability": [],
+        "violations": [],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "complete_true_with_unknown",
+      "mode": "strict",
+      "exit": 0,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "PASS",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [
+          {
+            "decision_id": "ADR-901",
+            "rule_id": "ADR-901:FORBID_LITERAL:x",
+            "outcome": "UNKNOWN"
+          }
+        ],
+        "violations": [],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "violations_null",
+      "mode": "strict",
+      "exit": 0,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "PASS",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": null,
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "freshness_not_list",
+      "mode": "strict",
+      "exit": 0,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "PASS",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [],
+        "freshness": {}
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "applicability_not_objects",
+      "mode": "strict",
+      "exit": 0,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "PASS",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [
+          "APPLIED"
+        ],
+        "violations": [],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "pass_with_violation",
+      "mode": "strict",
+      "exit": 0,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "PASS",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [
+          {
+            "decision_id": "ADR-901",
+            "decision_text": "Do not document the legacy installer.",
+            "severity": "FAIL",
+            "rule": "install legacy-client",
+            "trigger": "install legacy-client",
+            "rule_id": "ADR-901:FORBID_LITERAL:x"
+          }
+        ],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "warn_without_violations",
+      "mode": "strict",
+      "exit": 1,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "WARN",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "warn_with_fail_violation",
+      "mode": "strict",
+      "exit": 1,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "WARN",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [
+          {
+            "decision_id": "ADR-901",
+            "decision_text": "Do not document the legacy installer.",
+            "severity": "FAIL",
+            "rule": "install legacy-client",
+            "trigger": "install legacy-client",
+            "rule_id": "ADR-901:FORBID_LITERAL:x"
+          }
+        ],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "fail_without_violations",
+      "mode": "strict",
+      "exit": 2,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "FAIL",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "fail_with_warn_only",
+      "mode": "strict",
+      "exit": 2,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "FAIL",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [
+          {
+            "decision_id": "ADR-901",
+            "decision_text": "Do not document the legacy installer.",
+            "severity": "WARN",
+            "rule": "install legacy-client",
+            "trigger": "install legacy-client",
+            "rule_id": "ADR-901:FORBID_LITERAL:x"
+          }
+        ],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "violation_not_object",
+      "mode": "strict",
+      "exit": 2,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "FAIL",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [
+          "ADR-901"
+        ],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "violation_no_decision_id",
+      "mode": "strict",
+      "exit": 2,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "FAIL",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [
+          {
+            "decision_id": "",
+            "decision_text": "Do not document the legacy installer.",
+            "severity": "FAIL",
+            "rule": "install legacy-client",
+            "trigger": "install legacy-client",
+            "rule_id": "ADR-901:FORBID_LITERAL:x"
+          }
+        ],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "violation_no_decision_text",
+      "mode": "strict",
+      "exit": 2,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "FAIL",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [
+          {
+            "decision_id": "ADR-901",
+            "decision_text": null,
+            "severity": "FAIL",
+            "rule": "install legacy-client",
+            "trigger": "install legacy-client",
+            "rule_id": "ADR-901:FORBID_LITERAL:x"
+          }
+        ],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "violation_bad_severity",
+      "mode": "strict",
+      "exit": 2,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "FAIL",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [
+          {
+            "decision_id": "ADR-901",
+            "decision_text": "Do not document the legacy installer.",
+            "severity": "ERROR",
+            "rule": "install legacy-client",
+            "trigger": "install legacy-client",
+            "rule_id": "ADR-901:FORBID_LITERAL:x"
+          }
+        ],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "violation_no_rule",
+      "mode": "strict",
+      "exit": 2,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "FAIL",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [
+          {
+            "decision_id": "ADR-901",
+            "decision_text": "Do not document the legacy installer.",
+            "severity": "FAIL",
+            "rule": " ",
+            "trigger": "install legacy-client",
+            "rule_id": "ADR-901:FORBID_LITERAL:x"
+          }
+        ],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "violation_no_trigger",
+      "mode": "strict",
+      "exit": 2,
+      "payload": {
+        "schema": "mneme.check/v1",
+        "verdict": "FAIL",
+        "mode": "strict",
+        "evaluation_complete": true,
+        "applicability": [],
+        "violations": [
+          {
+            "decision_id": "ADR-901",
+            "decision_text": "Do not document the legacy installer.",
+            "severity": "FAIL",
+            "rule": "install legacy-client",
+            "trigger": "",
+            "rule_id": "ADR-901:FORBID_LITERAL:x"
+          }
+        ],
+        "freshness": []
+      },
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "crash_empty_stdout_exit_1",
+      "mode": "strict",
+      "exit": 1,
+      "stdout": "",
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "non_json_stdout",
+      "mode": "strict",
+      "exit": 0,
+      "stdout": "Result: PASS\n",
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "payload_then_text",
+      "mode": "strict",
+      "exit": 0,
+      "stdout": "{\"schema\": \"mneme.check/v1\", \"verdict\": \"PASS\", \"mode\": \"strict\", \"evaluation_complete\": true, \"applicability\": [], \"violations\": [], \"freshness\": []}\nResult: PASS\n",
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "two_payloads",
+      "mode": "strict",
+      "exit": 0,
+      "stdout": "{\"schema\": \"mneme.check/v1\", \"verdict\": \"PASS\", \"mode\": \"strict\", \"evaluation_complete\": true, \"applicability\": [], \"violations\": [], \"freshness\": []}\n{\"schema\": \"mneme.check/v1\", \"verdict\": \"PASS\", \"mode\": \"strict\", \"evaluation_complete\": true, \"applicability\": [], \"violations\": [], \"freshness\": []}",
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "truncated_payload",
+      "mode": "strict",
+      "exit": 0,
+      "stdout": "{\"schema\": \"mneme.check/v1\", \"verdict\": \"PASS\", \"mode\": \"strict\", \"evaluation_complete\": true, \"applicability\": [], \"violations\": [], \"freshness\": []",
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "json_array",
+      "mode": "strict",
+      "exit": 0,
+      "stdout": "[{\"schema\": \"mneme.check/v1\", \"verdict\": \"PASS\", \"mode\": \"strict\", \"evaluation_complete\": true, \"applicability\": [], \"violations\": [], \"freshness\": []}]",
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    },
+    {
+      "id": "json_null",
+      "mode": "strict",
+      "exit": 0,
+      "stdout": "null",
+      "expected": "UNEVALUATED",
+      "assess": "untrusted"
+    }
+  ]
+}

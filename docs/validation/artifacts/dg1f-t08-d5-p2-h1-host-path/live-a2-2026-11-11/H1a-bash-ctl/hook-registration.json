@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"<PYTHON>\" -I \"<HARNESS>\\emitter.py\" noop \"<LIVE>\\H1a-bash-ctl\\out\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

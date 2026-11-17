@@ -8,8 +8,11 @@ decision_governance.py — DG1 governance semantics over v1 (ADR-031).
 - DG1D ``resolve_change``: the governance delta between two supplied
   snapshots, derived only by comparing two ``resolve_effective`` results.
 
-None of these adds governance semantics: they make the v1 semantics that
-0.10.0 already applies explicit and explainable.
+DG1C/E/D make the v1 semantics that 0.10.0 already applies explicit and
+explainable. DG1B1 adds decision applicability over v2 memory; DG1F-C2 adds
+the three-state context (labels not supplied / supplied empty / supplied) and
+reads lifecycle eligibility from the single ``decision_index.lifecycle_governs``
+authority.
 
 v1 semantics (ADR-030 §11, ADR-031 §2-§3)
 -----------------------------------------
@@ -41,10 +44,12 @@ Whether such a finding should block execution is a later decision (DG1F),
 not a DG1C semantic. ``ambiguous`` is reserved for genuine governance
 ambiguity introduced by later slices (DG1P onward); DG1C never emits it.
 
-The resolver never reads the clock, retrieval scores, or input order.
-``GovernanceContext`` is accepted and validated, but no v1 semantic depends
-on it: the result is invariant to paths, labels, and ``as_of`` until
-decision applicability or waivers exist (ADR-031 §6-§7).
+The resolver never reads the clock, retrieval scores, or input order. The
+result is invariant to ``GovernanceContext.paths`` and ``as_of`` (no path- or
+time-bound semantic exists yet, ADR-031 §6-§7). Labels matter only for
+decisions that declare applicability, and only when supplied: with labels not
+supplied, such decisions are conservatively included and reported with
+``applicability_evaluated=False`` (DG1F-C2).
 
 Nothing here changes retrieval, enforcement, Audit, or MCP outcomes (DG1F).
 The enforcement trace carries canonical identity (DG1E), but no verdict
@@ -59,12 +64,19 @@ from pathlib import Path
 from mneme.decision_index import (
     VALID_LIFECYCLE_STATUSES,
     CanonicalArchitectureIndex,
+    lifecycle_governs,
 )
-from mneme.decision_index_persistence import load_decision_index_from_memory_file
+from mneme.decision_index_persistence import (
+    WAIVER_STATUS_ACTIVE,
+    is_waiver_timestamp,
+    load_decision_index_from_memory_file,
+)
 from mneme.path_selectors import validate_relative_path
 from mneme.schemas import VALID_RULE_TYPES
 
-GOVERNANCE_SEMANTICS_VERSION = "mneme.governance-semantics/dg1b1-1"
+# DG1B2a (charter #784 §3.7) bumps the semantics id: cause ``waived``, the
+# ``waiver`` trace step and ``DecisionResolution.waiver_ids``.
+GOVERNANCE_SEMANTICS_VERSION = "mneme.governance-semantics/dg1b2a-1"
 
 STATUS_EFFECTIVE = "effective"
 STATUS_INEFFECTIVE = "ineffective"
@@ -76,11 +88,26 @@ CAUSE_LIFECYCLE_INACTIVE = "lifecycle_inactive"
 # DG1B1 (ADR-031 §3): a lifecycle-active decision whose declared required
 # context labels are not all present in GovernanceContext.labels.
 CAUSE_NOT_APPLICABLE = "not_applicable"
+# DG1B2a (ADR-031 §3, §12): a lifecycle-active, applicable decision under at
+# least one applying canonical waiver. The decision stays authoritative.
+CAUSE_WAIVED = "waived"
 
 FINDING_SUPERSESSION_LIFECYCLE_CONFLICT = "supersession_lifecycle_conflict"
 FINDING_DANGLING_SUPERSEDES = "dangling_supersedes"
+# DG1B2a (charter §3.2): non-blocking integrity findings about active waivers.
+FINDING_DANGLING_WAIVER_TARGET = "dangling_waiver_target"
+FINDING_WAIVER_VERSION_MISMATCH = "waiver_version_mismatch"
 
-_EFFECTIVE_LIFECYCLE = "active"
+# Why an individual waiver did not apply (trace detail ``<waiver_id>:<reason>``).
+WAIVER_REASON_REVOKED = "revoked"
+WAIVER_REASON_VERSION_MISMATCH = "version_mismatch"
+WAIVER_REASON_LABELS_NOT_SUPPLIED = "labels_not_supplied"
+WAIVER_REASON_LABELS_NOT_MATCHED = "labels_not_matched"
+WAIVER_REASON_AS_OF_MISSING = "as_of_missing"
+WAIVER_REASON_AS_OF_INVALID = "as_of_invalid"
+WAIVER_REASON_NOT_YET_VALID = "not_yet_valid"
+WAIVER_REASON_EXPIRED = "expired"
+
 _NON_AUTHORITATIVE_LIFECYCLE = "inactive"
 _LIFECYCLE_CAUSES = {
     "superseded": CAUSE_LIFECYCLE_SUPERSEDED,
@@ -100,22 +127,35 @@ class GovernanceContext:
         as_of:  Explicit instant for time-bound semantics. The resolver never
                 reads the clock. ``None`` means no instant was supplied.
         labels: Opaque project-local strings with no identity, team, role or
-                organization meaning. Stored sorted and de-duplicated.
+                organization meaning. Three states (DG1F-C2 charter §3.2):
+                ``None`` (the default) means labels were **not supplied**;
+                ``()`` means supplied with no labels; a non-empty tuple means
+                supplied with those labels. Supplied labels are stored sorted
+                and de-duplicated.
     """
 
     paths: tuple[str, ...] = ()
     as_of: str | None = None
-    labels: tuple[str, ...] = ()
+    labels: tuple[str, ...] | None = None
 
     def __post_init__(self) -> None:
         paths = tuple(sorted({validate_relative_path(p) for p in self.paths}))
-        for label in self.labels:
-            if not isinstance(label, str) or not label:
-                raise ValueError("governance context labels must be non-empty strings")
+        if self.labels is not None:
+            if isinstance(self.labels, str):
+                raise ValueError("governance context labels must be a sequence of strings")
+            for label in self.labels:
+                if not isinstance(label, str) or not label:
+                    raise ValueError("governance context labels must be non-empty strings")
         if self.as_of is not None and (not isinstance(self.as_of, str) or not self.as_of):
             raise ValueError("governance context as_of must be a non-empty string or None")
         object.__setattr__(self, "paths", paths)
-        object.__setattr__(self, "labels", tuple(sorted(set(self.labels))))
+        if self.labels is not None:
+            object.__setattr__(self, "labels", tuple(sorted(set(self.labels))))
+
+    @property
+    def labels_supplied(self) -> bool:
+        """Whether governance labels were supplied (charter §3.2)."""
+        return self.labels is not None
 
 
 @dataclass(frozen=True)
@@ -143,7 +183,17 @@ class DecisionResolution:
         superseded_by:       Authoritative decisions declaring ``supersedes`` on it.
         applicability_required_labels: Declared decision applicability (DG1B1);
                              empty means globally eligible.
+        lifecycle_eligible:  Whether the lifecycle governs
+                             (``decision_index.lifecycle_governs``), regardless
+                             of context (DG1F-C2).
+        applicability_evaluated: Whether declared required labels were
+                             evaluated against supplied labels. ``False`` for a
+                             decision that declares none, and always ``False``
+                             when labels were not supplied: a conservatively
+                             included decision has **not** been shown to apply.
         trace:               Ordered explanation of the resolution.
+        waiver_ids:          Sorted ids of the canonical waivers that make the
+                             decision ``waived`` (DG1B2a); empty otherwise.
     """
 
     decision_id: str
@@ -154,7 +204,10 @@ class DecisionResolution:
     rule_ids: tuple[str, ...] = ()
     superseded_by: tuple[str, ...] = ()
     applicability_required_labels: tuple[str, ...] = ()
+    lifecycle_eligible: bool = False
+    applicability_evaluated: bool = False
     trace: tuple[TraceStep, ...] = ()
+    waiver_ids: tuple[str, ...] = ()
 
     @property
     def effective(self) -> bool:
@@ -195,6 +248,11 @@ class GovernanceResolution:
     def effective_ids(self) -> tuple[str, ...]:
         return tuple(d.decision_id for d in self.effective)
 
+    @property
+    def labels_supplied(self) -> bool:
+        """Whether this resolution evaluated applicability (charter §3.2)."""
+        return self.context.labels_supplied
+
 
 def _validate(index: CanonicalArchitectureIndex) -> None:
     seen: set[str] = set()
@@ -219,6 +277,35 @@ def _validate(index: CanonicalArchitectureIndex) -> None:
                 f"decision {record.decision_id!r} rule lineage does not match its "
                 f"bound rules: declared {sorted(record.derived_rule_ids)}, bound {bound}"
             )
+
+
+def _waiver_rejection(waiver, record, context: GovernanceContext) -> str | None:
+    """Why ``waiver`` does not apply to ``record`` here, or ``None`` (§3.2).
+
+    Fail closed to the decision: every unclear case leaves it effective.
+    ``as_of`` is parsed only here; ``GovernanceContext`` validation is
+    unchanged.
+    """
+    if waiver.status != WAIVER_STATUS_ACTIVE:
+        return WAIVER_REASON_REVOKED
+    if waiver.target_decision_version_id != record.version_id:
+        return WAIVER_REASON_VERSION_MISMATCH
+    if not context.labels_supplied:
+        return WAIVER_REASON_LABELS_NOT_SUPPLIED
+    supplied = set(context.labels)
+    if any(label not in supplied for label in waiver.required_labels):
+        return WAIVER_REASON_LABELS_NOT_MATCHED
+    if waiver.valid_from or waiver.valid_until:
+        if context.as_of is None:
+            return WAIVER_REASON_AS_OF_MISSING
+        if not is_waiver_timestamp(context.as_of):
+            return WAIVER_REASON_AS_OF_INVALID
+        # One fixed timestamp shape, so string order is instant order.
+        if waiver.valid_from and context.as_of < waiver.valid_from:
+            return WAIVER_REASON_NOT_YET_VALID
+        if waiver.valid_until and context.as_of >= waiver.valid_until:
+            return WAIVER_REASON_EXPIRED
+    return None
 
 
 def resolve_effective(
@@ -252,6 +339,31 @@ def resolve_effective(
                 detail=tuple(sorted(declarers[target])),
             ))
 
+    # DG1B2a: the trace gains a ``waiver`` step only for documents that carry
+    # waiver records, so resolutions of waiver-free memory are unchanged.
+    has_waivers = bool(index.waivers)
+    waivers_by_target: dict[str, list] = {}
+    active_versions = {r.decision_id: r.version_id for r in index.records}
+    for waiver in index.waivers:
+        waivers_by_target.setdefault(waiver.target_decision_id, []).append(waiver)
+        if waiver.status != WAIVER_STATUS_ACTIVE:
+            continue
+        if waiver.target_decision_id not in active_versions:
+            findings.append(GovernanceFinding(
+                code=FINDING_DANGLING_WAIVER_TARGET,
+                decision_id=waiver.target_decision_id,
+                detail=(waiver.waiver_id,),
+            ))
+        elif (
+            waiver.target_decision_version_id
+            != active_versions[waiver.target_decision_id]
+        ):
+            findings.append(GovernanceFinding(
+                code=FINDING_WAIVER_VERSION_MISMATCH,
+                decision_id=waiver.target_decision_id,
+                detail=(waiver.waiver_id, waiver.target_decision_version_id),
+            ))
+
     decisions: list[DecisionResolution] = []
     for record in sorted(index.records, key=lambda r: r.decision_id):
         superseded_by = tuple(sorted(declarers.get(record.decision_id, ())))
@@ -266,7 +378,10 @@ def resolve_effective(
             TraceStep("precedence", "not_recorded"),
         ]
         required_labels = record.applicability_required_labels
-        if record.lifecycle_status == _EFFECTIVE_LIFECYCLE:
+        lifecycle_eligible = lifecycle_governs(record.lifecycle_status)
+        applicability_evaluated = False
+        waiver_ids: tuple[str, ...] = ()
+        if lifecycle_eligible:
             if superseded_by:
                 findings.append(GovernanceFinding(
                     code=FINDING_SUPERSESSION_LIFECYCLE_CONFLICT,
@@ -280,7 +395,17 @@ def resolve_effective(
             if not required_labels:
                 status, cause = STATUS_EFFECTIVE, None
                 trace.append(TraceStep("applicability", "not_declared"))
+            elif not context.labels_supplied:
+                # DG1F-C2 charter §3.2: labels not supplied. Applicability is
+                # unknown, so the decision is conservatively included, never
+                # excluded (ADR-031 §11). This is not proof that it applies:
+                # applicability_evaluated stays False and it is never "matched".
+                status, cause = STATUS_EFFECTIVE, None
+                trace.append(TraceStep(
+                    "applicability", "context_not_supplied", required_labels
+                ))
             else:
+                applicability_evaluated = True
                 context_labels = set(context.labels)
                 missing = tuple(
                     label for label in required_labels if label not in context_labels
@@ -298,6 +423,32 @@ def resolve_effective(
         else:
             status, cause = STATUS_INEFFECTIVE, _LIFECYCLE_CAUSES[record.lifecycle_status]
             trace.append(TraceStep("applicability", "not_evaluated"))
+        if has_waivers:
+            # DG1B2a (charter §3.2): waivers are evaluated only after the
+            # unchanged lifecycle and applicability steps, and only for a
+            # decision that is still effective.
+            targeting = waivers_by_target.get(record.decision_id, [])
+            if status != STATUS_EFFECTIVE:
+                trace.append(TraceStep("waiver", "not_evaluated"))
+            elif not targeting:
+                trace.append(TraceStep("waiver", "none"))
+            else:
+                applying: list[str] = []
+                rejected: list[str] = []
+                for waiver in targeting:
+                    reason = _waiver_rejection(waiver, record, context)
+                    if reason is None:
+                        applying.append(waiver.waiver_id)
+                    else:
+                        rejected.append(f"{waiver.waiver_id}:{reason}")
+                if applying:
+                    waiver_ids = tuple(sorted(applying))
+                    status, cause = STATUS_INEFFECTIVE, CAUSE_WAIVED
+                    trace.append(TraceStep("waiver", "waived", waiver_ids))
+                else:
+                    trace.append(
+                        TraceStep("waiver", "not_applied", tuple(sorted(rejected)))
+                    )
         trace.append(TraceStep("result", status, (cause,) if cause else ()))
         decisions.append(DecisionResolution(
             decision_id=record.decision_id,
@@ -308,7 +459,10 @@ def resolve_effective(
             rule_ids=record.derived_rule_ids,
             superseded_by=superseded_by,
             applicability_required_labels=required_labels,
+            lifecycle_eligible=lifecycle_eligible,
+            applicability_evaluated=applicability_evaluated,
             trace=tuple(trace),
+            waiver_ids=waiver_ids,
         ))
 
     return GovernanceResolution(
@@ -317,6 +471,32 @@ def resolve_effective(
         decisions=tuple(decisions),
         findings=tuple(sorted(findings, key=lambda f: (f.code, f.decision_id, f.detail))),
     )
+
+
+def governed_runtime_decisions(store) -> list:
+    """The governed runtime decisions of a loaded ``MemoryStore`` (DG1F-C3a).
+
+    Charter docs/plans/2026-11-09-dg1f-c3a-audit-resolver-charter.md §3.3;
+    Layer 1 freeze amendment #775. Used only by ``mneme audit``, setup
+    readiness and ``protect list``.
+
+    - Canonical memory: the projected decisions whose ids are in the
+      resolver's effective set for the **not supplied** context, in projection
+      order, from the same snapshot (``store.canonical_index`` and
+      ``store.decisions()`` come from one ``MemoryStore.load()``). Labels are
+      never supplied. Only the effective set is used; findings never exclude
+      a decision and resolver errors are never caught.
+    - Section-less memory (no canonical index): ``store.decisions()``
+      unchanged (the DG1F-C2 path).
+
+    This reads no file.
+    """
+    decisions = store.decisions()
+    index = store.canonical_index
+    if index is None:
+        return decisions
+    effective = set(resolve_effective(index, GovernanceContext()).effective_ids)
+    return [decision for decision in decisions if decision.id in effective]
 
 
 def resolve_effective_from_memory_file(
@@ -624,13 +804,17 @@ __all__ = [
     "CHANGE_KINDS",
     "CHANGE_LIFECYCLE",
     "CHANGE_RULE_SET",
+    "CAUSE_WAIVED",
     "CHANGE_SEMANTICS_VERSION",
+    "FINDING_DANGLING_WAIVER_TARGET",
+    "FINDING_WAIVER_VERSION_MISMATCH",
     "CHANGE_SUPERSEDED_BY",
     "CHANGE_VERSION",
     "EVIDENCE_IDENTITY_FIELDS",
     "FINDING_DANGLING_SUPERSEDES",
     "FINDING_SUPERSESSION_LIFECYCLE_CONFLICT",
     "GOVERNANCE_SEMANTICS_VERSION",
+    "governed_runtime_decisions",
     "STATUS_AMBIGUOUS",
     "STATUS_EFFECTIVE",
     "STATUS_INEFFECTIVE",

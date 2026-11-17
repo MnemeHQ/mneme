@@ -1,0 +1,873 @@
+{
+  "ci": {
+    "cases": {
+      "B1_allow": {
+        "adapter_exit": 0,
+        "aggregate": "PASS",
+        "base_sha": "978de46e3e3223b466ed3b0667f37d11296796ee",
+        "disposition": "success",
+        "files": [
+          {
+            "applicability": "APPLIED",
+            "classification": "VERIFIED_PASS",
+            "content_sha256": "37c6e073132ff07d89b1bb134cb04647ba1fa8bc93af0420a5a7ea4a6b82c314",
+            "evaluation_complete": true,
+            "identity": {
+              "decision_id": "ADR-901",
+              "decision_version_id": "dver-d3d431ff6d5edba8b555a040a7b85f9b",
+              "rule_id": "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b"
+            },
+            "kind": null,
+            "path": "docs/guide.md",
+            "payload_has_subject": false,
+            "verdict": "PASS"
+          }
+        ],
+        "head_sha": "e7b90432d1fc63592f80ed7bc01e2ca920342ae5",
+        "memory": {
+          "blob": "4c669436199643458ae11fe7991ccfaa5b1a6e03",
+          "path": ".mneme/project_memory.json",
+          "sha256": "62f8eae564731e733ad95c97c048a84b2a1c9b9b12bb42cc8fdcf432c75abec7",
+          "source_commit": "978de46e3e3223b466ed3b0667f37d11296796ee"
+        },
+        "posture": {
+          "effective": "closed",
+          "fallback": null,
+          "source": "vars.MNEME_CI_AVAILABILITY"
+        },
+        "report_base_sha": "978de46e3e3223b466ed3b0667f37d11296796ee",
+        "report_head_sha": "e7b90432d1fc63592f80ed7bc01e2ca920342ae5",
+        "verify_exit": 0,
+        "verify_problems": []
+      },
+      "B2_bypass_violation": {
+        "adapter_exit": 1,
+        "aggregate": "VIOLATION",
+        "base_sha": "978de46e3e3223b466ed3b0667f37d11296796ee",
+        "disposition": "failure",
+        "files": [
+          {
+            "applicability": "APPLIED",
+            "classification": "VIOLATION",
+            "content_sha256": "04f345752c8bda683102c0a6140347d117b7f223b85b58a093f13635c7bd735a",
+            "evaluation_complete": true,
+            "identity": {
+              "decision_id": "ADR-901",
+              "decision_version_id": "dver-d3d431ff6d5edba8b555a040a7b85f9b",
+              "rule_id": "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b"
+            },
+            "kind": null,
+            "path": "docs/install.md",
+            "payload_has_subject": false,
+            "verdict": "FAIL"
+          }
+        ],
+        "head_sha": "99bdbccb6386da15d53e37308e7ac9dba753a770",
+        "memory": {
+          "blob": "4c669436199643458ae11fe7991ccfaa5b1a6e03",
+          "path": ".mneme/project_memory.json",
+          "sha256": "62f8eae564731e733ad95c97c048a84b2a1c9b9b12bb42cc8fdcf432c75abec7",
+          "source_commit": "978de46e3e3223b466ed3b0667f37d11296796ee"
+        },
+        "posture": {
+          "effective": "closed",
+          "fallback": null,
+          "source": "vars.MNEME_CI_AVAILABILITY"
+        },
+        "report_base_sha": "978de46e3e3223b466ed3b0667f37d11296796ee",
+        "report_head_sha": "99bdbccb6386da15d53e37308e7ac9dba753a770",
+        "verify_exit": 1,
+        "verify_problems": [
+          "required check fails: VIOLATION under availability closed"
+        ]
+      },
+      "B3_incomplete_symlink": {
+        "adapter_exit": 1,
+        "aggregate": "UNEVALUATED",
+        "base_sha": "978de46e3e3223b466ed3b0667f37d11296796ee",
+        "disposition": "failure",
+        "files": [
+          {
+            "applicability": null,
+            "classification": "UNEVALUATED",
+            "content_sha256": null,
+            "evaluation_complete": null,
+            "identity": null,
+            "kind": "mode",
+            "path": "docs/link.md",
+            "payload_has_subject": false,
+            "verdict": null
+          }
+        ],
+        "head_sha": "1729a0ab8a62ba3e70f424119b56ae24e81eeafa",
+        "memory": null,
+        "posture": {
+          "effective": "closed",
+          "fallback": null,
+          "source": "vars.MNEME_CI_AVAILABILITY"
+        },
+        "report_base_sha": "978de46e3e3223b466ed3b0667f37d11296796ee",
+        "report_head_sha": "1729a0ab8a62ba3e70f424119b56ae24e81eeafa",
+        "verify_exit": 1,
+        "verify_problems": [
+          "required check fails: UNEVALUATED under availability closed"
+        ]
+      },
+      "B4_missing_identity": {
+        "adapter_exit": 1,
+        "aggregate": "VIOLATION",
+        "base_sha": "cff670b109e47884675de511b04f1a1ab89c815f",
+        "disposition": "failure",
+        "files": [
+          {
+            "applicability": "APPLIED",
+            "classification": "VIOLATION",
+            "content_sha256": "04f345752c8bda683102c0a6140347d117b7f223b85b58a093f13635c7bd735a",
+            "evaluation_complete": true,
+            "identity": {
+              "decision_id": "ADR-901",
+              "decision_version_id": "",
+              "rule_id": "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b"
+            },
+            "kind": null,
+            "path": "docs/install.md",
+            "payload_has_subject": false,
+            "verdict": "FAIL"
+          }
+        ],
+        "head_sha": "d7e9451f6483b1b6dbd9a804334bbd577324dac0",
+        "memory": {
+          "blob": "65d9f95daa5b146564638ca7c67eea0281ea9fcf",
+          "path": ".mneme/project_memory.json",
+          "sha256": "2982e94aa794c1c9ef8d1551964de71cdfd48ecde87024e6f2081d32519ad065",
+          "source_commit": "cff670b109e47884675de511b04f1a1ab89c815f"
+        },
+        "posture": {
+          "effective": "closed",
+          "fallback": null,
+          "source": "vars.MNEME_CI_AVAILABILITY"
+        },
+        "report_base_sha": "cff670b109e47884675de511b04f1a1ab89c815f",
+        "report_head_sha": "d7e9451f6483b1b6dbd9a804334bbd577324dac0",
+        "verify_exit": 1,
+        "verify_problems": [
+          "required check fails: VIOLATION under availability closed"
+        ]
+      },
+      "B5_later_revision": {
+        "adapter_exit": 0,
+        "aggregate": "PASS",
+        "base_sha": "e7b90432d1fc63592f80ed7bc01e2ca920342ae5",
+        "disposition": "success",
+        "files": [
+          {
+            "applicability": "APPLIED",
+            "classification": "VERIFIED_PASS",
+            "content_sha256": "424fb9f4eaaf742b24a30dfd3b62cbacbc02f31cfeca011690696830d2e343f5",
+            "evaluation_complete": true,
+            "identity": {
+              "decision_id": "ADR-901",
+              "decision_version_id": "dver-d3d431ff6d5edba8b555a040a7b85f9b",
+              "rule_id": "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b"
+            },
+            "kind": null,
+            "path": "docs/guide.md",
+            "payload_has_subject": false,
+            "verdict": "PASS"
+          }
+        ],
+        "head_sha": "f77bd0f8ed87cc61eff0aa7b04d10355e3ac7e30",
+        "memory": {
+          "blob": "4c669436199643458ae11fe7991ccfaa5b1a6e03",
+          "path": ".mneme/project_memory.json",
+          "sha256": "62f8eae564731e733ad95c97c048a84b2a1c9b9b12bb42cc8fdcf432c75abec7",
+          "source_commit": "e7b90432d1fc63592f80ed7bc01e2ca920342ae5"
+        },
+        "posture": {
+          "effective": "closed",
+          "fallback": null,
+          "source": "vars.MNEME_CI_AVAILABILITY"
+        },
+        "report_base_sha": "e7b90432d1fc63592f80ed7bc01e2ca920342ae5",
+        "report_head_sha": "f77bd0f8ed87cc61eff0aa7b04d10355e3ac7e30",
+        "verify_exit": 0,
+        "verify_problems": []
+      }
+    },
+    "pins": {
+      "adapter_sha256": "afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9",
+      "evaluator_commit": "0b74d410b45e7b3efcf08d00ce58e7bd7017b757",
+      "evaluator_version": "0.10.0",
+      "evaluator_wheel_sha256": "e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51",
+      "gate_python": "3.12.3",
+      "os": "Ubuntu 24.04.5 LTS"
+    }
+  },
+  "pins": {
+    "adapter_blob": "5feedf60ce1a67b2bb85673354c8b8b367a87d06",
+    "adapter_commit": "c51729f78199203fe12fcbc5c678b89a2c4f7d3e",
+    "adapter_sha256": "afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9",
+    "container_image": "ubuntu@sha256:68ee22004a9109b44973313b02ff7b1de250f1de0f5ecb628d73f579aaff33ac",
+    "evaluator_commit": "0b74d410b45e7b3efcf08d00ce58e7bd7017b757",
+    "evaluator_wheel_sha256": "e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51",
+    "memory_blob": "4c669436199643458ae11fe7991ccfaa5b1a6e03",
+    "runtime_commit": "619d5405e80da61788448a7a0eeacc7c5eb3d0c0",
+    "runtime_tag": "v0.11.0"
+  },
+  "premutation": {
+    "cases": {
+      "A1_allow": {
+        "action": "allow",
+        "applicability": "APPLIED",
+        "attempted_content_sha256": "37c6e073132ff07d89b1bb134cb04647ba1fa8bc93af0420a5a7ea4a6b82c314",
+        "evaluation_complete": true,
+        "handler_called": true,
+        "identity": {
+          "decision_id": "ADR-901",
+          "decision_version_id": "dver-d3d431ff6d5edba8b555a040a7b85f9b",
+          "rule_id": "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b"
+        },
+        "payload_has_subject": false,
+        "payload_present": true,
+        "target": "premutation/allow/docs/guide.md",
+        "target_after_sha256": "37c6e073132ff07d89b1bb134cb04647ba1fa8bc93af0420a5a7ea4a6b82c314",
+        "target_before_sha256": null,
+        "tool": "write_file",
+        "tool_result_marker": null,
+        "verdict": "PASS",
+        "violation_rule_ids": []
+      },
+      "A2_deny_new_file": {
+        "action": "deny",
+        "applicability": "APPLIED",
+        "attempted_content_sha256": "04f345752c8bda683102c0a6140347d117b7f223b85b58a093f13635c7bd735a",
+        "evaluation_complete": true,
+        "handler_called": false,
+        "identity": {
+          "decision_id": "ADR-901",
+          "decision_version_id": "dver-d3d431ff6d5edba8b555a040a7b85f9b",
+          "rule_id": "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b"
+        },
+        "payload_has_subject": false,
+        "payload_present": true,
+        "target": "premutation/deny_new/docs/install.md",
+        "target_after_sha256": null,
+        "target_before_sha256": null,
+        "tool": "write_file",
+        "tool_result_marker": "[mneme] DENIED",
+        "verdict": "FAIL",
+        "violation_rule_ids": [
+          "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b"
+        ]
+      },
+      "A3_deny_existing_file": {
+        "action": "deny",
+        "applicability": "APPLIED",
+        "attempted_content_sha256": "8e901e3ae98613b10df3dd5e6c2d24e6a91ef06dd46cd2f1806a1ffc43bda21b",
+        "evaluation_complete": true,
+        "handler_called": false,
+        "identity": {
+          "decision_id": "ADR-901",
+          "decision_version_id": "dver-d3d431ff6d5edba8b555a040a7b85f9b",
+          "rule_id": "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b"
+        },
+        "payload_has_subject": false,
+        "payload_present": true,
+        "target": "premutation/deny_existing/docs/readme.md",
+        "target_after_sha256": "20dfecfbd7821f1762fa73214af341be7bd1ce7994bc4a0f559041f36ed3c806",
+        "target_before_sha256": "20dfecfbd7821f1762fa73214af341be7bd1ce7994bc4a0f559041f36ed3c806",
+        "tool": "edit_file",
+        "tool_result_marker": "[mneme] DENIED",
+        "verdict": "FAIL",
+        "violation_rule_ids": [
+          "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b"
+        ]
+      },
+      "A4_incomplete": {
+        "action": "fail_open",
+        "applicability": "UNKNOWN",
+        "attempted_content_sha256": "04f345752c8bda683102c0a6140347d117b7f223b85b58a093f13635c7bd735a",
+        "evaluation_complete": false,
+        "handler_called": true,
+        "identity": {
+          "decision_id": "ADR-901",
+          "decision_version_id": "dver-d3d431ff6d5edba8b555a040a7b85f9b",
+          "rule_id": "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b"
+        },
+        "payload_has_subject": false,
+        "payload_present": true,
+        "target": "premutation/outside/notes.md",
+        "target_after_sha256": "04f345752c8bda683102c0a6140347d117b7f223b85b58a093f13635c7bd735a",
+        "target_before_sha256": null,
+        "tool": "write_file",
+        "tool_result_marker": "[mneme] UNEVALUATED",
+        "verdict": "PASS",
+        "violation_rule_ids": []
+      },
+      "A5_missing_identity": {
+        "action": "deny",
+        "applicability": "APPLIED",
+        "attempted_content_sha256": "04f345752c8bda683102c0a6140347d117b7f223b85b58a093f13635c7bd735a",
+        "evaluation_complete": true,
+        "handler_called": false,
+        "identity": {
+          "decision_id": "ADR-901",
+          "decision_version_id": "",
+          "rule_id": "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b"
+        },
+        "payload_has_subject": false,
+        "payload_present": true,
+        "target": "premutation/missing_identity/docs/install.md",
+        "target_after_sha256": null,
+        "target_before_sha256": null,
+        "tool": "write_file",
+        "tool_result_marker": "[mneme] DENIED",
+        "verdict": "FAIL",
+        "violation_rule_ids": [
+          "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b"
+        ]
+      }
+    },
+    "checker_subprocess_runtime": "pinned root (verified)",
+    "langchain_version": "1.4.0",
+    "mneme_version": "0.11.0"
+  },
+  "summary": {
+    "checks": 13,
+    "failed": [],
+    "passed": 13
+  },
+  "verification": [
+    {
+      "evidence_level": {
+        "actual": "execution_observed",
+        "max": "execution_observed"
+      },
+      "id": "V1_allow_premutation",
+      "level_ok": true,
+      "observations": {
+        "action": {
+          "actual": "allow",
+          "expected": "allow",
+          "ok": true
+        },
+        "applicability": {
+          "actual": "APPLIED",
+          "expected": "APPLIED",
+          "ok": true
+        },
+        "handler_called": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "identity_complete": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "payload_has_subject": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        },
+        "target_after_matches_content": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "verdict": {
+          "actual": "PASS",
+          "expected": "PASS",
+          "ok": true
+        }
+      },
+      "pass": true,
+      "title": "Allowed content reaches the handler and the file is written"
+    },
+    {
+      "evidence_level": {
+        "actual": "execution_observed",
+        "max": "execution_observed"
+      },
+      "id": "V1_allow_ci",
+      "level_ok": true,
+      "observations": {
+        "aggregate": {
+          "actual": "PASS",
+          "expected": "PASS",
+          "ok": true
+        },
+        "applicability": {
+          "actual": "APPLIED",
+          "expected": "APPLIED",
+          "ok": true
+        },
+        "classification": {
+          "actual": "VERIFIED_PASS",
+          "expected": "VERIFIED_PASS",
+          "ok": true
+        },
+        "disposition": {
+          "actual": "success",
+          "expected": "success",
+          "ok": true
+        },
+        "head_matches_report": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "identity_complete": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "payload_has_subject": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        },
+        "verify_exit": {
+          "actual": 0,
+          "expected": 0,
+          "ok": true
+        },
+        "verify_problems": {
+          "actual": [],
+          "expected": [],
+          "ok": true
+        }
+      },
+      "pass": true,
+      "title": "CI independently evaluates the resulting revision"
+    },
+    {
+      "evidence_level": {
+        "actual": "execution_observed",
+        "max": "execution_observed"
+      },
+      "id": "V1_allow_linkage",
+      "level_ok": true,
+      "observations": {
+        "established": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "same_full_identity": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "same_subject_digest": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        }
+      },
+      "pass": true,
+      "title": "Fixture-level correlation: same full identity and same (harness-computed) subject digest"
+    },
+    {
+      "evidence_level": {
+        "actual": "execution_observed",
+        "max": "execution_observed"
+      },
+      "id": "V2_A2_deny_new_file",
+      "level_ok": true,
+      "observations": {
+        "action": {
+          "actual": "deny",
+          "expected": "deny",
+          "ok": true
+        },
+        "applicability": {
+          "actual": "APPLIED",
+          "expected": "APPLIED",
+          "ok": true
+        },
+        "handler_called": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        },
+        "identity_complete": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "target_unchanged": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "tool_result_marker": {
+          "actual": "[mneme] DENIED",
+          "expected": "[mneme] DENIED",
+          "ok": true
+        },
+        "verdict": {
+          "actual": "FAIL",
+          "expected": "FAIL",
+          "ok": true
+        },
+        "violation_rule_ids": {
+          "actual": [
+            "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b"
+          ],
+          "expected": [
+            "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b"
+          ],
+          "ok": true
+        }
+      },
+      "pass": true,
+      "title": "Prohibited content rejected; handler not called; target unchanged"
+    },
+    {
+      "evidence_level": {
+        "actual": "execution_observed",
+        "max": "execution_observed"
+      },
+      "id": "V2_A3_deny_existing_file",
+      "level_ok": true,
+      "observations": {
+        "action": {
+          "actual": "deny",
+          "expected": "deny",
+          "ok": true
+        },
+        "applicability": {
+          "actual": "APPLIED",
+          "expected": "APPLIED",
+          "ok": true
+        },
+        "handler_called": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        },
+        "identity_complete": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "target_unchanged": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "tool_result_marker": {
+          "actual": "[mneme] DENIED",
+          "expected": "[mneme] DENIED",
+          "ok": true
+        },
+        "verdict": {
+          "actual": "FAIL",
+          "expected": "FAIL",
+          "ok": true
+        },
+        "violation_rule_ids": {
+          "actual": [
+            "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b"
+          ],
+          "expected": [
+            "ADR-901:FORBID_LITERAL:1eff1b82c5be57bd80379f967b799f7b"
+          ],
+          "ok": true
+        }
+      },
+      "pass": true,
+      "title": "Prohibited content rejected; handler not called; target unchanged"
+    },
+    {
+      "evidence_level": {
+        "actual": "execution_observed",
+        "max": "execution_observed"
+      },
+      "id": "V2_ci_catches_bypass",
+      "level_ok": true,
+      "observations": {
+        "aggregate": {
+          "actual": "VIOLATION",
+          "expected": "VIOLATION",
+          "ok": true
+        },
+        "applicability": {
+          "actual": "APPLIED",
+          "expected": "APPLIED",
+          "ok": true
+        },
+        "classification": {
+          "actual": "VIOLATION",
+          "expected": "VIOLATION",
+          "ok": true
+        },
+        "disposition": {
+          "actual": "failure",
+          "expected": "failure",
+          "ok": true
+        },
+        "identity_complete": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "same_subject_as_denied_attempt": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "verify_exit": {
+          "actual": 1,
+          "expected": 1,
+          "ok": true
+        },
+        "verify_problems": {
+          "actual": [
+            "required check fails: VIOLATION under availability closed"
+          ],
+          "expected": [
+            "required check fails: VIOLATION under availability closed"
+          ],
+          "ok": true
+        }
+      },
+      "pass": true,
+      "title": "Content that bypassed pre-mutation is a CI violation"
+    },
+    {
+      "evidence_level": {
+        "actual": "not_executed",
+        "max": "not_executed"
+      },
+      "id": "V3_incomplete_premutation",
+      "level_ok": true,
+      "observations": {
+        "action": {
+          "actual": "fail_open",
+          "expected": "fail_open",
+          "ok": true
+        },
+        "applicability": {
+          "actual": "UNKNOWN",
+          "expected": "UNKNOWN",
+          "ok": true
+        },
+        "evaluation_complete": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        },
+        "handler_called": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "tool_result_marker": {
+          "actual": "[mneme] UNEVALUATED",
+          "expected": "[mneme] UNEVALUATED",
+          "ok": true
+        }
+      },
+      "pass": true,
+      "title": "Path outside the policy root: UNKNOWN, reported UNEVALUATED"
+    },
+    {
+      "evidence_level": {
+        "actual": "not_executed",
+        "max": "not_executed"
+      },
+      "id": "V3_incomplete_ci",
+      "level_ok": true,
+      "observations": {
+        "aggregate": {
+          "actual": "UNEVALUATED",
+          "expected": "UNEVALUATED",
+          "ok": true
+        },
+        "classification": {
+          "actual": "UNEVALUATED",
+          "expected": "UNEVALUATED",
+          "ok": true
+        },
+        "disposition": {
+          "actual": "failure",
+          "expected": "failure",
+          "ok": true
+        },
+        "verify_exit": {
+          "actual": 1,
+          "expected": 1,
+          "ok": true
+        },
+        "verify_problems": {
+          "actual": [
+            "required check fails: UNEVALUATED under availability closed"
+          ],
+          "expected": [
+            "required check fails: UNEVALUATED under availability closed"
+          ],
+          "ok": true
+        }
+      },
+      "pass": true,
+      "title": "Non-regular entry: UNEVALUATED, fails closed under posture closed"
+    },
+    {
+      "evidence_level": {
+        "actual": "execution_observed",
+        "max": "execution_observed"
+      },
+      "id": "V4_missing_identity_premutation",
+      "level_ok": true,
+      "observations": {
+        "action": {
+          "actual": "deny",
+          "expected": "deny",
+          "ok": true
+        },
+        "decision_version_id": {
+          "actual": "",
+          "expected": "",
+          "ok": true
+        },
+        "handler_called": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        },
+        "identity_complete": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        }
+      },
+      "pass": true,
+      "title": "Section-less memory: still denied, identity incomplete"
+    },
+    {
+      "evidence_level": {
+        "actual": "execution_observed",
+        "max": "execution_observed"
+      },
+      "id": "V4_missing_identity_ci",
+      "level_ok": true,
+      "observations": {
+        "aggregate": {
+          "actual": "VIOLATION",
+          "expected": "VIOLATION",
+          "ok": true
+        },
+        "disposition": {
+          "actual": "failure",
+          "expected": "failure",
+          "ok": true
+        },
+        "identity_complete": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        },
+        "verify_exit": {
+          "actual": 1,
+          "expected": 1,
+          "ok": true
+        },
+        "verify_problems": {
+          "actual": [
+            "required check fails: VIOLATION under availability closed"
+          ],
+          "expected": [
+            "required check fails: VIOLATION under availability closed"
+          ],
+          "ok": true
+        }
+      },
+      "pass": true,
+      "title": "Section-less memory at CI: violation, identity incomplete"
+    },
+    {
+      "evidence_level": {
+        "actual": "execution_observed",
+        "max": "execution_observed"
+      },
+      "id": "V4_missing_identity_linkage",
+      "level_ok": true,
+      "observations": {
+        "established": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        },
+        "same_full_identity": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        }
+      },
+      "pass": true,
+      "title": "No cross-checkpoint claim without complete identity"
+    },
+    {
+      "evidence_level": {
+        "actual": "execution_observed",
+        "max": "execution_observed"
+      },
+      "id": "V5_stale_reuse",
+      "level_ok": true,
+      "observations": {
+        "established": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        },
+        "same_full_identity": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "same_subject_digest": {
+          "actual": false,
+          "expected": false,
+          "ok": true
+        }
+      },
+      "pass": true,
+      "title": "A1 pre-mutation evidence cannot verify a later revision of the file"
+    },
+    {
+      "evidence_level": {
+        "actual": "execution_observed",
+        "max": "execution_observed"
+      },
+      "id": "V5_stale_ci_head",
+      "level_ok": true,
+      "observations": {
+        "different_head": {
+          "actual": true,
+          "expected": true,
+          "ok": true
+        },
+        "disposition": {
+          "actual": "success",
+          "expected": "success",
+          "ok": true
+        },
+        "verify_exit": {
+          "actual": 0,
+          "expected": 0,
+          "ok": true
+        },
+        "verify_problems": {
+          "actual": [],
+          "expected": [],
+          "ok": true
+        }
+      },
+      "pass": true,
+      "title": "B1 CI evidence is bound to its head, not the later one; B5 is its own accepted decision"
+    }
+  ]
+}

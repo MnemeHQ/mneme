@@ -1,0 +1,4 @@
+api.anthropic.com
+api.github.com
+github.com
+# 1 other host(s) observed, not published

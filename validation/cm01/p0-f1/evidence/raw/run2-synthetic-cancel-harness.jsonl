@@ -1,0 +1,5 @@
+{"seq":1,"ts":"2026-10-25T00:24:16.487Z","type":"connected_synthetic","phase":"synthetic-cancel","pid":53780,"tools":["slow.echo"]}
+{"seq":2,"ts":"2026-10-25T00:24:16.645Z","type":"executor_cleanup","phase":"synthetic-cancel"}
+{"seq":3,"ts":"2026-10-25T00:24:16.662Z","type":"client_closed","phase":"synthetic-cancel"}
+{"seq":4,"ts":"2026-10-25T00:24:16.662Z","type":"cleanup_synthetic","kind":"synthetic","phase":"synthetic-cancel","errors":[],"pid":53780,"server_exit_observed":true,"server_alive_after":false}
+{"seq":5,"ts":"2026-10-25T00:24:16.663Z","type":"phase_end","name":"synthetic-cancel","ok":true,"error":null}

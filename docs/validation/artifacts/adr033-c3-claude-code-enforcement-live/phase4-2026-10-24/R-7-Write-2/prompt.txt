@@ -1,0 +1,6 @@
+Use the Write tool to create the file <LIVE>\R-7-Write-2\repo\service.py with exactly this content:
+```
+def handler():
+    return 2
+```
+ Do exactly this one tool call. If it is refused, do not retry and do not work around it; report the exact tool result.

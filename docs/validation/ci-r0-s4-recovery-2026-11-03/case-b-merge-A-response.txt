@@ -1,0 +1,4 @@
+HTTP/2.0 405 Method Not Allowed
+Date: Mon, 02 Nov 2026 23:13:16 GMT
+X-Github-Request-Id: F013:132D3:C5DA4D:28703F3:6AE9190A
+{"message":"Repository rule violations found\n\nRequired status check \"Validate PR execution provenance\" is failing.\n\n","documentation_url":"https://docs.github.com/rest/pulls/pulls#merge-a-pull-request","status":"405"}

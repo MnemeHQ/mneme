@@ -1,0 +1,6 @@
+{"seq":1,"ts":"2026-10-25T00:24:15.793Z","type":"connected_direct","phase":"mcp-error","pid":34684,"tools":6}
+{"seq":2,"ts":"2026-10-25T00:24:15.822Z","type":"executor_cleanup","phase":"mcp-error"}
+{"seq":3,"ts":"2026-10-25T00:24:16.070Z","type":"client_closed","phase":"mcp-error"}
+{"seq":4,"ts":"2026-10-25T00:24:16.071Z","type":"cleanup_direct","kind":"direct","phase":"mcp-error","errors":[],"pid":34684,"server_exit_observed":true,"server_alive_after":false}
+{"seq":5,"ts":"2026-10-25T00:24:16.073Z","type":"client_errors","phase":"mcp-error","errors":[]}
+{"seq":6,"ts":"2026-10-25T00:24:16.074Z","type":"phase_end","name":"mcp-error","ok":true,"error":null}

@@ -1,0 +1,154 @@
+[preflight] pins.local.env sha256: d1bc8e02db80708928d75db41dfa452c1a4534de765d37f13dcb5ca885b26567
+[preflight] setting sources for every probe: project
+[preflight] pin set: A2 (paths: H1a-edit H1a-bash H1b-start)
+[preflight] DISABLE_AUTOUPDATER=1 (Amendment A2)
+[preflight] claude: 2.1.310 (Claude Code)
+[preflight] MNEME_* variables in launching shell: 0 (names/values not printed)
+[preflight] claude binary: <CLAUDE_BIN>
+[preflight] python: 3.12.10
+[preflight] live root: <LIVE>
+[preflight] model pin (passed as --model, checked from the first probe's init event): claude-opus-5-5
+[preflight] OK
+[h1] pin set: A2 (claude '2.1.310 (Claude Code)', model 'claude-opus-5-5', paths: H1a-edit H1a-bash H1b-start)
+[h1] harness HEAD: 4c1c270e6e7b0c1c27f3d124ed2f71c8a5fd681c
+[h1] harness sha256: 3f407814e1569537737bee380f4978b9089b24d39bcf1d5b3dc4bb70795ef58b *./classify_a1.py
+[h1] harness sha256: d6915fb4a0d8d88b83751f18f33e9bed23a132d54e0d44a28eb1aca692d9cb1e *./classify_h1.py
+[h1] harness sha256: 99e969921b5b6f834c271eb6e0b1a7e90c0f912ad0246cfc769fbf897a84215e *./collect_a1.py
+[h1] harness sha256: 64445c3c073e3e0d1c14ce6a651b4b5e9dd66c51110769d26c1305829570b25c *./collect_h1.py
+[h1] harness sha256: ddc94487cff3a9ac5ffa91ed4ffa11917cff1cd444b15f8bc83ba1f2270a58f9 *./emitter.py
+[h1] harness sha256: 9b26e01b7b8a41e91e4cdd0d2d6f3c0dae413284fda68e5a17395a59785d92c2 *./reclassify_a1.py
+[h1] harness sha256: 1dbbfdd4209d14afcaa8351e2fe82ebd4461dc62d89dc9d3e676563ddef0f89b *./reclassify_h1.py
+[h1] harness sha256: ab3dfac44bc459b508b36cb188d174cc806a6505b0872889d53c29f203ee7f56 *./safe_rmtree.py
+[h1] harness sha256: c0a42ab09bfef08fea912f38a68be3441918d5dbb793d4fc685710ec272f6f8c *./safe_rmtree_a1.py
+[h1] harness sha256: cbc2e9a28ab47904c90cf046966947773b362e028bd6c377bea1b3689c90b2f8 *./safe_rmtree_a2.py
+[h1] harness sha256: feed19ecd6ddbf70c76ddb2faebc7d21c01de20d8160db7e9cbe679c15856c96 *./setup_probe.py
+[h1] harness sha256: 6e77c21d66170951ade51f5236bbbb9e3a629d39558f4a9b28a2e81a6fd5ad43 *./finish_a1_interactive.sh
+[h1] harness sha256: 1fe10b168e3c49efb0b9f59dc583937cc2445af8046431b9e3debf4ecc704484 *./preflight.sh
+[h1] harness sha256: e0c93eda470fcab1b7f2f73d5f9c684ad28943e28ebf8bfca1d785f6c1dadad7 *./prep_a1_interactive.sh
+[h1] harness sha256: 1459c0ef00de0af12c174176ce009bf4580764f58f4a780e781461ad8c01eeb5 *./run_a1_headless.sh
+[h1] harness sha256: adfdb780b4f5893cf6ee010cfadb5e4ee0a16d3b1bf017f7c6b29f1c8bdc2fec *./run_a1_probe.sh
+[h1] harness sha256: 870efb2387308fa312b55cb12f8c54ae3952f73a682c4007529ccced5a1262b5 *./run_h1.sh
+[h1] harness sha256: 8040bf04ba52069cd245974d34c23a46f09e369bd3e8ee670baf79a056c3bf4f *./run_h1_probe.sh
+[h1] harness sha256: bf101353ced3e0eea8a43e377c87f8a1b636fb55fb99c28d3cec7e857eff3252 *pins.env
+[h1] harness sha256: 29a6204f406c99b62a464b7b075714f2fa58d7441577e64922766da7fb477f53 *pins_a1.env
+[h1] harness sha256: 6c048ac6f4b153587b371537a01aab467a5f91ae3727d12c46b65bb9a2d45b51 *.gitignore
+[h1] harness sha256: 15f76d87b7bd30f2620f0747e81ea2c73a469a428b25cb2245eb72424f626bf8 *README.md
+[h1] harness sha256: b8e581c95bfaf62d853983f6df35e6ae24873db263c3b2f5733c66d401a0e518 *selftest/claude
+[h1] harness sha256: 68463865ea3004908afd540cc3330222901613615df9610890cee89f039d52ba *selftest/stub_claude.py
+[h1] harness sha256: d2a05c63695aae21fb23774022ca3b6f4d63bd7de383771f01ad164ad74ebe02 *selftest/test_a1_harness.py
+[h1] harness sha256: ed1b5c5a93593ebec26fe5f1cb42acd1059ff6441fc73a605985687665257590 *selftest/test_a2_harness.py
+[h1] harness sha256: 0109bdd3f91ee18363ab872a648b9627c292efec086f0f0b3ceff19f2c8e76eb *selftest/test_h1_harness.py
+[h1] harness sha256: 3550692c7ba78be2636f08cde941122818318cffa8e61172a87876b665b98a2c *selftest/test_reclassify_completeness.py
+=== H1a-edit-ctl (no-op control)
+arm=H1a-edit-ctl
+pinset=A2
+model_flag=claude-opus-5-5
+disable_autoupdater=1
+claude_version=2.1.310 (Claude Code)
+claude_bin=<CLAUDE_BIN>
+harness_head=4c1c270e6e7b0c1c27f3d124ed2f71c8a5fd681c
+sources=project
+tools=Read Edit
+notes_before=b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060
+bash_out_before=absent
+settings_sha=fdf9176bb817eeac5882458eacd3a987d0f11962fe1b925e7a3c8713add913a8
+date=2026-11-11T17:41:31Z
+claude_exit=0
+notes_after=f2c82decdd7181cf98945929a62598db7e6b477e11f6e0eb0ae97020eff151ad
+bash_out_after=absent
+transcript_collected=yes
+=== H1a-edit (emitter)
+arm=H1a-edit
+pinset=A2
+model_flag=claude-opus-5-5
+disable_autoupdater=1
+claude_version=2.1.310 (Claude Code)
+claude_bin=<CLAUDE_BIN>
+harness_head=4c1c270e6e7b0c1c27f3d124ed2f71c8a5fd681c
+sources=project
+tools=Read Edit
+notes_before=b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060
+bash_out_before=absent
+settings_sha=32321c749dfe75eab37289e46b71bb9dcd34297cb97abbb571551afd7977fb77
+date=2026-11-11T17:41:49Z
+claude_exit=0
+notes_after=f2c82decdd7181cf98945929a62598db7e6b477e11f6e0eb0ae97020eff151ad
+bash_out_after=absent
+transcript_collected=yes
+[h1] H1a-edit: INCONCLUSIVE
+=== H1a-bash-ctl (no-op control)
+arm=H1a-bash-ctl
+pinset=A2
+model_flag=claude-opus-5-5
+disable_autoupdater=1
+claude_version=2.1.310 (Claude Code)
+claude_bin=<CLAUDE_BIN>
+harness_head=4c1c270e6e7b0c1c27f3d124ed2f71c8a5fd681c
+sources=project
+tools=Read Bash
+notes_before=b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060
+bash_out_before=absent
+settings_sha=17ba6cc6179cc313053d39b2767406401ce68c49044680458de191e72ac7d43a
+date=2026-11-11T17:42:05Z
+claude_exit=0
+notes_after=b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060
+bash_out_after=e41af99bf6ff10b4c04999a5b19fad2f372167b7334af8eb098ad461d71176a7
+transcript_collected=yes
+=== H1a-bash (emitter)
+arm=H1a-bash
+pinset=A2
+model_flag=claude-opus-5-5
+disable_autoupdater=1
+claude_version=2.1.310 (Claude Code)
+claude_bin=<CLAUDE_BIN>
+harness_head=4c1c270e6e7b0c1c27f3d124ed2f71c8a5fd681c
+sources=project
+tools=Read Bash
+notes_before=b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060
+bash_out_before=absent
+settings_sha=70e8dc7c9a982a16119bb291d6aec139e32a293afa04832a2a911906cf103038
+date=2026-11-11T17:42:20Z
+claude_exit=0
+notes_after=b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060
+bash_out_after=e41af99bf6ff10b4c04999a5b19fad2f372167b7334af8eb098ad461d71176a7
+transcript_collected=yes
+[h1] H1a-bash: INCONCLUSIVE
+=== H1b-start-ctl (no-op control)
+arm=H1b-start-ctl
+pinset=A2
+model_flag=claude-opus-5-5
+disable_autoupdater=1
+claude_version=2.1.310 (Claude Code)
+claude_bin=<CLAUDE_BIN>
+harness_head=4c1c270e6e7b0c1c27f3d124ed2f71c8a5fd681c
+sources=project
+tools=Read
+notes_before=b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060
+bash_out_before=absent
+settings_sha=73f7a21f12ee7d05ebe2982392902e2804cc1cb5bae49328ecd98ccf73670900
+date=2026-11-11T17:42:32Z
+claude_exit=0
+notes_after=b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060
+bash_out_after=absent
+transcript_collected=yes
+=== H1b-start (emitter)
+arm=H1b-start
+pinset=A2
+model_flag=claude-opus-5-5
+disable_autoupdater=1
+claude_version=2.1.310 (Claude Code)
+claude_bin=<CLAUDE_BIN>
+harness_head=4c1c270e6e7b0c1c27f3d124ed2f71c8a5fd681c
+sources=project
+tools=Read
+notes_before=b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060
+bash_out_before=absent
+settings_sha=1ad199b7734e1fc305388aec1841ed31056b36ea4ec2e8dd5ca0b3e6625a665a
+date=2026-11-11T17:42:39Z
+claude_exit=0
+notes_after=b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060
+bash_out_after=absent
+transcript_collected=yes
+[h1] H1b-start: INCONCLUSIVE
+Batch finished (H1_DONE is not a pass). Evidence under <LIVE> ; the result is the gate line in <LIVE>/summary_h1.md:
+Listed-path result (every listed path passes, one host version): **NOT MET**

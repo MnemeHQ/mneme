@@ -1,0 +1,1925 @@
+{
+  "schema": "mneme.cm01.s1a1.m6/v1",
+  "started_at": "2026-10-24T01:48:27.298Z",
+  "finished_at": "2026-10-24T01:48:33.055Z",
+  "repository": {
+    "base_sha": "942de7b121994647e99e9b862b44cda784c0ae84",
+    "s0_sha": "9eb4057a290795883076ab05bf11c92038c6ca13",
+    "branch": "feat/cm01-s1a1-e0-local-executor",
+    "head_sha": "942de7b121994647e99e9b862b44cda784c0ae84"
+  },
+  "versions": {
+    "node": "v24.13.1",
+    "npm": "11.8.0",
+    "codemode": "0.5.5",
+    "sdk": "1.32.2",
+    "ajv": "8.17.1",
+    "zod": "4.6.7",
+    "python": "3.12.10",
+    "mneme": "0.10.0",
+    "mcp": "2.2.0"
+  },
+  "fixture": {
+    "path": "C:\\dev\\mneme\\.worktrees\\feat-cm01-s1a1-e0-local-executor\\validation\\cm01\\s1a-local\\m4\\fixture\\canonical\\project_memory.json",
+    "sha256": "b4d83d0cc0f70f442e2a62bd0e527220ae99b07cba1238e39d0ad8c5685d4e7f",
+    "pre_migration_sha256": "6746f86c7164fbb06ec4d3eb99678dcdc6a96a7b2b55b8d2e5b51ddaf5c57537",
+    "repository_memory_used": false
+  },
+  "runs": [
+    {
+      "run": "run1",
+      "pid": 57072,
+      "upstream_inventory": {
+        "count": 6,
+        "names": [
+          "decision.applicable_to",
+          "decision.get",
+          "decision.propose",
+          "decision.propose_batch",
+          "decision.search",
+          "decision.trace"
+        ],
+        "exact_six": true
+      },
+      "adapter": {
+        "allowlist": [
+          "decision.get",
+          "decision.search",
+          "decision.applicable_to",
+          "decision.trace"
+        ],
+        "call_log": [
+          {
+            "seq": 1,
+            "tool": "decision.trace",
+            "args": {
+              "record_id": "ADR-9901"
+            },
+            "isError": false,
+            "structuredContent": {
+              "result_type": "canonical_trace",
+              "canonical_decision_id": "ADR-9901",
+              "canonical_record": {
+                "decision_id": "ADR-9901",
+                "version": "1",
+                "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+                "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+                "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+                "decision_class": "architecture",
+                "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+                "rationale": "Inventory and stdio handshake fixture only.",
+                "lifecycle_status": "active",
+                "owner": "",
+                "decided_at": "2026-01-01T00:00:00Z",
+                "updated_at": "2026-01-01T00:00:00Z",
+                "context_scope": [
+                  "cache"
+                ],
+                "targets": [],
+                "constraints": [
+                  "no external cache service"
+                ],
+                "anti_patterns": [
+                  "external_cache_client"
+                ],
+                "source_evidence": [
+                  {
+                    "source_type": "runtime",
+                    "source_locator": "",
+                    "source_revision": "",
+                    "observed_at": ""
+                  }
+                ],
+                "test_evidence": [],
+                "relationships": [],
+                "derived_rule_ids": [
+                  "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+                ]
+              },
+              "derived_rules": [
+                {
+                  "rule_id": "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584",
+                  "decision_id": "ADR-9901",
+                  "decision_version": "1",
+                  "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+                  "sequence": 0,
+                  "rule_type": "FORBID_LITERAL",
+                  "rule_payload": {
+                    "value": "external_cache_client"
+                  },
+                  "applicability": {},
+                  "lifecycle_status": "active"
+                }
+              ],
+              "declared_test_evidence": [],
+              "missing_links": [
+                "declared_test_evidence: none declared for canonical decision",
+                "enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)"
+              ]
+            },
+            "toolResult": null,
+            "text": "{\n  \"result_type\": \"canonical_trace\",\n  \"canonical_decision_id\": \"ADR-9901\",\n  \"canonical_record\": {\n    \"decision_id\": \"ADR-9901\",\n    \"version\": \"1\",\n    \"version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n    \"decision_version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n    \"content_digest\": \"662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650\",\n    \"decision_class\": \"architecture\",\n    \"statement\": \"Synthetic M1 cache adapter uses the in-memory backend.\",\n    \"rationale\": \"Inventory and stdio handshake fixture only.\",\n    \"lifecycle_status\": \"active\",\n    \"owner\": \"\",\n    \"decided_at\": \"2026-01-01T00:00:00Z\",\n    \"updated_at\": \"2026-01-01T00:00:00Z\",\n    \"context_scope\": [\n      \"cache\"\n    ],\n    \"targets\": [],\n    \"constraints\": [\n      \"no external cache service\"\n    ],\n    \"anti_patterns\": [\n      \"external_cache_client\"\n    ],\n    \"source_evidence\": [\n      {\n        \"source_type\": \"runtime\",\n        \"source_locator\": \"\",\n        \"source_revision\": \"\",\n        \"observed_at\": \"\"\n      }\n    ],\n    \"test_evidence\": [],\n    \"relationships\": [],\n    \"derived_rule_ids\": [\n      \"ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584\"\n    ]\n  },\n  \"derived_rules\": [\n    {\n      \"rule_id\": \"ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584\",\n      \"decision_id\": \"ADR-9901\",\n      \"decision_version\": \"1\",\n      \"decision_version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n      \"sequence\": 0,\n      \"rule_type\": \"FORBID_LITERAL\",\n      \"rule_payload\": {\n        \"value\": \"external_cache_client\"\n      },\n      \"applicability\": {},\n      \"lifecycle_status\": \"active\"\n    }\n  ],\n  \"declared_test_evidence\": [],\n  \"missing_links\": [\n    \"declared_test_evidence: none declared for canonical decision\",\n    \"enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)\"\n  ]\n}"
+          },
+          {
+            "seq": 2,
+            "tool": "decision.trace",
+            "args": {
+              "record_id": "ADR-9902"
+            },
+            "isError": false,
+            "structuredContent": {
+              "result_type": "canonical_trace",
+              "canonical_decision_id": "ADR-9902",
+              "canonical_record": {
+                "decision_id": "ADR-9902",
+                "version": "1",
+                "version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+                "decision_version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+                "content_digest": "ee82d7d1d19eec5d43fbd5814ba8e6ad9032ea589e66f0da53784c898e72de58",
+                "decision_class": "architecture",
+                "statement": "Synthetic deprecated cache policy for M4-F1 lifecycle coverage.",
+                "rationale": "Deprecated lifecycle control only; no typed rules.",
+                "lifecycle_status": "deprecated",
+                "owner": "",
+                "decided_at": "2026-01-01T00:00:00Z",
+                "updated_at": "2026-01-01T00:00:00Z",
+                "context_scope": [
+                  "cache"
+                ],
+                "targets": [],
+                "constraints": [],
+                "anti_patterns": [],
+                "source_evidence": [
+                  {
+                    "source_type": "runtime",
+                    "source_locator": "",
+                    "source_revision": "",
+                    "observed_at": ""
+                  }
+                ],
+                "test_evidence": [],
+                "relationships": [],
+                "derived_rule_ids": []
+              },
+              "derived_rules": [],
+              "declared_test_evidence": [],
+              "missing_links": [
+                "derived_rules: none recorded for canonical decision",
+                "declared_test_evidence: none declared for canonical decision",
+                "enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)"
+              ]
+            },
+            "toolResult": null,
+            "text": "{\n  \"result_type\": \"canonical_trace\",\n  \"canonical_decision_id\": \"ADR-9902\",\n  \"canonical_record\": {\n    \"decision_id\": \"ADR-9902\",\n    \"version\": \"1\",\n    \"version_id\": \"dver-1606ff8e8763eddde0d18d18ab72a30a\",\n    \"decision_version_id\": \"dver-1606ff8e8763eddde0d18d18ab72a30a\",\n    \"content_digest\": \"ee82d7d1d19eec5d43fbd5814ba8e6ad9032ea589e66f0da53784c898e72de58\",\n    \"decision_class\": \"architecture\",\n    \"statement\": \"Synthetic deprecated cache policy for M4-F1 lifecycle coverage.\",\n    \"rationale\": \"Deprecated lifecycle control only; no typed rules.\",\n    \"lifecycle_status\": \"deprecated\",\n    \"owner\": \"\",\n    \"decided_at\": \"2026-01-01T00:00:00Z\",\n    \"updated_at\": \"2026-01-01T00:00:00Z\",\n    \"context_scope\": [\n      \"cache\"\n    ],\n    \"targets\": [],\n    \"constraints\": [],\n    \"anti_patterns\": [],\n    \"source_evidence\": [\n      {\n        \"source_type\": \"runtime\",\n        \"source_locator\": \"\",\n        \"source_revision\": \"\",\n        \"observed_at\": \"\"\n      }\n    ],\n    \"test_evidence\": [],\n    \"relationships\": [],\n    \"derived_rule_ids\": []\n  },\n  \"derived_rules\": [],\n  \"declared_test_evidence\": [],\n  \"missing_links\": [\n    \"derived_rules: none recorded for canonical decision\",\n    \"declared_test_evidence: none declared for canonical decision\",\n    \"enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)\"\n  ]\n}"
+          },
+          {
+            "seq": 3,
+            "tool": "decision.trace",
+            "args": {
+              "record_id": "ADR-9999"
+            },
+            "isError": false,
+            "structuredContent": {
+              "result_type": "trace_not_found",
+              "record_id": "ADR-9999",
+              "missing_links": [
+                "record: not found ('ADR-9999' is neither a proposal id nor a canonical decision id)",
+                "proposal: not found",
+                "canonical_decision: not found",
+                "record_type: unknown (no proposal/canonical classification is asserted for an unresolved identifier)"
+              ]
+            },
+            "toolResult": null,
+            "text": "{\n  \"result_type\": \"trace_not_found\",\n  \"record_id\": \"ADR-9999\",\n  \"missing_links\": [\n    \"record: not found ('ADR-9999' is neither a proposal id nor a canonical decision id)\",\n    \"proposal: not found\",\n    \"canonical_decision: not found\",\n    \"record_type: unknown (no proposal/canonical classification is asserted for an unresolved identifier)\"\n  ]\n}"
+          }
+        ],
+        "schema_passthrough": {
+          "decision.get": true,
+          "decision.search": true,
+          "decision.applicable_to": true,
+          "decision.trace": true
+        }
+      },
+      "fixture_facts": {
+        "ADR-9901": {
+          "record": {
+            "decision_id": "ADR-9901",
+            "version": "1",
+            "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+            "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+            "rationale": "Inventory and stdio handshake fixture only.",
+            "lifecycle_status": "active",
+            "constraints": [
+              "no external cache service"
+            ],
+            "anti_patterns": [
+              "external_cache_client"
+            ],
+            "relationships": [],
+            "derived_rule_ids": [
+              "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+            ]
+          },
+          "rules": [
+            {
+              "rule_id": "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584",
+              "decision_id": "ADR-9901",
+              "decision_version": "1",
+              "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+              "sequence": 0,
+              "rule_type": "FORBID_LITERAL",
+              "rule_payload": {
+                "value": "external_cache_client"
+              },
+              "applicability": {},
+              "lifecycle_status": "active"
+            }
+          ],
+          "test_evidence": []
+        },
+        "ADR-9902": {
+          "record": {
+            "decision_id": "ADR-9902",
+            "version": "1",
+            "version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+            "decision_version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+            "content_digest": "ee82d7d1d19eec5d43fbd5814ba8e6ad9032ea589e66f0da53784c898e72de58",
+            "statement": "Synthetic deprecated cache policy for M4-F1 lifecycle coverage.",
+            "rationale": "Deprecated lifecycle control only; no typed rules.",
+            "lifecycle_status": "deprecated",
+            "constraints": [],
+            "anti_patterns": [],
+            "relationships": [],
+            "derived_rule_ids": []
+          },
+          "rules": [],
+          "test_evidence": []
+        }
+      },
+      "cases": {
+        "active": {
+          "args": {
+            "record_id": "ADR-9901"
+          },
+          "direct_normalized": {
+            "result_type": "canonical_trace",
+            "canonical_decision_id": "ADR-9901",
+            "canonical_record": {
+              "decision_id": "ADR-9901",
+              "version": "1",
+              "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+              "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+              "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+              "decision_class": "architecture",
+              "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+              "rationale": "Inventory and stdio handshake fixture only.",
+              "lifecycle_status": "active",
+              "owner": "",
+              "decided_at": "2026-01-01T00:00:00Z",
+              "updated_at": "2026-01-01T00:00:00Z",
+              "context_scope": [
+                "cache"
+              ],
+              "targets": [],
+              "constraints": [
+                "no external cache service"
+              ],
+              "anti_patterns": [
+                "external_cache_client"
+              ],
+              "source_evidence": [
+                {
+                  "source_type": "runtime",
+                  "source_locator": "",
+                  "source_revision": "",
+                  "observed_at": ""
+                }
+              ],
+              "test_evidence": [],
+              "relationships": [],
+              "derived_rule_ids": [
+                "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+              ]
+            },
+            "derived_rules": [
+              {
+                "rule_id": "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584",
+                "decision_id": "ADR-9901",
+                "decision_version": "1",
+                "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+                "sequence": 0,
+                "rule_type": "FORBID_LITERAL",
+                "rule_payload": {
+                  "value": "external_cache_client"
+                },
+                "applicability": {},
+                "lifecycle_status": "active"
+              }
+            ],
+            "declared_test_evidence": [],
+            "missing_links": [
+              "declared_test_evidence: none declared for canonical decision",
+              "enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)"
+            ]
+          },
+          "code_mode_normalized": {
+            "result_type": "canonical_trace",
+            "canonical_decision_id": "ADR-9901",
+            "canonical_record": {
+              "decision_id": "ADR-9901",
+              "version": "1",
+              "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+              "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+              "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+              "decision_class": "architecture",
+              "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+              "rationale": "Inventory and stdio handshake fixture only.",
+              "lifecycle_status": "active",
+              "owner": "",
+              "decided_at": "2026-01-01T00:00:00Z",
+              "updated_at": "2026-01-01T00:00:00Z",
+              "context_scope": [
+                "cache"
+              ],
+              "targets": [],
+              "constraints": [
+                "no external cache service"
+              ],
+              "anti_patterns": [
+                "external_cache_client"
+              ],
+              "source_evidence": [
+                {
+                  "source_type": "runtime",
+                  "source_locator": "",
+                  "source_revision": "",
+                  "observed_at": ""
+                }
+              ],
+              "test_evidence": [],
+              "relationships": [],
+              "derived_rule_ids": [
+                "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+              ]
+            },
+            "derived_rules": [
+              {
+                "rule_id": "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584",
+                "decision_id": "ADR-9901",
+                "decision_version": "1",
+                "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+                "sequence": 0,
+                "rule_type": "FORBID_LITERAL",
+                "rule_payload": {
+                  "value": "external_cache_client"
+                },
+                "applicability": {},
+                "lifecycle_status": "active"
+              }
+            ],
+            "declared_test_evidence": [],
+            "missing_links": [
+              "declared_test_evidence: none declared for canonical decision",
+              "enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)"
+            ]
+          },
+          "differences": [],
+          "equal": true
+        },
+        "deprecated": {
+          "args": {
+            "record_id": "ADR-9902"
+          },
+          "direct_normalized": {
+            "result_type": "canonical_trace",
+            "canonical_decision_id": "ADR-9902",
+            "canonical_record": {
+              "decision_id": "ADR-9902",
+              "version": "1",
+              "version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+              "decision_version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+              "content_digest": "ee82d7d1d19eec5d43fbd5814ba8e6ad9032ea589e66f0da53784c898e72de58",
+              "decision_class": "architecture",
+              "statement": "Synthetic deprecated cache policy for M4-F1 lifecycle coverage.",
+              "rationale": "Deprecated lifecycle control only; no typed rules.",
+              "lifecycle_status": "deprecated",
+              "owner": "",
+              "decided_at": "2026-01-01T00:00:00Z",
+              "updated_at": "2026-01-01T00:00:00Z",
+              "context_scope": [
+                "cache"
+              ],
+              "targets": [],
+              "constraints": [],
+              "anti_patterns": [],
+              "source_evidence": [
+                {
+                  "source_type": "runtime",
+                  "source_locator": "",
+                  "source_revision": "",
+                  "observed_at": ""
+                }
+              ],
+              "test_evidence": [],
+              "relationships": [],
+              "derived_rule_ids": []
+            },
+            "derived_rules": [],
+            "declared_test_evidence": [],
+            "missing_links": [
+              "derived_rules: none recorded for canonical decision",
+              "declared_test_evidence: none declared for canonical decision",
+              "enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)"
+            ]
+          },
+          "code_mode_normalized": {
+            "result_type": "canonical_trace",
+            "canonical_decision_id": "ADR-9902",
+            "canonical_record": {
+              "decision_id": "ADR-9902",
+              "version": "1",
+              "version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+              "decision_version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+              "content_digest": "ee82d7d1d19eec5d43fbd5814ba8e6ad9032ea589e66f0da53784c898e72de58",
+              "decision_class": "architecture",
+              "statement": "Synthetic deprecated cache policy for M4-F1 lifecycle coverage.",
+              "rationale": "Deprecated lifecycle control only; no typed rules.",
+              "lifecycle_status": "deprecated",
+              "owner": "",
+              "decided_at": "2026-01-01T00:00:00Z",
+              "updated_at": "2026-01-01T00:00:00Z",
+              "context_scope": [
+                "cache"
+              ],
+              "targets": [],
+              "constraints": [],
+              "anti_patterns": [],
+              "source_evidence": [
+                {
+                  "source_type": "runtime",
+                  "source_locator": "",
+                  "source_revision": "",
+                  "observed_at": ""
+                }
+              ],
+              "test_evidence": [],
+              "relationships": [],
+              "derived_rule_ids": []
+            },
+            "derived_rules": [],
+            "declared_test_evidence": [],
+            "missing_links": [
+              "derived_rules: none recorded for canonical decision",
+              "declared_test_evidence: none declared for canonical decision",
+              "enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)"
+            ]
+          },
+          "differences": [],
+          "equal": true
+        },
+        "unknown": {
+          "args": {
+            "record_id": "ADR-9999"
+          },
+          "direct_normalized": {
+            "result_type": "trace_not_found",
+            "record_id": "ADR-9999",
+            "missing_links": [
+              "record: not found ('ADR-9999' is neither a proposal id nor a canonical decision id)",
+              "proposal: not found",
+              "canonical_decision: not found",
+              "record_type: unknown (no proposal/canonical classification is asserted for an unresolved identifier)"
+            ]
+          },
+          "code_mode_normalized": {
+            "result_type": "trace_not_found",
+            "record_id": "ADR-9999",
+            "missing_links": [
+              "record: not found ('ADR-9999' is neither a proposal id nor a canonical decision id)",
+              "proposal: not found",
+              "canonical_decision: not found",
+              "record_type: unknown (no proposal/canonical classification is asserted for an unresolved identifier)"
+            ]
+          },
+          "differences": [],
+          "equal": true
+        }
+      },
+      "direct_raw": {
+        "active": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\n  \"result_type\": \"canonical_trace\",\n  \"canonical_decision_id\": \"ADR-9901\",\n  \"canonical_record\": {\n    \"decision_id\": \"ADR-9901\",\n    \"version\": \"1\",\n    \"version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n    \"decision_version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n    \"content_digest\": \"662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650\",\n    \"decision_class\": \"architecture\",\n    \"statement\": \"Synthetic M1 cache adapter uses the in-memory backend.\",\n    \"rationale\": \"Inventory and stdio handshake fixture only.\",\n    \"lifecycle_status\": \"active\",\n    \"owner\": \"\",\n    \"decided_at\": \"2026-01-01T00:00:00Z\",\n    \"updated_at\": \"2026-01-01T00:00:00Z\",\n    \"context_scope\": [\n      \"cache\"\n    ],\n    \"targets\": [],\n    \"constraints\": [\n      \"no external cache service\"\n    ],\n    \"anti_patterns\": [\n      \"external_cache_client\"\n    ],\n    \"source_evidence\": [\n      {\n        \"source_type\": \"runtime\",\n        \"source_locator\": \"\",\n        \"source_revision\": \"\",\n        \"observed_at\": \"\"\n      }\n    ],\n    \"test_evidence\": [],\n    \"relationships\": [],\n    \"derived_rule_ids\": [\n      \"ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584\"\n    ]\n  },\n  \"derived_rules\": [\n    {\n      \"rule_id\": \"ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584\",\n      \"decision_id\": \"ADR-9901\",\n      \"decision_version\": \"1\",\n      \"decision_version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n      \"sequence\": 0,\n      \"rule_type\": \"FORBID_LITERAL\",\n      \"rule_payload\": {\n        \"value\": \"external_cache_client\"\n      },\n      \"applicability\": {},\n      \"lifecycle_status\": \"active\"\n    }\n  ],\n  \"declared_test_evidence\": [],\n  \"missing_links\": [\n    \"declared_test_evidence: none declared for canonical decision\",\n    \"enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)\"\n  ]\n}"
+            }
+          ],
+          "structuredContent": {
+            "result_type": "canonical_trace",
+            "canonical_decision_id": "ADR-9901",
+            "canonical_record": {
+              "decision_id": "ADR-9901",
+              "version": "1",
+              "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+              "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+              "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+              "decision_class": "architecture",
+              "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+              "rationale": "Inventory and stdio handshake fixture only.",
+              "lifecycle_status": "active",
+              "owner": "",
+              "decided_at": "2026-01-01T00:00:00Z",
+              "updated_at": "2026-01-01T00:00:00Z",
+              "context_scope": [
+                "cache"
+              ],
+              "targets": [],
+              "constraints": [
+                "no external cache service"
+              ],
+              "anti_patterns": [
+                "external_cache_client"
+              ],
+              "source_evidence": [
+                {
+                  "source_type": "runtime",
+                  "source_locator": "",
+                  "source_revision": "",
+                  "observed_at": ""
+                }
+              ],
+              "test_evidence": [],
+              "relationships": [],
+              "derived_rule_ids": [
+                "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+              ]
+            },
+            "derived_rules": [
+              {
+                "rule_id": "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584",
+                "decision_id": "ADR-9901",
+                "decision_version": "1",
+                "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+                "sequence": 0,
+                "rule_type": "FORBID_LITERAL",
+                "rule_payload": {
+                  "value": "external_cache_client"
+                },
+                "applicability": {},
+                "lifecycle_status": "active"
+              }
+            ],
+            "declared_test_evidence": [],
+            "missing_links": [
+              "declared_test_evidence: none declared for canonical decision",
+              "enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)"
+            ]
+          },
+          "isError": false
+        },
+        "deprecated": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\n  \"result_type\": \"canonical_trace\",\n  \"canonical_decision_id\": \"ADR-9902\",\n  \"canonical_record\": {\n    \"decision_id\": \"ADR-9902\",\n    \"version\": \"1\",\n    \"version_id\": \"dver-1606ff8e8763eddde0d18d18ab72a30a\",\n    \"decision_version_id\": \"dver-1606ff8e8763eddde0d18d18ab72a30a\",\n    \"content_digest\": \"ee82d7d1d19eec5d43fbd5814ba8e6ad9032ea589e66f0da53784c898e72de58\",\n    \"decision_class\": \"architecture\",\n    \"statement\": \"Synthetic deprecated cache policy for M4-F1 lifecycle coverage.\",\n    \"rationale\": \"Deprecated lifecycle control only; no typed rules.\",\n    \"lifecycle_status\": \"deprecated\",\n    \"owner\": \"\",\n    \"decided_at\": \"2026-01-01T00:00:00Z\",\n    \"updated_at\": \"2026-01-01T00:00:00Z\",\n    \"context_scope\": [\n      \"cache\"\n    ],\n    \"targets\": [],\n    \"constraints\": [],\n    \"anti_patterns\": [],\n    \"source_evidence\": [\n      {\n        \"source_type\": \"runtime\",\n        \"source_locator\": \"\",\n        \"source_revision\": \"\",\n        \"observed_at\": \"\"\n      }\n    ],\n    \"test_evidence\": [],\n    \"relationships\": [],\n    \"derived_rule_ids\": []\n  },\n  \"derived_rules\": [],\n  \"declared_test_evidence\": [],\n  \"missing_links\": [\n    \"derived_rules: none recorded for canonical decision\",\n    \"declared_test_evidence: none declared for canonical decision\",\n    \"enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)\"\n  ]\n}"
+            }
+          ],
+          "structuredContent": {
+            "result_type": "canonical_trace",
+            "canonical_decision_id": "ADR-9902",
+            "canonical_record": {
+              "decision_id": "ADR-9902",
+              "version": "1",
+              "version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+              "decision_version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+              "content_digest": "ee82d7d1d19eec5d43fbd5814ba8e6ad9032ea589e66f0da53784c898e72de58",
+              "decision_class": "architecture",
+              "statement": "Synthetic deprecated cache policy for M4-F1 lifecycle coverage.",
+              "rationale": "Deprecated lifecycle control only; no typed rules.",
+              "lifecycle_status": "deprecated",
+              "owner": "",
+              "decided_at": "2026-01-01T00:00:00Z",
+              "updated_at": "2026-01-01T00:00:00Z",
+              "context_scope": [
+                "cache"
+              ],
+              "targets": [],
+              "constraints": [],
+              "anti_patterns": [],
+              "source_evidence": [
+                {
+                  "source_type": "runtime",
+                  "source_locator": "",
+                  "source_revision": "",
+                  "observed_at": ""
+                }
+              ],
+              "test_evidence": [],
+              "relationships": [],
+              "derived_rule_ids": []
+            },
+            "derived_rules": [],
+            "declared_test_evidence": [],
+            "missing_links": [
+              "derived_rules: none recorded for canonical decision",
+              "declared_test_evidence: none declared for canonical decision",
+              "enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)"
+            ]
+          },
+          "isError": false
+        },
+        "unknown": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\n  \"result_type\": \"trace_not_found\",\n  \"record_id\": \"ADR-9999\",\n  \"missing_links\": [\n    \"record: not found ('ADR-9999' is neither a proposal id nor a canonical decision id)\",\n    \"proposal: not found\",\n    \"canonical_decision: not found\",\n    \"record_type: unknown (no proposal/canonical classification is asserted for an unresolved identifier)\"\n  ]\n}"
+            }
+          ],
+          "structuredContent": {
+            "result_type": "trace_not_found",
+            "record_id": "ADR-9999",
+            "missing_links": [
+              "record: not found ('ADR-9999' is neither a proposal id nor a canonical decision id)",
+              "proposal: not found",
+              "canonical_decision: not found",
+              "record_type: unknown (no proposal/canonical classification is asserted for an unresolved identifier)"
+            ]
+          },
+          "isError": false
+        }
+      },
+      "code_mode_raw": {
+        "result": {
+          "active": {
+            "result_type": "canonical_trace",
+            "canonical_decision_id": "ADR-9901",
+            "canonical_record": {
+              "decision_id": "ADR-9901",
+              "version": "1",
+              "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+              "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+              "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+              "decision_class": "architecture",
+              "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+              "rationale": "Inventory and stdio handshake fixture only.",
+              "lifecycle_status": "active",
+              "owner": "",
+              "decided_at": "2026-01-01T00:00:00Z",
+              "updated_at": "2026-01-01T00:00:00Z",
+              "context_scope": [
+                "cache"
+              ],
+              "targets": [],
+              "constraints": [
+                "no external cache service"
+              ],
+              "anti_patterns": [
+                "external_cache_client"
+              ],
+              "source_evidence": [
+                {
+                  "source_type": "runtime",
+                  "source_locator": "",
+                  "source_revision": "",
+                  "observed_at": ""
+                }
+              ],
+              "test_evidence": [],
+              "relationships": [],
+              "derived_rule_ids": [
+                "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+              ]
+            },
+            "derived_rules": [
+              {
+                "rule_id": "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584",
+                "decision_id": "ADR-9901",
+                "decision_version": "1",
+                "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+                "sequence": 0,
+                "rule_type": "FORBID_LITERAL",
+                "rule_payload": {
+                  "value": "external_cache_client"
+                },
+                "applicability": {},
+                "lifecycle_status": "active"
+              }
+            ],
+            "declared_test_evidence": [],
+            "missing_links": [
+              "declared_test_evidence: none declared for canonical decision",
+              "enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)"
+            ]
+          },
+          "deprecated": {
+            "result_type": "canonical_trace",
+            "canonical_decision_id": "ADR-9902",
+            "canonical_record": {
+              "decision_id": "ADR-9902",
+              "version": "1",
+              "version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+              "decision_version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+              "content_digest": "ee82d7d1d19eec5d43fbd5814ba8e6ad9032ea589e66f0da53784c898e72de58",
+              "decision_class": "architecture",
+              "statement": "Synthetic deprecated cache policy for M4-F1 lifecycle coverage.",
+              "rationale": "Deprecated lifecycle control only; no typed rules.",
+              "lifecycle_status": "deprecated",
+              "owner": "",
+              "decided_at": "2026-01-01T00:00:00Z",
+              "updated_at": "2026-01-01T00:00:00Z",
+              "context_scope": [
+                "cache"
+              ],
+              "targets": [],
+              "constraints": [],
+              "anti_patterns": [],
+              "source_evidence": [
+                {
+                  "source_type": "runtime",
+                  "source_locator": "",
+                  "source_revision": "",
+                  "observed_at": ""
+                }
+              ],
+              "test_evidence": [],
+              "relationships": [],
+              "derived_rule_ids": []
+            },
+            "derived_rules": [],
+            "declared_test_evidence": [],
+            "missing_links": [
+              "derived_rules: none recorded for canonical decision",
+              "declared_test_evidence: none declared for canonical decision",
+              "enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)"
+            ]
+          },
+          "unknown": {
+            "result_type": "trace_not_found",
+            "record_id": "ADR-9999",
+            "missing_links": [
+              "record: not found ('ADR-9999' is neither a proposal id nor a canonical decision id)",
+              "proposal: not found",
+              "canonical_decision: not found",
+              "record_type: unknown (no proposal/canonical classification is asserted for an unresolved identifier)"
+            ]
+          }
+        }
+      },
+      "canonical_trace": {
+        "active_keys": [
+          "canonical_decision_id",
+          "canonical_record",
+          "declared_test_evidence",
+          "derived_rules",
+          "missing_links",
+          "result_type"
+        ],
+        "deprecated_keys": [
+          "canonical_decision_id",
+          "canonical_record",
+          "declared_test_evidence",
+          "derived_rules",
+          "missing_links",
+          "result_type"
+        ],
+        "active_result_type": "canonical_trace",
+        "deprecated_result_type": "canonical_trace",
+        "active_record_matches": true,
+        "deprecated_record_matches": true,
+        "active_derived_rule_count": 1,
+        "deprecated_derived_rule_count": 0,
+        "active_rule_matches": true,
+        "active_missing_links": [
+          "declared_test_evidence: none declared for canonical decision",
+          "enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)"
+        ],
+        "deprecated_missing_links": [
+          "derived_rules: none recorded for canonical decision",
+          "declared_test_evidence: none declared for canonical decision",
+          "enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)"
+        ],
+        "declared_test_evidence_counts": {
+          "active": 0,
+          "deprecated": 0,
+          "unknown": null
+        },
+        "declared_evidence_has_verification_state": false
+      },
+      "unknown": {
+        "keys": [
+          "missing_links",
+          "record_id",
+          "result_type"
+        ],
+        "result_type": "trace_not_found",
+        "record_id": "ADR-9999",
+        "missing_links": [
+          "record: not found ('ADR-9999' is neither a proposal id nor a canonical decision id)",
+          "proposal: not found",
+          "canonical_decision: not found",
+          "record_type: unknown (no proposal/canonical classification is asserted for an unresolved identifier)"
+        ],
+        "classified_as_proposal": false,
+        "classified_as_canonical": false,
+        "type_unknown": true
+      },
+      "stderr": ""
+    },
+    {
+      "run": "run2",
+      "pid": 27528,
+      "upstream_inventory": {
+        "count": 6,
+        "names": [
+          "decision.applicable_to",
+          "decision.get",
+          "decision.propose",
+          "decision.propose_batch",
+          "decision.search",
+          "decision.trace"
+        ],
+        "exact_six": true
+      },
+      "adapter": {
+        "allowlist": [
+          "decision.get",
+          "decision.search",
+          "decision.applicable_to",
+          "decision.trace"
+        ],
+        "call_log": [
+          {
+            "seq": 1,
+            "tool": "decision.trace",
+            "args": {
+              "record_id": "ADR-9901"
+            },
+            "isError": false,
+            "structuredContent": {
+              "result_type": "canonical_trace",
+              "canonical_decision_id": "ADR-9901",
+              "canonical_record": {
+                "decision_id": "ADR-9901",
+                "version": "1",
+                "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+                "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+                "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+                "decision_class": "architecture",
+                "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+                "rationale": "Inventory and stdio handshake fixture only.",
+                "lifecycle_status": "active",
+                "owner": "",
+                "decided_at": "2026-01-01T00:00:00Z",
+                "updated_at": "2026-01-01T00:00:00Z",
+                "context_scope": [
+                  "cache"
+                ],
+                "targets": [],
+                "constraints": [
+                  "no external cache service"
+                ],
+                "anti_patterns": [
+                  "external_cache_client"
+                ],
+                "source_evidence": [
+                  {
+                    "source_type": "runtime",
+                    "source_locator": "",
+                    "source_revision": "",
+                    "observed_at": ""
+                  }
+                ],
+                "test_evidence": [],
+                "relationships": [],
+                "derived_rule_ids": [
+                  "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+                ]
+              },
+              "derived_rules": [
+                {
+                  "rule_id": "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584",
+                  "decision_id": "ADR-9901",
+                  "decision_version": "1",
+                  "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+                  "sequence": 0,
+                  "rule_type": "FORBID_LITERAL",
+                  "rule_payload": {
+                    "value": "external_cache_client"
+                  },
+                  "applicability": {},
+                  "lifecycle_status": "active"
+                }
+              ],
+              "declared_test_evidence": [],
+              "missing_links": [
+                "declared_test_evidence: none declared for canonical decision",
+                "enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)"
+              ]
+            },
+            "toolResult": null,
+            "text": "{\n  \"result_type\": \"canonical_trace\",\n  \"canonical_decision_id\": \"ADR-9901\",\n  \"canonical_record\": {\n    \"decision_id\": \"ADR-9901\",\n    \"version\": \"1\",\n    \"version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n    \"decision_version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n    \"content_digest\": \"662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650\",\n    \"decision_class\": \"architecture\",\n    \"statement\": \"Synthetic M1 cache adapter uses the in-memory backend.\",\n    \"rationale\": \"Inventory and stdio handshake fixture only.\",\n    \"lifecycle_status\": \"active\",\n    \"owner\": \"\",\n    \"decided_at\": \"2026-01-01T00:00:00Z\",\n    \"updated_at\": \"2026-01-01T00:00:00Z\",\n    \"context_scope\": [\n      \"cache\"\n    ],\n    \"targets\": [],\n    \"constraints\": [\n      \"no external cache service\"\n    ],\n    \"anti_patterns\": [\n      \"external_cache_client\"\n    ],\n    \"source_evidence\": [\n      {\n        \"source_type\": \"runtime\",\n        \"source_locator\": \"\",\n        \"source_revision\": \"\",\n        \"observed_at\": \"\"\n      }\n    ],\n    \"test_evidence\": [],\n    \"relationships\": [],\n    \"derived_rule_ids\": [\n      \"ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584\"\n    ]\n  },\n  \"derived_rules\": [\n    {\n      \"rule_id\": \"ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584\",\n      \"decision_id\": \"ADR-9901\",\n      \"decision_version\": \"1\",\n      \"decision_version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n      \"sequence\": 0,\n      \"rule_type\": \"FORBID_LITERAL\",\n      \"rule_payload\": {\n        \"value\": \"external_cache_client\"\n      },\n      \"applicability\": {},\n      \"lifecycle_status\": \"active\"\n    }\n  ],\n  \"declared_test_evidence\": [],\n  \"missing_links\": [\n    \"declared_test_evidence: none declared for canonical decision\",\n    \"enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)\"\n  ]\n}"
+          },
+          {
+            "seq": 2,
+            "tool": "decision.trace",
+            "args": {
+              "record_id": "ADR-9902"
+            },
+            "isError": false,
+            "structuredContent": {
+              "result_type": "canonical_trace",
+              "canonical_decision_id": "ADR-9902",
+              "canonical_record": {
+                "decision_id": "ADR-9902",
+                "version": "1",
+                "version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+                "decision_version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+                "content_digest": "ee82d7d1d19eec5d43fbd5814ba8e6ad9032ea589e66f0da53784c898e72de58",
+                "decision_class": "architecture",
+                "statement": "Synthetic deprecated cache policy for M4-F1 lifecycle coverage.",
+                "rationale": "Deprecated lifecycle control only; no typed rules.",
+                "lifecycle_status": "deprecated",
+                "owner": "",
+                "decided_at": "2026-01-01T00:00:00Z",
+                "updated_at": "2026-01-01T00:00:00Z",
+                "context_scope": [
+                  "cache"
+                ],
+                "targets": [],
+                "constraints": [],
+                "anti_patterns": [],
+                "source_evidence": [
+                  {
+                    "source_type": "runtime",
+                    "source_locator": "",
+                    "source_revision": "",
+                    "observed_at": ""
+                  }
+                ],
+                "test_evidence": [],
+                "relationships": [],
+                "derived_rule_ids": []
+              },
+              "derived_rules": [],
+              "declared_test_evidence": [],
+              "missing_links": [
+                "derived_rules: none recorded for canonical decision",
+                "declared_test_evidence: none declared for canonical decision",
+                "enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)"
+              ]
+            },
+            "toolResult": null,
+            "text": "{\n  \"result_type\": \"canonical_trace\",\n  \"canonical_decision_id\": \"ADR-9902\",\n  \"canonical_record\": {\n    \"decision_id\": \"ADR-9902\",\n    \"version\": \"1\",\n    \"version_id\": \"dver-1606ff8e8763eddde0d18d18ab72a30a\",\n    \"decision_version_id\": \"dver-1606ff8e8763eddde0d18d18ab72a30a\",\n    \"content_digest\": \"ee82d7d1d19eec5d43fbd5814ba8e6ad9032ea589e66f0da53784c898e72de58\",\n    \"decision_class\": \"architecture\",\n    \"statement\": \"Synthetic deprecated cache policy for M4-F1 lifecycle coverage.\",\n    \"rationale\": \"Deprecated lifecycle control only; no typed rules.\",\n    \"lifecycle_status\": \"deprecated\",\n    \"owner\": \"\",\n    \"decided_at\": \"2026-01-01T00:00:00Z\",\n    \"updated_at\": \"2026-01-01T00:00:00Z\",\n    \"context_scope\": [\n      \"cache\"\n    ],\n    \"targets\": [],\n    \"constraints\": [],\n    \"anti_patterns\": [],\n    \"source_evidence\": [\n      {\n        \"source_type\": \"runtime\",\n        \"source_locator\": \"\",\n        \"source_revision\": \"\",\n        \"observed_at\": \"\"\n      }\n    ],\n    \"test_evidence\": [],\n    \"relationships\": [],\n    \"derived_rule_ids\": []\n  },\n  \"derived_rules\": [],\n  \"declared_test_evidence\": [],\n  \"missing_links\": [\n    \"derived_rules: none recorded for canonical decision\",\n    \"declared_test_evidence: none declared for canonical decision\",\n    \"enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)\"\n  ]\n}"
+          },
+          {
+            "seq": 3,
+            "tool": "decision.trace",
+            "args": {
+              "record_id": "ADR-9999"
+            },
+            "isError": false,
+            "structuredContent": {
+              "result_type": "trace_not_found",
+              "record_id": "ADR-9999",
+              "missing_links": [
+                "record: not found ('ADR-9999' is neither a proposal id nor a canonical decision id)",
+                "proposal: not found",
+                "canonical_decision: not found",
+                "record_type: unknown (no proposal/canonical classification is asserted for an unresolved identifier)"
+              ]
+            },
+            "toolResult": null,
+            "text": "{\n  \"result_type\": \"trace_not_found\",\n  \"record_id\": \"ADR-9999\",\n  \"missing_links\": [\n    \"record: not found ('ADR-9999' is neither a proposal id nor a canonical decision id)\",\n    \"proposal: not found\",\n    \"canonical_decision: not found\",\n    \"record_type: unknown (no proposal/canonical classification is asserted for an unresolved identifier)\"\n  ]\n}"
+          }
+        ],
+        "schema_passthrough": {
+          "decision.get": true,
+          "decision.search": true,
+          "decision.applicable_to": true,
+          "decision.trace": true
+        }
+      },
+      "fixture_facts": {
+        "ADR-9901": {
+          "record": {
+            "decision_id": "ADR-9901",
+            "version": "1",
+            "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+            "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+            "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+            "rationale": "Inventory and stdio handshake fixture only.",
+            "lifecycle_status": "active",
+            "constraints": [
+              "no external cache service"
+            ],
+            "anti_patterns": [
+              "external_cache_client"
+            ],
+            "relationships": [],
+            "derived_rule_ids": [
+              "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+            ]
+          },
+          "rules": [
+            {
+              "rule_id": "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584",
+              "decision_id": "ADR-9901",
+              "decision_version": "1",
+              "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+              "sequence": 0,
+              "rule_type": "FORBID_LITERAL",
+              "rule_payload": {
+                "value": "external_cache_client"
+              },
+              "applicability": {},
+              "lifecycle_status": "active"
+            }
+          ],
+          "test_evidence": []
+        },
+        "ADR-9902": {
+          "record": {
+            "decision_id": "ADR-9902",
+            "version": "1",
+            "version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+            "decision_version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+            "content_digest": "ee82d7d1d19eec5d43fbd5814ba8e6ad9032ea589e66f0da53784c898e72de58",
+            "statement": "Synthetic deprecated cache policy for M4-F1 lifecycle coverage.",
+            "rationale": "Deprecated lifecycle control only; no typed rules.",
+            "lifecycle_status": "deprecated",
+            "constraints": [],
+            "anti_patterns": [],
+            "relationships": [],
+            "derived_rule_ids": []
+          },
+          "rules": [],
+          "test_evidence": []
+        }
+      },
+      "cases": {
+        "active": {
+          "args": {
+            "record_id": "ADR-9901"
+          },
+          "direct_normalized": {
+            "result_type": "canonical_trace",
+            "canonical_decision_id": "ADR-9901",
+            "canonical_record": {
+              "decision_id": "ADR-9901",
+              "version": "1",
+              "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+              "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+              "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+              "decision_class": "architecture",
+              "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+              "rationale": "Inventory and stdio handshake fixture only.",
+              "lifecycle_status": "active",
+              "owner": "",
+              "decided_at": "2026-01-01T00:00:00Z",
+              "updated_at": "2026-01-01T00:00:00Z",
+              "context_scope": [
+                "cache"
+              ],
+              "targets": [],
+              "constraints": [
+                "no external cache service"
+              ],
+              "anti_patterns": [
+                "external_cache_client"
+              ],
+              "source_evidence": [
+                {
+                  "source_type": "runtime",
+                  "source_locator": "",
+                  "source_revision": "",
+                  "observed_at": ""
+                }
+              ],
+              "test_evidence": [],
+              "relationships": [],
+              "derived_rule_ids": [
+                "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+              ]
+            },
+            "derived_rules": [
+              {
+                "rule_id": "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584",
+                "decision_id": "ADR-9901",
+                "decision_version": "1",
+                "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+                "sequence": 0,
+                "rule_type": "FORBID_LITERAL",
+                "rule_payload": {
+                  "value": "external_cache_client"
+                },
+                "applicability": {},
+                "lifecycle_status": "active"
+              }
+            ],
+            "declared_test_evidence": [],
+            "missing_links": [
+              "declared_test_evidence: none declared for canonical decision",
+              "enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)"
+            ]
+          },
+          "code_mode_normalized": {
+            "result_type": "canonical_trace",
+            "canonical_decision_id": "ADR-9901",
+            "canonical_record": {
+              "decision_id": "ADR-9901",
+              "version": "1",
+              "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+              "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+              "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+              "decision_class": "architecture",
+              "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+              "rationale": "Inventory and stdio handshake fixture only.",
+              "lifecycle_status": "active",
+              "owner": "",
+              "decided_at": "2026-01-01T00:00:00Z",
+              "updated_at": "2026-01-01T00:00:00Z",
+              "context_scope": [
+                "cache"
+              ],
+              "targets": [],
+              "constraints": [
+                "no external cache service"
+              ],
+              "anti_patterns": [
+                "external_cache_client"
+              ],
+              "source_evidence": [
+                {
+                  "source_type": "runtime",
+                  "source_locator": "",
+                  "source_revision": "",
+                  "observed_at": ""
+                }
+              ],
+              "test_evidence": [],
+              "relationships": [],
+              "derived_rule_ids": [
+                "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+              ]
+            },
+            "derived_rules": [
+              {
+                "rule_id": "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584",
+                "decision_id": "ADR-9901",
+                "decision_version": "1",
+                "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+                "sequence": 0,
+                "rule_type": "FORBID_LITERAL",
+                "rule_payload": {
+                  "value": "external_cache_client"
+                },
+                "applicability": {},
+                "lifecycle_status": "active"
+              }
+            ],
+            "declared_test_evidence": [],
+            "missing_links": [
+              "declared_test_evidence: none declared for canonical decision",
+              "enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)"
+            ]
+          },
+          "differences": [],
+          "equal": true
+        },
+        "deprecated": {
+          "args": {
+            "record_id": "ADR-9902"
+          },
+          "direct_normalized": {
+            "result_type": "canonical_trace",
+            "canonical_decision_id": "ADR-9902",
+            "canonical_record": {
+              "decision_id": "ADR-9902",
+              "version": "1",
+              "version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+              "decision_version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+              "content_digest": "ee82d7d1d19eec5d43fbd5814ba8e6ad9032ea589e66f0da53784c898e72de58",
+              "decision_class": "architecture",
+              "statement": "Synthetic deprecated cache policy for M4-F1 lifecycle coverage.",
+              "rationale": "Deprecated lifecycle control only; no typed rules.",
+              "lifecycle_status": "deprecated",
+              "owner": "",
+              "decided_at": "2026-01-01T00:00:00Z",
+              "updated_at": "2026-01-01T00:00:00Z",
+              "context_scope": [
+                "cache"
+              ],
+              "targets": [],
+              "constraints": [],
+              "anti_patterns": [],
+              "source_evidence": [
+                {
+                  "source_type": "runtime",
+                  "source_locator": "",
+                  "source_revision": "",
+                  "observed_at": ""
+                }
+              ],
+              "test_evidence": [],
+              "relationships": [],
+              "derived_rule_ids": []
+            },
+            "derived_rules": [],
+            "declared_test_evidence": [],
+            "missing_links": [
+              "derived_rules: none recorded for canonical decision",
+              "declared_test_evidence: none declared for canonical decision",
+              "enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)"
+            ]
+          },
+          "code_mode_normalized": {
+            "result_type": "canonical_trace",
+            "canonical_decision_id": "ADR-9902",
+            "canonical_record": {
+              "decision_id": "ADR-9902",
+              "version": "1",
+              "version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+              "decision_version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+              "content_digest": "ee82d7d1d19eec5d43fbd5814ba8e6ad9032ea589e66f0da53784c898e72de58",
+              "decision_class": "architecture",
+              "statement": "Synthetic deprecated cache policy for M4-F1 lifecycle coverage.",
+              "rationale": "Deprecated lifecycle control only; no typed rules.",
+              "lifecycle_status": "deprecated",
+              "owner": "",
+              "decided_at": "2026-01-01T00:00:00Z",
+              "updated_at": "2026-01-01T00:00:00Z",
+              "context_scope": [
+                "cache"
+              ],
+              "targets": [],
+              "constraints": [],
+              "anti_patterns": [],
+              "source_evidence": [
+                {
+                  "source_type": "runtime",
+                  "source_locator": "",
+                  "source_revision": "",
+                  "observed_at": ""
+                }
+              ],
+              "test_evidence": [],
+              "relationships": [],
+              "derived_rule_ids": []
+            },
+            "derived_rules": [],
+            "declared_test_evidence": [],
+            "missing_links": [
+              "derived_rules: none recorded for canonical decision",
+              "declared_test_evidence: none declared for canonical decision",
+              "enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)"
+            ]
+          },
+          "differences": [],
+          "equal": true
+        },
+        "unknown": {
+          "args": {
+            "record_id": "ADR-9999"
+          },
+          "direct_normalized": {
+            "result_type": "trace_not_found",
+            "record_id": "ADR-9999",
+            "missing_links": [
+              "record: not found ('ADR-9999' is neither a proposal id nor a canonical decision id)",
+              "proposal: not found",
+              "canonical_decision: not found",
+              "record_type: unknown (no proposal/canonical classification is asserted for an unresolved identifier)"
+            ]
+          },
+          "code_mode_normalized": {
+            "result_type": "trace_not_found",
+            "record_id": "ADR-9999",
+            "missing_links": [
+              "record: not found ('ADR-9999' is neither a proposal id nor a canonical decision id)",
+              "proposal: not found",
+              "canonical_decision: not found",
+              "record_type: unknown (no proposal/canonical classification is asserted for an unresolved identifier)"
+            ]
+          },
+          "differences": [],
+          "equal": true
+        }
+      },
+      "direct_raw": {
+        "active": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\n  \"result_type\": \"canonical_trace\",\n  \"canonical_decision_id\": \"ADR-9901\",\n  \"canonical_record\": {\n    \"decision_id\": \"ADR-9901\",\n    \"version\": \"1\",\n    \"version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n    \"decision_version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n    \"content_digest\": \"662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650\",\n    \"decision_class\": \"architecture\",\n    \"statement\": \"Synthetic M1 cache adapter uses the in-memory backend.\",\n    \"rationale\": \"Inventory and stdio handshake fixture only.\",\n    \"lifecycle_status\": \"active\",\n    \"owner\": \"\",\n    \"decided_at\": \"2026-01-01T00:00:00Z\",\n    \"updated_at\": \"2026-01-01T00:00:00Z\",\n    \"context_scope\": [\n      \"cache\"\n    ],\n    \"targets\": [],\n    \"constraints\": [\n      \"no external cache service\"\n    ],\n    \"anti_patterns\": [\n      \"external_cache_client\"\n    ],\n    \"source_evidence\": [\n      {\n        \"source_type\": \"runtime\",\n        \"source_locator\": \"\",\n        \"source_revision\": \"\",\n        \"observed_at\": \"\"\n      }\n    ],\n    \"test_evidence\": [],\n    \"relationships\": [],\n    \"derived_rule_ids\": [\n      \"ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584\"\n    ]\n  },\n  \"derived_rules\": [\n    {\n      \"rule_id\": \"ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584\",\n      \"decision_id\": \"ADR-9901\",\n      \"decision_version\": \"1\",\n      \"decision_version_id\": \"dver-3c2da75d06c5a5ce73807f025fc1d5c9\",\n      \"sequence\": 0,\n      \"rule_type\": \"FORBID_LITERAL\",\n      \"rule_payload\": {\n        \"value\": \"external_cache_client\"\n      },\n      \"applicability\": {},\n      \"lifecycle_status\": \"active\"\n    }\n  ],\n  \"declared_test_evidence\": [],\n  \"missing_links\": [\n    \"declared_test_evidence: none declared for canonical decision\",\n    \"enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)\"\n  ]\n}"
+            }
+          ],
+          "structuredContent": {
+            "result_type": "canonical_trace",
+            "canonical_decision_id": "ADR-9901",
+            "canonical_record": {
+              "decision_id": "ADR-9901",
+              "version": "1",
+              "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+              "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+              "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+              "decision_class": "architecture",
+              "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+              "rationale": "Inventory and stdio handshake fixture only.",
+              "lifecycle_status": "active",
+              "owner": "",
+              "decided_at": "2026-01-01T00:00:00Z",
+              "updated_at": "2026-01-01T00:00:00Z",
+              "context_scope": [
+                "cache"
+              ],
+              "targets": [],
+              "constraints": [
+                "no external cache service"
+              ],
+              "anti_patterns": [
+                "external_cache_client"
+              ],
+              "source_evidence": [
+                {
+                  "source_type": "runtime",
+                  "source_locator": "",
+                  "source_revision": "",
+                  "observed_at": ""
+                }
+              ],
+              "test_evidence": [],
+              "relationships": [],
+              "derived_rule_ids": [
+                "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+              ]
+            },
+            "derived_rules": [
+              {
+                "rule_id": "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584",
+                "decision_id": "ADR-9901",
+                "decision_version": "1",
+                "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+                "sequence": 0,
+                "rule_type": "FORBID_LITERAL",
+                "rule_payload": {
+                  "value": "external_cache_client"
+                },
+                "applicability": {},
+                "lifecycle_status": "active"
+              }
+            ],
+            "declared_test_evidence": [],
+            "missing_links": [
+              "declared_test_evidence: none declared for canonical decision",
+              "enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)"
+            ]
+          },
+          "isError": false
+        },
+        "deprecated": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\n  \"result_type\": \"canonical_trace\",\n  \"canonical_decision_id\": \"ADR-9902\",\n  \"canonical_record\": {\n    \"decision_id\": \"ADR-9902\",\n    \"version\": \"1\",\n    \"version_id\": \"dver-1606ff8e8763eddde0d18d18ab72a30a\",\n    \"decision_version_id\": \"dver-1606ff8e8763eddde0d18d18ab72a30a\",\n    \"content_digest\": \"ee82d7d1d19eec5d43fbd5814ba8e6ad9032ea589e66f0da53784c898e72de58\",\n    \"decision_class\": \"architecture\",\n    \"statement\": \"Synthetic deprecated cache policy for M4-F1 lifecycle coverage.\",\n    \"rationale\": \"Deprecated lifecycle control only; no typed rules.\",\n    \"lifecycle_status\": \"deprecated\",\n    \"owner\": \"\",\n    \"decided_at\": \"2026-01-01T00:00:00Z\",\n    \"updated_at\": \"2026-01-01T00:00:00Z\",\n    \"context_scope\": [\n      \"cache\"\n    ],\n    \"targets\": [],\n    \"constraints\": [],\n    \"anti_patterns\": [],\n    \"source_evidence\": [\n      {\n        \"source_type\": \"runtime\",\n        \"source_locator\": \"\",\n        \"source_revision\": \"\",\n        \"observed_at\": \"\"\n      }\n    ],\n    \"test_evidence\": [],\n    \"relationships\": [],\n    \"derived_rule_ids\": []\n  },\n  \"derived_rules\": [],\n  \"declared_test_evidence\": [],\n  \"missing_links\": [\n    \"derived_rules: none recorded for canonical decision\",\n    \"declared_test_evidence: none declared for canonical decision\",\n    \"enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)\"\n  ]\n}"
+            }
+          ],
+          "structuredContent": {
+            "result_type": "canonical_trace",
+            "canonical_decision_id": "ADR-9902",
+            "canonical_record": {
+              "decision_id": "ADR-9902",
+              "version": "1",
+              "version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+              "decision_version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+              "content_digest": "ee82d7d1d19eec5d43fbd5814ba8e6ad9032ea589e66f0da53784c898e72de58",
+              "decision_class": "architecture",
+              "statement": "Synthetic deprecated cache policy for M4-F1 lifecycle coverage.",
+              "rationale": "Deprecated lifecycle control only; no typed rules.",
+              "lifecycle_status": "deprecated",
+              "owner": "",
+              "decided_at": "2026-01-01T00:00:00Z",
+              "updated_at": "2026-01-01T00:00:00Z",
+              "context_scope": [
+                "cache"
+              ],
+              "targets": [],
+              "constraints": [],
+              "anti_patterns": [],
+              "source_evidence": [
+                {
+                  "source_type": "runtime",
+                  "source_locator": "",
+                  "source_revision": "",
+                  "observed_at": ""
+                }
+              ],
+              "test_evidence": [],
+              "relationships": [],
+              "derived_rule_ids": []
+            },
+            "derived_rules": [],
+            "declared_test_evidence": [],
+            "missing_links": [
+              "derived_rules: none recorded for canonical decision",
+              "declared_test_evidence: none declared for canonical decision",
+              "enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)"
+            ]
+          },
+          "isError": false
+        },
+        "unknown": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\n  \"result_type\": \"trace_not_found\",\n  \"record_id\": \"ADR-9999\",\n  \"missing_links\": [\n    \"record: not found ('ADR-9999' is neither a proposal id nor a canonical decision id)\",\n    \"proposal: not found\",\n    \"canonical_decision: not found\",\n    \"record_type: unknown (no proposal/canonical classification is asserted for an unresolved identifier)\"\n  ]\n}"
+            }
+          ],
+          "structuredContent": {
+            "result_type": "trace_not_found",
+            "record_id": "ADR-9999",
+            "missing_links": [
+              "record: not found ('ADR-9999' is neither a proposal id nor a canonical decision id)",
+              "proposal: not found",
+              "canonical_decision: not found",
+              "record_type: unknown (no proposal/canonical classification is asserted for an unresolved identifier)"
+            ]
+          },
+          "isError": false
+        }
+      },
+      "code_mode_raw": {
+        "result": {
+          "active": {
+            "result_type": "canonical_trace",
+            "canonical_decision_id": "ADR-9901",
+            "canonical_record": {
+              "decision_id": "ADR-9901",
+              "version": "1",
+              "version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+              "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+              "content_digest": "662dae53252e95830a73cd93cf2fe129a21ffb39e6f3a159073cce860f233650",
+              "decision_class": "architecture",
+              "statement": "Synthetic M1 cache adapter uses the in-memory backend.",
+              "rationale": "Inventory and stdio handshake fixture only.",
+              "lifecycle_status": "active",
+              "owner": "",
+              "decided_at": "2026-01-01T00:00:00Z",
+              "updated_at": "2026-01-01T00:00:00Z",
+              "context_scope": [
+                "cache"
+              ],
+              "targets": [],
+              "constraints": [
+                "no external cache service"
+              ],
+              "anti_patterns": [
+                "external_cache_client"
+              ],
+              "source_evidence": [
+                {
+                  "source_type": "runtime",
+                  "source_locator": "",
+                  "source_revision": "",
+                  "observed_at": ""
+                }
+              ],
+              "test_evidence": [],
+              "relationships": [],
+              "derived_rule_ids": [
+                "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584"
+              ]
+            },
+            "derived_rules": [
+              {
+                "rule_id": "ADR-9901:FORBID_LITERAL:4e447d86bf0efac6f035d836c80c7584",
+                "decision_id": "ADR-9901",
+                "decision_version": "1",
+                "decision_version_id": "dver-3c2da75d06c5a5ce73807f025fc1d5c9",
+                "sequence": 0,
+                "rule_type": "FORBID_LITERAL",
+                "rule_payload": {
+                  "value": "external_cache_client"
+                },
+                "applicability": {},
+                "lifecycle_status": "active"
+              }
+            ],
+            "declared_test_evidence": [],
+            "missing_links": [
+              "declared_test_evidence: none declared for canonical decision",
+              "enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)"
+            ]
+          },
+          "deprecated": {
+            "result_type": "canonical_trace",
+            "canonical_decision_id": "ADR-9902",
+            "canonical_record": {
+              "decision_id": "ADR-9902",
+              "version": "1",
+              "version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+              "decision_version_id": "dver-1606ff8e8763eddde0d18d18ab72a30a",
+              "content_digest": "ee82d7d1d19eec5d43fbd5814ba8e6ad9032ea589e66f0da53784c898e72de58",
+              "decision_class": "architecture",
+              "statement": "Synthetic deprecated cache policy for M4-F1 lifecycle coverage.",
+              "rationale": "Deprecated lifecycle control only; no typed rules.",
+              "lifecycle_status": "deprecated",
+              "owner": "",
+              "decided_at": "2026-01-01T00:00:00Z",
+              "updated_at": "2026-01-01T00:00:00Z",
+              "context_scope": [
+                "cache"
+              ],
+              "targets": [],
+              "constraints": [],
+              "anti_patterns": [],
+              "source_evidence": [
+                {
+                  "source_type": "runtime",
+                  "source_locator": "",
+                  "source_revision": "",
+                  "observed_at": ""
+                }
+              ],
+              "test_evidence": [],
+              "relationships": [],
+              "derived_rule_ids": []
+            },
+            "derived_rules": [],
+            "declared_test_evidence": [],
+            "missing_links": [
+              "derived_rules: none recorded for canonical decision",
+              "declared_test_evidence: none declared for canonical decision",
+              "enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)"
+            ]
+          },
+          "unknown": {
+            "result_type": "trace_not_found",
+            "record_id": "ADR-9999",
+            "missing_links": [
+              "record: not found ('ADR-9999' is neither a proposal id nor a canonical decision id)",
+              "proposal: not found",
+              "canonical_decision: not found",
+              "record_type: unknown (no proposal/canonical classification is asserted for an unresolved identifier)"
+            ]
+          }
+        }
+      },
+      "canonical_trace": {
+        "active_keys": [
+          "canonical_decision_id",
+          "canonical_record",
+          "declared_test_evidence",
+          "derived_rules",
+          "missing_links",
+          "result_type"
+        ],
+        "deprecated_keys": [
+          "canonical_decision_id",
+          "canonical_record",
+          "declared_test_evidence",
+          "derived_rules",
+          "missing_links",
+          "result_type"
+        ],
+        "active_result_type": "canonical_trace",
+        "deprecated_result_type": "canonical_trace",
+        "active_record_matches": true,
+        "deprecated_record_matches": true,
+        "active_derived_rule_count": 1,
+        "deprecated_derived_rule_count": 0,
+        "active_rule_matches": true,
+        "active_missing_links": [
+          "declared_test_evidence: none declared for canonical decision",
+          "enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)"
+        ],
+        "deprecated_missing_links": [
+          "derived_rules: none recorded for canonical decision",
+          "declared_test_evidence: none declared for canonical decision",
+          "enforcement_links: absent (enforcement points are not modelled in the current canonical kernel)"
+        ],
+        "declared_test_evidence_counts": {
+          "active": 0,
+          "deprecated": 0,
+          "unknown": null
+        },
+        "declared_evidence_has_verification_state": false
+      },
+      "unknown": {
+        "keys": [
+          "missing_links",
+          "record_id",
+          "result_type"
+        ],
+        "result_type": "trace_not_found",
+        "record_id": "ADR-9999",
+        "missing_links": [
+          "record: not found ('ADR-9999' is neither a proposal id nor a canonical decision id)",
+          "proposal: not found",
+          "canonical_decision: not found",
+          "record_type: unknown (no proposal/canonical classification is asserted for an unresolved identifier)"
+        ],
+        "classified_as_proposal": false,
+        "classified_as_canonical": false,
+        "type_unknown": true
+      },
+      "stderr": ""
+    }
+  ],
+  "normalized_evidence_equal": true,
+  "checks": [
+    {
+      "id": "M6-UPSTREAM-SIX-1",
+      "pass": true
+    },
+    {
+      "id": "M6-UPSTREAM-SIX-2",
+      "pass": true
+    },
+    {
+      "id": "M6-PARITY-1",
+      "pass": true
+    },
+    {
+      "id": "M6-PARITY-2",
+      "pass": true
+    },
+    {
+      "id": "M6-ACTIVE-TRACE",
+      "pass": true
+    },
+    {
+      "id": "M6-DEPRECATED-TRACE",
+      "pass": true
+    },
+    {
+      "id": "M6-MISSING-LINKS",
+      "pass": true
+    },
+    {
+      "id": "M6-UNKNOWN",
+      "pass": true
+    },
+    {
+      "id": "M6-DECLARED-EVIDENCE",
+      "pass": true
+    },
+    {
+      "id": "M6-NO-PROPOSAL-CALLS",
+      "pass": true
+    },
+    {
+      "id": "M6-REPEAT",
+      "pass": true
+    },
+    {
+      "id": "M6-NO-MUTATION",
+      "pass": true
+    },
+    {
+      "id": "M6-M4",
+      "pass": true
+    }
+  ],
+  "verdict": {
+    "pass": true,
+    "failed": []
+  },
+  "no_mutation": {
+    "before": {
+      "fixture_sha256": "b4d83d0cc0f70f442e2a62bd0e527220ae99b07cba1238e39d0ad8c5685d4e7f",
+      "pre_migration_sha256": "6746f86c7164fbb06ec4d3eb99678dcdc6a96a7b2b55b8d2e5b51ddaf5c57537",
+      "repo_memory_sha256": "db7ab9956aa631d3c3ad8c96a502c4b2b4be44d8e555b6d284268fee918654d4",
+      "repo_proposals_exists": false,
+      "repo_proposals_sha256": null,
+      "empty_cwd_files": [],
+      "m4": {
+        "schema": "mneme.cm01.s1a1.e0.m4-guard/v1",
+        "s0_sha": "9eb4057a290795883076ab05bf11c92038c6ca13",
+        "base_sha": "942de7b121994647e99e9b862b44cda784c0ae84",
+        "head_sha": "942de7b121994647e99e9b862b44cda784c0ae84",
+        "base_to_head_is_clean": true,
+        "inherited_m4_diff": "benchmarks/adr034_m4/README.md             |  222 +++\n benchmarks/adr034_m4/harness.py            | 2067 ++++++++++++++++++++++++++++\n benchmarks/adr034_m4/m4_child.py           |  153 ++\n scripts/run_test_battery.py                |    9 +\n tests/adr034_m4_synthetic_corpus.py        |  226 +++\n tests/test_adr034_m4_harness.py            |  926 +++++++++++++\n tests/test_adr034_m4_harness_old_reader.py |   47 +\n 7 files changed, 3650 insertions(+)",
+        "groups": {
+          "committed_vs_base": [],
+          "staged": [],
+          "unstaged": [],
+          "untracked": [
+            "validation/cm01/s1a-local/.gitignore",
+            "validation/cm01/s1a-local/README.md",
+            "validation/cm01/s1a-local/e0/probe-native-promise.mjs",
+            "validation/cm01/s1a-local/e0/quickjs-executor.mjs",
+            "validation/cm01/s1a-local/e0/run-e0.mjs",
+            "validation/cm01/s1a-local/e0/synthetic-host.mjs",
+            "validation/cm01/s1a-local/evidence/commands.txt",
+            "validation/cm01/s1a-local/evidence/e0-run1.json",
+            "validation/cm01/s1a-local/evidence/e0-run2.json",
+            "validation/cm01/s1a-local/evidence/e0.json",
+            "validation/cm01/s1a-local/evidence/repeatability.json",
+            "validation/cm01/s1a-local/m1/README.md",
+            "validation/cm01/s1a-local/m1/evidence/commands.txt",
+            "validation/cm01/s1a-local/m1/evidence/m1.json",
+            "validation/cm01/s1a-local/m1/evidence/run1-tools.json",
+            "validation/cm01/s1a-local/m1/evidence/run2-tools.json",
+            "validation/cm01/s1a-local/m1/fixture/canonical/project_memory.json",
+            "validation/cm01/s1a-local/m1/fixture/pre_migration.json",
+            "validation/cm01/s1a-local/m1/fixture/work/project_memory.json",
+            "validation/cm01/s1a-local/m1/package-lock.json",
+            "validation/cm01/s1a-local/m1/package.json",
+            "validation/cm01/s1a-local/m1/run-m1.mjs",
+            "validation/cm01/s1a-local/m2/README.md",
+            "validation/cm01/s1a-local/m2/evidence/commands.txt",
+            "validation/cm01/s1a-local/m2/evidence/m2.json",
+            "validation/cm01/s1a-local/m2/evidence/run1.json",
+            "validation/cm01/s1a-local/m2/evidence/run2.json",
+            "validation/cm01/s1a-local/m2/package-lock.json",
+            "validation/cm01/s1a-local/m2/package.json",
+            "validation/cm01/s1a-local/m2/run-m2.mjs",
+            "validation/cm01/s1a-local/m3/README.md",
+            "validation/cm01/s1a-local/m3/evidence/commands.txt",
+            "validation/cm01/s1a-local/m3/evidence/m3.json",
+            "validation/cm01/s1a-local/m3/evidence/run1.json",
+            "validation/cm01/s1a-local/m3/evidence/run2.json",
+            "validation/cm01/s1a-local/m3/package-lock.json",
+            "validation/cm01/s1a-local/m3/package.json",
+            "validation/cm01/s1a-local/m3/run-m3.mjs",
+            "validation/cm01/s1a-local/m4-guard.mjs",
+            "validation/cm01/s1a-local/m4/README.md",
+            "validation/cm01/s1a-local/m4/evidence/commands.txt",
+            "validation/cm01/s1a-local/m4/evidence/m4.json",
+            "validation/cm01/s1a-local/m4/evidence/run1.json",
+            "validation/cm01/s1a-local/m4/evidence/run2.json",
+            "validation/cm01/s1a-local/m4/f1/README.md",
+            "validation/cm01/s1a-local/m4/f1/evidence/commands.txt",
+            "validation/cm01/s1a-local/m4/f1/evidence/m4-f1.json",
+            "validation/cm01/s1a-local/m4/f1/evidence/run1.json",
+            "validation/cm01/s1a-local/m4/f1/evidence/run2.json",
+            "validation/cm01/s1a-local/m4/f1/run-m4-f1.mjs",
+            "validation/cm01/s1a-local/m4/fixture/SHA256SUMS",
+            "validation/cm01/s1a-local/m4/fixture/canonical/project_memory.json",
+            "validation/cm01/s1a-local/m4/fixture/pre_migration.json",
+            "validation/cm01/s1a-local/m4/fixture/work/project_memory.json",
+            "validation/cm01/s1a-local/m4/package-lock.json",
+            "validation/cm01/s1a-local/m4/package.json",
+            "validation/cm01/s1a-local/m4/run-m4.mjs",
+            "validation/cm01/s1a-local/m5/README.md",
+            "validation/cm01/s1a-local/m5/evidence/commands.txt",
+            "validation/cm01/s1a-local/m5/evidence/m5.json",
+            "validation/cm01/s1a-local/m5/evidence/run1.json",
+            "validation/cm01/s1a-local/m5/evidence/run2.json",
+            "validation/cm01/s1a-local/m5/package-lock.json",
+            "validation/cm01/s1a-local/m5/package.json",
+            "validation/cm01/s1a-local/m5/run-m5.mjs",
+            "validation/cm01/s1a-local/m6/package-lock.json",
+            "validation/cm01/s1a-local/m6/package.json",
+            "validation/cm01/s1a-local/m6/run-m6.mjs",
+            "validation/cm01/s1a-local/package-lock.json",
+            "validation/cm01/s1a-local/package.json"
+          ]
+        },
+        "protected_patterns": [
+          "^benchmarks\\/adr034_m4\\/",
+          "^tests\\/adr034_m4_",
+          "^tests\\/test_adr034_m4_",
+          "^scripts\\/run_test_battery\\.py$",
+          "^docs\\/validation\\/adr-034-m4-",
+          "^docs\\/plans\\/.*adr-034-m4"
+        ],
+        "violations": [],
+        "pass": true
+      },
+      "preserved": {
+        "e0_evidence": "10c9e50b8594965ecb37a5a6dfdf4f86c95a6d0990de94aa57415ca98933d0de",
+        "m1_evidence": "b67af6d33fcf5e187ccbb2b8c11a00b1229ddf63ff1564f9e4553c08965a20e5",
+        "m2_evidence": "f133469feee4737d699892ba16d69dd35606787773b4eb0c288cc1d3aaa974a2",
+        "m3_evidence": "0531b12507926545883d1e85a25d5ef85ea0ad378f3fe0e10f89e1efa8ca5e9a",
+        "m4_evidence": "dde0f195ef6f38e7d239a13c3a2b932b834b8e166a7ba32fe59b0787376878dd",
+        "m4_f1_evidence": "7e47140dbb6cfd0cadca63f066ceea510b312d3d0d69805da1c69de602ef01af",
+        "m5_evidence": "756ccb953b9869c481c26bcb501a55295ea0e690cb65594f9b551bf8654e5fda",
+        "m1_fixture": "8f73429e70e04a6876b965bb00a1777fc90409f9da2889c72dab9ac26b9621ea",
+        "m4_f1_fixture": "b4d83d0cc0f70f442e2a62bd0e527220ae99b07cba1238e39d0ad8c5685d4e7f"
+      }
+    },
+    "after": {
+      "fixture_sha256": "b4d83d0cc0f70f442e2a62bd0e527220ae99b07cba1238e39d0ad8c5685d4e7f",
+      "pre_migration_sha256": "6746f86c7164fbb06ec4d3eb99678dcdc6a96a7b2b55b8d2e5b51ddaf5c57537",
+      "repo_memory_sha256": "db7ab9956aa631d3c3ad8c96a502c4b2b4be44d8e555b6d284268fee918654d4",
+      "repo_proposals_exists": false,
+      "repo_proposals_sha256": null,
+      "empty_cwd_files": [],
+      "m4": {
+        "schema": "mneme.cm01.s1a1.e0.m4-guard/v1",
+        "s0_sha": "9eb4057a290795883076ab05bf11c92038c6ca13",
+        "base_sha": "942de7b121994647e99e9b862b44cda784c0ae84",
+        "head_sha": "942de7b121994647e99e9b862b44cda784c0ae84",
+        "base_to_head_is_clean": true,
+        "inherited_m4_diff": "benchmarks/adr034_m4/README.md             |  222 +++\n benchmarks/adr034_m4/harness.py            | 2067 ++++++++++++++++++++++++++++\n benchmarks/adr034_m4/m4_child.py           |  153 ++\n scripts/run_test_battery.py                |    9 +\n tests/adr034_m4_synthetic_corpus.py        |  226 +++\n tests/test_adr034_m4_harness.py            |  926 +++++++++++++\n tests/test_adr034_m4_harness_old_reader.py |   47 +\n 7 files changed, 3650 insertions(+)",
+        "groups": {
+          "committed_vs_base": [],
+          "staged": [],
+          "unstaged": [],
+          "untracked": [
+            "validation/cm01/s1a-local/.gitignore",
+            "validation/cm01/s1a-local/README.md",
+            "validation/cm01/s1a-local/e0/probe-native-promise.mjs",
+            "validation/cm01/s1a-local/e0/quickjs-executor.mjs",
+            "validation/cm01/s1a-local/e0/run-e0.mjs",
+            "validation/cm01/s1a-local/e0/synthetic-host.mjs",
+            "validation/cm01/s1a-local/evidence/commands.txt",
+            "validation/cm01/s1a-local/evidence/e0-run1.json",
+            "validation/cm01/s1a-local/evidence/e0-run2.json",
+            "validation/cm01/s1a-local/evidence/e0.json",
+            "validation/cm01/s1a-local/evidence/repeatability.json",
+            "validation/cm01/s1a-local/m1/README.md",
+            "validation/cm01/s1a-local/m1/evidence/commands.txt",
+            "validation/cm01/s1a-local/m1/evidence/m1.json",
+            "validation/cm01/s1a-local/m1/evidence/run1-tools.json",
+            "validation/cm01/s1a-local/m1/evidence/run2-tools.json",
+            "validation/cm01/s1a-local/m1/fixture/canonical/project_memory.json",
+            "validation/cm01/s1a-local/m1/fixture/pre_migration.json",
+            "validation/cm01/s1a-local/m1/fixture/work/project_memory.json",
+            "validation/cm01/s1a-local/m1/package-lock.json",
+            "validation/cm01/s1a-local/m1/package.json",
+            "validation/cm01/s1a-local/m1/run-m1.mjs",
+            "validation/cm01/s1a-local/m2/README.md",
+            "validation/cm01/s1a-local/m2/evidence/commands.txt",
+            "validation/cm01/s1a-local/m2/evidence/m2.json",
+            "validation/cm01/s1a-local/m2/evidence/run1.json",
+            "validation/cm01/s1a-local/m2/evidence/run2.json",
+            "validation/cm01/s1a-local/m2/package-lock.json",
+            "validation/cm01/s1a-local/m2/package.json",
+            "validation/cm01/s1a-local/m2/run-m2.mjs",
+            "validation/cm01/s1a-local/m3/README.md",
+            "validation/cm01/s1a-local/m3/evidence/commands.txt",
+            "validation/cm01/s1a-local/m3/evidence/m3.json",
+            "validation/cm01/s1a-local/m3/evidence/run1.json",
+            "validation/cm01/s1a-local/m3/evidence/run2.json",
+            "validation/cm01/s1a-local/m3/package-lock.json",
+            "validation/cm01/s1a-local/m3/package.json",
+            "validation/cm01/s1a-local/m3/run-m3.mjs",
+            "validation/cm01/s1a-local/m4-guard.mjs",
+            "validation/cm01/s1a-local/m4/README.md",
+            "validation/cm01/s1a-local/m4/evidence/commands.txt",
+            "validation/cm01/s1a-local/m4/evidence/m4.json",
+            "validation/cm01/s1a-local/m4/evidence/run1.json",
+            "validation/cm01/s1a-local/m4/evidence/run2.json",
+            "validation/cm01/s1a-local/m4/f1/README.md",
+            "validation/cm01/s1a-local/m4/f1/evidence/commands.txt",
+            "validation/cm01/s1a-local/m4/f1/evidence/m4-f1.json",
+            "validation/cm01/s1a-local/m4/f1/evidence/run1.json",
+            "validation/cm01/s1a-local/m4/f1/evidence/run2.json",
+            "validation/cm01/s1a-local/m4/f1/run-m4-f1.mjs",
+            "validation/cm01/s1a-local/m4/fixture/SHA256SUMS",
+            "validation/cm01/s1a-local/m4/fixture/canonical/project_memory.json",
+            "validation/cm01/s1a-local/m4/fixture/pre_migration.json",
+            "validation/cm01/s1a-local/m4/fixture/work/project_memory.json",
+            "validation/cm01/s1a-local/m4/package-lock.json",
+            "validation/cm01/s1a-local/m4/package.json",
+            "validation/cm01/s1a-local/m4/run-m4.mjs",
+            "validation/cm01/s1a-local/m5/README.md",
+            "validation/cm01/s1a-local/m5/evidence/commands.txt",
+            "validation/cm01/s1a-local/m5/evidence/m5.json",
+            "validation/cm01/s1a-local/m5/evidence/run1.json",
+            "validation/cm01/s1a-local/m5/evidence/run2.json",
+            "validation/cm01/s1a-local/m5/package-lock.json",
+            "validation/cm01/s1a-local/m5/package.json",
+            "validation/cm01/s1a-local/m5/run-m5.mjs",
+            "validation/cm01/s1a-local/m6/package-lock.json",
+            "validation/cm01/s1a-local/m6/package.json",
+            "validation/cm01/s1a-local/m6/run-m6.mjs",
+            "validation/cm01/s1a-local/package-lock.json",
+            "validation/cm01/s1a-local/package.json"
+          ]
+        },
+        "protected_patterns": [
+          "^benchmarks\\/adr034_m4\\/",
+          "^tests\\/adr034_m4_",
+          "^tests\\/test_adr034_m4_",
+          "^scripts\\/run_test_battery\\.py$",
+          "^docs\\/validation\\/adr-034-m4-",
+          "^docs\\/plans\\/.*adr-034-m4"
+        ],
+        "violations": [],
+        "pass": true
+      },
+      "preserved": {
+        "e0_evidence": "10c9e50b8594965ecb37a5a6dfdf4f86c95a6d0990de94aa57415ca98933d0de",
+        "m1_evidence": "b67af6d33fcf5e187ccbb2b8c11a00b1229ddf63ff1564f9e4553c08965a20e5",
+        "m2_evidence": "f133469feee4737d699892ba16d69dd35606787773b4eb0c288cc1d3aaa974a2",
+        "m3_evidence": "0531b12507926545883d1e85a25d5ef85ea0ad378f3fe0e10f89e1efa8ca5e9a",
+        "m4_evidence": "dde0f195ef6f38e7d239a13c3a2b932b834b8e166a7ba32fe59b0787376878dd",
+        "m4_f1_evidence": "7e47140dbb6cfd0cadca63f066ceea510b312d3d0d69805da1c69de602ef01af",
+        "m5_evidence": "756ccb953b9869c481c26bcb501a55295ea0e690cb65594f9b551bf8654e5fda",
+        "m1_fixture": "8f73429e70e04a6876b965bb00a1777fc90409f9da2889c72dab9ac26b9621ea",
+        "m4_f1_fixture": "b4d83d0cc0f70f442e2a62bd0e527220ae99b07cba1238e39d0ad8c5685d4e7f"
+      }
+    }
+  },
+  "limitations": [
+    "M6 only: decision.trace parity. No M7-M8 acceptance tests.",
+    "A trace is lineage only; it is not enforcement evidence or mutation permission.",
+    "No proposal method was invoked.",
+    "No Cloudflare Workers, tunnel, live model, credentials, or repository project memory."
+  ]
+}

@@ -54,8 +54,10 @@ why-i-built-mneme.html
 scratch/
 
 
-# Internal session memory
-.claude/
+# Internal session memory. Only the shared project settings, which register
+# the Mneme enforcement hooks for this repo, are tracked.
+.claude/*
+!.claude/settings.json
 
 # Screenshots and generated visuals
 screenshots/

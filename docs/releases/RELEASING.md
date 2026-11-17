@@ -315,6 +315,18 @@ Run in order. Do not advance past a failing step.
       version: PyPI serves it, clean `pipx` install, CLI surface, and the
       disposable-repo clean-setup check (`state: setup`,
       `enforcement: not_enabled`).
+- [ ] **Website synchronized** in `MnemeHQ/mnemehq-site`, through a normal
+      reviewed PR (its `main` deploys to production on merge):
+      `python scripts/sync_core_version.py X.Y.Z`; regenerate
+      `site/.well-known/mcp/decision-tools.json` with
+      `scripts/export_mcp_tool_catalog.py` from an installed
+      `mneme-hq[mcp]==X.Y.Z`; replay `scripts/run_howto_fixtures.py` and
+      rewrite any guide prose the release changed, then rebuild with
+      `scripts/build_howto_page.py` and `scripts/sync_docs_nav.py`; update
+      current-release statements in the MCP reference, the Decision MCP agent
+      skill and `llms*.txt`. `check_agent_discovery.py --online` passes after
+      deploy. Until this is done, the site's daily `Agent discovery contract`
+      check fails on version drift.
 - [ ] **Publish MCP Registry** passed, followed by **MCP directory
       maintenance** with no Registry failure; any third-party drift or
       invalid-metadata warning has a maintenance owner or issue, and

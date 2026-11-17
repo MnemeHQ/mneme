@@ -1,0 +1,5 @@
+alive.github.com
+api.github.com
+collector.github.com
+github.com
+# 4 other host(s) observed, not published

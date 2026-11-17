@@ -1,0 +1,58 @@
+CM-01 S1-A1 M5 exact commands
+
+Worktree:
+  C:\dev\mneme\.worktrees\feat-cm01-s1a1-e0-local-executor
+
+Directory:
+  validation/cm01/s1a-local/m5
+
+Commands:
+  npm install --ignore-scripts --no-audit --no-fund
+  npm run m5
+
+Observed:
+  npm install: 98 packages added
+  npm run m5: pass=true, failed=[]
+  M5-UPSTREAM-SIX-1: true
+  M5-UPSTREAM-SIX-2: true
+  M5-PARITY-1: true
+  M5-PARITY-2: true
+  M5-SEPARATE-LISTS: true
+  M5-SLIM-FIELDS: true
+  M5-NO-TYPED-RULE-DATA: true
+  M5-MATCHING-CONTEXT: true
+  M5-OPAQUE-PATH: true
+  M5-EMPTY-AND-UNMATCHED: true
+  M5-CANONICAL-IDENTITY: true
+  M5-NO-PROPOSAL-CALLS: true
+  M5-REPEAT: true
+  M5-NO-MUTATION: true
+  M5-M4: true
+
+Cases:
+  matching-context equal=true diffs=0
+  opaque-path equal=true diffs=0
+  empty-context equal=true diffs=0
+  unmatched-context equal=true diffs=0
+
+Versions:
+  Node 24.13.1
+  npm 11.8.0
+  @cloudflare/codemode 0.5.5
+  @modelcontextprotocol/sdk 1.32.2
+  ajv 8.17.1
+  zod 4.6.7
+  Python 3.12.10
+  mneme 0.10.0
+  mcp 2.2.0
+
+Fixture:
+  m1/fixture/canonical/project_memory.json
+  sha256 8f73429e70e04a6876b965bb00a1777fc90409f9da2889c72dab9ac26b9621ea
+
+Evidence:
+  evidence/m5.json
+  evidence/run1.json
+  evidence/run2.json
+  evidence/run1-stderr.log
+  evidence/run2-stderr.log

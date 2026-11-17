@@ -1,0 +1,56 @@
+{
+  "schema": "mneme.c4.gate-report/v1",
+  "adapter": {
+    "path": "scripts/ci/adr033_c4_gate.py",
+    "sha256": "afe1d69c1ce4170875989c5866bb2ec7b5089fc895efa699ced826317e3777f9"
+  },
+  "evaluator": {
+    "commit": "0b74d410b45e7b3efcf08d00ce58e7bd7017b757",
+    "wheel_sha256": "e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51",
+    "python": "/home/runner/work/_temp/evaluator/bin/python"
+  },
+  "base_sha": "e6fa32d48b56640e7e196e238eb54195d2ea4fc6",
+  "head_sha": "e1e15ea5903ebc0bee844dd9d2b93ec533c65c29",
+  "merge_base": "e6fa32d48b56640e7e196e238eb54195d2ea4fc6",
+  "requested_mode": "strict",
+  "query": "adr033 c4 trusted gate",
+  "posture": {
+    "effective": "closed",
+    "source": "vars.MNEME_CI_AVAILABILITY",
+    "fallback": null
+  },
+  "trusted_surface": {
+    "files": [
+      ".gitattributes",
+      ".gitmodules"
+    ],
+    "dirs": [
+      ".github/"
+    ]
+  },
+  "memory": null,
+  "files": [
+    {
+      "path": ".mneme/r0-s4-a.txt",
+      "status": "A",
+      "mode": "100644",
+      "classification": "REFUSED",
+      "kind": "policy",
+      "reason": "policy path: PR changes never reach the trusted decision memory"
+    }
+  ],
+  "gate_conditions": [],
+  "aggregate": {
+    "classification": "REFUSED",
+    "reason": ".mneme/r0-s4-a.txt: policy path: PR changes never reach the trusted decision memory",
+    "partly_unevaluated": false,
+    "counts": {
+      "REFUSED": 1
+    }
+  },
+  "disposition": "failure",
+  "annotations": [
+    "::error title=ADR-033 C4 REFUSED::.mneme/r0-s4-a.txt: policy path: PR changes never reach the trusted decision memory"
+  ],
+  "summary_written": true
+}

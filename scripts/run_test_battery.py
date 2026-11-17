@@ -87,6 +87,13 @@ GATE_CORE_PATHS: tuple[str, ...] = (
     "tests/test_dg1b1_decision_applicability.py",
     "tests/test_dg1b1_functional_acceptance.py",
     "tests/test_dg1f_c1a_preview.py",
+    "tests/test_dg1f_c2_golden_parity.py",
+    "tests/test_dg1f_c2_lifecycle_consolidation.py",
+    "tests/test_dg1f_c3a_golden_parity.py",
+    "tests/test_dg1b2a_canonical_waivers.py",
+    "tests/test_dg1g_f10_evidence_distinction.py",
+    "tests/test_dg1f_c3a_resolver_consumers.py",
+    "tests/test_dg1f_c3a_validation_compat.py",
     "tests/test_dg1f_g4_cli_memory_failures.py",
     "tests/test_dg1c_effective_resolver.py",
     "tests/test_dg1d_change_resolution.py",
@@ -112,9 +119,14 @@ GATE_CORE_PATHS: tuple[str, ...] = (
     "tests/test_check_modes.py",
     "tests/test_check_json.py",
     "tests/test_numeric_upper_bound_g1.py",
+    "tests/test_numeric_upper_bound_g2_prewrite.py",
+    "tests/test_numeric_call_scope_resolution.py",
+    "tests/test_numeric_symbol_dynamic_writes.py",
+    "tests/test_adr034_post_m4_source_file_compat.py",
     "tests/test_ci1_contract_fixtures.py",
     "tests/test_ci1_contract_matrix.py",
     "tests/test_ci1_evaluator_preflight.py",
+    "tests/test_adr033_c4_ci_gate.py",
     "tests/test_smoke.py",
 )
 
@@ -208,6 +220,12 @@ GATE_SHIPPED_PATHS: tuple[str, ...] = (
     "tests/integrations/agent_sdk",
     "tests/integrations/antigravity",
     "tests/integrations/test_numeric_upper_bound_consumers.py",
+    "tests/integrations/test_numeric_upper_bound_g2_hook.py",
+    "tests/integrations/test_numeric_g2_per_rule_attribution.py",
+    "tests/integrations/test_d3_evidence_attribution.py",
+    "tests/integrations/test_memory_selection.py",
+    "tests/integrations/test_p2_first_consumer_parity.py",
+    "tests/integrations/test_p2_first_same_selection.py",
 )
 
 GATE_AUDIT_EVIDENCE_PATHS: tuple[str, ...] = (
@@ -243,6 +261,46 @@ GATE_EXCLUSIONS: tuple[tuple[str, str], ...] = (
     (
         "tests/test_hook_latency_harness.py",
         "main-only: benchmark tooling (hook latency harness, issue #60)",
+    ),
+    (
+        "tests/test_adr034_m4_harness.py",
+        "main-only: benchmark tooling (ADR-034 M4 scoring harness, charter §6)",
+    ),
+    (
+        "tests/test_adr034_m4_harness_old_reader.py",
+        "main-only: opt-in, needs a mneme-hq==0.10.0 old-reader environment "
+        "(skipped unless MNEME_M4_OLD_READER_PYTHON and MNEME_M4_OLD_READER_WHEEL are set)",
+    ),
+    (
+        "tests/test_adr034_g2_1_harness.py",
+        "main-only: benchmark tooling (ADR-034 G2-1 §8.D scoring harness)",
+    ),
+    (
+        "tests/test_adr034_g2_1_harness_smoke.py",
+        "main-only: opt-in, needs the G2-1 public smoke cases and both pinned "
+        "environments (skipped unless the MNEME_G2H_* variables are set)",
+    ),
+    (
+        "tests/test_adr034_g2_1_r2_harness.py",
+        "main-only: benchmark tooling (ADR-034 G2-1 R2 scoring harness)",
+    ),
+    (
+        "tests/test_adr034_g2_1_r2_harness_smoke.py",
+        "main-only: opt-in, needs the G2-1 R2 public smoke cases and both pinned "
+        "environments (skipped unless the MNEME_G2R2_* variables are set)",
+    ),
+    (
+        "tests/test_adr034_g2_1_r3_harness.py",
+        "main-only: benchmark tooling (ADR-034 G2-1 R3 scoring harness)",
+    ),
+    (
+        "tests/test_adr034_g2_1_r3_positive_coverage.py",
+        "main-only: synthetic corpus-admission positive control (ADR-034 G2-1 R3)",
+    ),
+    (
+        "tests/test_adr034_g2_1_r3_harness_smoke.py",
+        "main-only: opt-in, needs the G2-1 R3 public smoke cases and both pinned "
+        "environments (skipped unless the MNEME_G2R3_* variables are set)",
     ),
     ("tests/test_eventcatalog_import.py", "main-only: experimental integration"),
     ("tests/integrations/hermes", "main-only: experimental integration"),

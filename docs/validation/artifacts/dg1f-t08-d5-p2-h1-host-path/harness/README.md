@@ -73,6 +73,29 @@ H1 passes only if all four path ids pass (scope §6 gate rule). `summary_h1.md` 
 
 **R4 (accepted in [`docs/plans/2026-10-19-dg1f-t08-d5-p2-a1-hook-system-message-rule.md`](../../../../plans/2026-10-19-dg1f-t08-d5-p2-a1-hook-system-message-rule.md), #561).** A transcript `attachment` with `attachment.type: "hook_system_message"` is `host_output` only when all three of R1's narrow conditions hold: `hookEvent` equals the probed event, this arm's emitter invoked that event, and the nonce is in `attachment.content`. Otherwise it stays `unclassified`. R4 **never** counts as delivery to the agent or the developer, and it never masks another location: unclassified-first is unchanged. It was added for the shape Claude Code 2.1.202 recorded for the Stop `systemMessage` in the A1-headless run (#560), whose as-run outcome stands. Reclassifying that run is a separately authorized step. The H1 batch evidence contains no `hook_system_message` entry, so R4 changes no H1 label.
 
+**R5 (accepted in [`docs/plans/2026-11-11-dg1f-t08-d5-p2-a2-r5-host-record-rule.md`](../../../../plans/2026-11-11-dg1f-t08-d5-p2-a2-r5-host-record-rule.md), #796/#797).** This rule adds a category, `host_record`: the host's own record of content an anchor carries. It is recorded; it is never delivery, never sufficient alone, and never masks.
+
+- **Anchor** (`r5_anchors()`): a tool-attributed R1 entry that meets six conditions:
+  - A1: `hookEvent` is the probed event;
+  - A2: this arm's emitter emitted the nonce for it;
+  - A3: the nonce is in `attachment.content`;
+  - A4: `hookName` is exactly `L` (`PreToolUse:Edit`, `PreToolUse:Bash` or the bare lifecycle event);
+  - A5, tool paths: `toolUseID` is this arm's `tool_use` for the expected tool;
+  - A6, tool paths: the emitting hook-log envelope names the event and the tool.
+- **R5a:** the anchor's `rendered[i].content`, with `renderedRole` `system`, equal exactly to `<system-reminder>\n{L} hook additional context: {content[i]}\n</system-reminder>` (`\n` is a newline). Only that exact path is covered: a nonce at any other path under `rendered`, such as `rendered[0].metadata`, stays `unclassified` (review of #798).
+- **R5b:** an `api-request-blob` with role `system`, in an arm that has an anchor, where every nonce line equals exactly `{L} hook additional context: {C}` for some anchor item `C`.
+- **Everything else stays `unclassified`.** That includes wrong-tool evidence under the right event.
+
+R1 to R4 are unchanged: R1 still decides delivery, and R2 still covers every location of a `hook_success` entry. The stub's `H1_STUB_DELIVERY=hook_r5` mode writes the Claude Code 2.1.310 shape recorded in #795. `selftest/test_r5_classifier.py` covers:
+- the positives;
+- the R5a and R5b negatives;
+- the wrong-tool cases;
+- label interactions;
+- an anchor unit test;
+- H1 and A1 published-subset replays, which keep their labels.
+
+Reclassifying the A2 evidence is a separately authorized step.
+
 **Known consequence of the strict host-event rule.** If Claude Code emits a hook-output `system` event only when a hook prints something, the emitter and no-op arms will differ in event subtypes, and the probe will be `INCONCLUSIVE`. That is the conservative outcome by design (owner decision, 2026-10-17). The raw evidence is kept, so a reviewed rule change can re-classify without re-running.
 
 **`H1_DONE` is not a pass.** `run_h1.sh` writes `H1_DONE` when the batch has finished and every outcome has been written and verified, whatever the labels are. Only the gate line in `summary_h1.md`, derived from the classified outcomes, decides whether H1 passed. The summary says this too.
@@ -177,3 +200,115 @@ When, and only when, the owner authorizes the H1 live batch:
 & "C:\Program Files\Git\bin\bash.exe" -l "<harness>/run_a1_headless.sh"
 & "C:\Program Files\Git\bin\bash.exe" -l "<harness>/prep_a1_interactive.sh" H1c-sm-int-ctl
 ```
+
+## Amendment A2: H1a and H1b re-pinned to Claude Code 2.1.310 (offline-validated only)
+
+**Nothing here has run live.** The live run needs a separate, explicit go-ahead. The specification is probe scope §4.3 (proposed in the same PR as this harness change).
+
+| File | Role |
+|---|---|
+| `pins.env` (A2 pin set) | Selected only by `run_h1.sh A2`, which exports `H1_PINSET=A2` (the C3 `C3_PINSET=G3` pattern). Claude Code `2.1.310 (Claude Code)`, `--model claude-opus-5-5` (`PIN_MODEL_FLAG`), paths H1a-edit, H1a-bash and H1b-start only, root `C:\dev\d5p2-h1-a2-live`, guarded delete `safe_rmtree_a2.py`. An unknown or empty `H1_PINSET` aborts; `run_h1.sh` refuses to start whenever `H1_PINSET` is already set in the environment (even empty), with or without an argument, and never overwrites it; `pins_a1.env` refuses any, including empty. Without a pin set, every H1 value is unchanged. **`pins.local.env` may set `PY` only:** every pinned value (host version, model, model flag, live root, guarded delete, paths, settings sources, pin set) is snapshotted before it is sourced, and any change or unset aborts, naming the variables. This applies to the H1 pins too. |
+| `safe_rmtree_a2.py` | `safe_rmtree.py` with an exact delta: the A2 root, the six A2 arms, and `PROTECTED` covering the H1 and A1 live roots, both archives and `C:\dev\d5p2-h1c-a1-attempts`. |
+| `run_h1_probe.sh` | The arm must belong to the active pin set; A2 needs `DISABLE_AUTOUPDATER=1`; `claude --version` is checked against the pin immediately before **every** session; `--model` is passed when the pin set defines one; `observer.txt` records `pinset`, `model_flag` and the checked `claude_version`. |
+| `classify_h1.py` | `pair … <pin_model> [<pin_version>]`: with a version pin (A2 always passes one), an arm whose recorded `claude_version` differs, or is unrecorded, gives `NOT_EXECUTED`. `verify` and `summary` take an optional comma-separated path subset. Only an all-four summary carries the `H1 gate` line; a subset summary carries a `Listed-path result` that names the missing paths and says it is not the H1 gate. Either result is `PASS` only when every included path records the same host version; mixed or unrecorded versions give `NOT MET` with a `Host pin not established` note (review of #794). The summary now shows each path's host version. |
+| `selftest/claude`, `stub_claude.py` | The stub answers with the active pin set's version (`H1_STUB_VERSION`) and, like the host, takes its session model from `--model`. |
+
+**Offline validation (stub only, NOT evidence):**
+- `python -m pytest -q …/harness/selftest`: **161 passed** (58 in `test_a2_harness.py`). They cover:
+  - the A2 root, arms and protected trees, including refusal of every Stop and A1 arm name;
+  - path selection (default, order, refusal of unknown, duplicate or empty subsets);
+  - the subset `verify`, and a subset summary that never prints the H1 gate line;
+  - `--model` plumbing: present → `DELIVERED_TO_AGENT`, absent → `NOT_EXECUTED` under the A2 model pin;
+  - the version pin: match → pass; a mismatch in either arm, or no recorded version → `NOT_EXECUTED`; no pin → H1 behavior;
+  - shell plumbing through Git Bash: A2 and default pin values, unknown pin set, `pins_a1.env` refusing a pin set, Stop arms refused under A2, and `run_h1.sh` refusing an unknown pin set argument;
+  - #794 review regressions: an all-four set with H1c on another version, or with an unrecorded version, is `NOT MET` (never an H1 `PASS`); a mixed-version subset is never a listed-path `PASS`; an environment `H1_PINSET` is refused before the preflight, with no argument, the same argument, or a different one. A mutation check (rule disabled) failed all four version tests;
+  - second #794 review: a `pins.local.env` that overrides the A2 host version is refused, and so is one that overrides or unsets any other pinned value (model, model flag, live root, Windows root, guarded delete, paths, sources, the A2 pins, the pin set), for the H1 pins too; a `PY`-only file is accepted and the pins hold. An empty `H1_PINSET` is refused by `run_h1.sh`, `pins.env` and `pins_a1.env`. These tests copy `pins.env` into a temporary directory, so the operator's real `pins.local.env` is never touched. A mutation check with the guard disabled failed all 12 override tests.
+- **`run_h1.sh A2` was run end to end under `H1_SELFTEST=1`** in the A2 root: preflight OK, all three pairs `DELIVERED_TO_AGENT` (stub), `Listed-path result … PASS`, with every init event reporting `claude-opus-5-5` and every observer `2.1.310 (Claude Code)`. Without `DISABLE_AUTOUPDATER=1` it aborted at the preflight. `C:\dev\d5p2-h1-live` was not touched. The A2 root was emptied afterwards through `safe_rmtree_a2.py`.
+
+**Running it live (when authorized).** Use your own window, never inside Claude Code, with `claude --version` printing `2.1.310 (Claude Code)`, `PY` set in `pins.local.env`, and no `MNEME_*`, `CLAUDECODE`, `H1_SELFTEST`, `H1_LIVE` or `H1_PINSET` variables:
+
+```powershell
+$env:DISABLE_AUTOUPDATER = "1"
+& "C:\Program Files\Git\bin\bash.exe" -l "<harness>/run_h1.sh" A2
+```
+
+The evidence goes to `C:\dev\d5p2-h1-a2-live`. Collection with `collect_h1.py` and the record `docs/validation/dg1f-t08-d5-p2-host-path-h1-a2-<date>.md` form a separate evidence PR.
+
+## Amendment A3: H1c (A1 track) re-pinned to Claude Code 2.1.310 (offline-validated only)
+
+**Nothing here has run live.** The live runs need a separate, explicit go-ahead. The specification is probe scope §4.4 (proposed in the same PR as this harness change).
+
+| File | Role |
+|---|---|
+| `pins_a1.env` (A3 pin set) | Selected only by `A1_PINSET=A3`, which the A1 entry points set from their first argument `A3`. Claude Code `2.1.310 (Claude Code)`, `--model claude-opus-5-5` (`PIN_MODEL_FLAG`), root `C:\dev\d5p2-h1c-a3-live` (`A1_LIVE_W`), guarded delete `safe_rmtree_a3.py` (`A1_RMTREE`). An unknown or empty `A1_PINSET` aborts. Without it every A1 value is unchanged. `A1_PINSET` is in the `pins.env` snapshot, so `pins.local.env` can neither set nor clear it. |
+| `safe_rmtree_a3.py` | `safe_rmtree_a1.py` with an exact delta: the A3 root, and `PROTECTED` covering the H1, A1 and A2 roots, every archive and `C:\dev\d5p2-h1c-a1-attempts`. Same four arm names. |
+| `run_a1_headless.sh [A3]` | Pin-set selection from the argument only. An inherited `A1_PINSET` is refused, even empty. Under A3 the headless classifier gets the version pin. |
+| `run_a1_probe.sh` | The root and guarded delete come from the pin set. A3 needs `DISABLE_AUTOUPDATER=1`. `claude --version` is checked immediately before **every** session (A1 too, since a mismatch only aborts). `--model` is passed when the pin set defines one. `observer.txt` records `pinset`, `model_flag`, `disable_autoupdater` and the checked `claude_version`. |
+| `prep_a1_interactive.sh [A3] <arm>` | Pin-set selection, the A3 root and `DISABLE_AUTOUPDATER`. It records `pinset` and `model_flag`. Under A3 it prints hardened operator steps for one window: auto-updater off, version check, `--model`, stop if signed out, the prompt sent once, no `/model` or `/login`, at least 30 s idle, `/exit`. |
+| `finish_a1_interactive.sh [A3] <arm> <recording>` | Pin-set selection and `DISABLE_AUTOUPDATER` under A3. It refuses an arm prepared under another pin set. The version check refuses **without writing into the arm**. It prints the exact `classify_a1.py interactive` and `combine` commands for the active pins. |
+| `classify_a1.py` | `headless <live> <pin_model> [<pin_version>]`: with a version pin, an arm whose recorded version differs, or is unrecorded, gives `NOT_EXECUTED`. Both arms' versions are recorded under `a1.claude_versions`. `combine` first requires both headless versions and the interactive pin to be present and equal (`NOT_EXECUTED` otherwise), and records `host_version`. |
+| `preflight.sh`, `selftest/claude` | Under an A1 pin set they read `pins_a1.env`. The preflight reports the pin set and checks `DISABLE_AUTOUPDATER` for A3. `run_h1.sh` refuses an inherited `A1_PINSET`. |
+
+**Offline validation (stub only, NOT evidence):**
+- `python -m pytest -q …/harness/selftest`: **277 passed** (43 in `test_a3_harness.py`). They cover:
+  - the A3 root, arms and protected trees;
+  - the headless version pin: match, mismatch in either arm, unrecorded, and no pin (A1 behavior);
+  - `combine` on one version, and `NOT_EXECUTED` for mixed versions (including A1 headless plus A3 interactive) or an unrecorded version, checked before any passing label;
+  - the A3 and default A1 pin values, and unknown or empty `A1_PINSET`;
+  - `pins.local.env` unable to set, export or clear `A1_PINSET`;
+  - every entry point and `run_h1.sh` refusing an inherited `A1_PINSET`;
+  - `DISABLE_AUTOUPDATER` required by the probe, prep, finish and preflight under A3, with the preflight's success line checked exactly;
+  - `--model` in the probe.
+
+  The `test_a1_harness.py` headless fixture now records the host version, as the runner does.
+- **Mutation checks:** all 12 A3 mutants were caught, plus a broken preflight line continuation (a real bug found in the stub self-test and fixed).
+- **`run_a1_headless.sh A3` was run end to end under `H1_SELFTEST=1`**, together with `prep_a1_interactive.sh A3` and `finish_a1_interactive.sh A3` for the control arm, all in the A3 root:
+  - the preflight reported pin set A3, `DISABLE_AUTOUPDATER=1` and `2.1.310`;
+  - the observers recorded `pinset=A3`, `model_flag=claude-opus-5-5` and `2.1.310`, and the init event reported `claude-opus-5-5`;
+  - the stub's default `stream` mode reproduced the known A1 collision (`INCONCLUSIVE`);
+  - a stub version of `2.1.311` at finish was refused with nothing written.
+
+  The A3 root was emptied afterwards through `safe_rmtree_a3.py`.
+- **Incident during the self-test (fixed):** one `finish_a1_interactive.sh` call was made **without** `A3`, so it targeted the A1 root. The leftover attempt-2 control arm there received a new `harness_failure.txt` from the old failure path. The file was removed. That arm's file set and hashes match the preserved `2026-10-19-ctl-attempt2` copy, and nothing else in the A1 root or archive changed. `finish` now refuses on the version check without writing.
+
+**Running it live (when authorized).** Use your own windows, never inside Claude Code, with `claude --version` printing `2.1.310 (Claude Code)`, `PY` set in `pins.local.env`, and no `MNEME_*`, `CLAUDECODE`, `H1_SELFTEST`, `H1_LIVE`, `H1_PINSET` or `A1_PINSET` variables:
+
+```powershell
+$env:DISABLE_AUTOUPDATER = "1"
+& "C:\Program Files\Git\bin\bash.exe" -l "<harness>/run_a1_headless.sh" A3
+& "C:\Program Files\Git\bin\bash.exe" -l "<harness>/prep_a1_interactive.sh" A3 H1c-sm-int-ctl
+```
+
+Then follow the printed steps for the control arm, then for `H1c-sm-int`, then the capture reviews, `classify_a1.py interactive` and `combine`. The evidence goes to `C:\dev\d5p2-h1c-a3-live`. The record `docs/validation/dg1f-t08-d5-p2-host-path-h1c-a3-<date>.md` goes in a separate evidence PR.
+
+## Finished-batch guard: kept evidence is never touched
+
+`guard_finished.sh` is sourced by every runner and probe and runs **before the script's first write**. It changes nothing; it only refuses:
+
+| Script | Refuses when |
+|---|---|
+| `run_h1.sh`, `run_h1_probe.sh` | the root holds `H1_DONE` or `summary_h1.md` |
+| `run_a1_headless.sh`, `run_a1_probe.sh` | the root holds `A1_HEADLESS_DONE` or `outcome_a1_headless.json` |
+| `prep_a1_interactive.sh`, `finish_a1_interactive.sh` | the root holds `outcome_a1_interactive.json` or `outcome_a1.json`, **or** the arm is already finished (its `observer.txt` records `recording_sha256`) |
+
+The interactive steps deliberately ignore the headless markers, because the interactive pair follows the headless pair in the same root. An unfinished batch (`H1_INCOMPLETE`, `A1_HEADLESS_INCOMPLETE`) may still be re-run.
+
+**To start a new batch in a root that holds a finished one:** archive the root (copy plus SHA-256 listing), then empty it (`safe_rmtree*.py delete <arm>` per arm, and remove the batch files). There is no override flag.
+
+`finish_a1_interactive.sh` validates `observation.json` **before** writing anything. It then copies the transcript and writes the capture-review template, written atomically with the recording hash passed in rather than read back. Only after both succeed does it append the finished marker (`recording_sha256`, `recording_bytes`, `finished`, `notes_after`, `transcript_collected`) to `observer.txt`, in one block. A failure at any earlier step (review of #803) leaves the arm unfinished, and `finish` can be re-run once the cause is fixed.
+
+**Why.** On 2026-11-13 a mutation check of #802 disabled a pin-set guard. The shell test then ran `run_h1.sh A2` against the kept A2 root, which deleted `H1_DONE` and `summary_h1.md` and overwrote `run_h1.log` before aborting at the preflight. The files were restored from `C:\dev\d5p2-h1-a2-archive\2026-11-11`, and the root again verifies 74/74.
+
+**Rule for mutation checks:** never mutate a runner while running tests that execute it against the real, fixed roots, because a disabled guard can let the runner write. `selftest/test_finished_batch_guard.py` never touches a real root:
+- it exercises the helper only on temporary directories;
+- it checks each call site's position from the source;
+- it runs `finish` only inside a temporary copy of the harness whose A1 root is rewritten to a temporary directory, after asserting that rewrite.
+
+Mutate the guard only against that file.
+
+**Offline validation:**
+- `python -m pytest -q …/harness/selftest`: **296 passed** (19 in `test_finished_batch_guard.py`).
+- **Mutation checks:** 13 mutants, all caught, run against that file only. They covered the helper exiting, the helper matching the arm, the helper writing, each removed or late call site, prep keying on the headless markers, `finish` validating after writing, and `finish` marking the arm finished before the template.
+- **Retry (review of #803), sandboxed:** a `finish` whose template generation fails (a malformed `frames` entry), or whose transcript copy fails, leaves `observer.txt` unchanged and the arm retryable. After the cause is fixed, `finish` completes with exactly one `recording_sha256`, and the template is bound to it. A further `finish` is refused and changes nothing. Against the pre-fix `finish`, both failure tests fail.
+- **Replaying the incident:** `run_h1.sh A2`, `run_h1.sh` and `run_a1_headless.sh` against the kept A2, H1 and A1 roots each refused with `nothing was changed`.
+- **Evidence trees:** the H1, A1, A2 and A3 roots, the archives and the A1 attempts were byte-identical before and after.

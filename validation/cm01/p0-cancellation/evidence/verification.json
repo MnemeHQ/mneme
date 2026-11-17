@@ -1,0 +1,1342 @@
+{
+  "schema": "mneme.cm01.p0-cancellation.verification/v1",
+  "generated_at": "2026-10-24T14:12:02.528Z",
+  "purpose": "Read-only verification of the recorded CM-01-P0-01 FAIL against both raw runs, relay logs, child-process logs, source versions, fixture hashes, and baseline preservation.",
+  "original_verdict": "FAIL",
+  "original_reason": "the underlying MCP client request was still pending when Code Mode returned its timeout error; the underlying MCP client request was still pending after a 1500ms bounded observation period; the withheld late response still fulfilled the abandoned MCP client request; no notifications/cancelled was emitted by the integration",
+  "classification_changed": false,
+  "canonical_evidence": {
+    "files": [
+      "verdict.json",
+      "run1.json",
+      "run2.json",
+      "versions.json"
+    ],
+    "hashes_before": {
+      "verdict.json": "0917f33f66f9d92e6b639767b89c44af8c40cca9ab03c0e7fa3cb6d0ddabf46a",
+      "run1.json": "cd9360b21d8f6321dcb7c840b43bf1286ec841de055298a50ba7664900300492",
+      "run2.json": "49da740026fd2e8cc79c9cd8ef964bfa453e3fd49bfc9ae15a771df84b9cd826",
+      "versions.json": "e8003a2a05ea5620b57635c24aa93e7ca5c69de3c574561a4626c6d0a0f8ae57"
+    },
+    "hashes_after": {
+      "verdict.json": "0917f33f66f9d92e6b639767b89c44af8c40cca9ab03c0e7fa3cb6d0ddabf46a",
+      "run1.json": "cd9360b21d8f6321dcb7c840b43bf1286ec841de055298a50ba7664900300492",
+      "run2.json": "49da740026fd2e8cc79c9cd8ef964bfa453e3fd49bfc9ae15a771df84b9cd826",
+      "versions.json": "e8003a2a05ea5620b57635c24aa93e7ca5c69de3c574561a4626c6d0a0f8ae57"
+    },
+    "unchanged": true
+  },
+  "repository": {
+    "head": "0d367fc61316e8af50161f6bc48b8dee1711c807",
+    "declared_baseline": "ddeb85eec8f7734edde1c921250592d51afedbee",
+    "code_under_test_unchanged_since_baseline": true,
+    "drift_paths": [
+      "docs/validation/adr-034-m4-heldout-scoring-2026-10-24.md"
+    ],
+    "s1a_evidence_digest": "cc7f884866e6e94255b100de57b82eec4a51660aadaf51c6464198131030af57",
+    "s1a_git_status": "",
+    "m4_guard_pass": true
+  },
+  "verification_status": "VERIFIED",
+  "checks": [
+    {
+      "id": "ORIGINAL-CLASSIFICATION",
+      "pass": true,
+      "detail": {
+        "original_verdict": "FAIL",
+        "reason": "the underlying MCP client request was still pending when Code Mode returned its timeout error; the underlying MCP client request was still pending after a 1500ms bounded observation period; the withheld late response still fulfilled the abandoned MCP client request; no notifications/cancelled was emitted by the integration"
+      }
+    },
+    {
+      "id": "ORIGINAL-RUNS-PRESENT",
+      "pass": true,
+      "detail": [
+        {
+          "run": "run1",
+          "verdict": "FAIL"
+        },
+        {
+          "run": "run2",
+          "verdict": "FAIL"
+        }
+      ]
+    },
+    {
+      "id": "RUN1-CONTROL-DIRECT",
+      "pass": true,
+      "detail": {
+        "ok": true,
+        "canonical": true,
+        "request_id": 2,
+        "cleanup": {
+          "phase": "control-direct",
+          "errors": [],
+          "client_pid": 17304,
+          "server_alive_after": false,
+          "server_exit_observed": true
+        }
+      }
+    },
+    {
+      "id": "RUN1-CONTROL-RELAY",
+      "pass": true,
+      "detail": {
+        "ok": true,
+        "canonical": true,
+        "relay_events": {
+          "target_seen": true,
+          "target_forwarded": true,
+          "upstream_response_received": true,
+          "response_withheld": false,
+          "response_forwarded": true
+        },
+        "cleanup": {
+          "phase": "control-relay",
+          "errors": [],
+          "child_event_log": "C:\\dev\\mneme\\validation\\cm01\\p0-cancellation\\evidence\\raw\\run1-control-relay-child-events.jsonl",
+          "child_exit_event": {
+            "seq": 11,
+            "ts": "2026-10-24T13:48:35.543Z",
+            "pid": 44408,
+            "type": "child_exit",
+            "code": 0,
+            "signal": null,
+            "upstream_pid": 62748,
+            "observed_by": "top_level"
+          },
+          "child_exit_observed": true,
+          "relay_pid": 44408,
+          "relay_alive_after": false,
+          "relay_exit_observed": true,
+          "upstream_pid": 62748,
+          "upstream_alive_after": false,
+          "upstream_exit_observed": true
+        }
+      }
+    },
+    {
+      "id": "RUN1-CONTROL-RELAY-RAW",
+      "pass": true,
+      "detail": {
+        "seen": 1,
+        "forwarded": 1,
+        "received": 1,
+        "delivered": 1,
+        "withheld": 0,
+        "child_exit": {
+          "seq": 11,
+          "ts": "2026-10-24T13:48:35.543Z",
+          "pid": 44408,
+          "type": "child_exit",
+          "code": 0,
+          "signal": null,
+          "upstream_pid": 62748,
+          "observed_by": "top_level"
+        }
+      }
+    },
+    {
+      "id": "RUN1-CONTROL-CHILD-RAW",
+      "pass": true,
+      "detail": {
+        "call_id": 2,
+        "responses": 1,
+        "exit": {
+          "seq": 9,
+          "ts": "2026-10-24T13:48:35.544Z",
+          "upstream_pid": 62748,
+          "type": "child_exit",
+          "code": 0,
+          "signal": null,
+          "observed_by": "top_level"
+        }
+      }
+    },
+    {
+      "id": "RUN1-FAULT-WITHHELD",
+      "pass": true,
+      "detail": {
+        "withheld": true,
+        "event": {
+          "seq": 8,
+          "ts": "2026-10-24T13:49:08.141Z",
+          "pid": 41944,
+          "type": "response_withheld",
+          "requestId": 2
+        },
+        "request_id": 2
+      }
+    },
+    {
+      "id": "RUN1-FAULT-TIMEOUT",
+      "pass": true,
+      "detail": {
+        "error": "Code execution failed: execution exceeded 1500ms",
+        "stats": {
+          "hostCalls": 1,
+          "resolvedCalls": 0,
+          "failedCalls": 0,
+          "rejectedCalls": 1,
+          "timedOut": true,
+          "interrupted": true,
+          "pendingAtEnd": 0,
+          "deferredDisposed": 1,
+          "cleanupErrors": []
+        }
+      }
+    },
+    {
+      "id": "RUN1-FAULT-PENDING",
+      "pass": true,
+      "detail": {
+        "at_timeout": {
+          "seq": 1,
+          "name": "decision.get",
+          "args": {
+            "record_id": "ADR-9901"
+          },
+          "request_id": 2,
+          "started_at": "2026-10-24T13:49:08.130Z",
+          "pending": true,
+          "outcome": null,
+          "settled_at": null,
+          "error": null,
+          "adapter_error": null
+        },
+        "observation": {
+          "window_ms": 1500,
+          "reason": "window_elapsed",
+          "event": null,
+          "elapsed_ms": 1514,
+          "client_after_window": {
+            "seq": 1,
+            "name": "decision.get",
+            "args": {
+              "record_id": "ADR-9901"
+            },
+            "request_id": 2,
+            "started_at": "2026-10-24T13:49:08.130Z",
+            "pending": true,
+            "outcome": null,
+            "settled_at": null,
+            "error": null,
+            "adapter_error": null
+          },
+          "pending_after_window": true
+        }
+      }
+    },
+    {
+      "id": "RUN1-FAULT-NO-CANCELLATION",
+      "pass": true,
+      "detail": {
+        "sent": 0,
+        "relay_observed": 0
+      }
+    },
+    {
+      "id": "RUN1-FAULT-LATE-SETTLEMENT",
+      "pass": true,
+      "detail": {
+        "late": {
+          "window_ms": 3000,
+          "settled": true,
+          "outcome": "fulfilled",
+          "error": null,
+          "elapsed_ms": 0,
+          "client_after_late": {
+            "seq": 1,
+            "name": "decision.get",
+            "args": {
+              "record_id": "ADR-9901"
+            },
+            "request_id": 2,
+            "started_at": "2026-10-24T13:49:08.130Z",
+            "pending": false,
+            "outcome": "fulfilled",
+            "settled_at": "2026-10-24T13:49:11.155Z",
+            "error": null,
+            "adapter_error": null
+          },
+          "delivered_response_observed": true,
+          "executor_stats_before_timeout": {
+            "hostCalls": 1,
+            "resolvedCalls": 0,
+            "failedCalls": 0,
+            "rejectedCalls": 1,
+            "timedOut": true,
+            "interrupted": true,
+            "pendingAtEnd": 0,
+            "deferredDisposed": 1,
+            "cleanupErrors": []
+          },
+          "executor_stats_after_late": {
+            "hostCalls": 1,
+            "resolvedCalls": 1,
+            "failedCalls": 0,
+            "rejectedCalls": 1,
+            "timedOut": true,
+            "interrupted": true,
+            "pendingAtEnd": 0,
+            "deferredDisposed": 1,
+            "cleanupErrors": []
+          },
+          "executor_resolved_calls_delta": 1
+        },
+        "classification": {
+          "genuine_upstream_request": true,
+          "timeout_error_returned": true,
+          "timeout_error": "Code execution failed: execution exceeded 1500ms",
+          "cancellation_notifications_sent": 0,
+          "cancellation_observed_by_relay": 0,
+          "pending_immediately_after_timeout": true,
+          "pending_after_observation_window": true,
+          "observation_end_reason": "window_elapsed",
+          "late_response_settled_request": true,
+          "required_harness_release_to_settle": true,
+          "transport_open_after_timeout": true,
+          "client_closed_after_timeout": false,
+          "relay_upstream_alive_at_observation": true,
+          "direct_response_delivered_after_release": true
+        }
+      }
+    },
+    {
+      "id": "RUN1-FAULT-CLEANUP",
+      "pass": true,
+      "detail": {
+        "phase": "fault",
+        "errors": [],
+        "child_event_log": "C:\\dev\\mneme\\validation\\cm01\\p0-cancellation\\evidence\\raw\\run1-fault-child-events.jsonl",
+        "child_exit_event": {
+          "seq": 12,
+          "ts": "2026-10-24T13:49:11.491Z",
+          "pid": 41944,
+          "type": "child_exit",
+          "code": 0,
+          "signal": null,
+          "upstream_pid": 49592,
+          "observed_by": "top_level"
+        },
+        "child_exit_observed": true,
+        "relay_pid": 41944,
+        "relay_alive_after": false,
+        "relay_exit_observed": true,
+        "upstream_pid": 49592,
+        "upstream_alive_after": false,
+        "upstream_exit_observed": true
+      }
+    },
+    {
+      "id": "RUN1-FAULT-RELAY-RAW",
+      "pass": true,
+      "detail": {
+        "counts": {
+          "seen": 1,
+          "forwarded": 1,
+          "received": 1,
+          "withheld": 1,
+          "status": 1,
+          "released": 1,
+          "exit": 1
+        },
+        "order": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          11
+        ],
+        "withheld_before_timeout": true,
+        "released_after_window": true,
+        "status": {
+          "seq": 9,
+          "ts": "2026-10-24T13:49:11.153Z",
+          "pid": 41944,
+          "type": "status",
+          "child_alive": true,
+          "upstream_pid": 49592,
+          "target_request_id": 2,
+          "target_request_forwarded": true,
+          "upstream_response_received": true,
+          "held_request_id": 2,
+          "mode": "withhold",
+          "cancellation_events": [],
+          "requested_at": "2026-10-24T13:49:11.152Z"
+        },
+        "exit": {
+          "seq": 12,
+          "ts": "2026-10-24T13:49:11.491Z",
+          "pid": 41944,
+          "type": "child_exit",
+          "code": 0,
+          "signal": null,
+          "upstream_pid": 49592,
+          "observed_by": "top_level"
+        }
+      }
+    },
+    {
+      "id": "RUN1-FAULT-CHILD-RAW",
+      "pass": true,
+      "detail": {
+        "call_id": 2,
+        "response_lines": 1,
+        "response_ts": "2026-10-24T13:49:08.140Z",
+        "withheld_ts": "2026-10-24T13:49:08.141Z",
+        "exit": {
+          "seq": 9,
+          "ts": "2026-10-24T13:49:11.492Z",
+          "upstream_pid": 49592,
+          "type": "child_exit",
+          "code": 0,
+          "signal": null,
+          "observed_by": "top_level"
+        }
+      }
+    },
+    {
+      "id": "RUN1-FAULT-HARNESS-RAW",
+      "pass": true,
+      "detail": {
+        "call_sends": 1,
+        "response_receives": 1,
+        "response_ts": "2026-10-24T13:49:11.154Z",
+        "release_ts": "2026-10-24T13:49:11.154Z",
+        "executor_cleanup": {
+          "seq": 8,
+          "ts": "2026-10-24T13:49:09.637Z",
+          "type": "executor_cleanup",
+          "phase": "fault",
+          "at": "2026-10-24T13:49:09.637Z",
+          "client_call": {
+            "seq": 1,
+            "name": "decision.get",
+            "args": {
+              "record_id": "ADR-9901"
+            },
+            "request_id": 2,
+            "started_at": "2026-10-24T13:49:08.130Z",
+            "pending": true,
+            "outcome": null,
+            "settled_at": null,
+            "error": null,
+            "adapter_error": null
+          },
+          "note": "executor assigns lastStats after onCleanup, so stats are recorded from the execution outcome instead"
+        },
+        "timeout_ts": "2026-10-24T13:49:09.638Z"
+      }
+    },
+    {
+      "id": "RUN1-CLASSIFICATION",
+      "pass": true,
+      "detail": {
+        "derived": {
+          "genuine": true,
+          "timeoutReturned": true,
+          "pendingAtTimeout": true,
+          "pendingAtWindowEnd": true,
+          "lateSettled": true
+        },
+        "verdict": "FAIL",
+        "reason": "the underlying MCP client request was still pending when Code Mode returned its timeout error; the underlying MCP client request was still pending after a 1500ms bounded observation period; the withheld late response still fulfilled the abandoned MCP client request; no notifications/cancelled was emitted by the integration"
+      }
+    },
+    {
+      "id": "RUN1-RAW-FILES-PRESENT",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "RUN2-CONTROL-DIRECT",
+      "pass": true,
+      "detail": {
+        "ok": true,
+        "canonical": true,
+        "request_id": 2,
+        "cleanup": {
+          "phase": "control-direct",
+          "errors": [],
+          "client_pid": 7776,
+          "server_alive_after": false,
+          "server_exit_observed": true
+        }
+      }
+    },
+    {
+      "id": "RUN2-CONTROL-RELAY",
+      "pass": true,
+      "detail": {
+        "ok": true,
+        "canonical": true,
+        "relay_events": {
+          "target_seen": true,
+          "target_forwarded": true,
+          "upstream_response_received": true,
+          "response_withheld": false,
+          "response_forwarded": true
+        },
+        "cleanup": {
+          "phase": "control-relay",
+          "errors": [],
+          "child_event_log": "C:\\dev\\mneme\\validation\\cm01\\p0-cancellation\\evidence\\raw\\run2-control-relay-child-events.jsonl",
+          "child_exit_event": {
+            "seq": 11,
+            "ts": "2026-10-24T13:49:46.137Z",
+            "pid": 72148,
+            "type": "child_exit",
+            "code": 0,
+            "signal": null,
+            "upstream_pid": 11908,
+            "observed_by": "top_level"
+          },
+          "child_exit_observed": true,
+          "relay_pid": 72148,
+          "relay_alive_after": false,
+          "relay_exit_observed": true,
+          "upstream_pid": 11908,
+          "upstream_alive_after": false,
+          "upstream_exit_observed": true
+        }
+      }
+    },
+    {
+      "id": "RUN2-CONTROL-RELAY-RAW",
+      "pass": true,
+      "detail": {
+        "seen": 1,
+        "forwarded": 1,
+        "received": 1,
+        "delivered": 1,
+        "withheld": 0,
+        "child_exit": {
+          "seq": 11,
+          "ts": "2026-10-24T13:49:46.137Z",
+          "pid": 72148,
+          "type": "child_exit",
+          "code": 0,
+          "signal": null,
+          "upstream_pid": 11908,
+          "observed_by": "top_level"
+        }
+      }
+    },
+    {
+      "id": "RUN2-CONTROL-CHILD-RAW",
+      "pass": true,
+      "detail": {
+        "call_id": 2,
+        "responses": 1,
+        "exit": {
+          "seq": 9,
+          "ts": "2026-10-24T13:49:46.138Z",
+          "upstream_pid": 11908,
+          "type": "child_exit",
+          "code": 0,
+          "signal": null,
+          "observed_by": "top_level"
+        }
+      }
+    },
+    {
+      "id": "RUN2-FAULT-WITHHELD",
+      "pass": true,
+      "detail": {
+        "withheld": true,
+        "event": {
+          "seq": 8,
+          "ts": "2026-10-24T13:50:19.088Z",
+          "pid": 20856,
+          "type": "response_withheld",
+          "requestId": 2
+        },
+        "request_id": 2
+      }
+    },
+    {
+      "id": "RUN2-FAULT-TIMEOUT",
+      "pass": true,
+      "detail": {
+        "error": "Code execution failed: execution exceeded 1500ms",
+        "stats": {
+          "hostCalls": 1,
+          "resolvedCalls": 0,
+          "failedCalls": 0,
+          "rejectedCalls": 1,
+          "timedOut": true,
+          "interrupted": true,
+          "pendingAtEnd": 0,
+          "deferredDisposed": 1,
+          "cleanupErrors": []
+        }
+      }
+    },
+    {
+      "id": "RUN2-FAULT-PENDING",
+      "pass": true,
+      "detail": {
+        "at_timeout": {
+          "seq": 1,
+          "name": "decision.get",
+          "args": {
+            "record_id": "ADR-9901"
+          },
+          "request_id": 2,
+          "started_at": "2026-10-24T13:50:19.063Z",
+          "pending": true,
+          "outcome": null,
+          "settled_at": null,
+          "error": null,
+          "adapter_error": null
+        },
+        "observation": {
+          "window_ms": 1500,
+          "reason": "window_elapsed",
+          "event": null,
+          "elapsed_ms": 1516,
+          "client_after_window": {
+            "seq": 1,
+            "name": "decision.get",
+            "args": {
+              "record_id": "ADR-9901"
+            },
+            "request_id": 2,
+            "started_at": "2026-10-24T13:50:19.063Z",
+            "pending": true,
+            "outcome": null,
+            "settled_at": null,
+            "error": null,
+            "adapter_error": null
+          },
+          "pending_after_window": true
+        }
+      }
+    },
+    {
+      "id": "RUN2-FAULT-NO-CANCELLATION",
+      "pass": true,
+      "detail": {
+        "sent": 0,
+        "relay_observed": 0
+      }
+    },
+    {
+      "id": "RUN2-FAULT-LATE-SETTLEMENT",
+      "pass": true,
+      "detail": {
+        "late": {
+          "window_ms": 3000,
+          "settled": true,
+          "outcome": "fulfilled",
+          "error": null,
+          "elapsed_ms": 0,
+          "client_after_late": {
+            "seq": 1,
+            "name": "decision.get",
+            "args": {
+              "record_id": "ADR-9901"
+            },
+            "request_id": 2,
+            "started_at": "2026-10-24T13:50:19.063Z",
+            "pending": false,
+            "outcome": "fulfilled",
+            "settled_at": "2026-10-24T13:50:22.090Z",
+            "error": null,
+            "adapter_error": null
+          },
+          "delivered_response_observed": true,
+          "executor_stats_before_timeout": {
+            "hostCalls": 1,
+            "resolvedCalls": 0,
+            "failedCalls": 0,
+            "rejectedCalls": 1,
+            "timedOut": true,
+            "interrupted": true,
+            "pendingAtEnd": 0,
+            "deferredDisposed": 1,
+            "cleanupErrors": []
+          },
+          "executor_stats_after_late": {
+            "hostCalls": 1,
+            "resolvedCalls": 1,
+            "failedCalls": 0,
+            "rejectedCalls": 1,
+            "timedOut": true,
+            "interrupted": true,
+            "pendingAtEnd": 0,
+            "deferredDisposed": 1,
+            "cleanupErrors": []
+          },
+          "executor_resolved_calls_delta": 1
+        },
+        "classification": {
+          "genuine_upstream_request": true,
+          "timeout_error_returned": true,
+          "timeout_error": "Code execution failed: execution exceeded 1500ms",
+          "cancellation_notifications_sent": 0,
+          "cancellation_observed_by_relay": 0,
+          "pending_immediately_after_timeout": true,
+          "pending_after_observation_window": true,
+          "observation_end_reason": "window_elapsed",
+          "late_response_settled_request": true,
+          "required_harness_release_to_settle": true,
+          "transport_open_after_timeout": true,
+          "client_closed_after_timeout": false,
+          "relay_upstream_alive_at_observation": true,
+          "direct_response_delivered_after_release": true
+        }
+      }
+    },
+    {
+      "id": "RUN2-FAULT-CLEANUP",
+      "pass": true,
+      "detail": {
+        "phase": "fault",
+        "errors": [],
+        "child_event_log": "C:\\dev\\mneme\\validation\\cm01\\p0-cancellation\\evidence\\raw\\run2-fault-child-events.jsonl",
+        "child_exit_event": {
+          "seq": 12,
+          "ts": "2026-10-24T13:50:22.400Z",
+          "pid": 20856,
+          "type": "child_exit",
+          "code": 0,
+          "signal": null,
+          "upstream_pid": 53624,
+          "observed_by": "top_level"
+        },
+        "child_exit_observed": true,
+        "relay_pid": 20856,
+        "relay_alive_after": false,
+        "relay_exit_observed": true,
+        "upstream_pid": 53624,
+        "upstream_alive_after": false,
+        "upstream_exit_observed": true
+      }
+    },
+    {
+      "id": "RUN2-FAULT-RELAY-RAW",
+      "pass": true,
+      "detail": {
+        "counts": {
+          "seen": 1,
+          "forwarded": 1,
+          "received": 1,
+          "withheld": 1,
+          "status": 1,
+          "released": 1,
+          "exit": 1
+        },
+        "order": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          11
+        ],
+        "withheld_before_timeout": true,
+        "released_after_window": true,
+        "status": {
+          "seq": 9,
+          "ts": "2026-10-24T13:50:22.086Z",
+          "pid": 20856,
+          "type": "status",
+          "child_alive": true,
+          "upstream_pid": 53624,
+          "target_request_id": 2,
+          "target_request_forwarded": true,
+          "upstream_response_received": true,
+          "held_request_id": 2,
+          "mode": "withhold",
+          "cancellation_events": [],
+          "requested_at": "2026-10-24T13:50:22.086Z"
+        },
+        "exit": {
+          "seq": 12,
+          "ts": "2026-10-24T13:50:22.400Z",
+          "pid": 20856,
+          "type": "child_exit",
+          "code": 0,
+          "signal": null,
+          "upstream_pid": 53624,
+          "observed_by": "top_level"
+        }
+      }
+    },
+    {
+      "id": "RUN2-FAULT-CHILD-RAW",
+      "pass": true,
+      "detail": {
+        "call_id": 2,
+        "response_lines": 1,
+        "response_ts": "2026-10-24T13:50:19.085Z",
+        "withheld_ts": "2026-10-24T13:50:19.088Z",
+        "exit": {
+          "seq": 9,
+          "ts": "2026-10-24T13:50:22.401Z",
+          "upstream_pid": 53624,
+          "type": "child_exit",
+          "code": 0,
+          "signal": null,
+          "observed_by": "top_level"
+        }
+      }
+    },
+    {
+      "id": "RUN2-FAULT-HARNESS-RAW",
+      "pass": true,
+      "detail": {
+        "call_sends": 1,
+        "response_receives": 1,
+        "response_ts": "2026-10-24T13:50:22.089Z",
+        "release_ts": "2026-10-24T13:50:22.088Z",
+        "executor_cleanup": {
+          "seq": 8,
+          "ts": "2026-10-24T13:50:20.569Z",
+          "type": "executor_cleanup",
+          "phase": "fault",
+          "at": "2026-10-24T13:50:20.569Z",
+          "client_call": {
+            "seq": 1,
+            "name": "decision.get",
+            "args": {
+              "record_id": "ADR-9901"
+            },
+            "request_id": 2,
+            "started_at": "2026-10-24T13:50:19.063Z",
+            "pending": true,
+            "outcome": null,
+            "settled_at": null,
+            "error": null,
+            "adapter_error": null
+          },
+          "note": "executor assigns lastStats after onCleanup, so stats are recorded from the execution outcome instead"
+        },
+        "timeout_ts": "2026-10-24T13:50:20.570Z"
+      }
+    },
+    {
+      "id": "RUN2-CLASSIFICATION",
+      "pass": true,
+      "detail": {
+        "derived": {
+          "genuine": true,
+          "timeoutReturned": true,
+          "pendingAtTimeout": true,
+          "pendingAtWindowEnd": true,
+          "lateSettled": true
+        },
+        "verdict": "FAIL",
+        "reason": "the underlying MCP client request was still pending when Code Mode returned its timeout error; the underlying MCP client request was still pending after a 1500ms bounded observation period; the withheld late response still fulfilled the abandoned MCP client request; no notifications/cancelled was emitted by the integration"
+      }
+    },
+    {
+      "id": "RUN2-RAW-FILES-PRESENT",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "VERDICT-REPEATABLE",
+      "pass": true,
+      "detail": {
+        "recorded": true,
+        "derived": true
+      }
+    },
+    {
+      "id": "VERDICT-ACCEPTANCE",
+      "pass": true,
+      "detail": {
+        "recorded": {
+          "genuine_request_reached_server": true,
+          "code_mode_returned_timeout_not_success": true,
+          "integration_cancelled_or_terminated_within_window": false,
+          "no_request_pending_before_harness_cleanup": false,
+          "late_response_cannot_settle_request": false,
+          "reproducible_in_two_runs": true,
+          "no_protected_artifact_changed": true
+        },
+        "derived": {
+          "genuine_request_reached_server": true,
+          "code_mode_returned_timeout_not_success": true,
+          "integration_cancelled_or_terminated_within_window": false,
+          "no_request_pending_before_harness_cleanup": false,
+          "late_response_cannot_settle_request": false,
+          "reproducible_in_two_runs": true,
+          "no_protected_artifact_changed": true
+        }
+      }
+    },
+    {
+      "id": "VERDICT-FAILURE-CONDITIONS",
+      "pass": true,
+      "detail": {
+        "recorded": {
+          "request_pending_after_executor_timeout": true,
+          "request_pending_after_bounded_window": true,
+          "late_response_settled_request": true,
+          "harness_release_required_to_settle": true,
+          "cancellation_notification_emitted": false
+        },
+        "derived": {
+          "request_pending_after_executor_timeout": true,
+          "request_pending_after_bounded_window": true,
+          "late_response_settled_request": true,
+          "harness_release_required_to_settle": true,
+          "cancellation_notification_emitted": false
+        }
+      }
+    },
+    {
+      "id": "VERDICT-RUN-AGGREGATION",
+      "pass": true,
+      "detail": {
+        "recorded": [
+          {
+            "run": "run1",
+            "verdict": "FAIL",
+            "reason": "the underlying MCP client request was still pending when Code Mode returned its timeout error; the underlying MCP client request was still pending after a 1500ms bounded observation period; the withheld late response still fulfilled the abandoned MCP client request; no notifications/cancelled was emitted by the integration",
+            "controls_ok": true,
+            "fault_classification": {
+              "genuine_upstream_request": true,
+              "timeout_error_returned": true,
+              "timeout_error": "Code execution failed: execution exceeded 1500ms",
+              "cancellation_notifications_sent": 0,
+              "cancellation_observed_by_relay": 0,
+              "pending_immediately_after_timeout": true,
+              "pending_after_observation_window": true,
+              "observation_end_reason": "window_elapsed",
+              "late_response_settled_request": true,
+              "required_harness_release_to_settle": true,
+              "transport_open_after_timeout": true,
+              "client_closed_after_timeout": false,
+              "relay_upstream_alive_at_observation": true,
+              "direct_response_delivered_after_release": true
+            },
+            "client_request_id": 2,
+            "pending_after_timeout": true,
+            "pending_after_window": true,
+            "cancellation_notifications_sent": 0,
+            "late_response_settled_request": true,
+            "process_cleanup_ok": true
+          },
+          {
+            "run": "run2",
+            "verdict": "FAIL",
+            "reason": "the underlying MCP client request was still pending when Code Mode returned its timeout error; the underlying MCP client request was still pending after a 1500ms bounded observation period; the withheld late response still fulfilled the abandoned MCP client request; no notifications/cancelled was emitted by the integration",
+            "controls_ok": true,
+            "fault_classification": {
+              "genuine_upstream_request": true,
+              "timeout_error_returned": true,
+              "timeout_error": "Code execution failed: execution exceeded 1500ms",
+              "cancellation_notifications_sent": 0,
+              "cancellation_observed_by_relay": 0,
+              "pending_immediately_after_timeout": true,
+              "pending_after_observation_window": true,
+              "observation_end_reason": "window_elapsed",
+              "late_response_settled_request": true,
+              "required_harness_release_to_settle": true,
+              "transport_open_after_timeout": true,
+              "client_closed_after_timeout": false,
+              "relay_upstream_alive_at_observation": true,
+              "direct_response_delivered_after_release": true
+            },
+            "client_request_id": 2,
+            "pending_after_timeout": true,
+            "pending_after_window": true,
+            "cancellation_notifications_sent": 0,
+            "late_response_settled_request": true,
+            "process_cleanup_ok": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "BASELINE-PRESERVATION",
+      "pass": true,
+      "detail": {
+        "declared_baseline": "ddeb85eec8f7734edde1c921250592d51afedbee",
+        "head": "0d367fc61316e8af50161f6bc48b8dee1711c807",
+        "code_under_test_changed": [],
+        "drift_paths": [
+          "docs/validation/adr-034-m4-heldout-scoring-2026-10-24.md"
+        ]
+      }
+    },
+    {
+      "id": "IDENTITY-HASHES",
+      "pass": true,
+      "detail": {
+        "fixture": true,
+        "pre_migration": true,
+        "m4_fixture": true,
+        "executor": true,
+        "relay": true,
+        "runner": true,
+        "m4_guard": true,
+        "package_lock": true
+      }
+    },
+    {
+      "id": "BASELINE-BLOB-HASHES",
+      "pass": true,
+      "detail": {
+        "executor": true,
+        "fixture": true,
+        "pre_migration": true,
+        "m4_fixture": true,
+        "m4_guard": true
+      }
+    },
+    {
+      "id": "S1A-EVIDENCE-PRESERVATION",
+      "pass": true,
+      "detail": {
+        "digest": "cc7f884866e6e94255b100de57b82eec4a51660aadaf51c6464198131030af57",
+        "git_status": ""
+      }
+    },
+    {
+      "id": "M4-WORKTREE-PRESERVATION",
+      "pass": true,
+      "detail": {
+        "pass": true,
+        "violations": []
+      }
+    },
+    {
+      "id": "FIXTURES-UNCHANGED",
+      "pass": true,
+      "detail": {
+        "fixture": {
+          "path": "C:\\dev\\mneme\\validation\\cm01\\s1a-local\\m1\\fixture\\canonical\\project_memory.json",
+          "sha256": "8f73429e70e04a6876b965bb00a1777fc90409f9da2889c72dab9ac26b9621ea"
+        },
+        "pre_migration": {
+          "path": "C:\\dev\\mneme\\validation\\cm01\\s1a-local\\m1\\fixture\\pre_migration.json",
+          "sha256": "1923f12bdef0cec4a3c6bc56704e8e03f0d8531313574bff0ae010b5ce2a2a5c"
+        },
+        "m4_fixture": {
+          "path": "C:\\dev\\mneme\\validation\\cm01\\s1a-local\\m4\\fixture\\canonical\\project_memory.json",
+          "sha256": "b4d83d0cc0f70f442e2a62bd0e527220ae99b07cba1238e39d0ad8c5685d4e7f"
+        },
+        "executor": {
+          "path": "C:\\dev\\mneme\\validation\\cm01\\s1a-local\\e0\\quickjs-executor.mjs",
+          "sha256": "4b960124e9218ed124ed34e3b3595b648477b9dab6540c4ce1609d2efaf31313"
+        },
+        "relay": {
+          "path": "C:\\dev\\mneme\\validation\\cm01\\p0-cancellation\\relay.mjs",
+          "sha256": "e09e9b76c3b2e02b619a9339b7bb98c7c1abd8e358f785b1a08e518109adf9ad"
+        },
+        "runner": {
+          "path": "C:\\dev\\mneme\\validation\\cm01\\p0-cancellation\\run-cancellation.mjs",
+          "sha256": "87d0021d66e95153945265ea10413b6e7834a9eeb783639887e5dff253747133"
+        },
+        "m4_guard": {
+          "path": "C:\\dev\\mneme\\validation\\cm01\\s1a-local\\m4-guard.mjs",
+          "sha256": "7df06ddb301355d2a040e2a3d04e915f513f36177d640e40b5224b7ca9d128a6"
+        },
+        "package_lock": {
+          "path": "C:\\dev\\mneme\\validation\\cm01\\p0-cancellation\\package-lock.json",
+          "sha256": "bdf049f1e8ceeedf68d9fa9628dd00159a1be61d2219e59456af5832ac117ac9"
+        }
+      }
+    },
+    {
+      "id": "SOURCE-VERSIONS",
+      "pass": true,
+      "detail": {
+        "recorded": {
+          "node": "v24.13.1",
+          "npm": "11.8.0",
+          "codemode": "0.5.5",
+          "sdk": "1.32.2",
+          "ajv": "8.17.1",
+          "quickjs": "0.32.0",
+          "zod": "4.6.7",
+          "python": "3.12.10",
+          "mneme": "0.10.0",
+          "mcp": "2.2.0"
+        },
+        "current": {
+          "node": "v24.13.1",
+          "npm": "11.8.0",
+          "python": "3.12.10",
+          "mneme": "0.10.0",
+          "mcp": "2.2.0"
+        },
+        "pinned": {
+          "codemode": "0.5.5",
+          "sdk": "1.32.2",
+          "ajv": "8.17.1",
+          "quickjs": "0.32.0",
+          "zod": "4.6.7"
+        }
+      }
+    },
+    {
+      "id": "HARNESS-HASHES",
+      "pass": true,
+      "detail": {
+        "runner": "87d0021d66e95153945265ea10413b6e7834a9eeb783639887e5dff253747133",
+        "relay": "e09e9b76c3b2e02b619a9339b7bb98c7c1abd8e358f785b1a08e518109adf9ad"
+      }
+    },
+    {
+      "id": "CANONICAL-FILES-EXIST",
+      "pass": true,
+      "detail": [
+        "verdict.json",
+        "run1.json",
+        "run2.json",
+        "versions.json"
+      ]
+    },
+    {
+      "id": "CANONICAL-EVIDENCE-UNCHANGED",
+      "pass": true,
+      "detail": {
+        "before": {
+          "verdict.json": "0917f33f66f9d92e6b639767b89c44af8c40cca9ab03c0e7fa3cb6d0ddabf46a",
+          "run1.json": "cd9360b21d8f6321dcb7c840b43bf1286ec841de055298a50ba7664900300492",
+          "run2.json": "49da740026fd2e8cc79c9cd8ef964bfa453e3fd49bfc9ae15a771df84b9cd826",
+          "versions.json": "e8003a2a05ea5620b57635c24aa93e7ca5c69de3c574561a4626c6d0a0f8ae57"
+        },
+        "after": {
+          "verdict.json": "0917f33f66f9d92e6b639767b89c44af8c40cca9ab03c0e7fa3cb6d0ddabf46a",
+          "run1.json": "cd9360b21d8f6321dcb7c840b43bf1286ec841de055298a50ba7664900300492",
+          "run2.json": "49da740026fd2e8cc79c9cd8ef964bfa453e3fd49bfc9ae15a771df84b9cd826",
+          "versions.json": "e8003a2a05ea5620b57635c24aa93e7ca5c69de3c574561a4626c6d0a0f8ae57"
+        }
+      }
+    }
+  ],
+  "reproduction": {
+    "performed": true,
+    "temp_worktree": "C:\\Users\\hi\\AppData\\Local\\Temp\\opencode\\cm01-p0-verify-1792850955537",
+    "head": "0d367fc61316e8af50161f6bc48b8dee1711c807",
+    "steps": [
+      {
+        "step": "worktree_add",
+        "ok": true
+      },
+      {
+        "step": "copy_harness",
+        "ok": true,
+        "files": [
+          "run-cancellation.mjs",
+          "relay.mjs",
+          "package.json",
+          "package-lock.json",
+          ".gitignore",
+          ".gitattributes"
+        ]
+      },
+      {
+        "step": "npm_ci_s1a",
+        "ok": true
+      },
+      {
+        "step": "npm_ci_p0",
+        "ok": true
+      },
+      {
+        "step": "run",
+        "ok": true,
+        "status": 1
+      }
+    ],
+    "checks": [
+      {
+        "id": "REPRO-SIGNATURE-MATCH",
+        "pass": true,
+        "detail": {
+          "canonical": {
+            "verdict": "FAIL",
+            "repeatable": true,
+            "acceptance_criteria": {
+              "genuine_request_reached_server": true,
+              "code_mode_returned_timeout_not_success": true,
+              "integration_cancelled_or_terminated_within_window": false,
+              "no_request_pending_before_harness_cleanup": false,
+              "late_response_cannot_settle_request": false,
+              "reproducible_in_two_runs": true,
+              "no_protected_artifact_changed": true
+            },
+            "failure_conditions_observed": {
+              "request_pending_after_executor_timeout": true,
+              "request_pending_after_bounded_window": true,
+              "late_response_settled_request": true,
+              "harness_release_required_to_settle": true,
+              "cancellation_notification_emitted": false
+            },
+            "run_signatures": [
+              {
+                "verdict": "FAIL",
+                "genuine": true,
+                "timeout_error_returned": true,
+                "pending_at_timeout": true,
+                "pending_after_window": true,
+                "observation_end_reason": "window_elapsed",
+                "cancellation_notifications_sent": 0,
+                "late_response_settled_request": true,
+                "request_id_is_number": true,
+                "adapter_call_count": 1
+              },
+              {
+                "verdict": "FAIL",
+                "genuine": true,
+                "timeout_error_returned": true,
+                "pending_at_timeout": true,
+                "pending_after_window": true,
+                "observation_end_reason": "window_elapsed",
+                "cancellation_notifications_sent": 0,
+                "late_response_settled_request": true,
+                "request_id_is_number": true,
+                "adapter_call_count": 1
+              }
+            ],
+            "process_cleanup": [
+              true,
+              true
+            ]
+          },
+          "reproduced": {
+            "verdict": "FAIL",
+            "repeatable": true,
+            "acceptance_criteria": {
+              "genuine_request_reached_server": true,
+              "code_mode_returned_timeout_not_success": true,
+              "integration_cancelled_or_terminated_within_window": false,
+              "no_request_pending_before_harness_cleanup": false,
+              "late_response_cannot_settle_request": false,
+              "reproducible_in_two_runs": true,
+              "no_protected_artifact_changed": true
+            },
+            "failure_conditions_observed": {
+              "request_pending_after_executor_timeout": true,
+              "request_pending_after_bounded_window": true,
+              "late_response_settled_request": true,
+              "harness_release_required_to_settle": true,
+              "cancellation_notification_emitted": false
+            },
+            "run_signatures": [
+              {
+                "verdict": "FAIL",
+                "genuine": true,
+                "timeout_error_returned": true,
+                "pending_at_timeout": true,
+                "pending_after_window": true,
+                "observation_end_reason": "window_elapsed",
+                "cancellation_notifications_sent": 0,
+                "late_response_settled_request": true,
+                "request_id_is_number": true,
+                "adapter_call_count": 1
+              },
+              {
+                "verdict": "FAIL",
+                "genuine": true,
+                "timeout_error_returned": true,
+                "pending_at_timeout": true,
+                "pending_after_window": true,
+                "observation_end_reason": "window_elapsed",
+                "cancellation_notifications_sent": 0,
+                "late_response_settled_request": true,
+                "request_id_is_number": true,
+                "adapter_call_count": 1
+              }
+            ],
+            "process_cleanup": [
+              true,
+              true
+            ]
+          }
+        }
+      },
+      {
+        "id": "REPRO-EXIT-CODE",
+        "pass": true,
+        "detail": {
+          "exit_code": 1
+        }
+      },
+      {
+        "id": "REPRO-NO-MUTATION",
+        "pass": true,
+        "detail": {
+          "no_mutation": true
+        }
+      }
+    ],
+    "exit_code": 1,
+    "stdout_tail": [
+      "    \"process_cleanup_ok\": true",
+      "  }",
+      "]"
+    ],
+    "stderr_tail": [],
+    "verdict": "FAIL",
+    "reason": "the underlying MCP client request was still pending when Code Mode returned its timeout error; the underlying MCP client request was still pending after a 1500ms bounded observation period; the withheld late response still fulfilled the abandoned MCP client request; no notifications/cancelled was emitted by the integration",
+    "signature": {
+      "verdict": "FAIL",
+      "repeatable": true,
+      "acceptance_criteria": {
+        "genuine_request_reached_server": true,
+        "code_mode_returned_timeout_not_success": true,
+        "integration_cancelled_or_terminated_within_window": false,
+        "no_request_pending_before_harness_cleanup": false,
+        "late_response_cannot_settle_request": false,
+        "reproducible_in_two_runs": true,
+        "no_protected_artifact_changed": true
+      },
+      "failure_conditions_observed": {
+        "request_pending_after_executor_timeout": true,
+        "request_pending_after_bounded_window": true,
+        "late_response_settled_request": true,
+        "harness_release_required_to_settle": true,
+        "cancellation_notification_emitted": false
+      },
+      "run_signatures": [
+        {
+          "verdict": "FAIL",
+          "genuine": true,
+          "timeout_error_returned": true,
+          "pending_at_timeout": true,
+          "pending_after_window": true,
+          "observation_end_reason": "window_elapsed",
+          "cancellation_notifications_sent": 0,
+          "late_response_settled_request": true,
+          "request_id_is_number": true,
+          "adapter_call_count": 1
+        },
+        {
+          "verdict": "FAIL",
+          "genuine": true,
+          "timeout_error_returned": true,
+          "pending_at_timeout": true,
+          "pending_after_window": true,
+          "observation_end_reason": "window_elapsed",
+          "cancellation_notifications_sent": 0,
+          "late_response_settled_request": true,
+          "request_id_is_number": true,
+          "adapter_call_count": 1
+        }
+      ],
+      "process_cleanup": [
+        true,
+        true
+      ]
+    },
+    "cleaned_worktree": true
+  },
+  "summary": {
+    "total_checks": 46,
+    "failed_checks": [],
+    "reproduced": true,
+    "classification_changed": false
+  }
+}

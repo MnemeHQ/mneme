@@ -43,6 +43,7 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Literal
 
+from mneme.decision_index import lifecycle_governs
 from mneme.decision_retriever import ScoredDecision
 from mneme.enforcer import (
     ArchitectureProtectionReport,
@@ -121,6 +122,27 @@ def load_decisions(memory_path: str | Path) -> list[Decision]:
     return store.decisions()
 
 
+def load_governed_decisions(memory_path: str | Path) -> list[Decision]:
+    """``protect list`` loading (DG1F-C3a, freeze amendment #775).
+
+    Same validation and error message as :func:`load_decisions`, but the
+    result is the resolver-governed set
+    (``decision_governance.governed_runtime_decisions``). The resolver runs
+    outside the ``try`` so its errors are never wrapped as ``ProtectionError``.
+    :func:`load_decisions` is unchanged for status/validate/activate.
+    """
+    from mneme.decision_governance import governed_runtime_decisions
+
+    store = MemoryStore(memory_path)
+    try:
+        store.load()
+    except Exception as exc:
+        raise ProtectionError(
+            f"memory file {memory_path} failed validation: {exc}"
+        ) from exc
+    return governed_runtime_decisions(store)
+
+
 def find_decision(decisions: list[Decision], decision_id: str) -> Decision | None:
     """Return the first decision with the given id, or ``None``."""
     return next((d for d in decisions if d.id == decision_id), None)
@@ -167,7 +189,7 @@ def find_candidates(
         by_id.setdefault(decision.id, decision)
     candidates: list[ProtectionCandidate] = []
     for item in report.decisions:
-        if item.status != "active" or item.protection_tier != "mneme_ready":
+        if not lifecycle_governs(item.status) or item.protection_tier != "mneme_ready":
             continue
         decision = by_id.get(item.id)
         if decision is None:
@@ -209,7 +231,7 @@ def activation_precheck(
     """Classify activation eligibility exclusively from frozen semantics."""
     assessment = assess_protection(decision, repo_root=repo_root)
     tier = assessment.protection_tier
-    if decision.status != "active":
+    if not lifecycle_governs(decision.status):
         return Precheck(
             decision_id=decision.id,
             tier=tier,

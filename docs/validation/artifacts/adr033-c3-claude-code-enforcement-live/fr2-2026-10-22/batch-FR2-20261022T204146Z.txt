@@ -1,0 +1,22 @@
+batch=FR2 reps=2 mode=--recheck harness_head=b3f1e7fad6b98a76c28068f7d9be0638f10cf892
+P-1 Write 1 headless PASS
+P-1 Write 2 headless PASS
+P-1 Edit 1 headless PASS
+P-1 Edit 2 headless PASS
+D-1 Write 1 headless PASS
+D-1 Write 2 headless PASS
+D-1 Edit 1 headless PASS
+D-1 Edit 2 headless PASS
+D-2 Write 1 headless EVIDENCE_INCOMPLETE
+D-2 Write 2 headless EVIDENCE_INCOMPLETE
+D-2 Edit 1 headless EVIDENCE_INCOMPLETE
+D-2 Edit 2 headless EVIDENCE_INCOMPLETE
+PAIR D-2/P-1 Write 1 PAIR_MISMATCH
+PAIR D-2/P-1 Write 2 PAIR_MISMATCH
+PAIR D-2/P-1 Edit 1 PAIR_MISMATCH
+PAIR D-2/P-1 Edit 2 PAIR_MISMATCH
+PAIR D-2/D-1 Write 1 PAIR_MISMATCH
+PAIR D-2/D-1 Write 2 PAIR_MISMATCH
+PAIR D-2/D-1 Edit 1 PAIR_MISMATCH
+PAIR D-2/D-1 Edit 2 PAIR_MISMATCH
+BATCH_INCOMPLETE FR2: 4 probe(s) EVIDENCE_INCOMPLETE; add the missing evidence, then run: run_c3_batch.sh FR2 2 --recheck

@@ -1,0 +1,25 @@
+{
+  "tag": "07-pre-restore",
+  "archived": false,
+  "main": "9137c93b66c2b8534f2222f125378b6761f6aae3",
+  "ruleset_enforcement": "active",
+  "ruleset_updated_at": "2026-10-26T17:05:35.994-05:00",
+  "bypass_actors": [],
+  "required_checks": [
+    {
+      "context": "CI1 trusted gate",
+      "integration_id": 15368
+    }
+  ],
+  "policy_enforcement": "active",
+  "policy_updated_at": "2026-10-17T14:39:01.705-05:00",
+  "variables": {
+    "MNEME_CI_AVAILABILITY": "open"
+  },
+  "repo_sha256": "b410e7fc80432a8c",
+  "ruleset_sha256": "fb239be15d0a0593",
+  "policy_sha256": "44dc1848e312ce99",
+  "variables_sha256": "3438da5a5646f04a",
+  "actions-permissions_sha256": "0bffee97e4ad5267",
+  "main_sha256": "90ec26461a7383cb"
+}

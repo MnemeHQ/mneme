@@ -1,0 +1,5 @@
+import psycopg2
+
+
+def handler():
+    return 1

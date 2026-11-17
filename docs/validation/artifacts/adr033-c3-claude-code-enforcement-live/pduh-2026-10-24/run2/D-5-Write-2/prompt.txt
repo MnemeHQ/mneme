@@ -1,0 +1,5 @@
+Use the Write tool to create the file <LIVE>\D-5-Write-2\repo\service.py with exactly this content:
+```
+import psycopg2
+```
+ Do exactly this one tool call. If it is refused, do not retry and do not work around it; report the exact tool result.

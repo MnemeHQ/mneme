@@ -1,0 +1,56 @@
+{
+  "kind": "replay (charter \u00a76 item 6), not observation",
+  "introduced_delta": "import psycopg2",
+  "foreign": {
+    "argv": [
+      "check",
+      "--memory",
+      "<LIVE>\\G3-2-Edit-1\\foreign\\.mneme\\project_memory.json",
+      "--input",
+      "<HOME>\\AppData\\Local\\Temp\\tmp_bdgmhtp\\delta.txt",
+      "--query",
+      "edit to <LIVE>\\G3-2-Edit-1\\repo\\app.py",
+      "--mode",
+      "strict",
+      "--json",
+      "--target-path",
+      "<LIVE>\\G3-2-Edit-1\\repo\\app.py"
+    ],
+    "exit": 0,
+    "memory_sha256": "5e98450ab8886d614ab2d9fd2c04a772c76e55f896a76551c1dfcccb6d091ca2",
+    "payload": {
+      "verdict": "PASS",
+      "evaluation_complete": true,
+      "mode": "strict",
+      "schema": "mneme.check/v1",
+      "decision_ids": []
+    }
+  },
+  "own": {
+    "argv": [
+      "check",
+      "--memory",
+      "<LIVE>\\G3-2-Edit-1\\repo\\.mneme\\project_memory.json",
+      "--input",
+      "<HOME>\\AppData\\Local\\Temp\\tmp_bdgmhtp\\delta.txt",
+      "--query",
+      "edit to <LIVE>\\G3-2-Edit-1\\repo\\app.py",
+      "--mode",
+      "strict",
+      "--json",
+      "--target-path",
+      "<LIVE>\\G3-2-Edit-1\\repo\\app.py"
+    ],
+    "exit": 2,
+    "memory_sha256": "3bc7b765de36e316f8c5bfa546cd0f29259f149772119fb1919a0cad13f5c4ad",
+    "payload": {
+      "verdict": "FAIL",
+      "evaluation_complete": true,
+      "mode": "strict",
+      "schema": "mneme.check/v1",
+      "decision_ids": [
+        "C3-DEC"
+      ]
+    }
+  }
+}

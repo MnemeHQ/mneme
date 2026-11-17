@@ -1,0 +1,3 @@
+{"ts":"2026-10-25T00:24:16.489Z","type":"host_call_started","callId":1,"provider":"codemode","method":"slow_echo"}
+{"ts":"2026-10-25T00:24:16.644Z","type":"host_call_aborted","callId":1,"provider":"codemode","method":"slow_echo","abortedAt":1792887856643,"reason":"Error: Code Mode execution exceeded 150ms"}
+{"ts":"2026-10-25T00:24:16.645Z","type":"host_call_settled_after_abort","callId":1,"provider":"codemode","method":"slow_echo","outcome":"rejected","errorName":"McpError","errorMessage":"MCP error -32001: Error: Code Mode execution exceeded 150ms","afterAbortMs":2}

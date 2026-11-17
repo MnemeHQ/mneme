@@ -1,0 +1,3 @@
+api.anthropic.com
+mcp-proxy.anthropic.com
+# 2 other host(s) observed, not published

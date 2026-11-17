@@ -3,6 +3,19 @@
 **Date:** 2026-10-17
 **Status:** **ACCEPTED as the D6 precedence definition (P2) only** (owner approval, 2026-10-17, following an independent-review ACCEPT on `972712c9`). Architecture assessment, docs only. Acceptance does not authorize implementation, tests, experiments, C5/C6, ADR or Layer 1 freeze amendments, ADR-033 changes, or changes to C1–C4 evidence, pins or worktrees.
 **Revision 2 (2026-10-17):** answers the #538 review. It narrows P2's guarantee to correct boundary resolution and start points (§5, §8), ties rule 2 to D5 §5.4 with an added override constraint (§5, §7), and adds §5.4 to the implementation prerequisites (§10). The P2 rule itself is unchanged.
+**Amendment A1 (PROPOSED, 2026-11-16):** pointer only, reviewed together with the shared charter's [Amendment A2](2026-10-17-t08-d5-p2-memory-resolution-charter.md) (§5.2 there, P2-first). For the P2-first phase only, that amendment would make two changes.
+
+**It would relax, to reporting level R-ii:**
+- the reporting clauses of §5 rule 1 ("host-visible channel") and rule 3 ("reported host-visibly. Never a silent skip");
+- the "visible notice" mitigation in §6;
+- §10's "same host-visible channel as D5 §5.1" prerequisite.
+
+**It would depart from §10's "share one implementation charter … land together"** by landing precedence before the stop rule.
+
+It would also treat an unreadable but existing override as selected, with today's load-failure path, rather than as rule 3's `NO_MEMORY_SELECTED` (charter A2-3).
+
+The P2 rule itself (rules 1, 2 and 4, and rule 3's classification of a missing override) and the D5 row of §10 are unchanged. Phase 2 restores every relaxed reporting clause, and rule 3's classification of an unreadable override (charter §3.3 row 7, "missing or unreadable"). The departure from "land together" cannot be undone.
+
 **Source anchor:** `MnemeHQ/mneme` `main` at `28211f8b`, read-only.
 **Inputs:**
 - [D5 repository-boundary contract](2026-10-17-dg1f-t08-d5-repository-boundary-contract.md) (ACCEPTED, definition only);

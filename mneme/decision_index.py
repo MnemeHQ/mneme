@@ -76,6 +76,25 @@ VALID_LIFECYCLE_STATUSES: frozenset[str] = frozenset({
     "inactive",
 })
 
+# DG1F-C2 (charter docs/plans/2026-11-08-dg1f-c2-lifecycle-convergence-charter.md
+# §3.1; Layer 1 freeze amendment #767): the single lifecycle authority. Only
+# these lifecycle statuses govern. Projection, the DG1 resolver and the runtime
+# lifecycle checks (Audit aggregation, protection, CI evidence matching) all
+# read this one definition through ``lifecycle_governs``. This is predicate
+# sharing, not consumption of the resolver result.
+GOVERNING_LIFECYCLE_STATUSES: frozenset[str] = frozenset({"active"})
+
+
+def lifecycle_governs(status: str) -> bool:
+    """Whether a decision with this lifecycle status governs (ADR-023 §6).
+
+    The one lifecycle rule for canonical lifecycle and runtime
+    ``Decision.status`` alike. Section-less legacy memory supplies its own
+    status values; ``mneme check`` enforcement does not consult this
+    predicate (DG1F-C2 charter §3.3).
+    """
+    return status in GOVERNING_LIFECYCLE_STATUSES
+
 # D0-validated source types. The ADR adapter may claim ``"adr"`` because the
 # compiler path verified its sources. The generic runtime adapter records
 # ``"runtime"``: the runtime ``Decision`` shape does not carry enough
@@ -229,16 +248,48 @@ class CanonicalDecisionRecord:
 
 
 @dataclass(frozen=True)
+class CanonicalWaiverRecord:
+    """One persisted canonical waiver (DG1B2a, ADR-031 §12).
+
+    Charter docs/plans/2026-11-10-dg1b2-waiver-charter.md §3.1. A waiver is
+    its own canonical object: it targets an exact decision version, is scoped
+    by non-empty required labels and optionally by an RFC 3339 UTC window,
+    and never mutates the decision it targets. Only the explicit authority
+    operations write it. ``valid_from`` / ``valid_until`` / ``revoked_by`` /
+    ``revocation_reference`` / ``revocation_reason`` are empty when absent.
+    """
+
+    waiver_id: str
+    target_decision_id: str
+    target_decision_version_id: str
+    required_labels: tuple[str, ...]
+    requester: str
+    approver: str
+    approval_reference: str
+    reason: str
+    status: str
+    created_at: str
+    valid_from: str = ""
+    valid_until: str = ""
+    revoked_by: str = ""
+    revocation_reference: str = ""
+    revocation_reason: str = ""
+
+
+@dataclass(frozen=True)
 class CanonicalArchitectureIndex:
     """D0 canonical Decision Index contents for the architecture class.
 
     A flat, ordered pair of decision records and derived rule records.
     Records appear in adapter input order; rules appear grouped by owning
-    decision, in derived order. This is an in-memory view, not storage.
+    decision, in derived order. ``waivers`` (DG1B2a) are sorted by
+    ``waiver_id`` and empty unless the persisted v2 document declares
+    ``decision_waivers``. This is an in-memory view, not storage.
     """
 
     records: tuple[CanonicalDecisionRecord, ...] = ()
     rules: tuple[CanonicalRuleRecord, ...] = ()
+    waivers: tuple[CanonicalWaiverRecord, ...] = ()
 
     def rules_for_decision(self, decision_id: str) -> tuple[CanonicalRuleRecord, ...]:
         """Return the rules whose ``decision_id`` matches, in derived order."""

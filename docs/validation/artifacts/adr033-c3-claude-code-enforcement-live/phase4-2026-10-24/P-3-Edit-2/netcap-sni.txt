@@ -1,0 +1,2 @@
+api.github.com
+# 0 other host(s) observed, not published

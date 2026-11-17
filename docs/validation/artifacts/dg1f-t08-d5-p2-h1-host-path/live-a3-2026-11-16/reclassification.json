@@ -1,0 +1,174 @@
+{
+  "rules": "as-run table + R1-R6 (#551, #561, #796, #805)",
+  "a1_rules": "A1 (#555) on as-run table + R1-R6 (#551, #561, #796, #805)",
+  "pins": {
+    "claude_version": "2.1.310 (Claude Code)",
+    "model": "claude-opus-5-5"
+  },
+  "tool_sha256": {
+    "reclassify_a3.py": "e1fcd7d9c62e1333f4230a5336811c3833de89737423a4964611e5eea01506e4",
+    "classify_h1.py": "f6b96240ff8eaaa3f2cab7e4ac750484c12f39f9ca8cae6dd4034d304816b2f9",
+    "classify_a1.py": "d8056c6bc03e832cefd99bcd176d6c9da60a5539000e2971b44c5782cc16ff73",
+    "reclassify_a2.py (helpers)": "79dca960293e599dacac2c7a06961a700dcf250795450d0475e63d2803a55a0f",
+    "collect_a3.py (selection)": "a8e4c2e5954b9c1c0f280639cd1ed2c80e65ee3bd48705553efd158e637ca6aa"
+  },
+  "integrity": {
+    "archive_files_listed": 56,
+    "archive_sums_sha256": "17c73d1ac2c16eafc5fe1048d55d096c46b50748623691e145d476661249f74f",
+    "manifest_raw_files_checked": 13,
+    "problems": []
+  },
+  "headless": {
+    "label_as_run": "INCONCLUSIVE",
+    "label_r1r6_raw": "NOT_DELIVERED",
+    "label_r1r6_subset": "INCONCLUSIVE",
+    "raw_and_subset_agree": false,
+    "reasons_r1r6_raw": [],
+    "reasons_r1r6_subset": [
+      "unexplained host-event difference between arms (emitter ['informational'], control [])"
+    ],
+    "r6_excluded": {
+      "arm": "emitter",
+      "event_index": 3,
+      "subtype": "informational"
+    },
+    "host_interference": [],
+    "changes_from_as_run": {
+      "top_level_keys": [
+        "a1",
+        "host_events",
+        "label",
+        "reasons",
+        "rules",
+        "side_effect_observed"
+      ],
+      "nonce_location_categories": [],
+      "location_set_unchanged": true
+    }
+  },
+  "interactive": {
+    "label": "DELIVERED_TO_USER_ONLY",
+    "reclassified": false,
+    "note": "Unchanged as-run outcome (R6 does not touch the interactive classifier). It is not an accepted protocol-compliant pass until the screenshot evidence decision (#804 section 2.1)."
+  },
+  "combined": {
+    "label_as_run": "INCONCLUSIVE",
+    "label_r1r6": "DELIVERED_TO_USER_ONLY",
+    "reasons": [],
+    "host_version": "2.1.310 (Claude Code)",
+    "h1c_passes_under_a1": true,
+    "note": "As classified. Counts as an accepted H1c pass only if the screenshot evidence decision accepts the interactive capture. The H1 gate is a separate record."
+  },
+  "completeness": {
+    "H1c-sm": {
+      "nonces_scanned": 1,
+      "entries": {
+        "events": {
+          "whole": 1,
+          "trimmed": 4,
+          "dropped": 0,
+          "by_type": {
+            "system:init:trimmed": 1,
+            "assistant:None:trimmed": 2,
+            "system:informational:whole": 1,
+            "result:success:trimmed": 1
+          }
+        },
+        "transcript": {
+          "whole": 0,
+          "trimmed": 5,
+          "dropped": 24,
+          "by_type": {
+            "queue-operation:None:dropped": 2,
+            "user:None:trimmed": 1,
+            "attachment:environment:dropped": 1,
+            "attachment:model:dropped": 1,
+            "attachment:deferred_tools_delta:dropped": 1,
+            "attachment:agent_listing_delta:dropped": 1,
+            "attachment:skill_listing:dropped": 1,
+            "atis-latch:None:dropped": 3,
+            "attachment:session_context:dropped": 1,
+            "attachment:date:dropped": 1,
+            "attachment:remote_session_change:dropped": 1,
+            "attachment:prompt_snapshot:dropped": 2,
+            "api-request-shape:None:dropped": 1,
+            "api-request-blob:None:dropped": 2,
+            "api-request:None:dropped": 1,
+            "last-prompt:None:dropped": 3,
+            "assistant:None:trimmed": 2,
+            "attachment:hook_success:trimmed": 1,
+            "attachment:hook_system_message:trimmed": 1,
+            "system:stop_hook_summary:dropped": 1,
+            "cost-state:None:dropped": 1
+          }
+        }
+      },
+      "omitted_hits": [],
+      "hits_total": 0,
+      "stderr": {
+        "bytes": 192,
+        "lines": 1,
+        "nonce_occurrences": 0
+      }
+    },
+    "H1c-sm-ctl": {
+      "nonces_scanned": 2,
+      "entries": {
+        "events": {
+          "whole": 0,
+          "trimmed": 3,
+          "dropped": 0,
+          "by_type": {
+            "system:init:trimmed": 1,
+            "assistant:None:trimmed": 1,
+            "result:success:trimmed": 1
+          }
+        },
+        "transcript": {
+          "whole": 0,
+          "trimmed": 2,
+          "dropped": 24,
+          "by_type": {
+            "queue-operation:None:dropped": 2,
+            "user:None:trimmed": 1,
+            "attachment:environment:dropped": 1,
+            "attachment:model:dropped": 1,
+            "attachment:deferred_tools_delta:dropped": 1,
+            "attachment:agent_listing_delta:dropped": 1,
+            "attachment:skill_listing:dropped": 1,
+            "atis-latch:None:dropped": 3,
+            "attachment:session_context:dropped": 1,
+            "attachment:date:dropped": 1,
+            "attachment:remote_session_change:dropped": 1,
+            "attachment:prompt_snapshot:dropped": 2,
+            "api-request-shape:None:dropped": 1,
+            "api-request-blob:None:dropped": 2,
+            "api-request:None:dropped": 1,
+            "last-prompt:None:dropped": 3,
+            "assistant:None:trimmed": 1,
+            "system:stop_hook_summary:dropped": 1,
+            "cost-state:None:dropped": 1
+          }
+        }
+      },
+      "omitted_hits": [],
+      "hits_total": 0,
+      "stderr": {
+        "bytes": 192,
+        "lines": 1,
+        "nonce_occurrences": 0
+      }
+    }
+  },
+  "omitted_material_nonce_hits": 0,
+  "status": "COMPLETE",
+  "publication": {
+    "rule": "With any omitted nonce hit the outcome files are withheld (PENDING_REVIEW).",
+    "outcome_files_published": true
+  },
+  "subset_note": "Subset replay is supporting only; it is not an independent reproduction.",
+  "integrity_after": {
+    "problems": [],
+    "archive_sums_unchanged": true
+  }
+}

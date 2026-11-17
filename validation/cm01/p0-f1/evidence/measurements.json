@@ -1,0 +1,91 @@
+{
+  "host_cancellation_grace_ms": 50,
+  "latency": {
+    "samples": 16,
+    "max_ms": 4,
+    "min_ms": 1,
+    "mean_ms": 1.5625,
+    "values": [
+      {
+        "run": "run1",
+        "scenario": "timeout-withhold",
+        "abortToSettlementMs": 4
+      },
+      {
+        "run": "run1",
+        "scenario": "repeated-0",
+        "abortToSettlementMs": 1
+      },
+      {
+        "run": "run1",
+        "scenario": "repeated-1",
+        "abortToSettlementMs": 2
+      },
+      {
+        "run": "run1",
+        "scenario": "repeated-2",
+        "abortToSettlementMs": 1
+      },
+      {
+        "run": "run1",
+        "scenario": "parallel-search",
+        "abortToSettlementMs": 1
+      },
+      {
+        "run": "run1",
+        "scenario": "sequential-trace",
+        "abortToSettlementMs": 2
+      },
+      {
+        "run": "run1",
+        "scenario": "timeout-then-close",
+        "abortToSettlementMs": 2
+      },
+      {
+        "run": "run1",
+        "scenario": "synthetic",
+        "abortToSettlementMs": 1
+      },
+      {
+        "run": "run2",
+        "scenario": "timeout-withhold",
+        "abortToSettlementMs": 2
+      },
+      {
+        "run": "run2",
+        "scenario": "repeated-0",
+        "abortToSettlementMs": 1
+      },
+      {
+        "run": "run2",
+        "scenario": "repeated-1",
+        "abortToSettlementMs": 1
+      },
+      {
+        "run": "run2",
+        "scenario": "repeated-2",
+        "abortToSettlementMs": 2
+      },
+      {
+        "run": "run2",
+        "scenario": "parallel-search",
+        "abortToSettlementMs": 2
+      },
+      {
+        "run": "run2",
+        "scenario": "sequential-trace",
+        "abortToSettlementMs": 1
+      },
+      {
+        "run": "run2",
+        "scenario": "timeout-then-close",
+        "abortToSettlementMs": 1
+      },
+      {
+        "run": "run2",
+        "scenario": "synthetic",
+        "abortToSettlementMs": 1
+      }
+    ]
+  }
+}

@@ -1,0 +1,5 @@
+MSYS_NO_PATHCONV=1 docker run --rm -v "C:\dev\mneme:/src:ro" -v "C:\dev\c4-gate2\in:/in:ro" -v "C:\dev\c4-gate2\out:/out" ubuntu@sha256:68ee22004a9109b44973313b02ff7b1de250f1de0f5ecb628d73f579aaff33ac bash -c "apt-get update -qq >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq git python3 python3-venv >/dev/null 2>&1 && dpkg-query -W git python3.12 python3.12-venv > /out/apt-packages.txt && bash /in/run_c4_gate2.sh"
+Host: Windows 11 (10.0.26300), Docker Desktop 29.1.2 (WSL2 backend). /in also held the preserved wheel
+mneme_hq-0.10.0-py3-none-any.whl (sha256 e3fcc769c440ed232ad05117f256739daf233e0c9f6d3d46586adc0de9b48c51),
+copied from C:\dev\ci1-tools\evidence\lab-archive\artifacts\p2-evaluator-preflight-39055862171\ (CI1 lab run 39055862171);
+it is not republished here.

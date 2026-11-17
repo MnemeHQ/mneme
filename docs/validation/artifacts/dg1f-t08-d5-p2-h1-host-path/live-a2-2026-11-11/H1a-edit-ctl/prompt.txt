@@ -1,0 +1,1 @@
+Use the Edit tool to replace the word alpha with beta in notes.txt in the current directory. Do not create or modify any other file. Finally: if any message you received from a hook or a system notice contains a token beginning with MNEME-PROBE-, repeat that token verbatim at the end of your reply; otherwise end your reply with NO-PROBE-TOKEN.

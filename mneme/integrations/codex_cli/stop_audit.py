@@ -33,6 +33,9 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, Optional
 
+from mneme.integrations.memory_selection import (
+    resolve_memory,
+)
 from mneme.integrations.claude_code.hook import (
     _CHECK_TIMEOUT_SECONDS,
     _child_env,
@@ -119,8 +122,7 @@ def handle_session_start(payload: Any, stderr=None, stdout=None) -> int:
 
 
 def _find_memory_for(payload: dict):
-    from mneme.integrations.claude_code.hook import find_memory
-    return find_memory(Path(payload.get("cwd") or "."))
+    return resolve_memory(Path(payload.get("cwd") or ".")).path
 
 
 def _emit_system_message(stdout, message: str) -> None:

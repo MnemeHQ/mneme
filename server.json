@@ -8,19 +8,19 @@
     "url": "https://github.com/MnemeHQ/mneme",
     "source": "github"
   },
-  "version": "0.10.0",
+  "version": "0.11.0",
   "packages": [
     {
       "registryType": "pypi",
       "registryBaseUrl": "https://pypi.org",
       "identifier": "mneme-hq",
-      "version": "0.10.0",
+      "version": "0.11.0",
       "runtimeHint": "uvx",
       "runtimeArguments": [
         {
           "type": "named",
           "name": "--from",
-          "value": "mneme-hq[mcp]==0.10.0"
+          "value": "mneme-hq[mcp]==0.11.0"
         }
       ],
       "transport": {

@@ -1,9 +1,16 @@
 """Classify H1 (Claude Code) host-output-path probes per the accepted probe scope (#545).
 
 usage:
-  classify_h1.py pair    <live_dir> <path_id> <pin_model>   -> writes <path_id>/out/outcome.json, prints label
-  classify_h1.py verify  <live_dir>                          -> exit 1 unless all four outcomes exist
-  classify_h1.py summary <live_dir> <summary.md>
+  classify_h1.py pair    <live_dir> <path_id> <pin_model> [<pin_version>]
+                                                             -> writes <path_id>/out/outcome.json, prints label
+  With <pin_version>, each arm's observer claude_version must equal it (else
+  NOT_EXECUTED). run_h1.sh passes it under Amendment A2.
+  classify_h1.py verify  <live_dir> [paths]                  -> exit 1 unless every selected outcome exists
+  classify_h1.py summary <live_dir> <summary.md> [paths]
+  [paths] is a comma-separated subset of the path ids below (default: all four).
+  Only an all-four summary carries the H1 gate line; a subset summary (Amendment
+  A2) carries a listed-path result that says it is not the H1 gate. Either is
+  PASS only when every selected outcome records the same host version (A2-1).
 
 Path ids and their path type (scope section 3.1):
   H1a-edit   command hook, tool event       (PreToolUse, Edit matcher)
@@ -24,7 +31,10 @@ the table does not recognise is `unclassified`; it never counts as delivery.
 Rules R1-R3 (accepted in docs/plans/2026-10-17-dg1f-t08-d5-p2-h1-classifier-rules.md,
 #551) are implemented in categorise() (R1, R2) and host_events() (R3). Rule R4
 (accepted in docs/plans/2026-10-19-dg1f-t08-d5-p2-a1-hook-system-message-rule.md,
-#561) is implemented in categorise().
+#561) is implemented in categorise(). Rule R5 (accepted in
+docs/plans/2026-11-11-dg1f-t08-d5-p2-a2-r5-host-record-rule.md, #796/#797) is
+implemented in r5_anchors() and categorise(): category host_record, tied to
+tool-attributed anchors A1-A6.
 Extending the table is a reviewed change, and because raw evidence is kept,
 the classifier can be re-run on existing evidence without a new probe.
 """
@@ -41,7 +51,7 @@ PATHS = {
     "H1b-start": {"path_type": "command_lifecycle_event", "event": "SessionStart", "tool": None},
     "H1c-stop": {"path_type": "command_lifecycle_event", "event": "Stop", "tool": None},
 }
-RULES_ID = "as-run table + R1-R4 (#551, #561)"  # recorded in every outcome
+RULES_ID = "as-run table + R1-R6 (#551, #561, #796, #805)"  # recorded in every outcome
 PASSING = ("DELIVERED_TO_AGENT", "DELIVERED_TO_USER_ONLY", "EVIDENCE_REUSED")
 EDIT_EXPECTED = b"beta\n"
 BASH_FILE, BASH_EXPECTED = "bash_out.txt", b"probe-ran\n"  # exact bytes, not a prefix
@@ -214,15 +224,63 @@ INDICATOR_KEYS = ("decision", "permissionDecision", "permission_decision", "bloc
                   "retry", "continue", "stopReason", "stop_reason")
 
 
-def host_events(arm, nonce):
+# R6 (#805, accepted rule only; implemented here): the exact field set of the host's
+# stream echo of a Stop hook's top-level systemMessage, as observed on Claude Code
+# 2.1.310 (A3, #804). Any other field set is compared (S1).
+R6_FIELDS = frozenset({"type", "subtype", "content", "level", "session_id", "uuid"})
+R6_PREFIX = "Stop says: "
+
+
+def r6_stop_echo(arm, spec, emitter):
+    """Index into arm["events"] of the ONE event R6 leaves out of the subtype comparison,
+    or None. Every condition must hold; anything else keeps the event compared.
+
+    S1 shape: type system, subtype informational, level notice, field set exactly R6_FIELDS.
+    S2 path and arm: the path's event is Stop, and this is the emitter arm.
+    S3 attribution: exactly one Stop hook record, stop_hook_active false, whose emitted
+       text is a JSON object with a string systemMessage S.
+    S4 derivation: content == "Stop says: " + S exactly.
+    S5 uniqueness: exactly one event meets S1 and S4.
+    S6 position: after the last assistant event and before the first result event."""
+    if not emitter or spec.get("event") != "Stop":                                   # S2
+        return None
+    stops = hook_calls(arm, "Stop")
+    if len(stops) != 1 or (stops[0].get("envelope") or {}).get("stop_hook_active") is not False:  # S3
+        return None
+    try:
+        emitted = json.loads(stops[0].get("emitted") or "")
+    except ValueError:
+        return None
+    if not isinstance(emitted, dict) or not isinstance(emitted.get("systemMessage"), str):
+        return None
+    want = R6_PREFIX + emitted["systemMessage"]
+    events = [e for _, e in arm["events"]]
+    hits = [i for i, e in enumerate(events)
+            if e.get("type") == "system" and e.get("subtype") == "informational"
+            and e.get("level") == "notice" and set(e) == R6_FIELDS                   # S1
+            and e.get("content") == want]                                            # S4
+    if len(hits) != 1:                                                               # S5
+        return None
+    i = hits[0]
+    assistants = [j for j, e in enumerate(events) if e.get("type") == "assistant"]
+    results = [j for j, e in enumerate(events) if e.get("type") == "result"]
+    if not assistants or not results or not (assistants[-1] < i < results[0]):        # S6
+        return None
+    return i
+
+
+def host_events(arm, nonce, spec=None, emitter=False):
     """Every stream-json `system` event except init, NONCE OR NOT (strict rule).
-    Returns (sorted subtypes, {(subtype, indicator key): sorted masked values})."""
+    Returns (sorted subtypes, {(subtype, indicator key): sorted masked values}, R6 index).
+    R3 leaves thinking_tokens out of the subtype comparison; R6 leaves out at most one
+    event (r6_stop_echo). The indicator scan still covers every event, excluded or not."""
     subs, indicators = [], {}
-    for _, e in arm["events"]:
+    r6 = r6_stop_echo(arm, spec or {}, emitter)
+    for idx, (_, e) in enumerate(arm["events"]):
         if e.get("type") != "system" or e.get("subtype") == "init":
             continue
         sub = str(e.get("subtype"))
-        if sub not in EXCLUDED_FROM_SUBTYPE_COMPARISON:
+        if sub not in EXCLUDED_FROM_SUBTYPE_COMPARISON and idx != r6:
             subs.append(sub)
         stack = [e]
         while stack:
@@ -234,7 +292,7 @@ def host_events(arm, nonce):
                     stack.append(v)
             elif isinstance(o, list):
                 stack.extend(o)
-    return sorted(subs), {k: sorted(v) for k, v in indicators.items()}
+    return sorted(subs), {k: sorted(v) for k, v in indicators.items()}, r6
 
 
 def hook_calls(arm, event):
@@ -260,7 +318,101 @@ def walk(obj, path=""):
         yield path, obj
 
 
-def categorise(source, entry, path, probed_event=None, invoked_events=()):
+R5_CONTEXT = " hook additional context: "
+_R5_BLOB_TEXT = re.compile(r"message\.content\[(\d+)\]\.text")
+# R5a covers ONLY a nonce at rendered[i].content; any other path under `rendered`
+# (for example rendered[0].metadata) stays unclassified (review of #798).
+_R5_RENDERED_CONTENT = re.compile(r"rendered\[\d+\]\.content")
+
+
+def expected_label(event, tool):
+    """R5's L: the probed event, plus ':<tool>' on a tool path."""
+    return f"{event}:{tool}" if tool else event
+
+
+def r5_wrap(label, content):
+    """The exact host rendering R5a accepts for one hook_additional_context item."""
+    return f"<system-reminder>\n{label}{R5_CONTEXT}{content}\n</system-reminder>"
+
+
+def r5_anchors(arm, nonce, event, tool):
+    """Tool-attributed anchors (R5, A1-A6), as {transcript line: content items}.
+
+    An anchor is a transcript hook_additional_context attachment that meets R1's
+    conditions and names the expected tool:
+      A1 hookEvent is the probed event;
+      A2 this arm's emitter emitted the nonce for that event (hook-log.jsonl);
+      A3 the nonce is in attachment.content;
+      A4 hookName equals the expected label exactly;
+      A5 (tool path) toolUseID is the id of this arm's tool_use for the expected tool;
+      A6 (tool path) the emitting hook-log envelope names that event AND tool.
+    R1 itself is unchanged: an R1 entry that is not an anchor stays model_bound under
+    R1, but R5 never classifies a record against it."""
+    if not nonce or event is None:
+        return {}
+    label = expected_label(event, tool)
+    emitted = [h for h in arm["hooks"] if nonce in (h.get("emitted") or "")
+               and (h.get("envelope") or {}).get("hook_event_name") == event]           # A2
+    if tool:
+        emitted = [h for h in emitted if (h.get("envelope") or {}).get("tool_name") == tool]  # A6
+    if not emitted:
+        return {}
+    tool_ids = set()
+    if tool:
+        for _, e in arm["transcript"]:
+            if e.get("type") == "assistant":
+                for c in content_items(e):
+                    if c.get("type") == "tool_use" and c.get("name") == tool and c.get("id"):
+                        tool_ids.add(c["id"])
+    anchors = {}
+    for line_no, e in arm["transcript"]:
+        att = e.get("attachment") or {}
+        if e.get("type") != "attachment" or att.get("type") != "hook_additional_context":
+            continue
+        content = att.get("content")
+        if not isinstance(content, list) or not all(isinstance(c, str) for c in content):
+            continue
+        if (att.get("hookEvent") == event                                   # A1
+                and any(nonce in c for c in content)                         # A3
+                and att.get("hookName") == label                             # A4
+                and (not tool or att.get("toolUseID") in tool_ids)):         # A5
+            anchors[line_no] = list(content)
+    return anchors
+
+
+def _r5a_rendered(entry, line_no, r5):
+    """R5a: the anchor's own rendered copy, renderedRole system, exact wrapping."""
+    if not r5:
+        return False
+    label, anchors, _ = r5
+    content = anchors.get(line_no)
+    rendered = entry.get("rendered")
+    return (content is not None and entry.get("renderedRole") == "system"
+            and isinstance(rendered, list) and len(rendered) == len(content)
+            and all(isinstance(r, dict) and r.get("content") == r5_wrap(label, c)
+                    for r, c in zip(rendered, content)))
+
+
+def _r5b_blob(entry, path, r5):
+    """R5b: role system, an anchor exists, and every nonce line is an exact anchor line."""
+    if not r5:
+        return False
+    label, anchors, nonce = r5
+    m = _R5_BLOB_TEXT.fullmatch(path)
+    msg = entry.get("message") or {}
+    items = msg.get("content")
+    if not (m and anchors and msg.get("role") == "system" and isinstance(items, list)):
+        return False
+    j = int(m.group(1))
+    text = items[j].get("text") if j < len(items) and isinstance(items[j], dict) else None
+    if not isinstance(text, str):
+        return False
+    allowed = {f"{label}{R5_CONTEXT}{c}" for cs in anchors.values() for c in cs}
+    lines = [ln for ln in text.split("\n") if nonce in ln]
+    return bool(lines) and all(ln in allowed for ln in lines)
+
+
+def categorise(source, entry, path, probed_event=None, invoked_events=(), line_no=None, r5=None):
     """CATEGORY RULES. Return one of:
     model_bound    text the host placed in the model's input (user-role text, or a tool_result),
                    or (R1) a transcript `hook_additional_context` attachment for the probed
@@ -272,12 +424,23 @@ def categorise(source, entry, path, probed_event=None, invoked_events=()):
                    or (R4) a transcript `hook_system_message` attachment for the probed
                    event that the emitter invoked, with the token in `attachment.content`
                    (never delivery to the agent or the developer)
+    host_record    (R5) the host's own record of content an anchor carries: (R5a) the
+                   anchor's `rendered[i].content` when renderedRole is system and it equals
+                   r5_wrap(L, content[i]) exactly; (R5b) an `api-request-blob` text with
+                   role system whose every nonce line is exactly "L hook additional
+                   context: C" for an anchor item C. Recorded; never delivery, never
+                   sufficient alone, never masking (R1 still decides delivery)
     unclassified   anything else (never counted as delivery)
     """
     t = entry.get("type")
+    if source == "transcript" and t == "api-request-blob":  # R5b
+        return "host_record" if _r5b_blob(entry, path, r5) else "unclassified"
     if source == "transcript" and t == "attachment":
         att = entry.get("attachment") or {}
         kind = att.get("type")
+        if kind == "hook_additional_context" and path.startswith("rendered"):  # R5a
+            ok = bool(_R5_RENDERED_CONTENT.fullmatch(path)) and _r5a_rendered(entry, line_no, r5)
+            return "host_record" if ok else "unclassified"
         # R1 and R4 share the same three narrow conditions.
         narrow = (probed_event is not None and att.get("hookEvent") == probed_event
                   and probed_event in invoked_events
@@ -300,13 +463,16 @@ def categorise(source, entry, path, probed_event=None, invoked_events=()):
     return "unclassified"
 
 
-def nonce_locations(arm, nonce, probed_event=None):
+def nonce_locations(arm, nonce, probed_event=None, probed_tool=None):
     locs = []
     if not nonce:
         return locs
     # R1 condition (2): events for which this arm's emitter actually emitted the nonce.
     invoked = {(h.get("envelope") or {}).get("hook_event_name") for h in arm["hooks"]
                if nonce in (h.get("emitted") or "")}
+    # R5: tool-attributed anchors for the probed event and tool (A1-A6).
+    r5 = (expected_label(probed_event, probed_tool), r5_anchors(arm, nonce, probed_event, probed_tool),
+          nonce) if probed_event is not None else None
     for source in ("events", "transcript"):
         for line_no, entry in arm[source]:
             for path, s in walk(entry):
@@ -314,7 +480,8 @@ def nonce_locations(arm, nonce, probed_event=None):
                     locs.append({
                         "source": source, "line": line_no, "entry_type": entry.get("type"),
                         "entry_subtype": entry.get("subtype"), "json_path": path,
-                        "category": categorise(source, entry, path, probed_event, invoked),
+                        "category": categorise(source, entry, path, probed_event, invoked,
+                                               line_no=line_no, r5=r5),
                     })
     return locs
 
@@ -362,7 +529,7 @@ def path_control(arm, spec):
 # ---------------------------------------------------------------- classification
 
 
-def classify(emit, ctl, path_id, pin_model):
+def classify(emit, ctl, path_id, pin_model, pin_version=None):
     spec = PATHS[path_id]
     reasons = []
     # The rule-set id is set at creation so every outcome, including early
@@ -384,6 +551,11 @@ def classify(emit, ctl, path_id, pin_model):
             reasons.append(f"{name}: no init event (no session record)")
         elif ie.get("model") != pin_model:
             reasons.append(f"{name}: init model {ie.get('model')!r} != pinned {pin_model!r}")
+        # Host version pin, when the caller passes one (Amendment A2 always does):
+        # the observer records the version checked just before the session.
+        if pin_version is not None and arm["observer"].get("claude_version") != pin_version:
+            reasons.append(f"{name}: claude_version {arm['observer'].get('claude_version')!r} "
+                           f"!= pinned {pin_version!r}")
         if result_event(arm) is None:
             reasons.append(f"{name}: no result event")
     if reasons:
@@ -402,8 +574,8 @@ def classify(emit, ctl, path_id, pin_model):
         return done("NOT_EXECUTED")
 
     # Evidence.
-    locs = nonce_locations(emit, emit["nonce"], spec["event"])
-    ctl_locs = nonce_locations(ctl, emit["nonce"], spec["event"])
+    locs = nonce_locations(emit, emit["nonce"], spec["event"], spec["tool"])
+    ctl_locs = nonce_locations(ctl, emit["nonce"], spec["event"], spec["tool"])
     cats = {l["category"] for l in locs}
     rec["nonce_locations"] = locs
     rec["transcript_collected"] = emit["transcript_collected"]
@@ -419,8 +591,8 @@ def classify(emit, ctl, path_id, pin_model):
     rec["permissions"] = {"emitter": perm_e and {"unmatched_denials": perm_e["unmatched_denials"]},
                           "control": perm_c and {"unmatched_denials": perm_c["unmatched_denials"]},
                           "comparison": perm_cmp}
-    subs_e, ind_e = host_events(emit, nonce)
-    subs_c, ind_c = host_events(ctl, nonce)
+    subs_e, ind_e, r6_e = host_events(emit, nonce, spec, emitter=True)
+    subs_c, ind_c, r6_c = host_events(ctl, nonce, spec, emitter=False)
     ind_shared = sorted(set(ind_e) & set(ind_c))
     ind_mismatch = [{"event_subtype": k[0], "field": k[1], "emitter": ind_e[k], "control": ind_c[k]}
                     for k in ind_shared if ind_e[k] != ind_c[k]]
@@ -428,7 +600,12 @@ def classify(emit, ctl, path_id, pin_model):
     rec["host_events"] = {"emitter_subtypes": subs_e, "control_subtypes": subs_c,
                           "indicators": {"emitter": {f"{a}.{b}": v for (a, b), v in ind_e.items()},
                                          "control": {f"{a}.{b}": v for (a, b), v in ind_c.items()},
-                                         "mismatched": ind_mismatch}}
+                                         "mismatched": ind_mismatch},
+                          # R6 (#805): the emitter-arm Stop systemMessage stream echo left out
+                          # of the subtype comparison (still scanned for indicators), if any.
+                          "r6_excluded": None if r6_e is None else {
+                              "arm": "emitter", "event_index": r6_e,
+                              "subtype": str(emit["events"][r6_e][1].get("subtype"))}}
     common = {
         # Only decisions for EQUIVALENT requests are attributed to the host; requests
         # one arm made alone are model-chosen and only recorded (review of #546).
@@ -485,53 +662,97 @@ def classify(emit, ctl, path_id, pin_model):
     return done("NOT_DELIVERED")
 
 
-def cmd_pair(live, path_id, pin_model):
+def cmd_pair(live, path_id, pin_model, pin_version=None):
     if path_id not in PATHS:
         print(f"unknown path id {path_id!r}", file=sys.stderr)
         return 2
     emit = load_arm(Path(live) / path_id / "out")
     ctl = load_arm(Path(live) / f"{path_id}-ctl" / "out")
-    rec = classify(emit, ctl, path_id, pin_model)
-    rec["observer"] = {k: emit["observer"].get(k) for k in ("claude_version", "selftest", "date")}
+    rec = classify(emit, ctl, path_id, pin_model, pin_version)
+    rec["observer"] = {k: emit["observer"].get(k)
+                       for k in ("claude_version", "pinset", "model_flag", "selftest", "date")}
     (Path(live) / path_id / "out" / "outcome.json").write_text(json.dumps(rec, indent=2), encoding="utf-8")
     print(rec["label"])
     return 0
 
 
-def cmd_verify(live):
-    bad = [p for p in PATHS if not (Path(live) / p / "out" / "outcome.json").is_file()]
+def selected_paths(csv=None):
+    """The batch's paths, in PATHS order. None means every H1 path.
+
+    A batch may cover a subset (Amendment A2: H1a and H1b only). An unknown,
+    duplicate or empty selection is refused rather than guessed."""
+    if csv is None:
+        return list(PATHS)
+    names = [n for n in csv.split(",") if n]
+    if not names or len(set(names)) != len(names) or any(n not in PATHS for n in names):
+        raise ValueError(f"bad path selection {csv!r}; known paths: {', '.join(PATHS)}")
+    return [p for p in PATHS if p in names]
+
+
+def host_pin_problem(outcomes):
+    """None when every outcome records the same non-empty host version, else the reason.
+
+    A gate or listed-path result may only combine paths probed on one pinned host
+    (probe scope 4.3, A2-1). Outcomes copied together from batches on different
+    versions, or an outcome with no recorded version, never yield PASS."""
+    versions = {p: (r.get("observer") or {}).get("claude_version") for p, r in outcomes.items()}
+    unrecorded = sorted(p for p, v in versions.items() if not v)
+    if unrecorded:
+        return f"no recorded claude_version for {', '.join(unrecorded)}"
+    distinct = sorted(set(versions.values()))
+    if len(distinct) > 1:
+        return "mixed host versions: " + "; ".join(
+            f"{v} ({', '.join(p for p in outcomes if versions[p] == v)})" for v in distinct)
+    return None
+
+
+def cmd_verify(live, csv=None):
+    bad = [p for p in selected_paths(csv) if not (Path(live) / p / "out" / "outcome.json").is_file()]
     for p in bad:
         print(f"missing outcome: {p}", file=sys.stderr)
     return 1 if bad else 0
 
 
-def cmd_summary(live, dst):
-    rows = ["| Path | Path type | Label | Passes | Audience | Echoed | Reasons |", "|---|---|---|---|---|---|---|"]
-    for p in PATHS:
-        r = json.loads((Path(live) / p / "out" / "outcome.json").read_text(encoding="utf-8"))
+def cmd_summary(live, dst, csv=None):
+    paths = selected_paths(csv)
+    outcomes = {p: json.loads((Path(live) / p / "out" / "outcome.json").read_text(encoding="utf-8")) for p in paths}
+    rows = ["| Path | Path type | Label | Passes | Audience | Echoed | Host | Reasons |",
+            "|---|---|---|---|---|---|---|---|"]
+    for p, r in outcomes.items():
         audience = "agent" if r["label"] == "DELIVERED_TO_AGENT" else "none recorded"
+        host = (r.get("observer") or {}).get("claude_version")
         rows.append(f"| {p} | {r['path_type']} | {r['label']} | {r['passes_path']} | {audience} | "
-                    f"{r.get('echoed')} | {'; '.join(r.get('reasons') or []) or '-'} |")
-    gate = all(json.loads((Path(live) / p / "out" / "outcome.json").read_text(encoding="utf-8"))["passes_path"]
-               for p in PATHS)
-    selftest = any(json.loads((Path(live) / p / "out" / "outcome.json").read_text(encoding="utf-8"))
-                   .get("observer", {}).get("selftest") for p in PATHS)
+                    f"{r.get('echoed')} | {host} | {'; '.join(r.get('reasons') or []) or '-'} |")
+    pin_problem = host_pin_problem(outcomes)
+    passes = all(r["passes_path"] for r in outcomes.values()) and pin_problem is None
+    selftest = any((r.get("observer") or {}).get("selftest") for r in outcomes.values())
     banner = "**SELF-TEST (stub `claude`, not Claude Code): NOT live evidence.**\n\n" if selftest else ""
-    text = "# H1 Claude Code host-output-path probe summary\n\n" + banner + "\n".join(rows) + \
-        f"\n\nH1 gate (every path passes): **{'PASS' if gate else 'NOT MET'}**\n" + \
-        "\nOnly the gate line above decides H1. `H1_DONE` means only that the batch finished " \
-        "and every outcome was written; it never means H1 passed.\n"
+    pin_note = f"\n**Host pin not established:** {pin_problem}. A result needs every path on one recorded " \
+        "host version (probe scope §4.3, A2-1), so it cannot be PASS.\n" if pin_problem else ""
+    if paths == list(PATHS):
+        result = f"H1 gate (every path passes, one host version): **{'PASS' if passes else 'NOT MET'}**\n" + \
+            pin_note + \
+            "\nOnly the gate line above decides H1. `H1_DONE` means only that the batch finished " \
+            "and every outcome was written; it never means H1 passed.\n"
+    else:
+        missing = ", ".join(p for p in PATHS if p not in paths)
+        result = f"Listed-path result (every listed path passes, one host version): " \
+            f"**{'PASS' if passes else 'NOT MET'}**\n" + pin_note + \
+            f"\nThis batch covers only the listed paths, so this is **not** the H1 gate. H1 also needs " \
+            f"{missing}, which this batch did not probe. `H1_DONE` means only that the batch finished " \
+            "and every listed outcome was written; it never means a path passed.\n"
+    text = "# H1 Claude Code host-output-path probe summary\n\n" + banner + "\n".join(rows) + "\n\n" + result
     (Path(live) / dst).write_text(text, encoding="utf-8")
     return 0
 
 
 if __name__ == "__main__":
     a = sys.argv[1:]
-    if len(a) == 4 and a[0] == "pair":
-        sys.exit(cmd_pair(a[1], a[2], a[3]))
-    if len(a) == 2 and a[0] == "verify":
-        sys.exit(cmd_verify(a[1]))
-    if len(a) == 3 and a[0] == "summary":
-        sys.exit(cmd_summary(a[1], a[2]))
+    if len(a) in (4, 5) and a[0] == "pair":
+        sys.exit(cmd_pair(*a[1:]))
+    if len(a) in (2, 3) and a[0] == "verify":
+        sys.exit(cmd_verify(*a[1:]))
+    if len(a) in (3, 4) and a[0] == "summary":
+        sys.exit(cmd_summary(*a[1:]))
     print(__doc__, file=sys.stderr)
     sys.exit(2)

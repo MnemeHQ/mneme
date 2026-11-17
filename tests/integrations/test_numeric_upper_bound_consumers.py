@@ -24,6 +24,7 @@ from __future__ import annotations
 import copy
 import io
 import json
+import os
 import subprocess
 from pathlib import Path
 
@@ -106,6 +107,12 @@ def closed(project, monkeypatch):
 
 def _hook(project: Path, rel: str, content: str, *, tool="Write", **extra):
     target = project / rel
+    if tool == "Write" and not os.path.lexists(target):
+        # This matrix pins the delta gate. A Write over an existing empty
+        # file is never routed (ADR-034 G2-O1) and still diffs as wholly
+        # new, so the checked text is unchanged; the routed new-file path
+        # is pinned in test_numeric_upper_bound_g2_hook.py.
+        target.write_bytes(b"")
     tool_input = {"file_path": str(target), "content": content} | extra
     envelope = {
         "hook_event_name": "PreToolUse", "tool_name": tool,
@@ -276,13 +283,28 @@ def test_c_closed_refusal_keeps_literal_violation_evidence(closed, monkeypatch):
 
 
 def _real_payload(project: Path, content: str, mode="strict"):
-    source = project / "src" / "router.py"
-    source.write_text(content, encoding="utf-8")
+    """A real complete-source payload (ADR-034 G2-1 ``proposed_new_source``).
+
+    The G1 ``complete_source_file`` kind is never requested by a consumer,
+    so the shared validator rejects it outright (G2-1 charter §5.1); the
+    record-level contradictions below are exercised on the kind the Claude
+    Code hook does request.
+    """
+    carrier = project / "carrier.txt"
+    carrier.write_text(content, encoding="utf-8", newline="")
     proc = run_check_inprocess([
         "check", "--memory", str(project / ".mneme" / "project_memory.json"),
-        "--source-file", str(source), "--query", "router", "--mode", mode, "--json",
+        "--proposed-new-file", str(carrier),
+        "--target-path", str(project / "src" / "router.py"),
+        "--query", "router", "--mode", mode, "--json",
     ])
     return json.loads(proc.stdout), proc.returncode
+
+
+def _assess(payload, code):
+    return hook.assess_verdict(
+        json.dumps(payload), code, "strict", expected_input="proposed_new_file"
+    )
 
 
 def _numeric(payload):
@@ -307,10 +329,10 @@ TAMPERS = {
 @pytest.mark.parametrize("name", sorted(TAMPERS))
 def test_d_contradictory_numeric_payloads_are_untrusted(project, name):
     payload, code = _real_payload(project, "ROUTER_DEADLINE_S = 60\n")
-    assert hook.assess_verdict(json.dumps(payload), code, "strict").payload is not None
+    assert _assess(payload, code).payload is not None
     tampered = copy.deepcopy(payload)
     TAMPERS[name](tampered)
-    assessment = hook.assess_verdict(json.dumps(tampered), code, "strict")
+    assessment = _assess(tampered, code)
     assert assessment.payload is None and assessment.inconsistent, name
 
 
@@ -319,11 +341,12 @@ def test_d_recognized_payload_cannot_hide_unknown_sources(project):
         project, "ROUTER_DEADLINE_S = 3\ndef run(x):\n    return classify(x, 2)\n"
     )
     assert _numeric(payload)["matcher_status"] == "RECOGNIZED"
+    assert _assess(payload, code).payload is not None
     tampered = copy.deepcopy(payload)
     _numeric(tampered)["unknown_sources"] = [
         {"kind": "call", "line": 3, "reason": "SOURCE_NOT_FOUND"}
     ]
-    assert hook.assess_verdict(json.dumps(tampered), code, "strict").payload is None
+    assert _assess(tampered, code).payload is None
 
 
 def test_d_historical_payloads_unchanged():

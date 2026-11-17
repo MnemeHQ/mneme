@@ -111,9 +111,24 @@ mneme check --memory .mneme/project_memory.json \
      guessed APPLIED or EXCLUDED.
 4. **Anything else is not complete source.** A caller-supplied `--input` file,
    a materialized delta, a prompt, stdin, or input with only a claimed
-   `--target-path` is not verified complete source. For an APPLIED numeric
-   rule it yields `MATCHER_UNEVALUATED` / `INCOMPLETE_SOURCE_INPUT`. That is
-   decided before any AST parsing, even if the text happens to parse.
+   `--target-path` is not verified complete source.
+   - With `--target-path`, an APPLIED numeric rule yields
+     `MATCHER_UNEVALUATED` / `INCOMPLETE_SOURCE_INPUT`; an EXCLUDED one
+     stays EXCLUDED.
+   - Without `--target-path`, **every** numeric rule yields
+     `MATCHER_UNEVALUATED` / `INCOMPLETE_SOURCE_INPUT`, whatever the ADR-020
+     outcome of the input file's own path. Such input is never a clean
+     result (ADR-034 §6).
+
+   That is decided before any AST parsing, even if the text happens to parse.
+
+   **Erratum (post-scoring F-1, 2026-10-22).** This item first conditioned
+   the non-source result on "an APPLIED numeric rule". For `--input` without
+   `--target-path`, the input file's own path was then used for
+   applicability, so a file outside `include_paths` was EXCLUDED and returned
+   a clean PASS. That contradicted ADR-034 §6. The condition above is
+   corrected to match ADR-034; the fix was found by held-out scoring and is
+   verified by public regression tests.
 5. **Failures.**
    - A `--source-file` request that cannot be safely read or bound
      (including a path, encoding or I/O mismatch) is an operational error,

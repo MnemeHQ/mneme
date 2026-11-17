@@ -1,0 +1,2301 @@
+{
+  "collector_sha256": "2f302ed244b89364859c0832f638c40fd299601286e9716d4c024312c2ad7df8",
+  "files": [
+    {
+      "path": "P-1-Edit-1/observer.txt",
+      "source_sha256": "7e028787f5fe089bbcce4dd0cf85e68370d411747419ba971c5633866bdef035",
+      "published_sha256": "c5d36068a18abd462fbfcaae6374ce2955689b7c1a21187cfaa5ec3f354054eb"
+    },
+    {
+      "path": "P-1-Edit-1/prompt.txt",
+      "source_sha256": "23f9989a9e0fdd5c9258d670fbc417205a41d4171fc3c2152cca60bbd47a5558",
+      "published_sha256": "f9f9191706a69dcbbf226a4b84299a17451225d2f297e7e323702db238e0dfcc"
+    },
+    {
+      "path": "P-1-Edit-1/setup.json",
+      "source_sha256": "9a72dd682190fc333610417a6addddf70d7f1555d0c842eaa4fd47fd65873825",
+      "published_sha256": "c044757fd0e912ff562a401d79a0f6e0ee33f41916dfa9ae017bcc3606472cae"
+    },
+    {
+      "path": "P-1-Edit-1/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "P-1-Edit-1/events.jsonl",
+      "source_sha256": "0c24286f6dbc9b5851cd4e9e6812ffa3f8ea511047ed278332e41caaa053d6d2",
+      "published_sha256": "aaab4822e935f5ae56802e7d9554de963f3e52f1c20bcf888382b3ad8aa8a050"
+    },
+    {
+      "path": "P-1-Edit-1/hook-log.jsonl",
+      "source_sha256": "2a975e6fc354af1784a0175546edae2adcd1c008978c14d4abcbd5556496bd1d",
+      "published_sha256": "903951dc55d16d942dc953cb5859e3cea613bcf9e1321c80ab659fe5303ddb0d"
+    },
+    {
+      "path": "P-1-Edit-1/outcome.json",
+      "source_sha256": "62087ce89dac384e1b0bf5202a145b48ee2bac8ba53aab05a1d3d6123bc6e02e",
+      "published_sha256": "4ffd0067fe88b84415b591000842361a84426001b5836c1b821faff13063e1d8"
+    },
+    {
+      "path": "P-1-Edit-1/target.before",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "P-1-Edit-1/target.after",
+      "source_sha256": "ac7a2e1f56dae9d6d909abaefd054fafbd4a332ae0b10f01841c27c6b14571c1",
+      "published_sha256": "ac7a2e1f56dae9d6d909abaefd054fafbd4a332ae0b10f01841c27c6b14571c1"
+    },
+    {
+      "path": "P-1-Edit-1/netcap-sni.txt",
+      "source_sha256": "7cb02d1d8951e197261f82fad9e1d591cbba05b03fbccfd2fa90c5c0523f3a29",
+      "published_sha256": "7cb02d1d8951e197261f82fad9e1d591cbba05b03fbccfd2fa90c5c0523f3a29"
+    },
+    {
+      "path": "P-1-Edit-1/transcript.selected.jsonl",
+      "source_sha256": "f2c849d487a093c83a85350bfad7bb8379e67b77c0e0081ca9dd6c91d506f4be",
+      "published_sha256": "c1b0dcafcdcb118c329e049ca8e540a3cc47aa8310c876d4e67c5a5944fa136c",
+      "source_size": 186334,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 4,
+        "api-request": 2,
+        "last-prompt": 3,
+        "attachment:deferred_tools_record": 1,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "P-1-Edit-2/observer.txt",
+      "source_sha256": "ec015b3522751fde2f52d7b5c83572b10af758517ee34b803f64cab1f3da4902",
+      "published_sha256": "838bf414b2a0f48127edcf880c3ff09d2050e3161f3ae9120f223ba00ddfc9a6"
+    },
+    {
+      "path": "P-1-Edit-2/prompt.txt",
+      "source_sha256": "594eeab5e0b1ebca82f684431ce220ddab5b1afabd65b361cdcdfb30c4651cab",
+      "published_sha256": "9dbe6c246636a34f28cfc88bec8207e1f3439969e8d409f78ce2cfd7f1891e67"
+    },
+    {
+      "path": "P-1-Edit-2/setup.json",
+      "source_sha256": "a89a0ee2fdc6a4b72b40541662937df70b186047b3f99f26005817a3d045021c",
+      "published_sha256": "68f53463a96b101567ee89a64f9cc28169aa123f0c298d39272705a8fc64c606"
+    },
+    {
+      "path": "P-1-Edit-2/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "P-1-Edit-2/events.jsonl",
+      "source_sha256": "dcc4347d1a6b9659884517bc9d71f9e3f53c7763c907fe74ef2ddfed76c7049e",
+      "published_sha256": "184525a39f9bbe73d4d91f5d6a06a6d232580d2c8f21f16322dee69ed2b11bbd"
+    },
+    {
+      "path": "P-1-Edit-2/hook-log.jsonl",
+      "source_sha256": "18d5a2c5ef4e5ce28e1346ed60a0a1ecc569c7a4bbca87643a21bb8cb65d61ac",
+      "published_sha256": "88b3ab31b2330b44ea244288733c7574486300c0b431affb8c5d6cc48b48dc3d"
+    },
+    {
+      "path": "P-1-Edit-2/outcome.json",
+      "source_sha256": "e2f4faf2483f7b2e0feb401e5a3cf4d915aac3c61278f30e0c8469e3b864e849",
+      "published_sha256": "985e9969d0aa8fdf5d53b79d557e9f548ea28fe1a7eeb0ec7906312c3c0479b4"
+    },
+    {
+      "path": "P-1-Edit-2/target.before",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "P-1-Edit-2/target.after",
+      "source_sha256": "ac7a2e1f56dae9d6d909abaefd054fafbd4a332ae0b10f01841c27c6b14571c1",
+      "published_sha256": "ac7a2e1f56dae9d6d909abaefd054fafbd4a332ae0b10f01841c27c6b14571c1"
+    },
+    {
+      "path": "P-1-Edit-2/netcap-sni.txt",
+      "source_sha256": "a5b053cad5ca652a94461261f6e710f8e0336da18986a1f08e1d03bfde03806c",
+      "published_sha256": "a5b053cad5ca652a94461261f6e710f8e0336da18986a1f08e1d03bfde03806c"
+    },
+    {
+      "path": "P-1-Edit-2/transcript.selected.jsonl",
+      "source_sha256": "91e7a1d1ad9136baeeaf270adea6ebb4d4acb3af737499da258e36446556a487",
+      "published_sha256": "948e64fc934afe9fc5010379ac6d7f0e11c15accc758e5e197fed2e519f7ddf2",
+      "source_size": 186315,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 4,
+        "api-request": 2,
+        "last-prompt": 3,
+        "attachment:deferred_tools_record": 1,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "P-1-Write-1/observer.txt",
+      "source_sha256": "3393c647516a284b7ddeaf064e74fa040eb455ff14375687bbe0ebabfe4d2c0b",
+      "published_sha256": "2f0cab96e5b9ee85f01eb32cc6cedbe2686293c73972a7f87e4e392bc0653de3"
+    },
+    {
+      "path": "P-1-Write-1/prompt.txt",
+      "source_sha256": "0fb8da708796234f6ec806d347a2113a7cfdd01a4a5900a1b2f449e9c4480497",
+      "published_sha256": "41ad2ce549af0c1bb385498d2a99c6011c129220062cdbec852a3f32b0a3b816"
+    },
+    {
+      "path": "P-1-Write-1/setup.json",
+      "source_sha256": "70c363cccbde3973c2f6de2fcf5b03a6f1d26274022802f6c7bbcc72d5280c2b",
+      "published_sha256": "850ac014a4a7ab12bf3ee6fbb530cea20e24fb044c675901c44edfad07c6d681"
+    },
+    {
+      "path": "P-1-Write-1/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "P-1-Write-1/events.jsonl",
+      "source_sha256": "91082514030689ef59fd37aafc2b42e8adb2a2e8cc5d6780c4b1b0b1e8bf3fb8",
+      "published_sha256": "a4892c76c70ea43f4e1bec528a66705e7747b80b4a875538614794ebfa020fa6"
+    },
+    {
+      "path": "P-1-Write-1/hook-log.jsonl",
+      "source_sha256": "2849b4807cbe1527b5ef1f448f853726cb0fa147b6680d3e2e23f09bc6f0bfad",
+      "published_sha256": "48eef4a8e495ebff46f1f953a5c2b7296065c4fdf04b1156f07b4f2c6500aa91"
+    },
+    {
+      "path": "P-1-Write-1/outcome.json",
+      "source_sha256": "321b9a4523cd56ed009a9456b5cfb7bda820487e243aaef88249ff00553c2568",
+      "published_sha256": "68a24ac1c28a61e56a14851051f9cd214c8d049d24dc982fc1ecb95319d0d260"
+    },
+    {
+      "path": "P-1-Write-1/target.after",
+      "source_sha256": "78303cf96e9805d1ec0ecb3ba0570d39ef534e65d79837f74272e5e30471ee79",
+      "published_sha256": "78303cf96e9805d1ec0ecb3ba0570d39ef534e65d79837f74272e5e30471ee79"
+    },
+    {
+      "path": "P-1-Write-1/netcap-sni.txt",
+      "source_sha256": "ee622032314f4df610de59413df2c4b18bf06ba06bc015d878336c62b9bd1b30",
+      "published_sha256": "ee622032314f4df610de59413df2c4b18bf06ba06bc015d878336c62b9bd1b30"
+    },
+    {
+      "path": "P-1-Write-1/transcript.selected.jsonl",
+      "source_sha256": "8f782a57cd43aeb463d19e7cfe6092b21cb41ac05c19b729111ef5b4035c1993",
+      "published_sha256": "757237e510496659ad3548854ee4f1329d2df59dd44e0b28cfd9c71189bde387",
+      "source_size": 182823,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 2,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 3,
+        "api-request": 2,
+        "last-prompt": 3,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "P-1-Write-2/observer.txt",
+      "source_sha256": "a55d4e83d77fb99bb86ce0ee1e7c9dea773d05fbe7ceec259a9c125b0458b6e6",
+      "published_sha256": "7636f08ea3a1e564784373d738671ba765adbab3ea160f385ec95a461ec991e8"
+    },
+    {
+      "path": "P-1-Write-2/prompt.txt",
+      "source_sha256": "a13823ba0ed668389c6c26d96d63760bd75543e1735b1f0b2c64057ddccbe063",
+      "published_sha256": "dd22fdbb791a42934f16e39ad5a961e3118b0a76c6d0a998c75c304face6158e"
+    },
+    {
+      "path": "P-1-Write-2/setup.json",
+      "source_sha256": "c50de2d4f0895c167312d024f06ac1ff3c279aed188a5960a73f7ffb389fcdfc",
+      "published_sha256": "7d9aab8b12444ace1315f92e0fa6d1af1b64e5fcae61b25dded3d7f67a4ef50c"
+    },
+    {
+      "path": "P-1-Write-2/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "P-1-Write-2/events.jsonl",
+      "source_sha256": "a5e44abf4460adb3a2937231a5b162127979326f7dd0dc134d2eae9924368305",
+      "published_sha256": "b3d01ec99c679d57fafc74193c3febb7b22d25d35e016a3040a29f11031c4e57"
+    },
+    {
+      "path": "P-1-Write-2/hook-log.jsonl",
+      "source_sha256": "87bef144f017b1a2ebdf6002279df68bae36301b88a9784647952bbc13c64df4",
+      "published_sha256": "746d3f449bd460a06d6b72951449f86180303c0cf299a251d3986a874a060d88"
+    },
+    {
+      "path": "P-1-Write-2/outcome.json",
+      "source_sha256": "bf5201e7f74f3ace97bab953af35bf92e36afdcdb0aa8b1c3a13bb70ef07d8a2",
+      "published_sha256": "fd159683599ff44188efe86390d74b63537b5618404266bc3427a3f7a3ecf65f"
+    },
+    {
+      "path": "P-1-Write-2/target.after",
+      "source_sha256": "78303cf96e9805d1ec0ecb3ba0570d39ef534e65d79837f74272e5e30471ee79",
+      "published_sha256": "78303cf96e9805d1ec0ecb3ba0570d39ef534e65d79837f74272e5e30471ee79"
+    },
+    {
+      "path": "P-1-Write-2/netcap-sni.txt",
+      "source_sha256": "d0410c3e35df66ac136af920723ca9a5dcc5c51b4d92b8aa2cd4045b1dbb48d8",
+      "published_sha256": "d0410c3e35df66ac136af920723ca9a5dcc5c51b4d92b8aa2cd4045b1dbb48d8"
+    },
+    {
+      "path": "P-1-Write-2/transcript.selected.jsonl",
+      "source_sha256": "b1724fbf125304bdcfc57a79f4c5fb05bf08b5d42b968dc5c4372c8bc3f11285",
+      "published_sha256": "c8b2e9d5f53d6eb550b5f997ddeb097f218d7953842d626bd13fba92ed9c46cd",
+      "source_size": 181506,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 3,
+        "api-request": 2,
+        "last-prompt": 3,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "P-3-Edit-1/observer.txt",
+      "source_sha256": "1064328816160528b62d04292aae36da0d4a7b770363058917467024699e05a2",
+      "published_sha256": "f20c696bb64487e2488c5c7aacc91ee935446ad65f0344e0c750c141de55a24a"
+    },
+    {
+      "path": "P-3-Edit-1/prompt.txt",
+      "source_sha256": "660d58b5d2329f282b784a842ad34acad07de3f998d9043ca96912ee1736e25e",
+      "published_sha256": "6bc7033a0399ae5d83df565b0722ce26a9eae9f857a8ef8fc00d978e7cbb37f3"
+    },
+    {
+      "path": "P-3-Edit-1/setup.json",
+      "source_sha256": "e875f6a17dfd1be92719269c5e1d3d395ed8649dd6a3b9e68b2f7daa80d558da",
+      "published_sha256": "b2becf687eaeb5595089b6cf6f642cbb807649b3263f47596e46ed4f0f8ad78c"
+    },
+    {
+      "path": "P-3-Edit-1/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "P-3-Edit-1/events.jsonl",
+      "source_sha256": "6b61ca1ce5369e15601bbda5eb6312f45b3d774abd55f546a397ccc8964cacc1",
+      "published_sha256": "39f353a3efcffbc6c381e3d88e1ec8b83e359df6c27a01b7bd9dde0443742495"
+    },
+    {
+      "path": "P-3-Edit-1/hook-log.jsonl",
+      "source_sha256": "bcfb13f7f5bdfd0d57f688b6b33e740797b36972502bd84bcd24a4314292e3e5",
+      "published_sha256": "207a635c4beefdafa24bfd0515dc2d0fc86552d8bbcd9684bf528e8ec1690ddc"
+    },
+    {
+      "path": "P-3-Edit-1/outcome.json",
+      "source_sha256": "bee66a8593303ebf806d5453d3034594944065a860356fbb3ff0d1fe887c6e5d",
+      "published_sha256": "f723e639a7282fe174a11a56acf005d61c4b81d030c5c7e666d174d5878dd3e8"
+    },
+    {
+      "path": "P-3-Edit-1/target.before",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "P-3-Edit-1/target.after",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "P-3-Edit-1/netcap-sni.txt",
+      "source_sha256": "6531dcc6da2d2168c44580a48054987e4bebe394bb0ce6c72d4220802f363ea0",
+      "published_sha256": "6531dcc6da2d2168c44580a48054987e4bebe394bb0ce6c72d4220802f363ea0"
+    },
+    {
+      "path": "P-3-Edit-1/transcript.selected.jsonl",
+      "source_sha256": "710cac412332ec1e64413c081d73ff9877fbba3d6e7ce0e33757607c9507fbe0",
+      "published_sha256": "07c58e87aff1c0524ff3ab220c3a347e5c78e9d76c1238dbea16364e112f4362",
+      "source_size": 184396,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 4,
+        "api-request": 2,
+        "last-prompt": 3,
+        "attachment:deferred_tools_record": 1,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "P-3-Edit-2/observer.txt",
+      "source_sha256": "54e60efc578e6a042db5e99bedb07b22cc6c9f2040155049a2f96551e4d3913f",
+      "published_sha256": "ef1b40fc2570f28c53f7718f949476cc685015a75da2a8a6f0751dd359efa786"
+    },
+    {
+      "path": "P-3-Edit-2/prompt.txt",
+      "source_sha256": "e144703d3088e4de66b76af69ab7babcd53542caf50e7f06d330b48684f2e0cc",
+      "published_sha256": "8914ebda3e8061e77c9870a762dbc3875b8f56fd37c16d9c7c23728681c6abee"
+    },
+    {
+      "path": "P-3-Edit-2/setup.json",
+      "source_sha256": "27e1cdc5f7239cf87bcdeef27ba34744a2c4912f4d60f291fbe257c37d65ec8a",
+      "published_sha256": "8d4e3b2bd92015f13c93b89c0e1183758b0482106d978f60f0689e1b85dd7ea9"
+    },
+    {
+      "path": "P-3-Edit-2/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "P-3-Edit-2/events.jsonl",
+      "source_sha256": "f0653767f5774d4a4d2d25a16454c0ef1f286b7ed7f92c1d8bdee8c25b9335c0",
+      "published_sha256": "ed82f5cde8f57bb334817f7b0446b8659e007719643de9fd207ac385314cc59a"
+    },
+    {
+      "path": "P-3-Edit-2/hook-log.jsonl",
+      "source_sha256": "00f09058311da3980021bc1746266af16131971838d32c86d309f6aed6fef771",
+      "published_sha256": "c344c2a1409ec6336ccab95d8d07a0583107f73288c1438d8ed3f4b650b1ed2b"
+    },
+    {
+      "path": "P-3-Edit-2/outcome.json",
+      "source_sha256": "cf8d36eff27dd0a2b4a0883b50c1d24755ead0d5ff81923af6615b7d5338e741",
+      "published_sha256": "c33e11221363f74481be27faa18a2618fb66c3fdef7cefcfc8b8e52105d56168"
+    },
+    {
+      "path": "P-3-Edit-2/target.before",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "P-3-Edit-2/target.after",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "P-3-Edit-2/netcap-sni.txt",
+      "source_sha256": "0c87c373bacb11a6acf22615028dac2665627364d1943c03d6eba63f43b2de89",
+      "published_sha256": "0c87c373bacb11a6acf22615028dac2665627364d1943c03d6eba63f43b2de89"
+    },
+    {
+      "path": "P-3-Edit-2/transcript.selected.jsonl",
+      "source_sha256": "42d12d91d3c771bc6dca613cb2f7649f6a8707765bbc196aec553c72fac36c5e",
+      "published_sha256": "d9d56585d5dc429ee9fe10274f7022ddcb6ce925bc1a3724ffc6bc05bb7c7c86",
+      "source_size": 184360,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 4,
+        "api-request": 2,
+        "last-prompt": 3,
+        "attachment:deferred_tools_record": 1,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "P-3-Write-1/observer.txt",
+      "source_sha256": "0eccce0b0a299c459ed9566ae6d26e0cbd0a1516274e9117d6dcd8438a6c0ff5",
+      "published_sha256": "54c01a57f529e43be205aee19937f14129595f747c5e9d5275e73a41d6e274a2"
+    },
+    {
+      "path": "P-3-Write-1/prompt.txt",
+      "source_sha256": "f2982a50b7fdf0dbe7b026397549791afe2fa43515d11b86c37747d651842190",
+      "published_sha256": "9b5e97a6f970808bc3509cf0a9e4477e109c5aa737a2fe64b539d403e851aee9"
+    },
+    {
+      "path": "P-3-Write-1/setup.json",
+      "source_sha256": "977842e792bb3da2189cc62a6129cb94f49680743262f9f825c247b63ada0d47",
+      "published_sha256": "ce3eb0c5d11c88e93d6b3185f3a94ab7e02efae1329a6110240b5bf58e23213c"
+    },
+    {
+      "path": "P-3-Write-1/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "P-3-Write-1/events.jsonl",
+      "source_sha256": "1f96b9d7bb4a19b2341fa0a17684f20c383dc8f0e6b10867a9981e6bd219f4ff",
+      "published_sha256": "ed89eae6490c32af4b630f2f99cdfe0c1fe8298af9a6183b2d7c02554ab46be0"
+    },
+    {
+      "path": "P-3-Write-1/hook-log.jsonl",
+      "source_sha256": "925a9457692b3173cf5b0f7452a44fe8d28ead43294fb5b188caf6108cc54915",
+      "published_sha256": "a874dc7c5ba75b3896f859640fc1b3e81204f5767a298b8a1fd90b208200e51b"
+    },
+    {
+      "path": "P-3-Write-1/outcome.json",
+      "source_sha256": "0fe410000f3f6b5d2b67982a785a10884a8b0e3562913af587431ced60935b86",
+      "published_sha256": "dbe0567009f48b34152dd1f44652eb693de0e5d36a494fa7732c321b1541162e"
+    },
+    {
+      "path": "P-3-Write-1/netcap-sni.txt",
+      "source_sha256": "a5b053cad5ca652a94461261f6e710f8e0336da18986a1f08e1d03bfde03806c",
+      "published_sha256": "a5b053cad5ca652a94461261f6e710f8e0336da18986a1f08e1d03bfde03806c"
+    },
+    {
+      "path": "P-3-Write-1/transcript.selected.jsonl",
+      "source_sha256": "ef243be81dbb649536c7cb643489edbcf9d555dafb3c714731a9069cc818ea98",
+      "published_sha256": "e60474ead5a3de9c55b23ac3bd7ed4efd7cd9e6c2c593f790c2ca42df0c6671a",
+      "source_size": 183459,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 3,
+        "api-request": 2,
+        "last-prompt": 3,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "P-3-Write-2/observer.txt",
+      "source_sha256": "5a8fc60d63b3f9bc117d12d05c7a401bc80a776c4e7a3bdd8a285dc93a10a96a",
+      "published_sha256": "707a9f5ff8b9d4376838c8a44e4369314a457b94d7c558daa213f4ee234389f7"
+    },
+    {
+      "path": "P-3-Write-2/prompt.txt",
+      "source_sha256": "a983f2dba2b83613d26e0c3a86ade49b09080c3b5ba81cb15c931028311ca45e",
+      "published_sha256": "25d3cac8617984752396e457abd75014df9a49d0223f9d8a137996b963388065"
+    },
+    {
+      "path": "P-3-Write-2/setup.json",
+      "source_sha256": "cef36acc36a9186f31803aa19744f975975060b526708e4ebac2d604e02eb8a6",
+      "published_sha256": "970d9fb0722e4052ef2187059ed9a65c14b4b19b43784e9ae388c22c0c1d39a8"
+    },
+    {
+      "path": "P-3-Write-2/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "P-3-Write-2/events.jsonl",
+      "source_sha256": "458d47cd84b4faa900a3a0d82dc8537ccca6f80f8f00c3090fb5fce6505b91d2",
+      "published_sha256": "1f31244e3cc4dabc788e96d643cade579e16847d7a9cd78074064ec078fa9236"
+    },
+    {
+      "path": "P-3-Write-2/hook-log.jsonl",
+      "source_sha256": "ff1fdcdc8be6b28b140157fadc326482dac47dda19c6a682b523801d2f7a0791",
+      "published_sha256": "5956e70d74ad1d0840ecef178cf660e96b03380275ff0a9b7caa6280c7bd5648"
+    },
+    {
+      "path": "P-3-Write-2/outcome.json",
+      "source_sha256": "bb47cd6d4176eb8299c71ab8efd2e8038857b9c9c52f389abeba9220591ed7f7",
+      "published_sha256": "d990dc4306836a1acbf7debeff0f67b74821fa85dcfc45f8d87afcf596dceb4a"
+    },
+    {
+      "path": "P-3-Write-2/netcap-sni.txt",
+      "source_sha256": "7bfd80162a44a0fc24b911bb2b493cb9d03a79a1951bf748f79335bfb9e81be3",
+      "published_sha256": "7bfd80162a44a0fc24b911bb2b493cb9d03a79a1951bf748f79335bfb9e81be3"
+    },
+    {
+      "path": "P-3-Write-2/transcript.selected.jsonl",
+      "source_sha256": "cee4fab23bb4df538a8060ea8baaf2c191695552c98b8b5f2c7a91118c25682a",
+      "published_sha256": "aef7550437f869b7aaee9b538a628f549ec94704759558944260ee45dc92da33",
+      "source_size": 181059,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 3,
+        "api-request": 2,
+        "last-prompt": 3,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "P-4-Edit-1/observer.txt",
+      "source_sha256": "d1bd698e9ffc32a69033e8fd6c96f5cc4601ad3b9c19a56d994681c16b1f70d1",
+      "published_sha256": "33dc60b984f18c1966ac137bc602db7c979d6dc3ca3182f014d17ce3d342926e"
+    },
+    {
+      "path": "P-4-Edit-1/prompt.txt",
+      "source_sha256": "ae3b892ef0adedaf283604de321ddeb7251db8587cbe890b59f3918be425a557",
+      "published_sha256": "a47d1b0ba83ac179a449271ec56ae46a313665ad9a16dcf53903ab7ff927cf3f"
+    },
+    {
+      "path": "P-4-Edit-1/setup.json",
+      "source_sha256": "cdccc0e87062897bc570b07557f72973fdeed72c8a576be4b05eccb81e8267c7",
+      "published_sha256": "047917f259208f9c5d02f120f01862eb39e26e2cf6c799ff80d13da115c8e90a"
+    },
+    {
+      "path": "P-4-Edit-1/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "P-4-Edit-1/events.jsonl",
+      "source_sha256": "d1139387c8c1fa2a5a0fc61c3eb7f055814d9878a9d4a5fe8a77c4640d9025fd",
+      "published_sha256": "88df2b38e12fc14c9f6812c17ef0cb32749ac92a96f856e477a9f20784e7362d"
+    },
+    {
+      "path": "P-4-Edit-1/hook-log.jsonl",
+      "source_sha256": "2c84c41b85098372c847685c29003a260ddc4d0a531b199f321b8085214405bf",
+      "published_sha256": "076b5e170932d68a779a3e4aa4a185bc91206c7239a451a74be7f5830b03dda9"
+    },
+    {
+      "path": "P-4-Edit-1/outcome.json",
+      "source_sha256": "bc88c3fbbab2502bc7171d0cb61ad1c18931af953c4b25a921ce33ab61b73b9d",
+      "published_sha256": "2f4528c9f9dd6abbddc99ffddfe7cccbcb162cf81ce48334682802fa6d8c64aa"
+    },
+    {
+      "path": "P-4-Edit-1/target.before",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "P-4-Edit-1/target.after",
+      "source_sha256": "51468832125703235352d02f0e9d325746b3ac84e7ac90f873437d9d1596c94a",
+      "published_sha256": "51468832125703235352d02f0e9d325746b3ac84e7ac90f873437d9d1596c94a"
+    },
+    {
+      "path": "P-4-Edit-1/netcap-sni.txt",
+      "source_sha256": "ee622032314f4df610de59413df2c4b18bf06ba06bc015d878336c62b9bd1b30",
+      "published_sha256": "ee622032314f4df610de59413df2c4b18bf06ba06bc015d878336c62b9bd1b30"
+    },
+    {
+      "path": "P-4-Edit-1/transcript.selected.jsonl",
+      "source_sha256": "f061de30c6c320b4e4d37bab6532dc2a605412b9d5533c8dab1d33e902c3a8f2",
+      "published_sha256": "aabb4bd08e5d3a1836ee22cc17080fbc882300cc47a3f3780daecaa4f00876c3",
+      "source_size": 184523,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 4,
+        "api-request": 2,
+        "last-prompt": 3,
+        "attachment:deferred_tools_record": 1,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "P-4-Edit-2/observer.txt",
+      "source_sha256": "bbe1763eac30499c7a5cad7d878c778c10f7db9b3a8587e877c4e44eb5dea3f9",
+      "published_sha256": "a3551447beea9478a863f83bc085741fbbbc44c8db71f6c8eaeac6da9b0b0934"
+    },
+    {
+      "path": "P-4-Edit-2/prompt.txt",
+      "source_sha256": "666b69c9c8bfc1a1305fd855530e2935271ee90ed401a9b6d90160dd5b08ec0b",
+      "published_sha256": "fb9d702c828d123e38c3231772d96a24e06c0487921f70e14a3a38a7c39a4459"
+    },
+    {
+      "path": "P-4-Edit-2/setup.json",
+      "source_sha256": "a148421e493d5cf47f8531c98a8ee3a95923c0d5f19f45091693732359a595ad",
+      "published_sha256": "13c095068836a0726c809f9e6da2590528d9cc0cef3961292b9e5fb40db1afa1"
+    },
+    {
+      "path": "P-4-Edit-2/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "P-4-Edit-2/events.jsonl",
+      "source_sha256": "d1862cd1e64bf9a5533df0c175d66e4580fc4a6d5ce8bd3b977d51aa4e7eb929",
+      "published_sha256": "3884d2e8ffd79bf24076d73fdab46367a5e90fbb96f6c80ad2a52f3322228028"
+    },
+    {
+      "path": "P-4-Edit-2/hook-log.jsonl",
+      "source_sha256": "687aefe4d7e7b70c50e7731817ce31f0c54bfdcd2f07fbd5791b70d0475a0384",
+      "published_sha256": "27afd091c01afb223e896d5859a4c44ff63a4c20ee79482622eb580bd0db4a5d"
+    },
+    {
+      "path": "P-4-Edit-2/outcome.json",
+      "source_sha256": "e65356e217322b71bdc0cd0cce5a34c10eda81c651a7320b15b621211bcc2326",
+      "published_sha256": "f84fcb167cd5347c1754c5c2931ef56078e918f3540cd84f3e815e8846f6831a"
+    },
+    {
+      "path": "P-4-Edit-2/target.before",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "P-4-Edit-2/target.after",
+      "source_sha256": "51468832125703235352d02f0e9d325746b3ac84e7ac90f873437d9d1596c94a",
+      "published_sha256": "51468832125703235352d02f0e9d325746b3ac84e7ac90f873437d9d1596c94a"
+    },
+    {
+      "path": "P-4-Edit-2/netcap-sni.txt",
+      "source_sha256": "6531dcc6da2d2168c44580a48054987e4bebe394bb0ce6c72d4220802f363ea0",
+      "published_sha256": "6531dcc6da2d2168c44580a48054987e4bebe394bb0ce6c72d4220802f363ea0"
+    },
+    {
+      "path": "P-4-Edit-2/transcript.selected.jsonl",
+      "source_sha256": "e6429507bed2e5f0c1c1a1e4f60b9d1664e6d6d10162cbae48dd545bcaecc128",
+      "published_sha256": "d5f1330f0d45ea935b8bf99b6050ddcc655bdfe3e38d481841ef15998cb885c6",
+      "source_size": 180798,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 4,
+        "api-request": 2,
+        "last-prompt": 3,
+        "attachment:deferred_tools_record": 1,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "P-4-Write-1/observer.txt",
+      "source_sha256": "ffe0cb0b07dc07dd7ef2bd1221f77ac0488b6c69530cc9eeeccfc7626e23d871",
+      "published_sha256": "f940b1956ea09a6a612a33b2b8e3b3674ae5d623530f520a48ffc24b4d5ff225"
+    },
+    {
+      "path": "P-4-Write-1/prompt.txt",
+      "source_sha256": "f5f4cdbc3a68e8848339090f276eda16f11a2cc0ae99e20bda12d952253ee8df",
+      "published_sha256": "b14f89ef2bcb8b380b5131c6109c4177c6eed3d01b0729c49a621c5863d79922"
+    },
+    {
+      "path": "P-4-Write-1/setup.json",
+      "source_sha256": "e591e0ef633a77f0850ee0aa1e68ad7b584aee35aa89460d577f22e6ca3df79d",
+      "published_sha256": "d8eb4e113594b73458d0a072c492e359af13421ae8ebeb8bbfb5688c4a51595b"
+    },
+    {
+      "path": "P-4-Write-1/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "P-4-Write-1/events.jsonl",
+      "source_sha256": "4ff37e61d7d2f007562809c8f01a861d3aab4b8ae6d722b630225017b4e77702",
+      "published_sha256": "eb91c3ac71fecc3f1441f3e25435a70f5d2fe08d2dc3755a2eba021fed0b5c82"
+    },
+    {
+      "path": "P-4-Write-1/hook-log.jsonl",
+      "source_sha256": "59b7f35e33e1c39b009a8de339866684e78cf103992cc0d2ef81f1d9beea47ca",
+      "published_sha256": "ff724b6461b7074bebe2940735cd23dc858bdf1a73b75749e53639db10d2543b"
+    },
+    {
+      "path": "P-4-Write-1/outcome.json",
+      "source_sha256": "a9da78fdaf573bce604ba0c58a4cf08e47aa1489dcb13ff7d9826f9aabee7c2b",
+      "published_sha256": "22f34c083bcc3bbc91a6b926ca70844909f621887502e06a5225026e5b5f9a54"
+    },
+    {
+      "path": "P-4-Write-1/target.after",
+      "source_sha256": "353ec15e9a6fb6c64c9be1a25201667c5bfd8bfda9395d9e83b737f2341b6fd0",
+      "published_sha256": "353ec15e9a6fb6c64c9be1a25201667c5bfd8bfda9395d9e83b737f2341b6fd0"
+    },
+    {
+      "path": "P-4-Write-1/netcap-sni.txt",
+      "source_sha256": "b66bd9feb95796bc09cf2f7d00a773aa4781b273ebc63e3079c0c3e8eabf61bc",
+      "published_sha256": "b66bd9feb95796bc09cf2f7d00a773aa4781b273ebc63e3079c0c3e8eabf61bc"
+    },
+    {
+      "path": "P-4-Write-1/transcript.selected.jsonl",
+      "source_sha256": "06c6a475805b0274a53c32074f91d8e404c1ff5a44550bff8ef180b2a337e9c4",
+      "published_sha256": "1c5a67c16d9413534cfb6532f529feb49bea521c05ea25b7bf23d536f93ac936",
+      "source_size": 179704,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 3,
+        "api-request": 2,
+        "last-prompt": 3,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "P-4-Write-2/observer.txt",
+      "source_sha256": "f9b25ed9cc678e79ea57e4e5cd9909fce6688eea8571903202dd39a2e21601dc",
+      "published_sha256": "34a675a6f85c42932dcb3448467cc8ff63bfc2d47335c43fede3b7d9c72cf79c"
+    },
+    {
+      "path": "P-4-Write-2/prompt.txt",
+      "source_sha256": "5b8a787aa6ac1460b11d7f9fdc8bc47ef4f7984d8bf67f93cdbd9ad01a65fdd2",
+      "published_sha256": "5fb13891857b836986b0de0fff0e9b35a75c12e7a2d1953eea8881051d3840fc"
+    },
+    {
+      "path": "P-4-Write-2/setup.json",
+      "source_sha256": "e43221dbee29f1bc3f5df5d2b5f2fe53b617270b498e25256d53252cb3965723",
+      "published_sha256": "990edfce352c0dc6ca5d3c7ae6a4a5e62a141a71bfc2a2ab51dd8c8ec5b0c1d2"
+    },
+    {
+      "path": "P-4-Write-2/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "P-4-Write-2/events.jsonl",
+      "source_sha256": "b3581f9ed1bf46befec59e08417a01845a8e37a7eef4f4057ad13c56339e03ba",
+      "published_sha256": "f728ae31fc4e70a71ac9c742209250deefc730c275e0bf4d41cc5217c11c74ad"
+    },
+    {
+      "path": "P-4-Write-2/hook-log.jsonl",
+      "source_sha256": "e127e1e0bbc8a3bcdcec60cc8da9c8d201e08f29487bdb44f0fe77084a8e134e",
+      "published_sha256": "67099fe94ed7727c909d49fa74cac2630cefd1a6dc07f40e7e325b20ce2f34e7"
+    },
+    {
+      "path": "P-4-Write-2/outcome.json",
+      "source_sha256": "e28968ba8b460f9d6a1d5adae4500be16b214d32bc26e0289e05f306670fd953",
+      "published_sha256": "93fa87a5f5fdd392fab821d7287c5eaadea09408aa8ddafaaec7ce215ccd5a8f"
+    },
+    {
+      "path": "P-4-Write-2/target.after",
+      "source_sha256": "353ec15e9a6fb6c64c9be1a25201667c5bfd8bfda9395d9e83b737f2341b6fd0",
+      "published_sha256": "353ec15e9a6fb6c64c9be1a25201667c5bfd8bfda9395d9e83b737f2341b6fd0"
+    },
+    {
+      "path": "P-4-Write-2/netcap-sni.txt",
+      "source_sha256": "b4e06cb4f31baf79ac2544830bdeee5b156f0c3cf1562ac2c507589458f97bb9",
+      "published_sha256": "b4e06cb4f31baf79ac2544830bdeee5b156f0c3cf1562ac2c507589458f97bb9"
+    },
+    {
+      "path": "P-4-Write-2/transcript.selected.jsonl",
+      "source_sha256": "039419d7952ece19b360a46375a7ae3694f63cfa70ca220321db44641e378b0e",
+      "published_sha256": "ec9c3f60fd3d20fcd6701b008b17fb203afef7de86709e701ef3762fca82ec53",
+      "source_size": 179820,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 3,
+        "api-request": 2,
+        "last-prompt": 3,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "R-3-Edit-1/observer.txt",
+      "source_sha256": "895503d552845518e8bc2f5acc924377c8449a366242384b3ced80d825d8bc7c",
+      "published_sha256": "f3e9c66c7d2ad95e534144be3a2bb5f4e5a724674f5189ce354ee58cd6708e10"
+    },
+    {
+      "path": "R-3-Edit-1/prompt.txt",
+      "source_sha256": "93536dbeef8186ce34e214c5a319fa1774b7169b4a777a86149f3bb8b7424781",
+      "published_sha256": "6ba3fc9997f7b8618287aa7baea8d82a805aca03b2c7f43c508a6f1ab3d4f3aa"
+    },
+    {
+      "path": "R-3-Edit-1/setup.json",
+      "source_sha256": "8da3a9685a35cea1e38a5a30d9adec5d58cccb1ea47a763629a6cacaed9c7048",
+      "published_sha256": "5fcbbb7c39e51c24ca84c1cf1f88cf8cbd046d0afa9ea366b3666a5bbb2c4979"
+    },
+    {
+      "path": "R-3-Edit-1/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "R-3-Edit-1/events.jsonl",
+      "source_sha256": "73a33801e3ec8b75f91243d3179e07744d8ac633556d68d67a12df603ce55a31",
+      "published_sha256": "c12637c24711f1140b2d364e013998270c472df81c0c683e05f2c6b6d63edf9b"
+    },
+    {
+      "path": "R-3-Edit-1/hook-log.jsonl",
+      "source_sha256": "0e2c1191c4809871c0b8090d0eff758db4b784850f847a508d9f9f90c854e516",
+      "published_sha256": "9a6b23b06a8ca4d159c132d04cdfbad795c03b1849e18b4f5db82039f96c12ea"
+    },
+    {
+      "path": "R-3-Edit-1/outcome.json",
+      "source_sha256": "ed7728d850f7fff1f1dce004c34a553902871278fa92ae20decaae262177d424",
+      "published_sha256": "d08804494c3f94ad08f43911f87861a88371902d638a8ed34935a8736417c9d3"
+    },
+    {
+      "path": "R-3-Edit-1/target.before",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "R-3-Edit-1/target.after",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "R-3-Edit-1/netcap-sni.txt",
+      "source_sha256": "a5b053cad5ca652a94461261f6e710f8e0336da18986a1f08e1d03bfde03806c",
+      "published_sha256": "a5b053cad5ca652a94461261f6e710f8e0336da18986a1f08e1d03bfde03806c"
+    },
+    {
+      "path": "R-3-Edit-1/transcript.selected.jsonl",
+      "source_sha256": "2fcc9c07245f34a1d6f435d92d4dc37937f98b050afe5f7ba2f7b69ab1b98ccb",
+      "published_sha256": "346856d029ec6b026c0d4c414410a5d18aa4c721c091f6f538ebb57cd7bdb2f8",
+      "source_size": 186772,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 4,
+        "api-request": 2,
+        "last-prompt": 3,
+        "attachment:deferred_tools_record": 1,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "R-3-Edit-2/observer.txt",
+      "source_sha256": "c64991754b87d411a9cc36f3a5a233ddb02859cfc7e4b914e79ec608b455b4de",
+      "published_sha256": "f26e4a8fe9f0dfc96e7f7bcc5b519bd90ce4c117bc65fd315405f059cebc8888"
+    },
+    {
+      "path": "R-3-Edit-2/prompt.txt",
+      "source_sha256": "300f79d4b9f8903edc9326738d2d892804ef64dd6fe031faccca08d187fa45d7",
+      "published_sha256": "6e878bf6b12bdeb132d36316cd8bb3da2b407a3e9fe5fa197455f0ce59e595c1"
+    },
+    {
+      "path": "R-3-Edit-2/setup.json",
+      "source_sha256": "b7540c0d1a0da42e1ea56d300c7ac94e3e1da04368d66e44d170e57cdb8f9299",
+      "published_sha256": "c094d272455b07030d9309960b58758ff8afa9a7c1994148d931786c152f0721"
+    },
+    {
+      "path": "R-3-Edit-2/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "R-3-Edit-2/events.jsonl",
+      "source_sha256": "175c9343b93cf325c7e66d17735a25ce3d4e2bb531d8111ccb7cdfac38ccffe0",
+      "published_sha256": "afcbbd412469e0483cfa4a26ab606ef284efddc92ea72b2169e493ede24f2f2d"
+    },
+    {
+      "path": "R-3-Edit-2/hook-log.jsonl",
+      "source_sha256": "6907dfc4fb2922c9ceb485cb037d8c5e9b5b8fa2f15ed37e2b079e37e7c747d6",
+      "published_sha256": "b221e64efdf392ccc8ac4af8aef0c65d40dcff096f1fffe7170f82ba88a79e6c"
+    },
+    {
+      "path": "R-3-Edit-2/outcome.json",
+      "source_sha256": "acd9da118fb6dab29e32cf152705511db9741093e4ac5e00ca761ee99219a07d",
+      "published_sha256": "9724b83a8eff249402a1c3ce5aab8c4fd22b552a5aa326018636f5cc927129ee"
+    },
+    {
+      "path": "R-3-Edit-2/target.before",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "R-3-Edit-2/target.after",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "R-3-Edit-2/netcap-sni.txt",
+      "source_sha256": "77d4579178a1c2ab08a682e86b7639958b0148429ae3aaedf6a6835d01916be5",
+      "published_sha256": "77d4579178a1c2ab08a682e86b7639958b0148429ae3aaedf6a6835d01916be5"
+    },
+    {
+      "path": "R-3-Edit-2/transcript.selected.jsonl",
+      "source_sha256": "cc14affc6a40d4a988037e99d4fbd4d5584f3e97f43d70361581ac5e3dd53196",
+      "published_sha256": "65da0579fec1afa4712bb089be21f0154b485c2b40552b898ccd675945629470",
+      "source_size": 185457,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 4,
+        "api-request": 2,
+        "last-prompt": 3,
+        "attachment:deferred_tools_record": 1,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "R-3-Write-1/observer.txt",
+      "source_sha256": "d16267a2cad5685366efde259f51653f76c0104db76eb3ec3b6042b5d2be775a",
+      "published_sha256": "c0792c1793f17d472e65b929bb5e15eb7d6d1b5011c06856c938fb3a43a84f0f"
+    },
+    {
+      "path": "R-3-Write-1/prompt.txt",
+      "source_sha256": "725ad8506804b796c435286268d1e4809a8a0c2e598a3bc2feb49f5d1c1f4764",
+      "published_sha256": "951a8e6f566254a99476dd75e9c983550007138e4207edde9d436df907a72ae5"
+    },
+    {
+      "path": "R-3-Write-1/setup.json",
+      "source_sha256": "e10ddb33f63c9e70095526cb2ce7f3165d08e44b093fbb8430d049c333e4a64f",
+      "published_sha256": "cae018f2c5a2a32976e9ceacd4a76c26ab86ea160784974cdd1e68e6419dbf60"
+    },
+    {
+      "path": "R-3-Write-1/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "R-3-Write-1/events.jsonl",
+      "source_sha256": "c06aec2366e6f8770216f5bfab2752dd528f7e8cd7ba5992a0b291ea3178140b",
+      "published_sha256": "855dc18e7a662c1e6d762f26200ab0acdb91a46304649c18c232386af556a073"
+    },
+    {
+      "path": "R-3-Write-1/hook-log.jsonl",
+      "source_sha256": "9c791a3ec0c03c8f08d2450767ba4a5641143a0b641f830f182b427bc9e9e121",
+      "published_sha256": "a018e4c24ae3696dd527c0ce0e619460cc0866d481cdf52fef3416a98919ea2f"
+    },
+    {
+      "path": "R-3-Write-1/outcome.json",
+      "source_sha256": "0dd840a9124654cb42113a5a5d729753d9a53ecfec11afc1146e38bb7f6e560f",
+      "published_sha256": "1f863bf407cf58ef7c2b4941c6e6acde407c2fca2a8d66e34340fedea45d6a6f"
+    },
+    {
+      "path": "R-3-Write-1/netcap-sni.txt",
+      "source_sha256": "ee622032314f4df610de59413df2c4b18bf06ba06bc015d878336c62b9bd1b30",
+      "published_sha256": "ee622032314f4df610de59413df2c4b18bf06ba06bc015d878336c62b9bd1b30"
+    },
+    {
+      "path": "R-3-Write-1/transcript.selected.jsonl",
+      "source_sha256": "d8ba92132ce9de1f9eeb9577d91c65f01501f4356c5543b0384ff3946fa89cc7",
+      "published_sha256": "0a4d4907cbbd8ce5fcf40b36cedbcc23e7779d7b3d1d5130d66f17eda495dce3",
+      "source_size": 184709,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 3,
+        "api-request": 2,
+        "last-prompt": 3,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "R-3-Write-2/observer.txt",
+      "source_sha256": "ef2451e32b8a591480be8c9023d842b262583b2a9c972c6ce52c325cbc6d9887",
+      "published_sha256": "af0775a51303a79828eaf7c3432e1a98537cfcc6546aef5c1cfd40991ad655fe"
+    },
+    {
+      "path": "R-3-Write-2/prompt.txt",
+      "source_sha256": "416a64651d313b6e8e5fd9e7492956b30276482bd09a2acfac6fd845a6db182d",
+      "published_sha256": "cf59626f0d9497d59aec96869365c2f34536326342c7f2b3b73383c2ebbc215b"
+    },
+    {
+      "path": "R-3-Write-2/setup.json",
+      "source_sha256": "722cc7ff8ca616d40f09332671beae0054b033137b4b9fb54eef85e225d1371f",
+      "published_sha256": "e2fb5f9c0a355ef95d0c1669c67018a99ba6cf9aaba3e2c3254e1a0c9d8d55a5"
+    },
+    {
+      "path": "R-3-Write-2/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "R-3-Write-2/events.jsonl",
+      "source_sha256": "5564d31159ea41dd27f6e4df36616741e4efa201d80706e2c261f8e92b438d06",
+      "published_sha256": "e3a0a2b59d3f20c756e41adbf0601fb312ba491d6a192fa9d983cccbee9e5c8a"
+    },
+    {
+      "path": "R-3-Write-2/hook-log.jsonl",
+      "source_sha256": "238cf1f1880489cfe1aa0baf9fbb93055907a410eed901f3a742bb79c8a30d3a",
+      "published_sha256": "a414b08a005e203f98144f80d44cdf3c7cbdfe0fbb8c0e6ad3bfee6f6c04cd1c"
+    },
+    {
+      "path": "R-3-Write-2/outcome.json",
+      "source_sha256": "c4c20b30fa3dc3164e1d86f3a03ae5f396590576a78e482b5ca7386df3ba4c3a",
+      "published_sha256": "1433a47b50e020c304d31d2b5c1d029c552727820180b37d7615cde7a1e92b08"
+    },
+    {
+      "path": "R-3-Write-2/netcap-sni.txt",
+      "source_sha256": "23e74355dd16c6235c4f2d83af6c699ebb2cb73b5e0b9f3285dbf3389bbce6b4",
+      "published_sha256": "23e74355dd16c6235c4f2d83af6c699ebb2cb73b5e0b9f3285dbf3389bbce6b4"
+    },
+    {
+      "path": "R-3-Write-2/transcript.selected.jsonl",
+      "source_sha256": "03462ce4f05f0fb13195c401bd5826c3b19cbf4630e5f4413160a0dd97c0e14f",
+      "published_sha256": "02f8774f98523c78a5ace423d9b3b58b4d8af163c38f3fb873f155df3d3c4ada",
+      "source_size": 184614,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 3,
+        "api-request": 2,
+        "last-prompt": 3,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "R-4-Edit-1/observer.txt",
+      "source_sha256": "f53b19c14d5e2232969560a070207b78264edc77151023ef7607ed187b3878ac",
+      "published_sha256": "093b9e1e14271dd6c8c25549a030937681b74ed528a95fc0e5c6d8204e7f233f"
+    },
+    {
+      "path": "R-4-Edit-1/prompt.txt",
+      "source_sha256": "5f3d4decb2c17b25a15a601a29ba2d95e4538b14ec79618adfc744380ad8d653",
+      "published_sha256": "75c5b23aab24403794dcc24406572c46ce78a5044f22344ab806068eafb4cf72"
+    },
+    {
+      "path": "R-4-Edit-1/setup.json",
+      "source_sha256": "c5bcef1368e0e9e100953bbf519981083bb076ea38d88fc3586a2e61dcbc9b0f",
+      "published_sha256": "bd0d5b675053391ce6bec2474e581f9ea652646a4443aeeda6a5d339fe925e4c"
+    },
+    {
+      "path": "R-4-Edit-1/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "R-4-Edit-1/events.jsonl",
+      "source_sha256": "8441c5a91698d68eb3a038a172b581bfe1a97745cc001c30526efb9ca0455d32",
+      "published_sha256": "1555275473ec6c6f5c9a40cf89c6219144ab8f282d008c3aa820f6bfa7652b12"
+    },
+    {
+      "path": "R-4-Edit-1/hook-log.jsonl",
+      "source_sha256": "3970727d9a316d0a4e9af4df11418572e1383c8550df073c1f9c20c2fa413872",
+      "published_sha256": "5e07557d3bb23fbe786cf254425f215f068e11c5f17899224f68d4a5c8729a9b"
+    },
+    {
+      "path": "R-4-Edit-1/outcome.json",
+      "source_sha256": "f88d906b7dc028e66641656e74d88478d451fc9aca46f4d759bc9d2a2d634458",
+      "published_sha256": "2ca308e766b52be99bafb828b4605619974a9aa511f65db025590b29262d0b9e"
+    },
+    {
+      "path": "R-4-Edit-1/target.before",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "R-4-Edit-1/target.after",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "R-4-Edit-1/netcap-sni.txt",
+      "source_sha256": "6531dcc6da2d2168c44580a48054987e4bebe394bb0ce6c72d4220802f363ea0",
+      "published_sha256": "6531dcc6da2d2168c44580a48054987e4bebe394bb0ce6c72d4220802f363ea0"
+    },
+    {
+      "path": "R-4-Edit-1/transcript.selected.jsonl",
+      "source_sha256": "61975e1b5bd4f74d18aeb08a0bfbd9ddfaa910b60524d7dfaf70ab11025e5ba5",
+      "published_sha256": "b500195815aa8c072c0ea55ab2c0ba945762c2926ff70a10e694268c8fae4b25",
+      "source_size": 187146,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 4,
+        "api-request": 2,
+        "last-prompt": 3,
+        "attachment:deferred_tools_record": 1,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "R-4-Edit-2/observer.txt",
+      "source_sha256": "cc776033c41c5880c48fad5b4b98456e0313e945a5100969c754a8f77e4e6ace",
+      "published_sha256": "da65910dc55c9e12f188cb16a9074e8e26452dc6d275306e8872c9ee60bcb4a3"
+    },
+    {
+      "path": "R-4-Edit-2/prompt.txt",
+      "source_sha256": "535fb8481e6bd0937b6a9b5adea2c2cba541c7010551efd126430df96aa592a2",
+      "published_sha256": "c035096133f7f8ecee52b889b358f3186ddc8392a7a324b7cc6c62297b724bdc"
+    },
+    {
+      "path": "R-4-Edit-2/setup.json",
+      "source_sha256": "c5f82761d7f7a128996c2e9a783d2ec4ec6c1b8d2aefa041126cb3428cb996dc",
+      "published_sha256": "219344704249478ec8fd01769252988b64270e6dc91439fc9b22f0979955aee6"
+    },
+    {
+      "path": "R-4-Edit-2/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "R-4-Edit-2/events.jsonl",
+      "source_sha256": "4a59d421c30ddf21fb7948a1bdee1ac268b8ff118d79956263970c41fa2ba4a8",
+      "published_sha256": "120a68a483583b75426ca12d0f0d565c8eb179432e62508f8f501adceb229962"
+    },
+    {
+      "path": "R-4-Edit-2/hook-log.jsonl",
+      "source_sha256": "3447ad98761e3aab2acb28117aa7112d99e1a22d0beca0301004474289464cd0",
+      "published_sha256": "72eea3d559f3e71e54f9c38eafb7523790e5510893c8955ecbffca86bed153e2"
+    },
+    {
+      "path": "R-4-Edit-2/outcome.json",
+      "source_sha256": "8245a1e8fff97b1ae3dfb02ffc8caabba1f416a4e122c52ba20beb4f4ff7b38d",
+      "published_sha256": "2e35cf7f0156e5182721adb334760823e259cf89f00d018120e999870f7efe59"
+    },
+    {
+      "path": "R-4-Edit-2/target.before",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "R-4-Edit-2/target.after",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "R-4-Edit-2/netcap-sni.txt",
+      "source_sha256": "9a008508367e99ba5f265e6780872c1669c3ea70ac57a2f1dc2c65294a2a57fe",
+      "published_sha256": "9a008508367e99ba5f265e6780872c1669c3ea70ac57a2f1dc2c65294a2a57fe"
+    },
+    {
+      "path": "R-4-Edit-2/transcript.selected.jsonl",
+      "source_sha256": "6db1dcbbef5add327429defa1eab86cc73ec344efb08d8a028e688440d63d295",
+      "published_sha256": "980a01ee245a450fa34819b8b02fe8f468f19788bc90d6541bb3463e012397d0",
+      "source_size": 186992,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 4,
+        "api-request": 2,
+        "last-prompt": 3,
+        "attachment:deferred_tools_record": 1,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "R-4-Write-1/observer.txt",
+      "source_sha256": "424356662b446eaef87702f4b32201b349f6fade0bfb129faed47d6f989e20d2",
+      "published_sha256": "708f539c271e4d0bfea1529267302d34c95f8960fbc716cbe15854dde8470e1f"
+    },
+    {
+      "path": "R-4-Write-1/prompt.txt",
+      "source_sha256": "4c45a58a017459bafd430a23ab748b3ce871194e1f6534a20f20a932b8354e36",
+      "published_sha256": "3ab302e0a04c7c2a86c55b62be3fd1db50c4b897f6506160d2a605b003d36fcc"
+    },
+    {
+      "path": "R-4-Write-1/setup.json",
+      "source_sha256": "ba74ac066a9ae3cf5202d58e865a793ccd269ff270b0d0ee40840886720de13f",
+      "published_sha256": "0901bae6af5388d1d6915117da614ce1f56e1873c0bfb8942eab2d3fff904603"
+    },
+    {
+      "path": "R-4-Write-1/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "R-4-Write-1/events.jsonl",
+      "source_sha256": "1bef94aefe7c4daa34962eb50b6626808c6871e72cc489f5a9eda5e4a6af3141",
+      "published_sha256": "c9f2461de6b72a7e98e3aa28138e57ae28c5bec47777649fc77700968132a1b2"
+    },
+    {
+      "path": "R-4-Write-1/hook-log.jsonl",
+      "source_sha256": "768dee34d9c773e7a24d2c15402de47a14fc24a2bca926a51a97269aa25a5afb",
+      "published_sha256": "c3c830d396501a409c7ffdbbc91adfceb3c0b6071bf0c7f4364eb5b505f42335"
+    },
+    {
+      "path": "R-4-Write-1/outcome.json",
+      "source_sha256": "0de91c9595695fbf469603a9f35d50f55fbb46cb7232b8ebe70cd1d9abfc0c9f",
+      "published_sha256": "790acd32cfbb2a3d00c3fee111884419356d8d1fe91c35613071cf7957808c6d"
+    },
+    {
+      "path": "R-4-Write-1/netcap-sni.txt",
+      "source_sha256": "d0410c3e35df66ac136af920723ca9a5dcc5c51b4d92b8aa2cd4045b1dbb48d8",
+      "published_sha256": "d0410c3e35df66ac136af920723ca9a5dcc5c51b4d92b8aa2cd4045b1dbb48d8"
+    },
+    {
+      "path": "R-4-Write-1/transcript.selected.jsonl",
+      "source_sha256": "759f312b9ca63b611855bd06c2c01d6bf5c009dd5a3681f77574b4cfc6e7a21d",
+      "published_sha256": "83c687664ab5409243a3a6b476f2d32059b47c31b84261875e4a9b0e47476ceb",
+      "source_size": 184839,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 3,
+        "api-request": 2,
+        "last-prompt": 3,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "R-4-Write-2/observer.txt",
+      "source_sha256": "f818f9ceabb4e68de5335c5060ff17be7bbbcebb2162c51baeecf7f4a192e4ee",
+      "published_sha256": "6507548e6f3ac7a17da0ac433557b8acdf4a2a211dae944880d8f3306241c934"
+    },
+    {
+      "path": "R-4-Write-2/prompt.txt",
+      "source_sha256": "d0692adec304ce23cd17497ab0909fca64940577f945b6d979cf640688ef4a3c",
+      "published_sha256": "0513f8aa99b20e66d644f15b690ceed4de9adac88573800b8ba1a386bb70b99a"
+    },
+    {
+      "path": "R-4-Write-2/setup.json",
+      "source_sha256": "7e8637f9d5f5d0c87a32d48e0caf12d5db554423a2cc06c617217aa9d8766226",
+      "published_sha256": "87d474aaa233212c828060669fa3c2ed12b4bda0fbc09df8871dd56b40a76b17"
+    },
+    {
+      "path": "R-4-Write-2/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "R-4-Write-2/events.jsonl",
+      "source_sha256": "c72e295dc38deac97bf36ca7662ab0236f6d3ab6048619511b49f850bd0e8735",
+      "published_sha256": "466e58580b027c521385d3a6bda6ad648169ade49eb429cf1416420b6acc52b5"
+    },
+    {
+      "path": "R-4-Write-2/hook-log.jsonl",
+      "source_sha256": "d94278d4d29157b6cd9813e91887cf2b572f9db935bdc0aafc940f7e25ddee75",
+      "published_sha256": "d30a9af8b81885608ba009d146c47e83ef2bec7067f239beee4996c774025aeb"
+    },
+    {
+      "path": "R-4-Write-2/outcome.json",
+      "source_sha256": "e5a9c3e6154802ded7bcafcbdc170ae9e2d3f4de8a9e8ff93d1d6328c1d3b49e",
+      "published_sha256": "695e90af15ab8ae4e00f4398608627eb6986a0f3f9113a14dd05d7c9228330b0"
+    },
+    {
+      "path": "R-4-Write-2/netcap-sni.txt",
+      "source_sha256": "77d4579178a1c2ab08a682e86b7639958b0148429ae3aaedf6a6835d01916be5",
+      "published_sha256": "77d4579178a1c2ab08a682e86b7639958b0148429ae3aaedf6a6835d01916be5"
+    },
+    {
+      "path": "R-4-Write-2/transcript.selected.jsonl",
+      "source_sha256": "2ae23b870b619c764f8823e9d22ee376f86881ac3f6eafe72e6ab6afff85805e",
+      "published_sha256": "02f044365765572b04077946256b591d905797fda1f010e3f70d415cfecd4110",
+      "source_size": 184857,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 3,
+        "api-request": 2,
+        "last-prompt": 3,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "R-5-Edit-1/observer.txt",
+      "source_sha256": "d27ce04d1c8067c878b9dda449b48c1f35d7ba725f64957ba1f7e90cfaa04397",
+      "published_sha256": "5d5115ff4acfc91b9d53185d7e62fddada4ab5711153f02d4301c6474e059e2a"
+    },
+    {
+      "path": "R-5-Edit-1/prompt.txt",
+      "source_sha256": "555c0256d372e1e5e3be5b7a90a263bce2394a8d5660b75055a44d5031c365e3",
+      "published_sha256": "551d945cec6adaacf561c138b02e77d7b55156fd9e9a363aec3951bd62ae0719"
+    },
+    {
+      "path": "R-5-Edit-1/setup.json",
+      "source_sha256": "dbd3fd4698908a4cd3a8c5997e05323cb2077d06667e3aaf356a9a3b88ff3206",
+      "published_sha256": "6f6ffb57022dc8c6c46a6f13e23f954da49b37943ceae88b2c0901674a50b9b9"
+    },
+    {
+      "path": "R-5-Edit-1/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "R-5-Edit-1/events.jsonl",
+      "source_sha256": "338016333d79d1a4d1cab68ff0f271bd44155a9cc00f999fd443043ea454a29f",
+      "published_sha256": "944f35912dcd33276c0c8f16b3fd97481e8c0eb45b63c70a1b43b497528d8990"
+    },
+    {
+      "path": "R-5-Edit-1/hook-log.jsonl",
+      "source_sha256": "2ab3a651415e2683b0c0fed13a0eb8976d7453ee82b36b18a8cd12fc9222ce7e",
+      "published_sha256": "75ac4e92118ea7d5ac307aaa2b05ece9297f0b75eda30e4a3dac621c2e9dfde1"
+    },
+    {
+      "path": "R-5-Edit-1/outcome.json",
+      "source_sha256": "f5ccf336ed6724b9a418f7ce789155a3857444abcfcbed06e56a8d39a08bc950",
+      "published_sha256": "d0c2e09acaf5bc794fe877bd4fdf15213a9f371e480cc9e89cf17bd821fa8659"
+    },
+    {
+      "path": "R-5-Edit-1/target.before",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "R-5-Edit-1/target.after",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "R-5-Edit-1/netcap-sni.txt",
+      "source_sha256": "77d4579178a1c2ab08a682e86b7639958b0148429ae3aaedf6a6835d01916be5",
+      "published_sha256": "77d4579178a1c2ab08a682e86b7639958b0148429ae3aaedf6a6835d01916be5"
+    },
+    {
+      "path": "R-5-Edit-1/transcript.selected.jsonl",
+      "source_sha256": "fa52602185aecaa5152b1bb02de86d3e69e557803fddaf31ac42132f9854588a",
+      "published_sha256": "ce8e96fe30407e0d25cea4ab6b7504225cd006f35e1231fa4e7f54ba278ed7b4",
+      "source_size": 186534,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 4,
+        "api-request": 2,
+        "last-prompt": 3,
+        "attachment:deferred_tools_record": 1,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "R-5-Edit-2/observer.txt",
+      "source_sha256": "79c879066def59de0b6af96434568038cc5badae4bbe868969a057e090a7ff8e",
+      "published_sha256": "097eb803800175e795574e7544c50c3cd26d3c8b75a0813897620f28826e8331"
+    },
+    {
+      "path": "R-5-Edit-2/prompt.txt",
+      "source_sha256": "17f7c23d51e1315e129de35b7e4678a112512ddfde013fc8287f71574f558071",
+      "published_sha256": "5c341493eb027534f42f32710d3443b6b6988633467418e054a5a506da3c9ef3"
+    },
+    {
+      "path": "R-5-Edit-2/setup.json",
+      "source_sha256": "1b4dc992d2c5b7593da75c62362c80ea22b7f39ff48623d485fecbdad68aa2cc",
+      "published_sha256": "2900308d9314295b0922b607e87a6d3c0d399c402fe2184b1c94b7b863ad4e69"
+    },
+    {
+      "path": "R-5-Edit-2/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "R-5-Edit-2/events.jsonl",
+      "source_sha256": "436774678b22b46f9208fdb1b8a49cb9aa594a95e4c93463a7fbef027e61ae9f",
+      "published_sha256": "922a99ac9c33fe7cf759b9c97cb1ebe4d6f9ad5494bee963379e519a6e3e6748"
+    },
+    {
+      "path": "R-5-Edit-2/hook-log.jsonl",
+      "source_sha256": "9b9862078000e3595bf2affb1aa20fd66b3f25daed5b1b59f3f4095d0dbf7160",
+      "published_sha256": "a449f32fe0564ca67daa73c8076a5460c97da67105e10eb824f2648e097e2be2"
+    },
+    {
+      "path": "R-5-Edit-2/outcome.json",
+      "source_sha256": "51d6645569fe19b6389d562dade5b8346cbef008151bba65e13da39694363f68",
+      "published_sha256": "1da0fb476c7739b344e781617d33446e731783f643800350f1c82e566220ffdf"
+    },
+    {
+      "path": "R-5-Edit-2/target.before",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "R-5-Edit-2/target.after",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "R-5-Edit-2/netcap-sni.txt",
+      "source_sha256": "7cb02d1d8951e197261f82fad9e1d591cbba05b03fbccfd2fa90c5c0523f3a29",
+      "published_sha256": "7cb02d1d8951e197261f82fad9e1d591cbba05b03fbccfd2fa90c5c0523f3a29"
+    },
+    {
+      "path": "R-5-Edit-2/transcript.selected.jsonl",
+      "source_sha256": "2f559d456ae4d76517aadde36a6d9f6867188d401eb05e7d0a6f0854f2186f73",
+      "published_sha256": "ed0c3679dbaa70121510b77b9d7a913db3213c493eed05cfeb082b7fc169a6f4",
+      "source_size": 186353,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 4,
+        "api-request": 2,
+        "last-prompt": 3,
+        "attachment:deferred_tools_record": 1,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "R-5-Write-1/observer.txt",
+      "source_sha256": "2214a36e41b424884d4ff8a9d29fdc1c3a01dd387403e1a9efd7ed75933b6252",
+      "published_sha256": "2efe7ab781a5f0de6379ad5bb8bccd118a6488950613696e0b1f408f0ff204e5"
+    },
+    {
+      "path": "R-5-Write-1/prompt.txt",
+      "source_sha256": "df0abe05ce0e024decc3771c8a6d2f9509d7960f5e1777c57290f0410fc6d80b",
+      "published_sha256": "b9e1ed68fa389b7a0e7f2bff93fa9ded23036fb7c8f5668a5bf0099dd2c4f063"
+    },
+    {
+      "path": "R-5-Write-1/setup.json",
+      "source_sha256": "54666a617e765c245e667b2cde2e982b592b9277fdb9a8cfb619a776422fe22e",
+      "published_sha256": "b2a4e0e066dc5fd17d066e45ef46d3619fb612a91fb2489034e41459e53cc568"
+    },
+    {
+      "path": "R-5-Write-1/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "R-5-Write-1/events.jsonl",
+      "source_sha256": "8a380272c88b4fc43bbb5d3bc7af5ba141bfab8126d4272d3a714a8bb53d59ad",
+      "published_sha256": "12b722ecd281ce23222cfcd3ed11c7e29e40d7f5b61a31f59ab61aff967eee17"
+    },
+    {
+      "path": "R-5-Write-1/hook-log.jsonl",
+      "source_sha256": "16a08972bb32baeac5ddd732590192b94ad1d9a322f0c84a998658428e1d4106",
+      "published_sha256": "770f653884baf6ef7850703d96a4207c0e5ecf4e4ec86cc2236857592ca53f44"
+    },
+    {
+      "path": "R-5-Write-1/outcome.json",
+      "source_sha256": "58901c5f649a93a847adb2931a1f29b2ae051be3c2a30f7a6d526335a0c3309f",
+      "published_sha256": "5adbd844ab2bbae28cbe4d8771e02347096b96d23c76776d927e96f2baaf93a1"
+    },
+    {
+      "path": "R-5-Write-1/netcap-sni.txt",
+      "source_sha256": "d0410c3e35df66ac136af920723ca9a5dcc5c51b4d92b8aa2cd4045b1dbb48d8",
+      "published_sha256": "d0410c3e35df66ac136af920723ca9a5dcc5c51b4d92b8aa2cd4045b1dbb48d8"
+    },
+    {
+      "path": "R-5-Write-1/transcript.selected.jsonl",
+      "source_sha256": "d8363eef87f014a6a38b3f8b7512ca2107ec46324c84a700916119d946828039",
+      "published_sha256": "58c5d6c640ff9d2b6afd7cf9c4893a2b0c2bbbdd544b5a0e1b4ce1d2c935969a",
+      "source_size": 184467,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 3,
+        "api-request": 2,
+        "last-prompt": 3,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "R-5-Write-2/observer.txt",
+      "source_sha256": "333d37983158d67fbf099bf65b2dfd876ca7298e261f0230a24d6f8cba796431",
+      "published_sha256": "f42457597e7bf2830c455361ac93d271631faa02baca88c36434689065fbc3cf"
+    },
+    {
+      "path": "R-5-Write-2/prompt.txt",
+      "source_sha256": "a82bce70a579696a3f93f619d308a36283bf28923727917928e05b91f68b3aad",
+      "published_sha256": "2c8b3065559189937771d82b104355a21a6a493e363f8907c2dcaf9d542c242d"
+    },
+    {
+      "path": "R-5-Write-2/setup.json",
+      "source_sha256": "3d19dd78f4f46c42e6e5d1fac2eb2f86b7b0e7577f74ee6251e8ded9077f43e8",
+      "published_sha256": "c8c46328df91ceff53278a4f91dfcb5f486fdc6bf13f2932015355a33c18f3bb"
+    },
+    {
+      "path": "R-5-Write-2/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "R-5-Write-2/events.jsonl",
+      "source_sha256": "b06e8dbb1499d4cbc7006fd5f18ecdc83044d389ba4e6d7cd890ddbe1323cae4",
+      "published_sha256": "865e2ea5e9dfcd710129431d98b9471ec687a19b0280295eaeed0e2baa35645d"
+    },
+    {
+      "path": "R-5-Write-2/hook-log.jsonl",
+      "source_sha256": "21cbca5454f9586cdadf2498c3eade4b733fcb2dabc0259f0e6280b9711fd4d9",
+      "published_sha256": "ed29f93561ecc1e9d29be072298a683e0016cf1323fbe85c00b58e102b88092d"
+    },
+    {
+      "path": "R-5-Write-2/outcome.json",
+      "source_sha256": "cd5325d9947755d6151accd75ea952ab0ca12dfeb58440720b53a9e052cfe083",
+      "published_sha256": "1f5f781715bba06f180a96b5dc56ac5f19d8c3b670699284f261229fe59fef67"
+    },
+    {
+      "path": "R-5-Write-2/netcap-sni.txt",
+      "source_sha256": "77d4579178a1c2ab08a682e86b7639958b0148429ae3aaedf6a6835d01916be5",
+      "published_sha256": "77d4579178a1c2ab08a682e86b7639958b0148429ae3aaedf6a6835d01916be5"
+    },
+    {
+      "path": "R-5-Write-2/transcript.selected.jsonl",
+      "source_sha256": "c17802c3dd3b628bdc7e5a3daebaf52b23753b2b3f0e3d7a598c888b6df85f11",
+      "published_sha256": "7aa6ce31814584b5bfb3488bfcdc545b8b3866be4cf982c0e4ca7ab7a02a0632",
+      "source_size": 184537,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 3,
+        "api-request": 2,
+        "last-prompt": 3,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "R-6-Edit-1/observer.txt",
+      "source_sha256": "f356dac3cf391a5434b588fc9fbc190ec736e1054e2baaea8bef3e47c6abc457",
+      "published_sha256": "da473b0a94127c9c09a4b60a462b7b131f3e95f3d2f5896defae54e0919937e7"
+    },
+    {
+      "path": "R-6-Edit-1/prompt.txt",
+      "source_sha256": "f0318f9dd51aa834a5f31b5c932aee9b5dbecf81e6275e9f8abde6decc5b76cb",
+      "published_sha256": "954a7068644962999ee466f90b41f0a3a96908ce1d4872ccfa1c3d85e3be3231"
+    },
+    {
+      "path": "R-6-Edit-1/setup.json",
+      "source_sha256": "b1d32333c31c81f699a2fd87a66139db1d3cd5bb17a29b3260e320df8bb1cba4",
+      "published_sha256": "d4e7fa5fbf864db8d6e7f0e870823e46153dd6a457f85814a2e6f011622cc00c"
+    },
+    {
+      "path": "R-6-Edit-1/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "R-6-Edit-1/events.jsonl",
+      "source_sha256": "0ae5e19f068d823d658a5606869322023d4ef0171f35517014c9f2d32132649e",
+      "published_sha256": "471a6098f07f5a83c67653585d1d826f63cd25befd573448187897448d0d33f6"
+    },
+    {
+      "path": "R-6-Edit-1/hook-log.jsonl",
+      "source_sha256": "98cc78395119172b7551e5e7cd49e94c741495f8110ac88f1de504fe2bbb29ad",
+      "published_sha256": "ac9c282a550364015be19cc127343b99dec53ce80de48f57d46ebf76075ab4a0"
+    },
+    {
+      "path": "R-6-Edit-1/outcome.json",
+      "source_sha256": "573226b69fa2148e5803ea243f6debfaedbdfe45b82369a84a1fbd30cd1853e4",
+      "published_sha256": "363051251ec5281322033cf24f2035fc928f5aff9a669e3f36c3f58c6ba5da42"
+    },
+    {
+      "path": "R-6-Edit-1/target.before",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "R-6-Edit-1/target.after",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "R-6-Edit-1/netcap-sni.txt",
+      "source_sha256": "d0410c3e35df66ac136af920723ca9a5dcc5c51b4d92b8aa2cd4045b1dbb48d8",
+      "published_sha256": "d0410c3e35df66ac136af920723ca9a5dcc5c51b4d92b8aa2cd4045b1dbb48d8"
+    },
+    {
+      "path": "R-6-Edit-1/transcript.selected.jsonl",
+      "source_sha256": "22427a06edb88e144f204ff8d60fb94db6a8cbeb4445866324cdff91a67926e5",
+      "published_sha256": "b2b8dd167c3ab47950d55c70b71e6af5d3b1fcb1be8566513c3b0fde25de6aaa",
+      "source_size": 186847,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 4,
+        "api-request": 2,
+        "last-prompt": 3,
+        "attachment:deferred_tools_record": 1,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "R-6-Edit-2/observer.txt",
+      "source_sha256": "90c6374bf4459fbd07dcc67cadc1ad4e35fdcb2ff9d3e2a5c330bdfd80009a85",
+      "published_sha256": "2fea960f7f3c76e94c96bd3a0a89da0a9c0fcfd31b61d279e3faddab80e941b4"
+    },
+    {
+      "path": "R-6-Edit-2/prompt.txt",
+      "source_sha256": "7738d0d0bf17aa64f53e026f70c636b1e9a6f6aee63381d323d827fc3824cc3a",
+      "published_sha256": "b86ca7d3f3122c56583bcefa7c5e2043120a1a62dc9f617e3604721a2edd3997"
+    },
+    {
+      "path": "R-6-Edit-2/setup.json",
+      "source_sha256": "a6e1e8b5b83515390fc735436973157b72fe91da95e6a9ff0be7d460f143849f",
+      "published_sha256": "69fcd893fe56060ad49e754315a5f0b93d08547b31b2bf47086eae54ed7befb6"
+    },
+    {
+      "path": "R-6-Edit-2/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "R-6-Edit-2/events.jsonl",
+      "source_sha256": "91ee87a7a7fe47be08788fa17536ee7378dfd85b898693bee3852a2073bcfcc4",
+      "published_sha256": "00bf64537438323b433bb9e76fdd1004a9fa42c4271785089af7e4397a6a1c18"
+    },
+    {
+      "path": "R-6-Edit-2/hook-log.jsonl",
+      "source_sha256": "1bdf88f43d7de935be88aeefebc3a543bb649f84e60c2e747b941c3bfc388332",
+      "published_sha256": "fe7815b5980d137cdf431bceb97f5f0cbf8f498c26e8fc9a386fb916a9fc26f0"
+    },
+    {
+      "path": "R-6-Edit-2/outcome.json",
+      "source_sha256": "bf8a286bc7d425638831102cc88c8d03fc86f6023d7e8ac3d8a6d9e678f966e5",
+      "published_sha256": "b5450a47f4920bd959c893887ef63b8973775560691dfdf740917cda351db9f8"
+    },
+    {
+      "path": "R-6-Edit-2/target.before",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "R-6-Edit-2/target.after",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "R-6-Edit-2/netcap-sni.txt",
+      "source_sha256": "9a008508367e99ba5f265e6780872c1669c3ea70ac57a2f1dc2c65294a2a57fe",
+      "published_sha256": "9a008508367e99ba5f265e6780872c1669c3ea70ac57a2f1dc2c65294a2a57fe"
+    },
+    {
+      "path": "R-6-Edit-2/transcript.selected.jsonl",
+      "source_sha256": "c080bf52515459296cc8305b48ea31e76cf60ac4707218b7e2ed1779e8adc13d",
+      "published_sha256": "2236f43d130fd982faf388d5eb074cde354c9010257815a32b3f803ff4429e32",
+      "source_size": 186902,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 4,
+        "api-request": 2,
+        "last-prompt": 3,
+        "attachment:deferred_tools_record": 1,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "R-6-Write-1/observer.txt",
+      "source_sha256": "6c0d5753a0bc52b346f6ad5e0d44911ed44ab67d7ae13c29327c5df88316ee0c",
+      "published_sha256": "71765536cdd52202fd54340d397b86f4233090987d4a7d78d6d38341e0049987"
+    },
+    {
+      "path": "R-6-Write-1/prompt.txt",
+      "source_sha256": "8a07f9ea109ec9e7fc84081e4c7ba083e87200ff9897c2db20ca47019e06a51f",
+      "published_sha256": "5b0b05743abcbc7befa1e5c965462f4dd0b17288c932371fc0794ecd815c1fe4"
+    },
+    {
+      "path": "R-6-Write-1/setup.json",
+      "source_sha256": "fdf74749504d6590b4658645b6c8325f0f65b12c8d9ead6be24c603b690b0c7f",
+      "published_sha256": "e6f04233ae445bb1b742dd0767b01617c3323bf75d8a99d4ebcff4e941037f80"
+    },
+    {
+      "path": "R-6-Write-1/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "R-6-Write-1/events.jsonl",
+      "source_sha256": "a90e9de9c32991ab60c0bc3f849aa339221b3a1a484bc8e7cd756d39ae0199a1",
+      "published_sha256": "9991392c069be4d6a0e74bd32165a16d848ca1111b6b2f3f0e713a577f61fa1a"
+    },
+    {
+      "path": "R-6-Write-1/hook-log.jsonl",
+      "source_sha256": "49fc13f0f3e9e6ef255603c8a86292f04d643d16febbce96d524eac195a00d86",
+      "published_sha256": "a7681ead3803b436e19d65936cd289f30fc76a78400a41f484dd932103ee403c"
+    },
+    {
+      "path": "R-6-Write-1/outcome.json",
+      "source_sha256": "00c6cd3f00b8901801d1b585687e9bf4352ea65953735b568ccff8ce4b8f5619",
+      "published_sha256": "db2958a78a9ac50268d5f7aeaf839a60c121afa857cc52c12fddd26fdc3a276c"
+    },
+    {
+      "path": "R-6-Write-1/netcap-sni.txt",
+      "source_sha256": "6531dcc6da2d2168c44580a48054987e4bebe394bb0ce6c72d4220802f363ea0",
+      "published_sha256": "6531dcc6da2d2168c44580a48054987e4bebe394bb0ce6c72d4220802f363ea0"
+    },
+    {
+      "path": "R-6-Write-1/transcript.selected.jsonl",
+      "source_sha256": "f0a9c82301065384bc6f740e47428a7f6144abd4564ce032e1c837392bd86384",
+      "published_sha256": "4a7725759f854e3044170e2cd341cb8652b1168ba48184c1cebd1aa5d6ba7b72",
+      "source_size": 184795,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 3,
+        "api-request": 2,
+        "last-prompt": 3,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "R-6-Write-2/observer.txt",
+      "source_sha256": "2f5f1c791f23e5e68c9d4732c47785496c826e1bc6c19b81f2dd453097097e9c",
+      "published_sha256": "2d24a1894cc3f0a2eda7aba2608cba236038da60ec100b8afe9c9ae08f8f32ec"
+    },
+    {
+      "path": "R-6-Write-2/prompt.txt",
+      "source_sha256": "c6f332014e9638787600796bf71335a34fb6f2870e54f6be0ebc43f76e3ef5c7",
+      "published_sha256": "99b0eed3577b17c60417288fc82859ab4e5f520ba19ea2db0e28d1b23c78fd6d"
+    },
+    {
+      "path": "R-6-Write-2/setup.json",
+      "source_sha256": "a2bb20f31e191e8e321f6fa598dcd7fd8813340c7da66dfe9af95f4749f2d79f",
+      "published_sha256": "8fecaf8b24b04b65b42d7a4cc349b906479b7bb6559ea19574ca134a15a77008"
+    },
+    {
+      "path": "R-6-Write-2/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "R-6-Write-2/events.jsonl",
+      "source_sha256": "3466c5cba0f2f391dc6ed2f40278ed6665a365f6f8ac193482c857f6e5ceef8d",
+      "published_sha256": "99237d51ed96027028e1ef6405d9ac167283b91f5a13ff16d23128d695e97317"
+    },
+    {
+      "path": "R-6-Write-2/hook-log.jsonl",
+      "source_sha256": "485f8e5769d391cd842abe9ff5d91ab6f37dceb8afef6bc391a5b85c67650c4d",
+      "published_sha256": "b2987877057d5fbaa496b7d9ebb2478eeeb1b8d1e5bcf5f8a5c69b033f99915f"
+    },
+    {
+      "path": "R-6-Write-2/outcome.json",
+      "source_sha256": "c2959a99ef4991b2e7d880bb9f045a06ac65d86a8c666a44a36d5ef7622ccc56",
+      "published_sha256": "9034d92873bc7d8a8b7c8948209117f95094eeac0f970ca9809e065edd8e8430"
+    },
+    {
+      "path": "R-6-Write-2/netcap-sni.txt",
+      "source_sha256": "a5b053cad5ca652a94461261f6e710f8e0336da18986a1f08e1d03bfde03806c",
+      "published_sha256": "a5b053cad5ca652a94461261f6e710f8e0336da18986a1f08e1d03bfde03806c"
+    },
+    {
+      "path": "R-6-Write-2/transcript.selected.jsonl",
+      "source_sha256": "d3d818957d47caf22007e8d025663dd104aaafdc63b9a3ea7797ff6b6b3fa4db",
+      "published_sha256": "e540d2945b2e1537dbb27a81744f8ae2dd83b9a2d09a0677dda55ff0e6f38166",
+      "source_size": 184750,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 3,
+        "api-request": 2,
+        "last-prompt": 3,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "R-7-Edit-1/observer.txt",
+      "source_sha256": "b61863874f22594213c73f2b991c973abf8a4bb0436903328de547b137bb7ec4",
+      "published_sha256": "da249b2208b5bbfb91000c6ac486c640b7e05c9062dfdd921286a36136673b57"
+    },
+    {
+      "path": "R-7-Edit-1/prompt.txt",
+      "source_sha256": "22bd56b78c510eda20d5cda72c18672f638e2f537a775a0157f1e115b14183b0",
+      "published_sha256": "57c1fe3cbd994a762ceab165d8e518ac118ac64ddbe0b84b9b76c8b0e86b0c46"
+    },
+    {
+      "path": "R-7-Edit-1/setup.json",
+      "source_sha256": "c6875d9527045b5132e69badeb3f2b9cd232dc65c77dd5d3abd1ba17e80a9fb6",
+      "published_sha256": "5bcd990e0477eda24c191022eb105252c7992a6f001ebf4a5f3547a9421d26c6"
+    },
+    {
+      "path": "R-7-Edit-1/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "R-7-Edit-1/events.jsonl",
+      "source_sha256": "355a10de7dafed9dddd13e6b9d4161d7d4566c7a55a6b41cf7036a1f98d27127",
+      "published_sha256": "696b70a83c93ff0de15cb0519a523437f570fdb48dece08c6408005459b01b37"
+    },
+    {
+      "path": "R-7-Edit-1/hook-log.jsonl",
+      "source_sha256": "31aa912a98e0430039e0bbae3ba19c080c0416015f19e0f153ebcb916876f751",
+      "published_sha256": "5063647524e126c46ebcad835bea1fcbef4dfb71bb7abb0033e4b7cb49dc1a34"
+    },
+    {
+      "path": "R-7-Edit-1/outcome.json",
+      "source_sha256": "027a4b1b6f66ffcc64dbf7e3069d53699d8c8654745a3c01ade7f72adfadf393",
+      "published_sha256": "6613da1d5b76d5cefcc2de764d1df0b25ae410dde62a12e6c7cff6af56144099"
+    },
+    {
+      "path": "R-7-Edit-1/target.before",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "R-7-Edit-1/target.after",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "R-7-Edit-1/netcap-sni.txt",
+      "source_sha256": "d4aac0b1125a305b794d27006c1e34e88dec29ae03f4a9649d2b1e7b460324d4",
+      "published_sha256": "d4aac0b1125a305b794d27006c1e34e88dec29ae03f4a9649d2b1e7b460324d4"
+    },
+    {
+      "path": "R-7-Edit-1/transcript.selected.jsonl",
+      "source_sha256": "4e8b2b5cbb69677c3d813e0be0ed4f72eda5f192800a3ee56857e7c5edd884c2",
+      "published_sha256": "afaf300a98fdc7e5f198264ad866f7d8277c2a3ded25b793afb23abd794c84ab",
+      "source_size": 188811,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 4,
+        "api-request": 2,
+        "last-prompt": 3,
+        "attachment:deferred_tools_record": 1,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "R-7-Edit-2/observer.txt",
+      "source_sha256": "d68b0260c6da8ab550a73397e6022a30292fe2b034b073aec3072bcdc1454d0d",
+      "published_sha256": "ad50633c8292925b77a09c221a1ee7966ce43778336cd38b6b2e401c92181029"
+    },
+    {
+      "path": "R-7-Edit-2/prompt.txt",
+      "source_sha256": "f8bc48d9aa225b616c97688392ab1b3125dc9a42fa6f3684d16cf638033698f1",
+      "published_sha256": "f63c2b30430a3438f86b50f26c2c3831dfc55e232706f61b598ea6ad1df3b048"
+    },
+    {
+      "path": "R-7-Edit-2/setup.json",
+      "source_sha256": "0f562dba8dd501db1e30a8eb937692942dfb0161801fe83e31f355313f15e2ee",
+      "published_sha256": "e31718411f838d7e97c49fe0e3ebbeb68388d6e7ca4fc3318ebf1332a07d9e1f"
+    },
+    {
+      "path": "R-7-Edit-2/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "R-7-Edit-2/events.jsonl",
+      "source_sha256": "f3f037281b7381bdd7af32d14896ba90fbd349464667355a5bf1004e4b548282",
+      "published_sha256": "28e41d92148147d2c41690b49b79c5ed17ab7f28c3378be9dbd2ecf4335e5072"
+    },
+    {
+      "path": "R-7-Edit-2/hook-log.jsonl",
+      "source_sha256": "33301d0f5ef79df5fbf0fb492a898b288989417b41ad3e267d13cd22c75045d5",
+      "published_sha256": "9e128a035ea4e113efe1c2fb3ed839fc2ea9ff08006e2e53d20630d31a0ca0e1"
+    },
+    {
+      "path": "R-7-Edit-2/outcome.json",
+      "source_sha256": "e6d9526f6c29430c16c6b52ac27a65918b235a0ae7c0c180d262d4a9c33261d8",
+      "published_sha256": "56b90c7316f0a79ef3a145f1dc60bdd81e65cfa0ef2a501e5bc69e3869248a76"
+    },
+    {
+      "path": "R-7-Edit-2/target.before",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "R-7-Edit-2/target.after",
+      "source_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea",
+      "published_sha256": "05e4bbae2334e509c737aee1309f663ed23a82fef05f5a8ddb67f431fcd4e2ea"
+    },
+    {
+      "path": "R-7-Edit-2/netcap-sni.txt",
+      "source_sha256": "5244fd854dfe58bfc6a3a0e9711ecd15b6d84138ac177abefe2269f7d22e90a1",
+      "published_sha256": "5244fd854dfe58bfc6a3a0e9711ecd15b6d84138ac177abefe2269f7d22e90a1"
+    },
+    {
+      "path": "R-7-Edit-2/transcript.selected.jsonl",
+      "source_sha256": "ba510a4468d8215023483e034bee37dec306f076b49475d09dbdf26e6417af63",
+      "published_sha256": "2dabd9adb853d7854c387def67e78ba5961c2e67600f3254a8b2439320ab010c",
+      "source_size": 188794,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 4,
+        "api-request": 2,
+        "last-prompt": 3,
+        "attachment:deferred_tools_record": 1,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "R-7-Write-1/observer.txt",
+      "source_sha256": "0f983810e390c25054965961e4878ac777c9f9eab61dc7cb0faf1f733c7c0326",
+      "published_sha256": "2c4c5256f8f2e6bcca0d03c5c9c62e62af094f690f8ea612e052271313c7d830"
+    },
+    {
+      "path": "R-7-Write-1/prompt.txt",
+      "source_sha256": "9c311218df714dd6a535e7decb2ba124b3b0f95f023a3b78b62a9458ccb810ed",
+      "published_sha256": "5b24e3a06d39cb1440bce2e011c31a65fdb628f0ca3986bc49e3841d71486c67"
+    },
+    {
+      "path": "R-7-Write-1/setup.json",
+      "source_sha256": "af9354c4fd9fa8fe73a2477518b0a8e0077086ce7f3cf57727a76b8209d1d529",
+      "published_sha256": "5a550441d4c2bc468c3dae2fd368fe908cd51b6ed77fdc982b9a0769878aaf7e"
+    },
+    {
+      "path": "R-7-Write-1/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "R-7-Write-1/events.jsonl",
+      "source_sha256": "2660ba437af643e4bdd692910fa047b0665542867de0e4fcc8ec00539ab42ef0",
+      "published_sha256": "ca86dee8e89bc05f764cd2329c2fac000373c69b3c538e3832b2fe3cff64e626"
+    },
+    {
+      "path": "R-7-Write-1/hook-log.jsonl",
+      "source_sha256": "f52a235c9a7538b40cb7f288989f593e24a121e9dd9f134c48d61d3f97655bed",
+      "published_sha256": "ccf9ceb0230f9b674185e139f8bdcc471e0fc9c8b7a6841c9021ebebad7cb003"
+    },
+    {
+      "path": "R-7-Write-1/outcome.json",
+      "source_sha256": "321d93babc7f3887b1b1c44ee1803292b6522969dee0a59e6f868065e32f827c",
+      "published_sha256": "ae4a742d130a3a7c2d6d2c0257c999b7416b5c788f5f58e83cca74995b0c05a1"
+    },
+    {
+      "path": "R-7-Write-1/netcap-sni.txt",
+      "source_sha256": "f1f6a2d88457d6ee08077a44416305b6d093eb828c11cacc62acc10f76e715b4",
+      "published_sha256": "f1f6a2d88457d6ee08077a44416305b6d093eb828c11cacc62acc10f76e715b4"
+    },
+    {
+      "path": "R-7-Write-1/transcript.selected.jsonl",
+      "source_sha256": "da58e92e53a71e79cf1cd0299650e16f0339b1468eea1a27570ed2ca32762393",
+      "published_sha256": "e77f3832ac8af849294d3f0e7fc4282fdfe65cef8feaf300637bbbc5b158541e",
+      "source_size": 184374,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 3,
+        "api-request": 2,
+        "last-prompt": 3,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "R-7-Write-2/observer.txt",
+      "source_sha256": "4c1f63e5b35fa67293e9eb1a7645bb9d6bd0b1764436312fd1f482ffc08c06c3",
+      "published_sha256": "7176f7b8023657a8b767aaa8eab18a632cb916d4808fcd79988e905bac479f09"
+    },
+    {
+      "path": "R-7-Write-2/prompt.txt",
+      "source_sha256": "f37783c44853ad24cee1ebafdf1af183234d7c5fbb21440dff7e8717988de029",
+      "published_sha256": "7b590db422b79743ced149216f30699b3848467ae29561c29b1a55bd3b253563"
+    },
+    {
+      "path": "R-7-Write-2/setup.json",
+      "source_sha256": "7f372149535ca5b3dd3cd0bd388f5f2016637037d5daa30a65057d047076bfd1",
+      "published_sha256": "8d76123364c2a20a8c5ec8f7da1ed1671e7cc531c0e72c964d426c80cc616e7a"
+    },
+    {
+      "path": "R-7-Write-2/hook-registration.json",
+      "source_sha256": "07374b24ea24a3659ea01c1c10bc984249a977e218d56298b020a3b5ccad9041",
+      "published_sha256": "819eb3b3283119cfb2b4bb3986671b69a23c08844d382818d788379b21ceefd0"
+    },
+    {
+      "path": "R-7-Write-2/events.jsonl",
+      "source_sha256": "835d8d59fafe0db584a632bebf36943309f27d0850a4af6c503357f3ca93ac8f",
+      "published_sha256": "8d39dbaee2709085377d0579a3e1bc3148509d032a917cd6dcf0c1539a4cf998"
+    },
+    {
+      "path": "R-7-Write-2/hook-log.jsonl",
+      "source_sha256": "5324345c8ebe73aba85a1379f6fb06500a5a2f8c6b500a75e90af7d7208fb400",
+      "published_sha256": "8787d3e84809ab88016a1c56cca94040ab03ba88389c9c0835ba9d737b822029"
+    },
+    {
+      "path": "R-7-Write-2/outcome.json",
+      "source_sha256": "c276b5675f8b7bd55b0eeb2c0863e95c1d027bef4bfca4850bcbd21cc1a1609b",
+      "published_sha256": "351df7a59ee2db3176479d4956287d74806b2893df5e662d8fff7ea654512cfe"
+    },
+    {
+      "path": "R-7-Write-2/netcap-sni.txt",
+      "source_sha256": "f1f6a2d88457d6ee08077a44416305b6d093eb828c11cacc62acc10f76e715b4",
+      "published_sha256": "f1f6a2d88457d6ee08077a44416305b6d093eb828c11cacc62acc10f76e715b4"
+    },
+    {
+      "path": "R-7-Write-2/transcript.selected.jsonl",
+      "source_sha256": "aac1b503af6f0f139b286977ec5adb400b41ca6eb59745008320b934ac350929",
+      "published_sha256": "d8587cd2486b8b6f7252c09442db4d641b3ee1759ec1366c21bc0aee721fb093",
+      "source_size": 184454,
+      "entries_not_published": {
+        "queue-operation": 2,
+        "attachment:environment": 1,
+        "attachment:model": 1,
+        "attachment:deferred_tools_delta": 1,
+        "attachment:agent_listing_delta": 1,
+        "attachment:skill_listing": 1,
+        "attachment:total_tokens_reminder": 2,
+        "atis-latch": 3,
+        "attachment:session_context": 1,
+        "attachment:date": 1,
+        "attachment:remote_session_change": 1,
+        "attachment:prompt_snapshot": 2,
+        "api-request-shape": 1,
+        "api-request-blob": 3,
+        "api-request": 2,
+        "last-prompt": 3,
+        "cost-state": 1
+      }
+    },
+    {
+      "path": "batch-phase4-e4-20261024T134930Z.txt",
+      "source_sha256": "b4e82604ea17a146e41bf29b8fabb19122ea61378dca6f8cc849f2e29fd8165b",
+      "published_sha256": "a145c3455df2dec5c96d2a2a4ace8e979f9239c0a65856e402b8dc8b1e933ce4"
+    }
+  ],
+  "selection": {
+    "probes": [
+      "P-1-*",
+      "P-3-*",
+      "P-4-*",
+      "R-3-*",
+      "R-4-*",
+      "R-5-*",
+      "R-6-*",
+      "R-7-*"
+    ],
+    "extra": [
+      "batch-phase4-e4-20261024T134930Z.txt"
+    ]
+  }
+}
