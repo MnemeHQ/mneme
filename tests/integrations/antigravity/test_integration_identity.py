@@ -16,7 +16,7 @@ ADAPTER = (
 # never redefine them.
 REQUIRED_IMPORTS = [
     "introduced_content",
-    "find_memory",
+    "resolve_memory",
     "resolve_mode",
     "assess_verdict",
     "format_reason",

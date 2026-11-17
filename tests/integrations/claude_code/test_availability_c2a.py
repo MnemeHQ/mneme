@@ -297,13 +297,26 @@ def test_d4_invalid_declaration_reports_error(tmp_path, raw, problem):
 
 
 def test_d5_mneme_memory_override_is_mismatch(tmp_path, monkeypatch):
-    target = _project(tmp_path)
+    """Rewritten for P2-first (charter §5.2.6): SS-3 through MNEME_MEMORY now
+    needs row 6, so the declared memory is absent and no memory is walked."""
+    target = _project(tmp_path, memory=False)
     other = tmp_path / "other.json"
     other.write_text('{"decisions": []}', encoding="utf-8")
     monkeypatch.setenv("MNEME_MEMORY", str(other))
     rc, _, err = _invoke(_envelope(target), response=check_result("PASS"))
     assert rc == 0 and "SS-3 memory path mismatch" in err
     assert "not bound to declaration" in err
+
+
+def test_d5_mneme_memory_alone_beside_discovered_memory_is_not_a_mismatch(tmp_path, monkeypatch):
+    """P2-first row 2: the discovered (declared) memory governs; no SS-3."""
+    target = _project(tmp_path)
+    other = tmp_path / "other.json"
+    other.write_text('{"decisions": []}', encoding="utf-8")
+    monkeypatch.setenv("MNEME_MEMORY", str(other))
+    rc, _, err = _invoke(_envelope(target), response=check_result("PASS"))
+    assert rc == 0
+    assert "SS-3" not in err
 
 
 def test_d6_historical_payload_completeness_unstated(tmp_path):
@@ -383,7 +396,12 @@ def _foreign_memory(tmp_path, text):
 
 def _real_case(case, tmp_path, monkeypatch, *, declaration):
     """Build a project for one real-check case; return the stdin envelope."""
-    memory = {"crash": "malformed", "no_memory": None}.get(case, "real")
+    # P2-first (charter §5.2.6): a memory the walk finds beats MNEME_MEMORY,
+    # so the SS-3 cases have no repository memory. "incomplete" reaches its
+    # out-of-root foreign memory through row 6 (override fills the absence);
+    # "mismatch" reaches an ancestor memory through parent-directory discovery.
+    memory = {"crash": "malformed", "no_memory": None, "incomplete": None,
+              "mismatch": None}.get(case, "real")
     target = _real_project(tmp_path / "repo", declaration=declaration, memory=memory)
     content = "import sqlite3\n"
     if case in ("fail", "incomplete"):
@@ -391,7 +409,8 @@ def _real_case(case, tmp_path, monkeypatch, *, declaration):
     if case == "incomplete":
         monkeypatch.setenv("MNEME_MEMORY", str(_foreign_memory(tmp_path, MIXED_MEMORY)))
     elif case == "mismatch":
-        monkeypatch.setenv("MNEME_MEMORY", str(_foreign_memory(tmp_path, REAL_MEMORY)))
+        (tmp_path / ".mneme").mkdir(exist_ok=True)
+        (tmp_path / ".mneme" / "project_memory.json").write_text(REAL_MEMORY, encoding="utf-8")
     return json.dumps(_envelope(target, content=content))
 
 

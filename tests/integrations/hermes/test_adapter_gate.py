@@ -9,6 +9,14 @@ from tests.integrations.check_contract import check_payload, check_result_for, v
 from mneme.integrations.hermes import adapter
 from mneme.integrations.hermes.adapter import ACTION_DENY, ACTION_SKIP, MnemeHermes, directive_for
 
+def _selected(path):
+    """A resolver result for a patched selection (charter §5.2.2 rows 1 and 8)."""
+    from mneme.integrations.memory_selection import MemorySelection
+    return MemorySelection(path=path, source="discovered" if path else "none",
+                           reason="DISCOVERED" if path else "NO_MEMORY_ON_PATH",
+                           walk="unbounded")
+
+
 
 def _verdict(verdict="FAIL", evaluation_complete=True):
     """Answer as the real CLI would, in whatever mode the gate requested."""
@@ -50,7 +58,7 @@ def gate(tmp_path, monkeypatch):
         ),
         encoding="utf-8",
     )
-    monkeypatch.setattr(adapter, "find_memory", lambda start: mem)
+    monkeypatch.setattr(adapter, "resolve_memory", lambda start: _selected(mem))
     return MnemeHermes(project_dir=str(tmp_path))
 
 
@@ -276,7 +284,7 @@ class TestFailureSemantics:
         assert result.evaluation_complete is False
 
     def test_no_project_memory_has_no_opinion(self, tmp_path, monkeypatch):
-        monkeypatch.setattr(adapter, "find_memory", lambda start: None)
+        monkeypatch.setattr(adapter, "resolve_memory", lambda start: _selected(None))
         gate = MnemeHermes(project_dir=str(tmp_path))
         result = gate.evaluate_tool_call(
             "write_file", {"path": "x.py", "content": "FORBIDDEN_TOKEN\n"}, cwd=str(tmp_path)

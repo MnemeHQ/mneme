@@ -17,7 +17,7 @@ ADAPTER = (
 REQUIRED_IMPORTS = [
     "introduced_content",
     "introduced_between",
-    "find_memory",
+    "resolve_memory",
     "resolve_mode",
     "assess_verdict",
     "format_reason",

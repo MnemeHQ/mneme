@@ -56,12 +56,14 @@ import tempfile
 from pathlib import Path
 from typing import Dict, Optional, TextIO, Tuple
 
+from mneme.integrations.memory_selection import (
+    resolve_memory,
+)
 from mneme.integrations.claude_code.hook import (
     ToolEvent,
     _CHECK_TIMEOUT_SECONDS,
     _child_env,
     _is_stale_runtime,
-    find_memory,
     format_applicability_reason,
     format_reason,
     introduced_content,
@@ -295,7 +297,7 @@ def main(
     if event is None:
         return 0
 
-    memory = find_memory(Path(event.cwd or "."))
+    memory = resolve_memory(Path(event.cwd or ".")).path
     if memory is None:
         return 0
 

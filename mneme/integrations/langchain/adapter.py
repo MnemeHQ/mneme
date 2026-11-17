@@ -138,6 +138,7 @@ class MnemeLangChain:
         """
         canonical = LANGCHAIN_FILE_TOOLS.get(tool_name)
         if canonical is None:
+            self._sdk._clear_selection()
             self._record_unmapped_skip(tool_name)
             return GateResult(
                 action=ACTION_SKIP,
@@ -165,6 +166,10 @@ class MnemeLangChain:
         return build_middleware(self)
 
     # ── Internals ───────────────────────────────────────────────────────────
+
+    def _selection_trace_keys(self):
+        """Trace keys for the selection behind this context's call, if any."""
+        return self._sdk._selection_trace_keys()
 
     def _record_unmapped_skip(self, tool_name: str) -> None:
         self._sdk.trace.append(

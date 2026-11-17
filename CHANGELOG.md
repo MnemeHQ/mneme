@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+**T-08 P2-first memory precedence (all integrations).** Charter Amendments A2
+#809 and A2-RT #811, ADR-033 erratum #810/#811, Layer 1 freeze amendment #812.
+
+- **A memory the walk finds now always governs.** One shared resolver
+  (`mneme.integrations.memory_selection.resolve_memory`) keeps today's walk
+  (nearest `.mneme/project_memory.json` at or above the start, no Git-marker
+  check) and applies the D6/Q2 P2 rule: `MNEME_MEMORY` no longer replaces or
+  masks a discovered memory; it only fills an absence. Every integration uses
+  it, with start points unchanged. `find_memory` remains as a wrapper.
+- **Notices on Claude Code only.** An ignored override, or a missing override
+  with no memory found, is reported in the probed shapes: PreToolUse and
+  SessionStart `additionalContext`, Stop top-level `systemMessage`; never
+  beside the hook's own output (warn `defer`, exit 2, Stop feedback or block,
+  SessionStart text). Verified live (#808) only for Edit and Bash
+  PreToolUse, SessionStart (delivered to the agent) and Stop (delivered to
+  the developer only), under H1's run conditions: Claude Code 2.1.310,
+  `claude-opus-5-5`, `--permission-mode acceptEdits`, project setting
+  sources, n = 1, headless (interactive for Stop). Unverified elsewhere,
+  including Write and MultiEdit. Other integrations emit nothing new; the
+  Agent SDK and LangChain record `selection_reason`, `selection_source` and
+  `walk` in their traces.
+- **ADR-033:** a `MNEME_MEMORY` beside the declared memory no longer causes
+  `MEMORY_PATH_MISMATCH`. When the declared memory is missing and another
+  memory is selected, the remediation now says to restore it.
+- **Unchanged:** fail-open policy and exit codes for the same selected memory.
+
 **DG1B2a canonical waiver records (recorded and explained only; no
 enforcement change).** Charter #784, Layer 1 freeze amendment #785, evidence
 packet #783.

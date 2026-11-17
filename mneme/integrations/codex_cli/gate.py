@@ -33,10 +33,12 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Optional
 
+from mneme.integrations.memory_selection import (
+    resolve_memory,
+)
 from mneme.integrations.claude_code.hook import (
     _CHECK_TIMEOUT_SECONDS,
     _child_env,
-    find_memory,
     format_applicability_reason,
     format_reason,
     assess_verdict,
@@ -152,7 +154,7 @@ def evaluate_apply_patch(
         if not memory.is_file():
             return GateResult(SKIP, "no project memory", target_path="")
     else:
-        memory = find_memory(Path(cwd or "."))
+        memory = resolve_memory(Path(cwd or ".")).path
         if memory is None:
             return GateResult(SKIP, "no project memory", target_path="")
 

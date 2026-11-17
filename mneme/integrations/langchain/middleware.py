@@ -76,17 +76,21 @@ def build_middleware(gate):
 
         def wrap_tool_call(self, request, handler):
             result = self._evaluate(request)
+            # Captured now: the selection belongs to this evaluation (charter
+            # §5.2.4 item 1), whatever runs while the tool executes.
+            keys = gate._selection_trace_keys()
             if result.action == ACTION_DENY:
                 return self._rejection(result, request)
             executed = handler(request)
-            return self._annotate_verdict(executed, result, request)
+            return self._annotate_verdict(executed, result, request, keys)
 
         async def awrap_tool_call(self, request, handler):
             result = self._evaluate(request)
+            keys = gate._selection_trace_keys()
             if result.action == ACTION_DENY:
                 return self._rejection(result, request)
             executed = await handler(request)
-            return self._annotate_verdict(executed, result, request)
+            return self._annotate_verdict(executed, result, request, keys)
 
         def _evaluate(self, request):
             tool_call = request.tool_call
@@ -104,7 +108,7 @@ def build_middleware(gate):
                 tool_call_id=str(request.tool_call.get("id", "")),
             )
 
-        def _annotate_verdict(self, executed, result, request):
+        def _annotate_verdict(self, executed, result, request, keys):
             if result.action == ACTION_WARN:
                 return _append_note(
                     executed,
@@ -113,6 +117,7 @@ def build_middleware(gate):
                     gate,
                     result,
                     request,
+                    keys,
                 )
             if result.action == ACTION_FAIL_OPEN:
                 return _append_note(
@@ -122,6 +127,7 @@ def build_middleware(gate):
                     gate,
                     result,
                     request,
+                    keys,
                 )
             return executed
 
@@ -168,7 +174,7 @@ def _merge_system_content(existing: Any, note: str) -> Any:
     return f"{existing}\n{note}"
 
 
-def _annotate_command(command: Command, note: str, gate, result, request) -> Command:
+def _annotate_command(command: Command, note: str, gate, result, request, keys) -> Command:
     """Carry a WARN/UNEVALUATED marker through a ``Command`` tool result.
 
     The handler contract allows returning ``ToolMessage | Command``. A
@@ -183,7 +189,7 @@ def _annotate_command(command: Command, note: str, gate, result, request) -> Com
     """
     update = command.update
     if not isinstance(update, dict):
-        _record_annotation_gap(gate, result, request, "command-update-not-dict")
+        _record_annotation_gap(gate, result, request, "command-update-not-dict", keys)
         return command
 
     messages = update.get("messages")
@@ -207,7 +213,7 @@ def _annotate_command(command: Command, note: str, gate, result, request) -> Com
         new_update["messages"] = new_messages
         return dataclasses.replace(command, update=new_update)
 
-    _record_annotation_gap(gate, result, request, "no-tool-message-in-command")
+    _record_annotation_gap(gate, result, request, "no-tool-message-in-command", keys)
     return command
 
 
@@ -219,7 +225,7 @@ def _tool_message_with_note(message: ToolMessage, note: str) -> ToolMessage:
     return copy
 
 
-def _record_annotation_gap(gate, result, request, detail: str) -> None:
+def _record_annotation_gap(gate, result, request, detail: str, keys) -> None:
     """Record an un-annotatable result on the audit trace; never silent."""
     gate.trace.append(
         {
@@ -233,14 +239,15 @@ def _record_annotation_gap(gate, result, request, detail: str) -> None:
             "verdict": result.verdict,
             "evaluation_complete": result.evaluation_complete,
             "reason": result.reason,
+            **keys,
         }
     )
 
 
-def _append_note(message: Any, note: str, gate=None, result=None, request=None) -> Any:
+def _append_note(message: Any, note: str, gate, result, request, keys) -> Any:
     """Make a warn/unevaluated outcome visible in the tool result itself."""
     if isinstance(message, ToolMessage):
         return _tool_message_with_note(message, note)
     if isinstance(message, Command):
-        return _annotate_command(message, note, gate, result, request)
+        return _annotate_command(message, note, gate, result, request, keys)
     return message

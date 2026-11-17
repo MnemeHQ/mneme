@@ -12,6 +12,7 @@ Surfaces (ADR-021):
 from __future__ import annotations
 
 import difflib
+import io
 import json
 import os
 import stat
@@ -44,6 +45,10 @@ from mneme.integrations.claude_code.shell_preflight import (
     Classification,
     classify_command,
     reconstruct_heredoc_write,
+)
+from mneme.integrations.memory_selection import (
+    resolve_memory,
+    selection_notice,
 )
 from mneme.path_selectors import policy_root
 
@@ -200,18 +205,35 @@ def introduced_content(event: ToolEvent) -> str:
 
 
 def find_memory(start: Path) -> Optional[Path]:
-    env = os.environ.get("MNEME_MEMORY")
-    if env:
-        p = Path(env)
-        return p if p.is_file() else None
-    cur = Path(start).resolve()
-    while True:
-        candidate = cur / ".mneme" / "project_memory.json"
-        if candidate.is_file():
-            return candidate
-        if cur.parent == cur:
-            return None
-        cur = cur.parent
+    """Thin wrapper over ``resolve_memory`` for external imports (charter §3.1).
+
+    It carries no diagnostics; every in-tree consumer calls
+    ``resolve_memory`` directly. Its semantics are P2-first precedence.
+    """
+    return resolve_memory(start).path
+
+
+@dataclass
+class SelectionNote:
+    """A P2-first row-2 or row-7 notice for this invocation (charter §5.2.4).
+
+    Set by the boundary handler that selected memory; written by
+    ``handle_event`` only on an H1 path, in that path's probed shape, and
+    only when the event's output would otherwise fit that shape.
+    """
+
+    text: Optional[str] = None
+
+
+def _select_memory(start: Path, note: Optional[SelectionNote]) -> Optional[Path]:
+    selection = resolve_memory(start)
+    if note is not None:
+        note.text = selection_notice(selection)
+    return selection.path
+
+
+def _context_object(event_name: str, text: str) -> Dict[str, Any]:
+    return {"hookSpecificOutput": {"hookEventName": event_name, "additionalContext": text}}
 
 
 _CHECK_TIMEOUT_SECONDS = 10
@@ -1573,6 +1595,7 @@ def bash_tool_event(
     event: ToolEvent,
     stderr: TextIO,
     stdout: TextIO,
+    selection_note: Optional[SelectionNote] = None,
 ) -> int:
     """Preflight a Bash call when — and only when — it is reconstructable.
 
@@ -1591,7 +1614,7 @@ def bash_tool_event(
         )
         return 0
 
-    memory = find_memory(Path(event.cwd or "."))
+    memory = _select_memory(Path(event.cwd or "."), selection_note)
     if memory is None:
         return 0
 
@@ -1646,6 +1669,7 @@ def session_start_event(
     envelope: Dict[str, Any],
     stderr: TextIO,
     stdout: TextIO,
+    selection_note: Optional[SelectionNote] = None,
 ) -> int:
     """Capture the per-session repository baseline.
 
@@ -1653,7 +1677,7 @@ def session_start_event(
     compact, and fork keep it so mid-session compaction cannot launder deltas
     introduced earlier in the same working tree.
     """
-    memory = find_memory(Path(envelope.get("cwd") or "."))
+    memory = _select_memory(Path(envelope.get("cwd") or "."), selection_note)
     if memory is None:
         return 0
     root = policy_root(memory)
@@ -1787,6 +1811,7 @@ def stop_event(
     envelope: Dict[str, Any],
     stderr: TextIO,
     stdout: TextIO,
+    selection_note: Optional[SelectionNote] = None,
 ) -> int:
     """Session-delta backstop: post-mutation, pre-completion.
 
@@ -1803,7 +1828,7 @@ def stop_event(
     passes on re-evaluation, and Claude Code's documented eight-consecutive-
     block cap bounds any unresolvable case.
     """
-    memory = find_memory(Path(envelope.get("cwd") or "."))
+    memory = _select_memory(Path(envelope.get("cwd") or "."), selection_note)
     if memory is None:
         return 0
 
@@ -1996,28 +2021,75 @@ def handle_event(
         return 0
     name = envelope.get("hook_event_name")
     if name == "SessionStart":
-        return session_start_event(envelope, stderr, stdout)
+        return _with_selection_notice(
+            lambda out, sel: session_start_event(envelope, stderr, out, sel),
+            stdout, lambda text: _context_object("SessionStart", text),
+        )
     if name == "Stop":
-        return stop_event(envelope, stderr, stdout)
+        return _with_selection_notice(
+            lambda out, sel: stop_event(envelope, stderr, out, sel),
+            stdout, lambda text: {"systemMessage": text},
+        )
     try:
         event = parse_event(json.dumps(envelope))
     except (json.JSONDecodeError, KeyError, TypeError) as e:
         print(f"mneme-hook: bad envelope: {e}", file=stderr)
         return 0
     if event.tool_name == "Bash":
-        return bash_tool_event(event, stderr, stdout)
+        return _with_selection_notice(
+            lambda out, sel: bash_tool_event(event, stderr, out, sel),
+            stdout, lambda text: _context_object("PreToolUse", text),
+        )
     if not should_check(event.tool_name):
         return 0
 
     # C2b section 17: an UNVERIFIABLE proceed is reported to Claude as one
     # additionalContext object, written only when the hook exits 0 and warn
-    # mode has not already carried the text in its defer object.
+    # mode has not already carried the text in its defer object. A P2-first
+    # selection notice (charter §5.2.4 item 5) shares that same object.
     note = ProceedNote()
-    rc = _direct_write_event(
-        event, stderr, stdout, note, identifiers=event_identifiers(envelope)
-    )
+    selection = SelectionNote()
+    buffer = io.StringIO()
+    try:
+        rc = _direct_write_event(
+            event, stderr, buffer, note, identifiers=event_identifiers(envelope),
+            selection_note=selection,
+        )
+    finally:
+        written = buffer.getvalue()
+        stdout.write(written)
     if rc == 0:
-        write_proceed_context(note, stdout)
+        if selection.text and not written:
+            texts = []
+            if note.text and not note.consumed:
+                texts.append(note.text)
+                note.consumed = True
+            texts.append(selection.text)
+            json.dump(_context_object("PreToolUse", "\n".join(texts)), stdout)
+            stdout.write("\n")
+        else:
+            write_proceed_context(note, stdout)
+    return rc
+
+
+def _with_selection_notice(handler, stdout: TextIO, shape) -> int:
+    """Run one boundary handler and add its P2-first notice when it fits.
+
+    Charter §5.2.4 item 3: the notice is written only when the handler exits
+    0 and wrote nothing to stdout, so it never sits beside the handler's own
+    output (a defer object, Stop feedback, a Stop block or SessionStart's
+    plain-text line). Otherwise it is suppressed and the output is unchanged.
+    """
+    selection = SelectionNote()
+    buffer = io.StringIO()
+    try:
+        rc = handler(buffer, selection)
+    finally:
+        written = buffer.getvalue()
+        stdout.write(written)
+    if rc == 0 and selection.text and not written:
+        json.dump(shape(selection.text), stdout)
+        stdout.write("\n")
     return rc
 
 
@@ -2027,13 +2099,14 @@ def _direct_write_event(
     stdout: TextIO,
     note: ProceedNote,
     identifiers: Optional[Dict[str, str]] = None,
+    selection_note: Optional[SelectionNote] = None,
 ) -> int:
     start = _direct_write_memory_start(event)
     # ADR-033 C2a: local policy detection precedes the missing-memory return.
     # With no declaration, output, check behavior and exit codes remain
     # identical to the old path.
     availability = discover_declaration(start)
-    memory = find_memory(start)
+    memory = _select_memory(start, selection_note)
     if memory is None:
         if emit_availability(availability, "NOT_RUN", stderr, detail="check not run",
                              note=note):

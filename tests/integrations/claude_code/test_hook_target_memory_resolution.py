@@ -283,28 +283,36 @@ def test_symlink_into_protected_repo_is_governed_by_it(env, spy):
     _assert_contained(spy[0], envelope)
 
 
-# ── UNCHANGED from main (characterization; deferred, charter §8) ─────────────
+# ── FLIPPED by P2-first (charter §5.2.6): the override no longer wins ───────
 
 
-def test_v4_mneme_memory_missing_file_unchanged(env, spy, monkeypatch):
-    """D6: MNEME_MEMORY precedence is unchanged; a missing override means no memory."""
+def test_v4_missing_override_no_longer_masks_repository_memory(env, spy, monkeypatch):
+    """Flipped by P2-first (charter §5.2.6): row 2, repo_a's memory governs.
+
+    Was ``test_v4_mneme_memory_missing_file_unchanged``.
+    """
     monkeypatch.setenv("MNEME_MEMORY", str(env.root / "nope.json"))
     rc, err, out = _run(_edit(env.repo_a, env.target))
-    assert spy == []
-    assert rc == 0
-    assert err == "" and out == ""
+    assert [c["memory"] for c in spy] == [env.mem_a]
+    assert rc == 2
+    assert "T08-DEC" in err
+    assert out == "", "an exit-2 event carries no selection notice"
 
 
-def test_v5_mneme_memory_other_repo_unchanged(env, spy, monkeypatch):
-    """D3/D6: the override still wins and still yields an out-of-root complete PASS."""
+def test_v5_other_repo_override_is_ignored(env, spy, monkeypatch):
+    """Flipped by P2-first (charter §5.2.6): row 2, repo_a's memory governs.
+
+    Was ``test_v5_mneme_memory_other_repo_unchanged``.
+    """
     monkeypatch.setenv("MNEME_MEMORY", str(env.mem_b))
     rc, err, _ = _run(_edit(env.repo_a, env.target))
-    assert [c["memory"] for c in spy] == [env.mem_b]
-    assert rc == 0
-    assert "T08-DEC" not in err
-    payload = spy[0]["payload"]
-    assert payload["verdict"] == "PASS"
-    assert payload["evaluation_complete"] is True
+    assert [c["memory"] for c in spy] == [env.mem_a]
+    assert rc == 2
+    assert "T08-DEC" in err
+    _assert_contained(spy[0], _edit(env.repo_a, env.target))
+
+
+# ── UNCHANGED from main (characterization; deferred, charter §8) ─────────────
 
 
 def test_v6_edit_under_planted_memory_unchanged(env, spy):

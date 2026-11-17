@@ -223,6 +223,9 @@ GATE_SHIPPED_PATHS: tuple[str, ...] = (
     "tests/integrations/test_numeric_upper_bound_g2_hook.py",
     "tests/integrations/test_numeric_g2_per_rule_attribution.py",
     "tests/integrations/test_d3_evidence_attribution.py",
+    "tests/integrations/test_memory_selection.py",
+    "tests/integrations/test_p2_first_consumer_parity.py",
+    "tests/integrations/test_p2_first_same_selection.py",
 )
 
 GATE_AUDIT_EVIDENCE_PATHS: tuple[str, ...] = (

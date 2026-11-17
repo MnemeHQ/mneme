@@ -8,6 +8,14 @@ import pytest
 from tests.integrations.check_contract import check_payload, check_result_for, violation
 from mneme.integrations.antigravity import adapter
 
+def _selected(path):
+    """A resolver result for a patched selection (charter §5.2.2 rows 1 and 8)."""
+    from mneme.integrations.memory_selection import MemorySelection
+    return MemorySelection(path=path, source="discovered" if path else "none",
+                           reason="DISCOVERED" if path else "NO_MEMORY_ON_PATH",
+                           walk="unbounded")
+
+
 
 def _write_event(tmp_path, content="FORBIDDEN_TOKEN here\n"):
     return adapter.ToolEvent(
@@ -75,7 +83,7 @@ def memory(tmp_path, monkeypatch):
         ),
         encoding="utf-8",
     )
-    monkeypatch.setattr(adapter, "find_memory", lambda start: mem)
+    monkeypatch.setattr(adapter, "resolve_memory", lambda start: _selected(mem))
     return mem
 
 
@@ -219,7 +227,7 @@ class TestNoOpinionPaths:
         assert json.loads(out) == {}
 
     def test_no_memory_has_no_opinion(self, tmp_path, monkeypatch):
-        monkeypatch.setattr(adapter, "find_memory", lambda start: None)
+        monkeypatch.setattr(adapter, "resolve_memory", lambda start: _selected(None))
         code, out, _ = _invoke(_hook_input(_write_event(tmp_path)))
         assert code == 0
         assert json.loads(out) == {}

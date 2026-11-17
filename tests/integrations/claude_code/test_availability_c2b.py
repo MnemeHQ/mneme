@@ -613,7 +613,9 @@ def test_h6_line_endings_and_key_order_still_match(fake):
 
 
 def test_h7_mneme_memory_mismatch_refuses(fake, tmp_path, monkeypatch):
+    """Rewritten for P2-first (charter §5.2.6): SS-3 via MNEME_MEMORY is row 6."""
     root = fake()
+    (root / ".mneme" / "project_memory.json").unlink()
     other = tmp_path / "other.json"
     other.write_bytes(ACTIVE_MEMORY)
     monkeypatch.setenv("MNEME_MEMORY", str(other))
@@ -670,7 +672,9 @@ def test_h11_unverifiable_unavailable_evaluation_proceeds(fake):
 
 
 def test_h12_unverifiable_mismatch_is_reported_not_refused(fake, tmp_path, monkeypatch):
+    """Rewritten for P2-first (charter §5.2.6): SS-3 via MNEME_MEMORY is row 6."""
     root = fake(UNVERIFIABLE, aa.NETWORK)
+    (root / ".mneme" / "project_memory.json").unlink()
     other = tmp_path / "other.json"
     other.write_bytes(ACTIVE_MEMORY)
     monkeypatch.setenv("MNEME_MEMORY", str(other))
