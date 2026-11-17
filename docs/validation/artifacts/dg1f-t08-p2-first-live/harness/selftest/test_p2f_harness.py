@@ -153,7 +153,7 @@ KIND = {"P2F-R0-control": "none", "P2F-V4": "v4", "P2F-V4-own": "v4"}
 def _probe(root, name, *, reason, exit_code, stdout="", stderr="[T08-DEC] refused", before="h1",
            after="h1", model="claude-opus-5-5", host="2.1.310 (Claude Code)", records=True,
            path=None, sources="project", tree="yes", kind=None, seen=None, is_file=None,
-           present=None, module=None, extra_log="", other_after="m1", content=None):
+           present=None, module=None, extra_log="", other_after="m1", content=None, head_after="c1"):
     out = root / name / "out"
     out.mkdir(parents=True)
     a_mem = str(root / name / "A" / "repo_a" / ".mneme" / "project_memory.json")
@@ -178,7 +178,7 @@ def _probe(root, name, *, reason, exit_code, stdout="", stderr="[T08-DEC] refuse
         "BEFORE A/HEAD               c1",
         f"init_model={model}",
         f"AFTER target               {after}", f"AFTER A/memory             {other_after}",
-        "AFTER A/HEAD               c1",
+        f"AFTER A/HEAD               {head_after}",
         *content]) + "\n", encoding="utf-8")
     rec = {"hook_event_name": "PreToolUse", "tool_name": "Edit", "file_path": target,
            "selection": {"path": a_mem if path is None else path, "reason": reason, "walk": "unbounded"},
@@ -221,6 +221,7 @@ def test_classifier_pass_each_expectation(tmp_path):
     {"present": ["MNEME_MEMORY", "MNEME_HOOK_CHECK_TRANSPORT"]},  # other MNEME_* leaked in
     {"module": r"C:\elsewhere\mneme\integrations\claude_code\hook.py"},  # hook not from pin
     {"other_after": "m2"},                               # A's memory changed
+    {"head_after": "c2"},                                # a commit happened
     {"content": ["target contains psycopg2: 1"]},        # forbidden literal present
 ])
 def test_classifier_fails_each_disagreement(tmp_path, kw):
@@ -313,7 +314,9 @@ def test_runner_guards_are_present():
     assert "status --porcelain" in runner
     assert "safe_rmtree.py\" delete" not in probe, "probes must never delete earlier evidence"
     assert "already exists" in probe
-    assert "grep '^MNEME_'" in probe
+    assert "grep '^MNEME_'" in probe and "export -n MNEME_SRC_W MNEME_SRC_U" in probe
+    assert probe.index("P2F_STARTED") < probe.index("mkdir -p \"$P\"")
+    assert "is not empty" in runner
     for f in HARNESS.glob("*.sh"):
         assert "SELFTEST" not in f.read_text(encoding="utf-8")
 

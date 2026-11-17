@@ -30,10 +30,12 @@ It reuses the D6 C2 harness
   D6 C2 R2 counterfactual (repo A permissive) is dropped: under P2-first the
   `T08-DEC` refusals in every override probe already attribute the outcome to
   A's memory, and R0 is the positive control.
-- **No re-rolling:** probes never delete a probe directory. A batch writes
-  `P2F_STARTED` before its first probe and refuses to start if any earlier
-  batch file exists, so an aborted or failed batch is kept and the live root
-  must be archived before another run. There is no self-test mode.
+- **No re-rolling:** probes never delete a probe directory, and run only
+  inside a started, unfinished batch. A batch starts only from an empty
+  (or absent) live root, writes `P2F_STARTED` before its first probe, and
+  refuses to start if any earlier batch file exists. An aborted or failed
+  batch is therefore kept, and the live root must be archived before another
+  run. There is no self-test mode.
 - **Leak scan:** also catches Claude Code's encoded project ids (`C--dev`).
 
 ## Probes

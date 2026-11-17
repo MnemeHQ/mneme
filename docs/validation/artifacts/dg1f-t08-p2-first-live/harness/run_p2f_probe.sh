@@ -32,6 +32,10 @@ case "$NAME" in
 esac
 [ "$(cygpath -w "$LIVE")" = 'C:\dev\t08-p2first-live' ] || { echo "ABORT: live root is not C:\\dev\\t08-p2first-live"; exit 1; }
 P="$LIVE/$NAME"
+# Probes run only inside a started, unfinished batch (run_p2f.sh), never on
+# their own: a stray session would leave a directory outside any batch.
+[ -e "$LIVE/P2F_STARTED" ] || { echo "ABORT: no batch started ($LIVE/P2F_STARTED missing); run run_p2f.sh"; exit 1; }
+[ -e "$LIVE/P2F_DONE" ] && { echo "ABORT: the batch already finished ($LIVE/P2F_DONE)"; exit 1; }
 # No deletion: an existing probe directory is earlier evidence and is never
 # replaced (no re-rolling). Archive the live root to run again.
 "$PY" -I "$BASE/safe_rmtree.py" check-root || { echo "ABORT: disposable root unsafe"; exit 1; }
@@ -77,7 +81,10 @@ snap() {  # $1 = BEFORE|AFTER
 
 # Every MNEME_* variable is removed, not only the three the hook reads, so no
 # operator setting (for example MNEME_HOOK_CHECK_TRANSPORT) reaches the hook.
-for _v in $(env | cut -d= -f1 | grep '^MNEME_' || true); do unset "$_v"; done
+# The harness's own MNEME_SRC_W/U pins keep their values but are never
+# exported to the session (the hook gets the source path as T08_MNEME_SRC).
+for _v in $(env | cut -d= -f1 | grep '^MNEME_' | grep -vx 'MNEME_SRC_W\|MNEME_SRC_U' || true); do unset "$_v"; done
+export -n MNEME_SRC_W MNEME_SRC_U
 unset CLAUDE_PLUGIN_OPTION_MODE
 export T08_MNEME_SRC="$MNEME_SRC_W" T08_LOG="$(cygpath -w "$OUT/hook-log.jsonl")"
 

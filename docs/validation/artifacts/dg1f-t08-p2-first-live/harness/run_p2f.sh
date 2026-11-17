@@ -17,6 +17,7 @@ abort() { echo "ABORT: $*"; exit 1; }
 for marker in P2F_STARTED P2F_DONE summary_p2f.md classification_p2f.json run_p2f.log; do
   [ -e "$LIVE/$marker" ] && abort "$LIVE/$marker exists: a batch already started here (archive the live root first)"
 done
+[ -d "$LIVE" ] && [ -n "$(ls -A "$LIVE")" ] && abort "$LIVE is not empty (archive it first; a batch starts from an empty root)"
 mkdir -p "$LIVE"
 "$PY" -I "$BASE/safe_rmtree.py" check-root || abort "disposable root unsafe"
 LOGF="$LIVE/run_p2f.log"

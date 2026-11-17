@@ -179,7 +179,7 @@ def classify_probe(root, name, pinned):
         checks["evaluated_no_stderr"] = all((r.get("stderr") or "") == "" for r in records)
     checks["target_changed_as_expected"] = (before is not None and after is not None
                                             and (before != after) == exp["changed"])
-    others = [k for (when, k) in snaps if when == "BEFORE" and k != "target" and not k.endswith("HEAD")]
+    others = [k for (when, k) in snaps if when == "BEFORE" and k != "target"]  # incl. A/HEAD, B/HEAD
     checks["nothing_else_changed"] = bool(others) and all(
         snaps.get(("BEFORE", k)) == snaps.get(("AFTER", k)) for k in others)
     observer_text = obs_p.read_text(encoding="utf-8")
