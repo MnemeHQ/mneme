@@ -14,7 +14,7 @@
 
 It would also treat an unreadable but existing override as selected, with today's load-failure path, rather than as rule 3's `NO_MEMORY_SELECTED` (charter A2-3).
 
-The P2 rule itself (rules 1, 2 and 4, and rule 3's classification of a missing override) and the D5 row of §10 are unchanged. Phase 2 restores every relaxed clause.
+The P2 rule itself (rules 1, 2 and 4, and rule 3's classification of a missing override) and the D5 row of §10 are unchanged. Phase 2 restores every relaxed reporting clause, and rule 3's classification of an unreadable override (charter §3.3 row 7, "missing or unreadable"). The departure from "land together" cannot be undone.
 
 **Source anchor:** `MnemeHQ/mneme` `main` at `28211f8b`, read-only.
 **Inputs:**

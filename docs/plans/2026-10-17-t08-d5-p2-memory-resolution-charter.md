@@ -8,7 +8,7 @@
 
 **Amendment A1 (ACCEPTED, 2026-10-17; owner approval following an independent-review ACCEPT on `19734ac8`):** implements the accepted [H1c Stop-path decision](2026-10-17-dg1f-t08-d5-p2-h1c-stop-path-decision.md) (#554, O1). It changes **only** Claude Code Stop's candidate channel in §5, from `hookSpecificOutput.additionalContext` to top-level `systemMessage`. It is coordinated with the probe-scope Amendment A1 and is reviewed together with it. D5's developer-or-agent visibility rule, the gate rule, every other channel, implementation and the Layer 1 freeze are unchanged (§5.1).
 
-**Amendment A2 (PROPOSED, 2026-11-16; revision 3):** adds a **P2-first interim phase** (§5.2). It lands the D6/Q2 P2 precedence rule on today's unbounded walk, across every consumer at once, with reporting level R-ii:
+**Amendment A2 (PROPOSED, 2026-11-16; draft 4):** adds a **P2-first interim phase** (§5.2). It lands the D6/Q2 P2 precedence rule on today's unbounded walk, across every consumer at once, with reporting level R-ii:
 - the selection is computed in every consumer, but recorded only in the Agent SDK/LangChain trace;
 - host-visible notices appear only on the H1 paths that passed on Claude Code `2.1.310` (#808), and only under H1's run conditions.
 
@@ -184,7 +184,15 @@ A Stop notice that reaches only the developer is acceptable, as it already is on
 
 **Status: PROPOSED** (2026-11-16), for independent review. Acceptance would change this charter's sequence and gate for **one interim phase only**. It would authorize **no** code, test, live run, ADR change, `[layer1-freeze]` amendment or runtime change. Each of those keeps its own PR and its own go-ahead (§5.2.8).
 
-**Revision 3 (2026-11-16):** answers the independent review of `4fd82f61` (REQUEST CHANGES, findings F1–F13). Changes:
+**A2 draft 4 (2026-11-16):** answers the re-review of `1acdfdfc` (ACCEPT WITH CHANGES, N1–N6). Changes:
+- the ADR-033 test-rewrite route now allows row 6 (N1);
+- the freeze list adds preserved item 1 of C2a, C2b and C2b Amendment 1, and Amendment 1 item 4 (N2);
+- the returned path form is specified, and the "same as today" claims are qualified to the same selection (N3);
+- the Claude Code gap in A2-3 is stated (N4);
+- the second SessionStart text line is cited (N5);
+- labelling is fixed (N6).
+
+**A2 draft 3 (2026-11-16):** answered the independent review of `4fd82f61` (REQUEST CHANGES, findings F1–F13). Changes:
 - the ADR-033 C2a/C2b consequences are stated, with a required ADR-033 §4.1 erratum (F1);
 - the already-merged §6 test is flipped by P2-first (F2);
 - the freeze-supersession list is completed (F3);
@@ -209,7 +217,7 @@ P2-first is a **distinct interim contract**, not "D5 postponed". It lands the [D
 
 Why it can go first:
 - **The defect it fixes is a precedence defect, not a boundary defect.** Today `find_memory` returns the `MNEME_MEMORY` path whenever the variable is set, and returns nothing when that file is missing (`hook.py:202-206`). Those are V5/V5-own (replacement) and V4 (masking), reachable through committed settings (Q2 §3, C2). The G3-2 case (#793) is the same defect: the repository's own memory **is** found by today's walk, and only the env-first order is wrong. P2 rule 1 fixes it without a boundary.
-- **No edit that today's walk governs becomes ungoverned.** D5 §5.1 makes a verified host-visible channel the price of B1, because B1 turns governed edits (L4, L5, L6) into skips. P2-first never stops a walk earlier than today. Rows 1 and 2 select the memory the walk finds. Rows 6, 7 and 8 occur only where today's walk finds none, and there the outcome equals today's for the same override. A **different** memory can govern than today (§5.2.3).
+- **No edit that today's walk governs becomes ungoverned.** D5 §5.1 makes a verified host-visible channel the price of B1, because B1 turns governed edits (L4, L5, L6) into skips. P2-first never stops a walk earlier than today. Rows 1 and 2 select the memory the walk finds. Rows 6, 7 and 8 occur only where today's walk finds none, and there the **selection** equals today's for the same override. Row 7 can additionally gain an H1 notice. A **different** memory can govern than today (§5.2.3).
 - **Planted Git markers have nothing to act on.** Markers are not honored, so the D5 §5.4 planted-marker case, and the Q2 rule-2 substitution it would enable, cannot occur.
 - **The ordering risk Q2 names does not arise.** Q2 §10 warns against a window in which "the boundary exists but the override can still replace `M_R`". P2-first is the opposite order: precedence first, boundary later. It is still a departure from Q2 §10's "land together", and the Q2 pointer records it.
 
@@ -226,6 +234,11 @@ Why it can go first:
 | 8 | no `M_W` | unset | none | `NO_MEMORY_ON_PATH` |
 
 - **Rows 3, 4 and 5 cannot occur**, because they need a boundary. Their reason codes are reserved for Phase 2 and are never emitted in P2-first. The row numbers and reason codes are §3.3's, so Phase 2 extends the contract rather than renaming it.
+- **Returned path form.** Equality uses `resolve()`, but the returned `path` keeps today's form:
+  - when the selection is the override (row 6, or row 1 with an equal override), it is `Path(M_X)` exactly as given, as `hook.py:204-205` returns it today;
+  - otherwise it is the walk's path, as today.
+
+  So `--memory` arguments and `ContextInjection.memory_path` are byte-identical to today for the same selection.
 - **Resolver shape.** The §3.1 resolver and `MemorySelection` land in P2-first with `path`, `source` and `reason`.
   - `boundary` and `shadowed` are **not populated** (both `None`). A field `walk: "unbounded"` records why, so no consumer can read an absent boundary as "no Git repository" (A2-5). Phase 2 populates both and sets `walk: "b1"`.
   - The explicit constructor path (§4, Q2 O3) is recorded as `source: "explicit"`, with `reason` and `walk` set to `None`. It is not a resolver outcome.
@@ -270,7 +283,7 @@ What P2-first removes: env-based replacement (V5, V5-own) and env-based masking 
 ### 5.2.4 Reporting at level R-ii (I4-P2F, replacing I4 for P2-first only)
 
 1. **Every consumer computes the selection; it is recorded only where a non-wire record already exists.** Every §4 consumer calls the resolver and gets `reason`, `source` and `walk`. Where they are recorded was checked against `main` at `0118d91f`:
-   - **Agent SDK and LangChain:** additive keys (`selection_reason`, `selection_source`, `walk`) on **every** trace record written after a selection. That covers records written through `_record` (`agent_sdk/adapter.py:135`, via `_gate` and `context_for_task`), and LangChain's direct trace appends (`langchain/adapter.py:170`, `langchain/middleware.py:224`). The trace is an in-process list the embedding program may read. It is not hook output.
+   - **Agent SDK and LangChain:** additive keys (`selection_reason`, `selection_source`, `walk`) on **every** trace record that follows a selection. That covers records written through `_record` (`agent_sdk/adapter.py:135`, via `_gate` and `context_for_task`), and LangChain's direct trace append `_record_annotation_gap` (`langchain/middleware.py:224`). Records written with no selection, such as `_record_unmapped_skip` (`langchain/adapter.py:169-170`), carry none. The trace is an in-process list the embedding program may read. It is not hook output.
    - **Every other consumer has no such record,** so the selection is held in-process only:
      - **Claude Code direct write** (`hook.py:2036-2042`): with nothing selected it returns 0 with no output, unless an ADR-033 declaration is present. Then `emit_availability` produces its existing outcome (an exit-2 refusal or a proceed-note object).
      - **Claude Code Bash** (`:1594-1596`), **SessionStart** (`:1656`) and **Stop** (`:1806`): return 0 with no output when nothing is selected. Their notices are items 2 and 3.
@@ -299,7 +312,7 @@ What P2-first removes: env-based replacement (V5, V5-own) and env-based masking 
    Default-mode permission prompts, other versions and other models were not exercised. Documentation calls the notice **unverified** outside these conditions.
 3. **Emission conditions (F4).** A notice is emitted **only when the event's output would otherwise fit the probed shape**. Otherwise it is suppressed, and the event's existing output is unchanged:
    - **H1a:** emitted when the hook would otherwise exit 0 with no `permissionDecision`. That includes a PASS or SKIP with no output, and the C2b proceed-note object (item 5). **Suppressed** on a warn-mode `defer` event (`hook.py:844-860`) and on any exit-2 event (strict `FAIL`, ADR-033 refusal).
-   - **H1b:** emitted when SessionStart would otherwise write nothing to stdout. **Suppressed** when it writes its existing plain-text line (`hook.py:1672-1679`).
+   - **H1b:** emitted when SessionStart would otherwise write nothing to stdout. **Suppressed** when it writes either existing plain-text line (`hook.py:1672-1679`, `:1686-1690`).
    - **H1c:** emitted when Stop would otherwise write nothing. **Suppressed** when Stop emits `_emit_stop_feedback` (`hookSpecificOutput`) or `{"decision": "block"}`.
 
    C5 is narrowed accordingly: row 2 is reported on every PreToolUse event **whose output fits the H1a shape**. A suppressed notice leaves no record (item 1).
@@ -309,7 +322,7 @@ What P2-first removes: env-based replacement (V5, V5-own) and env-based masking 
    - Reason: an unprobed shape can change host behavior. The original H1c Stop shape made the host continue the session (#549).
    - These paths are recorded as **not host-visible** until their own probe passes and §5.2.5's extension rule is met.
 5. **ADR-033 coexistence.** On H1a direct write, the notice shares the single PreToolUse `additionalContext` object with the C2b Amendment 1 proceed text (`ProceedNote.consumed`, probe-scope A2-3): one object, both texts, no `permissionDecision`. That changes the fixed 17.2 output, which needs freeze cover (§5.2.6).
-6. **Unchanged:** exit codes and blocking (ADR-021; no row blocks).
+6. **Unchanged:** exit codes and blocking **for the same selected memory** (ADR-021; no row blocks). Where the selection changes, the exit code follows it. For example, in the G3-1 layout the ADR-033 refusal (exit 2) becomes the check's own result.
 
 ### 5.2.5 Gate for P2-first, and what changes for Phase 2
 
@@ -351,11 +364,14 @@ A separate `[layer1-freeze]` P2-first amendment PR, under Amendment Procedure §
   - T-08 slice-1 preserved item 6 (Bash, SessionStart and Stop selection and behavior);
   - C2a preserved item 4 (the "`find_memory`" and "`MNEME_MEMORY` precedence" clauses) and C2a item 6 (Bash, SessionStart and Stop behavior);
   - C2b preserved item 4 (the same two clauses) and C2b item 6;
+  - preserved item 1 of C2a, C2b and C2b Amendment 1 ("No declaration → today's behavior, byte-identical output, the same exit codes"). On a direct write with no declaration, the H1a notice and the row-2 selection change both alter that output;
   - C2b Amendment 1:
     - preserved item 3 (refusals, exit codes, every existing stderr line), because SS-3 via `MNEME_MEMORY` and `MEMORY_MISSING` via a missing override become unreachable;
+    - preserved item 4 (`AUTHORIZED`, `REVOKED` and `VERIFIED_ABSENT` outputs), because the `MNEME_MEMORY`-driven SS-3 stderr line is emitted under every authorization state;
     - preserved item 7 (Bash, SessionStart and Stop behavior);
     - its authorized "exactly one … object with the fixed 17.2 text", which gains the coexisting H1a notice;
 - **leave unauthorized** everything else in §10, including B1, I3 and rows 3–5.
+- **confirm the list is exhaustive.** The later freeze amendments (DG1B1, #260, G1, G2-1, S1, C4, R0) were checked for preserved memory-selection items by keyword only. The freeze PR must confirm that none of them preserves memory selection.
 
 The implementation PR carries a subset of §7, plus P2-first cases:
 - **§7.2 precedence matrix** for rows 1, 2, 6, 7 and 8, including relative, symlinked and differently-cased (Windows) override paths. It also covers the A2-3 override classes:
@@ -370,7 +386,11 @@ The implementation PR carries a subset of §7, plus P2-first cases:
   - C2b: `test_h7_mneme_memory_mismatch_refuses` (`test_availability_c2b.py:615`) and `test_h12`;
   - C2b Amendment 1: `test_a3_mismatch_sentence` (`test_availability_c2b_am1.py:124`) and `test_a9`.
 
-  Each is rewritten to produce the same outcome through parent-directory discovery. A new test asserts that `MNEME_MEMORY` alone no longer produces SS-3 (row 2). Every other C2a, C2b and Amendment 1 test stays green and unmodified.
+  Each is rewritten to produce the same outcome through parent-directory discovery **or through row 6**: a `.mneme/` directory holding the declaration but no memory, no ancestor memory, and `MNEME_MEMORY` naming a foreign memory.
+
+  Row 6 is required for the two `incomplete` cases, which need the target outside the selected memory's root (`test_availability_c2a.py:424-426`). A walked memory is always an ancestor of the target, so parent discovery cannot produce that. The two cases are:
+  - the D-matrix `incomplete` case;
+  - `test_p1_real_check_no_declaration_byte_identical[incomplete]` (`:401`). Its oracle is the pinned pre-C2a hook (`78459d1a`), and under row 6 the selection, path form and output equal that oracle's. A new test asserts that `MNEME_MEMORY` alone no longer produces SS-3 (row 2). Every other C2a, C2b and Amendment 1 test stays green and unmodified.
 - **§7.7** unchanged tests, and **§7.9** latency.
 - **§7.8 channel shape:**
   - each H1 notice is in its probed shape;
@@ -412,9 +432,9 @@ Each step needs the previous one merged and its own go-ahead. Phase 2 then conti
 
 | # | Decision | Recommendation |
 |---|---|---|
-| A2-1 | Relax I4, Q2 §5 rules 1 and 3's reporting clauses, Q2 §6's notice mitigation and Q2 §10's host-visible prerequisite to I4-P2F, for P2-first only | **Yes.** It is the owner's chosen level (R-ii). On unprobed paths, row 2 now silently selects the right memory where today it silently selects the wrong one, and rows 6 to 8 match today. Visibility is claimed only where it was proven. |
+| A2-1 | Relax I4, Q2 §5 rules 1 and 3's reporting clauses, Q2 §6's notice mitigation and Q2 §10's host-visible prerequisite to I4-P2F, for P2-first only | **Yes.** It is the owner's chosen level (R-ii). On unprobed paths, row 2 now silently selects the right memory where today it silently selects the wrong one, and rows 6 to 8 select what today selects. Visibility is claimed only where it was proven. |
 | A2-2 | Adopt `M_W` (today's unbounded walk) as the interim contract | **Yes.** The variant that computes `R` without stopping, so an ancestor memory loses to the override, was rejected on 2026-11-11: a planted `.git` would reopen the substitution. |
-| A2-3 | Missing, unreadable and malformed overrides | **`is_file()` only; the resolver never opens the file.**<br>- *Missing* (`is_file()` false, including a directory) gives row 7, or row 2 when `M_W` exists. This matches Q2 rule 3's classification.<br>- *Unreadable* and *malformed* files both exist, so they are selected under row 6. They then take today's load-failure path, unchanged (ADR-021; CI1.4 §7 condition 4). That path is non-PASS. The review reports it as visible today on Codex, Kiro and the Agent SDK/LangChain, as an `UNEVALUATED` fail-open notice. That is **partly unverified**: what `mneme check` returns for an unreadable memory was not run.<br>- **Deviation from Q2 rule 3, stated:** rule 3 classifies an unreadable override as `NO_MEMORY_SELECTED`. An open-probe would make that a row 7, which is silent off the H1 paths (F7). It would lose today's visible fail-open, add a Windows sharing-lock race, and trigger OneDrive placeholder downloads. Keeping today's path serves rule 3's "never a silent skip" better.<br>- The pre-existing uncaught `MemoryStore.load` error in the Agent SDK `context_for_task` (`agent_sdk/adapter.py:151-152`) is unchanged and out of scope.<br>- Revision 2 (`4fd82f61`) proposed the open-probe; it is withdrawn. |
+| A2-3 | Missing, unreadable and malformed overrides | **`is_file()` only; the resolver never opens the file.**<br>- *Missing* (`is_file()` false, including a directory) gives row 7, or row 2 when `M_W` exists. This matches Q2 rule 3's classification.<br>- *Unreadable* and *malformed* files both exist, so they are selected under row 6. They then take today's load-failure path, unchanged (ADR-021; CI1.4 §7 condition 4). That path is non-PASS. The review reports it as visible today on Codex, Kiro and the Agent SDK/LangChain, as an `UNEVALUATED` fail-open notice. That is **partly unverified**: what `mneme check` returns for an unreadable memory was not run.<br>- **Deviation from Q2 rule 3, stated:** rule 3 classifies an unreadable override as `NO_MEMORY_SELECTED`. An open-probe would make that a row 7, which is silent off the H1 paths (F7). It would lose today's visible fail-open, add a Windows sharing-lock race, and trigger OneDrive placeholder downloads. Keeping today's path serves rule 3's "never a silent skip" better **on Codex and the Agent SDK/LangChain only**. On Claude Code direct write, today's load-failure path is stderr-only (`hook.py:1527-1532`). So it is not visible there, where a row-7 notice would have been delivered. That gap is accepted.<br>- The pre-existing uncaught `MemoryStore.load` error in the Agent SDK `context_for_task` (`agent_sdk/adapter.py:151-152`) is unchanged and out of scope.<br>- Draft 2 (`4fd82f61`) proposed the open-probe; it is withdrawn. |
 | A2-4 | Accept, for the interim, case 2 (an ancestor memory beats the override) **and** its adversarial variant (a planted memory beats the operator's override) | **Yes, with the risk stated** (§5.2.3). Case 2 ends in Phase 2. The adversarial variant is D4 territory. P2 removes the env override as an incidental defense, but repository memory was always meant to win (Q2 §4 finding). The reviewer is asked to accept or reject this risk explicitly. |
 | A2-5 | Leave `boundary` and `shadowed` unpopulated, with a `walk` marker | **Yes.** It keeps a later G3-B root binding from reading an absent boundary as a real one. |
 | A2-6 | No new output on unprobed paths, and the reason recorded only in the Agent SDK/LangChain trace (§5.2.4 item 1) | **Yes.** The H1c history shows an unprobed shape can change host behavior. Hermes's `reason` reaches its host, so it cannot carry the selection either. The cost: rows 2 and 7 leave no record on Codex, Kiro, Antigravity or Hermes, or on suppressed Claude Code events. Accepting this also accepts the narrower reading of R-ii in item 1. |
