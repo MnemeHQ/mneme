@@ -571,8 +571,7 @@ and do **not** complete ADR-031 §11 resolver-result convergence:
   codes.
 - **DG1F-C2** — one lifecycle authority read by projection, the resolver and
   the existing lifecycle checks, plus the three-state `GovernanceContext`
-  used by the resolver and lifecycle checks. It adds no new
-  `resolve_effective` consumer.
+  used by the resolver. It adds no new `resolve_effective` consumer.
 - **DG1F-C3a** — resolver-result consumption by `mneme audit`, setup
   readiness and `protect list`. These are three reporting consumers only; no
   enforcement input changes.
@@ -595,9 +594,9 @@ closeout record must carry that caveat. The closeout record must also state
 the mapping status at its pinned commit and must not upgrade F13 into a
 runtime waiver claim.
 
-Any future DG1F-C1b or DG1B2b slice adds its own fixtures under §13. This
-section does not pre-approve those fixtures and does not make the current
-mapping sufficient for their slices.
+Any future DG1F-C1b applicability or DG1B2b waiver slice adds its own
+fixtures under §13. This section does not pre-approve those fixtures and does
+not make the current mapping sufficient for their slices.
 
 #### 11a.4 Required closeout evidence record
 
