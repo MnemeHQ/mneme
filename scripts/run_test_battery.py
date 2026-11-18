@@ -217,6 +217,7 @@ GATE_SHIPPED_PATHS: tuple[str, ...] = (
     "tests/integrations/claude_code",
     "tests/integrations/codex_cli",
     "tests/integrations/kiro",
+    "tests/integrations/opencode",
     "tests/integrations/agent_sdk",
     "tests/integrations/antigravity",
     "tests/integrations/test_numeric_upper_bound_consumers.py",
