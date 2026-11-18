@@ -13,7 +13,7 @@
 **Proposal:**
 - Remove **H4** (Antigravity) from the mandatory Phase 2 host gate. Antigravity's integration, the #828 H4a harness, all accepted evidence and the `2.8.1` pin stay as they are.
 - During Phase 2, **Antigravity stays on the P2-first selection contract already on `main`** (charter A2 §5.2.2): today's unbounded walk with P2 precedence, and no host notice.
-- B1, I3 and rows 3–5 apply to every other consumer. They reach Antigravity only after its own H4a probe passes.
+- B1, I3 and rows 3–5 apply to every other consumer. They reach Antigravity only through the §3 re-entry rule: an H4a pass, a `[layer1-freeze]` amendment and a parity flip.
 - Hermes H6a and H6b form probe batch 2 on their own.
 - H4a is recorded as **deferred, not run**. It is never PASS.
 - The exception names **Antigravity only**. It is not a general deferral rule, and it sets no precedent for any other consumer, OpenCode included.
@@ -82,7 +82,7 @@ D5 itself ties Phase 2 to Antigravity, and the charter forbids per-host exceptio
   - Authenticode valid, signer Google LLC;
   - file version `2.8.1`;
   - size and MD5 matching the storage record;
-  - SHA-256 `05085047994932949BB6777765710CDC28ADB61C804851167995A3C285ACCA47`.
+  - SHA-256 `05085047994932949BB6777765710CDC28ADB61C804851167995A3C285ACCA47`, computed locally at first verification. It pins the downloaded bytes, but no publisher attests to it; only the size and MD5 come from the storage record.
 - That verification is **not yet in any repository record**. It would be committed with the deferred H4a evidence, and it is not relied on here.
 
 ## 4. A separate status discrepancy (decision E0, decoupled)
