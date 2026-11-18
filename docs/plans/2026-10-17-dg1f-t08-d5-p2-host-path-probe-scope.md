@@ -13,6 +13,8 @@
 
 **Amendment A3 (PROPOSED, 2026-11-13):** re-pins the **H1c A1 track** (Stop top-level `systemMessage`, headless and interactive) to Claude Code `2.1.310` with `--model claude-opus-5-5`, the host and model of A2, in a separate disposable root (§4.4). Both runs are repeated on that pin, and H1c is judged on one host version. Shape, controls, labels and rules are unchanged. Nothing runs without a separate go-ahead.
 
+**Amendment A4 (PROPOSED, 2026-11-18):** changes **only the batch order** in decision D5 (§10). The two paths this scope marks "At risk", **H4a** (Antigravity) and **H6a** (Hermes), move from the last batches to the next batch, with H6b joining them. A stop rule is added: if either at-risk path fails, no further batch starts until the owner decides the D5 revisit that charter §5 requires (§4.5). Paths, shapes, controls, labels, pins, the gate rule and the one-pin-per-gate rule are unchanged. Nothing runs, and no harness is built, without a separate go-ahead.
+
 **Revision 3 (2026-10-17):** answers the #545 re-review. The emitter mechanism and the side-effect control are now specific to each **path type**: command hook on a tool event, command hook on a lifecycle event, in-process callback, and middleware (§3.1). The nonce, evidence, audience and non-interference requirements stay common. No gate, decision or D5/P2 semantics change.
 **Parent:** charter §5 (gate rule) and §12 step 3. The format follows the D6 scopes [#519](2026-10-15-dg1f-t08-d6-mneme-memory-live-scope.md) and [#527](2026-10-16-dg1f-t08-d6-c4-local-settings-scope.md).
 
@@ -313,6 +315,113 @@ Evidence goes into a separate PR: `docs/validation/dg1f-t08-d5-p2-host-path-h1c-
 - a P2-first or D5 + P2 charter amendment;
 - the `[layer1-freeze]` amendment;
 - implementation.
+
+### 4.5 Amendment A4: at-risk paths first (PROPOSED)
+
+**Status: PROPOSED**, for independent review and owner acceptance. Docs only. Acceptance would change decision D5's batch order (§10) and nothing else. It would authorize **no** harness PR, harness build, shape discovery, live run, evidence PR, credential use, charter or D5 amendment, `[layer1-freeze]` amendment, implementation or release. Each of those keeps its own PR and go-ahead (§11).
+
+**Owner direction.**
+- The owner accepted the [T-08 Phase 2 readiness assessment](2026-11-17-t08-phase2-readiness-assessment.md) (#823, `c0dc0686`).
+- The owner then named this as the next separate task: "a read-only proposal to amend the host-probe batch order so H4a and H6a can be evaluated first".
+- On 2026-11-18 the owner said "Yes, draft it".
+
+Neither statement accepts this amendment.
+
+**Where the gate stands** (readiness assessment §3 Q4):
+- H1 is `PASS` on Claude Code `2.1.310` (#808).
+- H2–H6 are not started. Nine paths remain: H2a, H2b, H3a, H4a, H5a, H5b, H5c, H6a and H6b.
+- Phase 2 is NOT READY, and its gate is BLOCKED.
+
+#### 4.5.1 Change
+
+| Batch | D5 today (§10) | A4 |
+|---|---|---|
+| 1 | H1 (harness reuse; done, #808) | Unchanged |
+| 2 | H2b and H5c (existing harnesses) | **H4a and H6a:** shape discovery, then the probe for each path where a candidate shape exists. **H6b** joins this batch (A4-2). |
+| 3 | H3, H5a/H5b and H6 (new harnesses, credentials) | H2a (the D1 targeted re-run), H2b and H5c (existing harnesses) |
+| 4 | H4 last (IDE, operator-driven, highest risk) | H3, H5a and H5b (new harnesses, credentials) |
+
+D5 today does not name H2a. Its D1 targeted re-run is placed in batch 3 with H2b, since both use the Codex harness.
+
+**Stop rule (new).** If batch 2 gives H4a or H6a a failing label (`NO_NONBLOCKING_CHANNEL`, `NOT_DELIVERED` or `DELIVERED_WITH_SIDE_EFFECT`, §6), batches 3 and 4 do **not** start. The result goes to the owner, because charter §5 then keeps the shared implementation blocked for every consumer and requires D5 to be revisited explicitly.
+- The direction of that revisit is the owner's decision, and nothing here pre-decides it. Options include a D5 amendment for that host, or removing the host from the D5 + P2 scope.
+- `NOT_EXECUTED` and `INCONCLUSIVE` are not failures (§6). They are re-run under D4 before the stop rule is applied.
+
+**Unchanged:**
+- all twelve paths, with their candidate shapes (§4), path-type controls (§3.1), and labels and criteria (§6);
+- the gate rule: H*n* passes only when every path under it passes, and every one of H1–H6 must pass before the Phase 2 `[layer1-freeze]` amendment (charter §5, §12);
+- one pin per gate (charter §5) and the §7 pins, including Antigravity `2.8.1` and hermes-agent `0.19.0`. A re-pin still needs a reviewed amendment;
+- harness discipline: every new harness gets an offline self-test, with a stub host where possible, before any live run (§5);
+- decisions D1–D4:
+  - D1: H2a evidence reuse;
+  - D2: H6 needs a live model session;
+  - D3: developer-only delivery passes any path;
+  - D4: n = 1, plus a paired control;
+- the §7 safety guards, the §8 evidence and provenance rules, and the §9 limits.
+
+#### 4.5.2 Why this order
+
+**Only these two paths are foreseen as able to end Phase 2.** §4 marks exactly two paths "At risk", H4a and H6a, and both need shape discovery before any probe (§4, §5).
+
+- **H4a (Antigravity).**
+  - The adapter has two outputs: `{}` ("no opinion") and `{"decision": "deny", …}`.
+  - Emitting `"allow"` auto-grants the tool call, and Antigravity fails closed on hook output it cannot parse (`docs/integrations/antigravity.md`, "Policy"). Every non-deny reason goes to stderr.
+  - No known exit-0 shape reaches the agent or the developer without changing the decision. §4 records "None", and "Verified against 2.8.1 (IDE)" has no run or artifact behind it.
+- **H6a (Hermes).**
+  - `pre_tool_call` offers a block directive or nothing (`mneme/integrations/hermes/plugin.py:57-58`; `adapter.py` `directive_for`: "Only DENY produces a directive").
+  - A non-blocking tool-call notice may have to be carried as next-turn context through `pre_llm_call`, which is H6b's surface (§4).
+
+Every other remaining path has a candidate shape with some prior evidence (§4):
+- H2a: live (M1d-a);
+- H2b: unit tests;
+- H3a: documented live;
+- H5c: live at the dispatch layer;
+- H5a/H5b: an existing code precedent.
+
+A failure there is possible but not foreseen.
+
+**What the change protects against.** The gate already blocks implementation until all twelve paths pass, and A4 does not weaken it. Reordering cannot cause Phase 2 to be implemented early. What it reduces is the risk of **committing to Phase 2 before anyone knows its gate is reachable:**
+- **Wasted harness work.** Under today's order, all of the H2, H3 and H5 work happens before the one result that could make it moot, because H4 comes last. That work includes two new harnesses and operator credentials.
+- **Premature specification work.** The readiness assessment's gaps S1–S6 point at charter, D5, Q2 and ADR-033 amendments. Their scope depends on whether every host can carry a notice. A failing H4a or H6a reopens D5 itself (charter §5), and some of that text would have to be rewritten.
+- **Pressure on the gate.** The later a fatal result arrives, the more finished Phase 2 work exists, and the stronger the pull to relax the gate or claim more than was proven. Running the at-risk paths first lets the owner decide the D5 revisit before that work exists.
+- **An early decision either way.** If both paths pass, the rest of the gate has no foreseen blocker, and the remaining batches and spec work proceed at lower risk. If either fails, the owner faces the D5 revisit first.
+
+**Cost:**
+- The two harnesses with operator dependencies come first instead of last:
+  - an operator-driven Antigravity IDE session with capture;
+  - a hermes-agent session with a live model and operator-supplied credentials (§5, D2).
+- If batch 2 is slow, batches 3 and 4 move later.
+- The existing H2 and H5c harnesses stay unused for longer. Nothing is lost: their pins and evidence are unchanged.
+
+#### 4.5.3 What batch 2 would need (none of it authorized here)
+
+These steps run in order, and each needs its own go-ahead:
+1. **A harness PR** for H4a, H6a and H6b (A4-2), with offline self-tests. It includes a check that Antigravity `2.8.1` and hermes-agent `0.19.0` can still be installed. An uninstallable pin needs a reviewed re-pin amendment first (§7).
+2. **Shape discovery** for H4a and H6a (§5): what each host accepts on exit 0, or as a callback return, without blocking or changing the decision. A path with no such shape is labelled `NO_NONBLOCKING_CHANNEL`, and the stop rule applies.
+3. **The probes**, for each path with a candidate shape, each with its paired control (§3, §3.1).
+4. **The evidence PRs**, one validation record per gate batch (§8): `docs/validation/dg1f-t08-d5-p2-host-path-<gate>-<date>.md`.
+
+Operator dependencies:
+- an operator for the IDE run, because developer delivery is established only by an operator-observed, captured run (§3.1);
+- provider credentials for the Hermes model session, supplied through the environment and never logged (§7).
+
+#### 4.5.4 Decisions requested of the reviewer
+
+| # | Decision | Recommendation |
+|---|---|---|
+| A4-1 | Move H4a and H6a to batch 2, with the stop rule | **Yes.** They are the only paths §4 marks at risk, and charter §5 makes either failure fatal for every consumer. |
+| A4-2 | Bring H6b into batch 2 with H6a | **Yes.** H6b uses the same hermes-agent harness, the same live model session and the same credentials (§5). H6a's likely non-blocking shape is next-turn context on H6b's surface, so they are best discovered together. The H6 gate needs both paths on one pin anyway. |
+| A4-3 | After a failing batch-2 result, start no further batch until the owner decides the D5 revisit | **Yes.** It is the point of the reordering. Running the remaining batches first would spend effort on evidence that the revisit may change. |
+| A4-4 | Leave everything else in this scope unchanged | **Yes.** A4 changes when paths are probed, not what passes. |
+
+#### 4.5.5 Not authorized by A4
+
+- any harness PR, harness build, shape discovery, live run, credential use or evidence PR, including for batch 2;
+- any change to §4, §3.1, §6, §7, or decisions D1–D4;
+- any charter, D5, Q2, ADR or ADR-033 amendment, or any decision on the D5 revisit;
+- the Phase 2 `[layer1-freeze]` amendment, implementation, or any change under `mneme/`;
+- any change to an earlier label: H1 stays `PASS` (#808), and G3 stays `PARTIAL` (#822);
+- any release.
 
 ## 5. Harness: reuse and build, per host
 
