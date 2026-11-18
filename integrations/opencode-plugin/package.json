@@ -3,6 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Experimental OpenCode S1 pre-mutation transport plugin for Mneme.",
+  "description": "OpenCode S1 pre-mutation transport plugin for Mneme.",
   "main": "index.ts"
 }

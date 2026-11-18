@@ -32,6 +32,7 @@ from mneme.integrations.claude_code.hook import (
 )
 from mneme.integrations.memory_selection import MemorySelection, resolve_memory
 from mneme.memory_store import MemoryStore
+from mneme.path_selectors import policy_root
 from mneme.rule_identity import rule_id_for
 
 BRIDGE_SCHEMA = "mneme.opencode.bridge/v1"
@@ -107,6 +108,9 @@ class Outcome:
     memory: Optional[str] = None
     selection_reason: Optional[str] = None
     selection_walk: Optional[str] = None
+    applicability_records: tuple[dict, ...] = ()
+    violations: tuple[dict, ...] = ()
+    violated_rule_ids: tuple[str, ...] = ()
 
 
 def _sha256(value: str) -> str:
@@ -188,8 +192,47 @@ def _is_within(child: Path, root: Path) -> bool:
         return False
 
 
+def _reject_symlink_target(lexical: Path, root: Optional[Path]) -> None:
+    """Reject a symlink anywhere from the trusted base to the target.
+
+    Within the session root the walk starts at that root, preserving the
+    verified-new-file contract. An absolute target outside the root is
+    target-anchored, so its whole lexical chain is checked instead.
+    """
+    parts: tuple[str, ...]
+    base: Path
+    if root is not None:
+        try:
+            relative = Path(os.path.relpath(str(lexical), str(root)))
+        except ValueError:
+            relative = None
+        if relative is not None and ".." not in relative.parts:
+            base = root
+            parts = relative.parts
+        else:
+            base = Path(lexical.anchor)
+            parts = lexical.parts[1:]
+    else:
+        base = Path(lexical.anchor)
+        parts = lexical.parts[1:]
+
+    current = base
+    for part in parts:
+        if part in ("", "."):
+            continue
+        current = current / part
+        if current.is_symlink():
+            raise UnsupportedError("symlink_target")
+
+
 def resolve_target(request: Request) -> Path:
-    """Resolve the host target and enforce the verified-new-file `.py` contract."""
+    """Resolve the host target and enforce the verified-new-file `.py` contract.
+
+    A relative target is resolved against the session directory and may not
+    traverse outside it. An absolute target may resolve outside the session
+    directory: governance is then anchored to the memory that governs the
+    target path, and the selected memory's policy root must contain it.
+    """
     if not request.session_directory:
         raise EvaluationError("session_directory_unavailable")
     root = Path(request.session_directory)
@@ -197,25 +240,18 @@ def resolve_target(request: Request) -> Path:
         raise EvaluationError("session_directory_not_absolute")
     root = root.resolve(strict=False)
     candidate = Path(request.path)
-    if not candidate.is_absolute():
+    absolute_input = candidate.is_absolute()
+    if not absolute_input:
         candidate = root / candidate
     lexical = Path(os.path.abspath(str(candidate)))
     if os.path.lexists(str(lexical)):
         raise UnsupportedError("existing_target")
-    try:
-        lexical_relative = Path(os.path.relpath(str(lexical), str(root)))
-    except ValueError:
-        lexical_relative = None
-    if lexical_relative is not None and ".." not in lexical_relative.parts:
-        current = root
-        for part in lexical_relative.parts:
-            if part in ("", "."):
-                continue
-            current = current / part
-            if current.is_symlink():
-                raise UnsupportedError("symlink_target")
+
+    inside_root = _is_within(lexical, root)
+    _reject_symlink_target(lexical, root if inside_root else None)
+
     resolved = lexical.resolve(strict=False)
-    if not _is_within(resolved, root):
+    if not absolute_input and not _is_within(resolved, root):
         raise EvaluationError("target_outside_session_directory")
     if resolved.suffix != TARGET_SUFFIX:
         raise UnsupportedError("non_python_target")
@@ -260,6 +296,25 @@ def _memory_schema(memory: Optional[Path]) -> Optional[str]:
     return None
 
 
+IDENTITY_FIELDS = (
+    ("tool", "tool"),
+    ("sessionID", "session_id"),
+    ("callID", "call_id"),
+    ("agent", "agent"),
+    ("messageID", "message_id"),
+    ("eventID", "event_id"),
+)
+
+
+def _identity_missing(request: Request) -> list[str]:
+    """Names of the six raw host identifiers that are absent for this event."""
+    return [
+        name
+        for name, attribute in IDENTITY_FIELDS
+        if not getattr(request, attribute)
+    ]
+
+
 def _evidence(
     request: Request,
     authority: Optional[Authority],
@@ -269,6 +324,7 @@ def _evidence(
     claude_env_present: bool,
 ) -> dict:
     memory = Path(outcome.memory) if outcome.memory else None
+    missing = _identity_missing(request)
     return {
         "schema": EVIDENCE_SCHEMA,
         "bridge": {"version": BRIDGE_VERSION},
@@ -279,12 +335,14 @@ def _evidence(
         "host": {"version": request.host_version or None},
         "plugin": {"id": "mneme.opencode.s1"},
         "event": {
+            "tool": request.tool or None,
             "sessionID": request.session_id or None,
             "callID": request.call_id or None,
             "agent": request.agent or None,
             "messageID": request.message_id or None,
             "eventID": request.event_id or None,
         },
+        "identity": {"complete": not missing, "missing": missing},
         "target": outcome.target,
         "content_sha256": _sha256(request.content) if request.content is not None else None,
         "memory": {
@@ -297,10 +355,16 @@ def _evidence(
             "decision_id": authority.decision_id if authority else None,
             "decision_version_id": authority.decision_version_id if authority else None,
             "rule_id": authority.rule_id if authority else None,
+            "outcome": outcome.applicability,
         },
         "mode": {"value": mode, "source": mode_source, "claude_env_present": claude_env_present},
         "observation_state": outcome.observation_state,
-        "applicability": outcome.applicability,
+        "applicability": list(outcome.applicability_records),
+        "violations": list(outcome.violations),
+        "violated_rule_ids": list(outcome.violated_rule_ids),
+        # Host prevention is a separate validator-owned witness. The bridge
+        # never observes the host's refusal and never infers it from `block`.
+        "host_witness": None,
         "decision": outcome.decision,
         "reason": outcome.reason,
         "claim": outcome.claim,
@@ -312,10 +376,8 @@ def evaluate(request: Request, authority: Authority) -> Outcome:
     target: Optional[Path] = None
     memory: Optional[Path] = None
     selection: Optional[MemorySelection] = None
-    claude_env_present = "CLAUDE_PLUGIN_OPTION_MODE" in os.environ
     os.environ.pop("CLAUDE_PLUGIN_OPTION_MODE", None)
     mode = resolve_mode()
-    mode_source = "MNEME_HOOK_MODE" if "MNEME_HOOK_MODE" in os.environ else "default"
 
     def finish(
         decision: str,
@@ -324,17 +386,26 @@ def evaluate(request: Request, authority: Authority) -> Outcome:
         *,
         observation_state: Optional[str] = None,
         applicability: Optional[str] = None,
+        applicability_records: tuple[dict, ...] = (),
+        violations: tuple[dict, ...] = (),
+        violated_rule_ids: tuple[str, ...] = (),
     ) -> Outcome:
+        # The claim ceiling requires all six raw host identifiers. A decision
+        # may still be enforced, but missing identity never yields evidence.
+        effective_claim = claim if not _identity_missing(request) else NO_CLAIM
         return Outcome(
             decision=decision,
             reason=reason,
-            claim=claim,
+            claim=effective_claim,
             observation_state=observation_state,
             applicability=applicability,
             target=str(target) if target else None,
             memory=str(memory) if memory else None,
             selection_reason=selection.reason if selection else None,
             selection_walk=selection.walk if selection else None,
+            applicability_records=applicability_records,
+            violations=violations,
+            violated_rule_ids=violated_rule_ids,
         )
 
     if request.tool != TOOL:
@@ -370,11 +441,10 @@ def evaluate(request: Request, authority: Authority) -> Outcome:
     except BridgeConfigError as exc:
         return finish(SETUP_INVALID, str(exc), NO_CLAIM)
 
-    root = Path(request.session_directory or "").resolve(strict=False)
-    try:
-        relative = target.relative_to(root)
-    except ValueError:
-        relative = Path(target.name)
+    memory_root = policy_root(memory)
+    if not _is_within(target, memory_root):
+        return finish(UNEVALUATED, "target_outside_policy_root", NO_CLAIM)
+    relative = target.relative_to(memory_root)
     proc = _invoke_check(
         memory,
         relative.as_posix(),
@@ -390,22 +460,30 @@ def evaluate(request: Request, authority: Authority) -> Outcome:
     if payload is None:
         return finish(UNEVALUATED, assessment.problem or "untrusted_check", NO_CLAIM)
     state = classify_observation(payload)
+    applicability = tuple(payload.get("applicability") or ())
+    violations = tuple(payload.get("violations") or ())
     if state != "TRUSTED_COMPLETE":
         return finish(
             UNEVALUATED,
             f"evaluation_{state.lower()}",
             NO_CLAIM,
             observation_state=state,
+            applicability_records=applicability,
+            violations=violations,
         )
 
-    applicability = payload.get("applicability") or []
     entry = next(
         (item for item in applicability if item.get("rule_id") == authority.rule_id),
         None,
     )
     if entry is None:
         return finish(
-            UNEVALUATED, "rule_not_evaluated", NO_CLAIM, observation_state=state
+            UNEVALUATED,
+            "rule_not_evaluated",
+            NO_CLAIM,
+            observation_state=state,
+            applicability_records=applicability,
+            violations=violations,
         )
     if entry.get("decision_version_id") != authority.decision_version_id:
         return finish(
@@ -413,6 +491,8 @@ def evaluate(request: Request, authority: Authority) -> Outcome:
             "authority_version_mismatch",
             NO_CLAIM,
             observation_state=state,
+            applicability_records=applicability,
+            violations=violations,
         )
     outcome = entry.get("outcome")
     if outcome not in ("APPLIED", "EXCLUDED"):
@@ -421,25 +501,11 @@ def evaluate(request: Request, authority: Authority) -> Outcome:
             f"applicability_{str(outcome).lower()}",
             NO_CLAIM,
             observation_state=state,
+            applicability_records=applicability,
+            violations=violations,
         )
 
     verdict = payload.get("verdict")
-    if verdict == "FAIL" and outcome == "APPLIED":
-        if mode == "strict":
-            return finish(
-                BLOCK,
-                "literal_violation",
-                EXECUTION_OBSERVED,
-                observation_state=state,
-                applicability=outcome,
-            )
-        return finish(
-            ALLOW,
-            "warn_mode_violation",
-            EXECUTION_OBSERVED,
-            observation_state=state,
-            applicability=outcome,
-        )
     if verdict == "PASS":
         return finish(
             ALLOW,
@@ -447,6 +513,55 @@ def evaluate(request: Request, authority: Authority) -> Outcome:
             EXECUTION_OBSERVED,
             observation_state=state,
             applicability=outcome,
+            applicability_records=applicability,
+            violations=violations,
+        )
+    if verdict == "FAIL":
+        # Blocking is attributable to a canonical FORBID_LITERAL violation
+        # record, never to the aggregate verdict and never to the pinned rule
+        # by assumption. The authority pin is an expectation, not a filter.
+        canonical = tuple(
+            item
+            for item in violations
+            if isinstance(item, dict)
+            and item.get("rule_type") == "FORBID_LITERAL"
+            and item.get("severity") == "FAIL"
+            and isinstance(item.get("rule_id"), str)
+            and item["rule_id"]
+        )
+        violated_rule_ids = tuple(
+            sorted({item["rule_id"] for item in canonical})
+        )
+        if not canonical:
+            return finish(
+                UNEVALUATED,
+                "fail_without_canonical_literal_violation",
+                NO_CLAIM,
+                observation_state=state,
+                applicability=outcome,
+                applicability_records=applicability,
+                violations=violations,
+            )
+        if mode == "strict":
+            return finish(
+                BLOCK,
+                "literal_violation",
+                EXECUTION_OBSERVED,
+                observation_state=state,
+                applicability=outcome,
+                applicability_records=applicability,
+                violations=violations,
+                violated_rule_ids=violated_rule_ids,
+            )
+        return finish(
+            ALLOW,
+            "warn_mode_violation",
+            EXECUTION_OBSERVED,
+            observation_state=state,
+            applicability=outcome,
+            applicability_records=applicability,
+            violations=violations,
+            violated_rule_ids=violated_rule_ids,
         )
     return finish(
         UNEVALUATED,
@@ -454,6 +569,8 @@ def evaluate(request: Request, authority: Authority) -> Outcome:
         NO_CLAIM,
         observation_state=state,
         applicability=outcome,
+        applicability_records=applicability,
+        violations=violations,
     )
 
 
@@ -469,6 +586,16 @@ def _write_evidence(record: dict) -> None:
         pass
 
 
+def _bare_decision(outcome: Outcome) -> dict:
+    """The decision surface for transport/setup failures (no evidence)."""
+    return {
+        "schema": DECISION_SCHEMA,
+        "decision": outcome.decision,
+        "reason": outcome.reason,
+        "claim": outcome.claim,
+    }
+
+
 def main(argv: Optional[list[str]] = None) -> int:
     parser = argparse.ArgumentParser(description="OpenCode S1 pre-mutation bridge")
     parser.add_argument("--authority", default=None, help="trusted authority pin JSON")
@@ -480,14 +607,14 @@ def main(argv: Optional[list[str]] = None) -> int:
     except (UnicodeDecodeError, json.JSONDecodeError, EvaluationError) as exc:
         reason = str(exc) or type(exc).__name__
         outcome = Outcome(UNEVALUATED, f"invalid_request_{reason}", NO_CLAIM)
-        print(json.dumps({"schema": DECISION_SCHEMA, **outcome.__dict__}, sort_keys=True))
+        print(json.dumps(_bare_decision(outcome), sort_keys=True))
         return 0
 
     try:
         authority = load_authority(args.authority)
     except BridgeConfigError as exc:
         outcome = Outcome(SETUP_INVALID, str(exc), NO_CLAIM)
-        print(json.dumps({"schema": DECISION_SCHEMA, **outcome.__dict__}, sort_keys=True))
+        print(json.dumps(_bare_decision(outcome), sort_keys=True))
         return 0
 
     claude_env_present = "CLAUDE_PLUGIN_OPTION_MODE" in os.environ

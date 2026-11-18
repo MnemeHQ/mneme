@@ -7,6 +7,7 @@ leave the governed tree byte-identical in every case.
 from __future__ import annotations
 
 import hashlib
+import io
 import json
 import os
 import subprocess
@@ -14,6 +15,8 @@ import sys
 from pathlib import Path
 
 import pytest
+
+from mneme.integrations.opencode import bridge
 
 BRIDGE = [sys.executable, "-m", "mneme.integrations.opencode.bridge"]
 _UNSET = object()
@@ -27,6 +30,14 @@ def _snapshot(root: Path) -> dict[str, str]:
     }
 
 
+def _entry(outcome: dict, rule_id: str) -> dict:
+    return next(
+        item
+        for item in outcome["evidence"]["applicability"]
+        if item["rule_id"] == rule_id
+    )
+
+
 def _request(
     root: Path,
     path: str,
@@ -35,6 +46,9 @@ def _request(
     tool: str = "write",
     session_id: str = "ses_test",
     call_id: str = "call_1",
+    agent: str | None = "test",
+    message_id: str | None = "msg_1",
+    event_id: str | None = "evt_1",
     session_directory=_UNSET,
 ):
     return {
@@ -45,9 +59,9 @@ def _request(
         else session_directory,
         "sessionID": session_id,
         "callID": call_id,
-        "agent": "test",
-        "messageID": "msg_1",
-        "eventID": "evt_1",
+        "agent": agent,
+        "messageID": message_id,
+        "eventID": event_id,
         "hostVersion": "2.3.0",
     }
 
@@ -63,6 +77,9 @@ def _run(
     tool: str = "write",
     session_id: str = "ses_test",
     call_id: str = "call_1",
+    agent: str | None = "test",
+    message_id: str | None = "msg_1",
+    event_id: str | None = "evt_1",
     session_directory=_UNSET,
 ):
     child_env = dict(os.environ)
@@ -80,6 +97,9 @@ def _run(
         tool=tool,
         session_id=session_id,
         call_id=call_id,
+        agent=agent,
+        message_id=message_id,
+        event_id=event_id,
         session_directory=session_directory,
     )
     proc = subprocess.run(
@@ -88,6 +108,7 @@ def _run(
         capture_output=True,
         cwd=str(cwd or fixture.root),
         env=child_env,
+        check=False,
     )
     assert proc.returncode == 0, proc.stderr.decode("utf-8", errors="replace")
     return json.loads(proc.stdout.decode("utf-8"))
@@ -103,7 +124,13 @@ def test_forbidden_literal_blocks_without_mutating(s1_fixture):
     assert outcome["reason"] == "literal_violation"
     assert outcome["claim"] == "execution_observed"
     assert outcome["evidence"]["observation_state"] == "TRUSTED_COMPLETE"
-    assert outcome["evidence"]["applicability"] == "APPLIED"
+    entry = _entry(outcome, s1_fixture.rule_id)
+    assert entry["outcome"] == "APPLIED"
+    assert outcome["evidence"]["violated_rule_ids"] == [s1_fixture.rule_id]
+    assert any(
+        violation["rule_id"] == s1_fixture.rule_id
+        for violation in outcome["evidence"]["violations"]
+    )
     assert before == after
     assert not target.exists()
 
@@ -128,13 +155,43 @@ def test_excluded_rule_allows_with_execution_observed(s1_fixture):
     outcome = _run(s1_fixture, "src/other/allowed.py", "import psycopg2\n")
     assert outcome["decision"] == "allow"
     assert outcome["claim"] == "execution_observed"
-    assert outcome["evidence"]["applicability"] == "EXCLUDED"
+    assert _entry(outcome, s1_fixture.rule_id)["outcome"] == "EXCLUDED"
 
 
 def test_non_python_target_is_unsupported(s1_fixture):
     outcome = _run(s1_fixture, "src/handlers/allowed.txt", "VALUE = 1\n")
     assert outcome["decision"] == "unsupported"
     assert outcome["reason"] == "non_python_target"
+    assert outcome["claim"] == "none"
+
+
+def test_non_write_tool_is_unsupported(s1_fixture):
+    outcome = _run(
+        s1_fixture,
+        "src/handlers/new_handler.py",
+        "VALUE = 1\n",
+        tool="edit",
+    )
+    assert outcome["decision"] == "unsupported"
+    assert outcome["reason"] == "unsupported_tool"
+    assert outcome["claim"] == "none"
+
+
+def test_non_complete_content_is_unsupported(s1_fixture):
+    outcome = _run(
+        s1_fixture,
+        "src/handlers/new_handler.py",
+        None,
+    )
+    assert outcome["decision"] == "unsupported"
+    assert outcome["reason"] == "non_complete_content"
+    assert outcome["claim"] == "none"
+
+
+def test_empty_content_is_skip(s1_fixture):
+    outcome = _run(s1_fixture, "src/handlers/new_handler.py", "")
+    assert outcome["decision"] == "skip"
+    assert outcome["reason"] == "empty_content"
     assert outcome["claim"] == "none"
 
 
@@ -334,3 +391,455 @@ def test_target_created_before_evaluation_is_unsupported(s1_fixture):
     outcome = _run(s1_fixture, "src/handlers/new_handler.py", "VALUE = 1\n")
     assert outcome["decision"] == "unsupported"
     assert outcome["reason"] == "existing_target"
+
+
+# ---------------------------------------------------------------------------
+# B1: absolute targets are target-anchored; relative traversal stays closed.
+# ---------------------------------------------------------------------------
+
+
+def test_absolute_sibling_target_uses_the_sibling_memory(
+    tmp_path, project_factory
+):
+    session = tmp_path / "session"
+    session.mkdir()
+    sibling = project_factory()
+    target = sibling.root / "src" / "handlers" / "new_handler.py"
+
+    class _Fixture:
+        pass
+
+    fixture = _Fixture()
+    fixture.root = session
+    fixture.authority = sibling.authority
+
+    outcome = _run(fixture, str(target), "import psycopg2\n")
+    assert outcome["decision"] == "block"
+    assert outcome["claim"] == "execution_observed"
+    assert outcome["evidence"]["target"] == str(target.resolve())
+    assert outcome["evidence"]["memory"]["path"] == str(sibling.memory)
+    assert _entry(outcome, sibling.rule_id)["outcome"] == "APPLIED"
+    assert not target.exists()
+
+
+def test_relative_traversal_outside_the_session_stays_unevaluated(
+    tmp_path, project_factory
+):
+    session = tmp_path / "session"
+    session.mkdir()
+    sibling = project_factory()
+    relative = (
+        Path("..")
+        / sibling.root.name
+        / "src"
+        / "handlers"
+        / "new_handler.py"
+    )
+
+    class _Fixture:
+        pass
+
+    fixture = _Fixture()
+    fixture.root = session
+    fixture.authority = sibling.authority
+
+    outcome = _run(fixture, relative.as_posix(), "import psycopg2\n")
+    assert outcome["decision"] == "unevaluated"
+    assert outcome["reason"] == "target_outside_session_directory"
+    assert outcome["claim"] == "none"
+
+
+def test_missing_parent_is_unsupported_and_default_open(s1_fixture):
+    target = s1_fixture.root / "src" / "handlers" / "missing" / "new_handler.py"
+    outcome = _run(
+        s1_fixture,
+        "src/handlers/missing/new_handler.py",
+        "import psycopg2\n",
+    )
+    assert outcome["decision"] == "unsupported"
+    assert outcome["reason"] == "target_parent_missing"
+    assert outcome["claim"] == "none"
+    assert not target.parent.exists()
+
+
+# ---------------------------------------------------------------------------
+# B2: canonical per-rule violation attribution.
+# ---------------------------------------------------------------------------
+
+
+def test_fail_is_attributed_to_the_actual_rule(two_rule_fixture):
+    secondary = two_rule_fixture.rule_ids["forbidden_secondary"]
+    outcome = _run(
+        two_rule_fixture,
+        "src/handlers/new_handler.py",
+        "forbidden_secondary\n",
+    )
+
+    assert outcome["decision"] == "block"
+    assert outcome["claim"] == "execution_observed"
+    assert outcome["evidence"]["violated_rule_ids"] == [secondary]
+    violation_rule_ids = {
+        violation["rule_id"] for violation in outcome["evidence"]["violations"]
+    }
+    assert secondary in violation_rule_ids
+    assert two_rule_fixture.rule_id not in violation_rule_ids
+    assert _entry(outcome, two_rule_fixture.rule_id)["outcome"] == "APPLIED"
+
+
+# ---------------------------------------------------------------------------
+# B3: evidence copies canonical records; identity gates the claim.
+# ---------------------------------------------------------------------------
+
+
+def test_missing_host_identifiers_downgrade_the_claim(s1_fixture):
+    outcome = _run(
+        s1_fixture,
+        "src/handlers/new_handler.py",
+        "import psycopg2\n",
+        session_id=None,
+        call_id=None,
+        agent=None,
+        message_id=None,
+        event_id=None,
+    )
+
+    assert outcome["decision"] == "block"
+    assert outcome["claim"] == "none"
+    evidence = outcome["evidence"]
+    assert evidence["observation_state"] == "TRUSTED_COMPLETE"
+    assert evidence["identity"]["complete"] is False
+    assert evidence["identity"]["missing"] == [
+        "sessionID",
+        "callID",
+        "agent",
+        "messageID",
+        "eventID",
+    ]
+    assert evidence["event"]["tool"] == "write"
+    assert evidence["event"]["sessionID"] is None
+    assert evidence["host_witness"] is None
+
+
+def test_complete_identity_claims_execution_observed(s1_fixture):
+    outcome = _run(s1_fixture, "src/handlers/new_handler.py", "VALUE = 1\n")
+    evidence = outcome["evidence"]
+    assert evidence["identity"] == {"complete": True, "missing": []}
+    assert evidence["event"]["tool"] == "write"
+    assert evidence["event"]["agent"] == "test"
+    assert evidence["event"]["messageID"] == "msg_1"
+    assert evidence["event"]["eventID"] == "evt_1"
+    assert evidence["memory"]["selection_reason"] == "DISCOVERED"
+    assert evidence["memory"]["selection_walk"] == "unbounded"
+    assert outcome["claim"] == "execution_observed"
+
+
+def test_evidence_copies_canonical_checker_records(s1_fixture, tmp_path_factory):
+    evidence_dir = tmp_path_factory.mktemp("canonical-projection")
+    log = evidence_dir / "evidence.jsonl"
+    content = "import psycopg2\n"
+    outcome = _run(
+        s1_fixture,
+        "src/handlers/new_handler.py",
+        content,
+        env={"MNEME_OPENCODE_EVIDENCE_LOG": str(log)},
+    )
+    assert outcome["decision"] == "block"
+    record = json.loads(log.read_text(encoding="utf-8").splitlines()[-1])
+
+    carrier = evidence_dir / "carrier.txt"
+    carrier.write_text(content, encoding="utf-8", newline="")
+    child_env = dict(os.environ)
+    repo = str(Path(__file__).resolve().parents[3])
+    existing = child_env.get("PYTHONPATH", "")
+    child_env["PYTHONPATH"] = repo + (os.pathsep + existing if existing else "")
+    for name in ("CLAUDE_PLUGIN_OPTION_MODE", "MNEME_HOOK_MODE"):
+        child_env.pop(name, None)
+    proc = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "mneme",
+            "check",
+            "--memory",
+            str(s1_fixture.memory),
+            "--input",
+            str(carrier),
+            "--query",
+            "edit to src/handlers/new_handler.py",
+            "--mode",
+            "strict",
+            "--json",
+            "--target-path",
+            str(s1_fixture.root / "src" / "handlers" / "new_handler.py"),
+        ],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        cwd=str(s1_fixture.root),
+        env=child_env,
+        check=False,
+    )
+    payload = json.loads(proc.stdout)
+    assert record["applicability"] == payload["applicability"]
+    assert record["violations"] == payload["violations"]
+
+
+# ---------------------------------------------------------------------------
+# B4: immutability, byte fidelity, races and the host witness.
+# ---------------------------------------------------------------------------
+
+
+def _run_inprocess(authority: Path, payload: dict) -> dict:
+    data = json.dumps(payload).encode("utf-8")
+    stdin = io.TextIOWrapper(io.BytesIO(data), encoding="utf-8")
+    stdout = io.StringIO()
+    stderr = io.StringIO()
+    previous = sys.stdin, sys.stdout, sys.stderr
+    sys.stdin, sys.stdout, sys.stderr = stdin, stdout, stderr
+    try:
+        assert bridge.main(["--authority", str(authority)]) == 0
+    finally:
+        sys.stdin, sys.stdout, sys.stderr = previous
+    return json.loads(stdout.getvalue())
+
+
+def _install_write_audit(root: Path):
+    active = {"on": True}
+    writes: list[tuple[str, str]] = []
+
+    def as_path(value):
+        if isinstance(value, bytes):
+            value = os.fsdecode(value)
+        if isinstance(value, (str, os.PathLike)):
+            return Path(os.path.abspath(value))
+        return None
+
+    def audit(event, args):
+        if not active["on"]:
+            return
+        if event == "open":
+            path, mode, flags = args
+            candidate = as_path(path)
+            if candidate is None:
+                return
+            writing = bool(
+                isinstance(flags, int)
+                and flags
+                & (os.O_WRONLY | os.O_RDWR | os.O_CREAT | os.O_TRUNC | os.O_APPEND)
+            )
+            if isinstance(mode, str):
+                writing = writing or any(ch in mode for ch in "wax+")
+            if writing and bridge._is_within(candidate, root):
+                writes.append((event, str(candidate)))
+            return
+        if event in {
+            "os.remove",
+            "os.rename",
+            "os.replace",
+            "os.mkdir",
+            "os.rmdir",
+            "os.chmod",
+        }:
+            for value in args:
+                candidate = as_path(value)
+                if candidate is not None and bridge._is_within(candidate, root):
+                    writes.append((event, str(candidate)))
+
+    sys.addaudithook(audit)
+    return active, writes
+
+
+def test_bridge_never_writes_under_the_governed_root(s1_fixture, monkeypatch):
+    for name in (
+        "CLAUDE_PLUGIN_OPTION_MODE",
+        "MNEME_HOOK_MODE",
+        "MNEME_MEMORY",
+    ):
+        monkeypatch.delenv(name, raising=False)
+    active, writes = _install_write_audit(s1_fixture.root)
+    before = _snapshot(s1_fixture.root)
+    try:
+        outcome = _run_inprocess(
+            s1_fixture.authority,
+            _request(
+                s1_fixture.root,
+                "src/handlers/new_handler.py",
+                "import psycopg2\n",
+            ),
+        )
+    finally:
+        active["on"] = False
+    after = _snapshot(s1_fixture.root)
+
+    target = s1_fixture.root / "src" / "handlers" / "new_handler.py"
+    assert outcome["decision"] == "block"
+    assert writes == []
+    assert before == after
+    assert not target.exists()
+
+
+@pytest.mark.skipif(
+    os.name == "nt",
+    reason=(
+        "the shared text-mode carrier translates newlines on Windows; byte "
+        "fidelity requires the pinned non-Windows host"
+    ),
+)
+@pytest.mark.parametrize(
+    "content",
+    [
+        "VALUE = 1\n",
+        "VALUE = 1\r\n",
+        "# café\nVALUE = 1\n",
+        "VALUE = 1",
+    ],
+)
+def test_byte_fidelity_and_carrier_isolation(
+    s1_fixture, monkeypatch, content
+):
+    for name in (
+        "CLAUDE_PLUGIN_OPTION_MODE",
+        "MNEME_HOOK_MODE",
+        "MNEME_MEMORY",
+    ):
+        monkeypatch.delenv(name, raising=False)
+    captured: dict[str, object] = {}
+    real_unlink = os.unlink
+
+    def capture(path):
+        candidate = Path(path)
+        if candidate.suffix == ".txt" and not bridge._is_within(
+            candidate, s1_fixture.root
+        ):
+            captured["path"] = candidate
+            captured["bytes"] = candidate.read_bytes()
+        return real_unlink(path)
+
+    monkeypatch.setattr(os, "unlink", capture)
+    outcome = _run_inprocess(
+        s1_fixture.authority,
+        _request(s1_fixture.root, "src/handlers/bytes.py", content),
+    )
+    assert outcome["decision"] == "allow"
+
+    carrier_path = captured["path"]
+    carrier_bytes = captured["bytes"]
+    assert not bridge._is_within(carrier_path, s1_fixture.root)
+    assert not carrier_path.exists()
+
+    target = s1_fixture.root / "src" / "handlers" / "bytes.py"
+    target.write_bytes(content.encode("utf-8"))
+    expected = hashlib.sha256(content.encode("utf-8")).hexdigest()
+    assert hashlib.sha256(carrier_bytes).hexdigest() == expected
+    assert hashlib.sha256(target.read_bytes()).hexdigest() == expected
+
+
+def test_race_cases_are_characterized(s1_fixture, monkeypatch):
+    for name in (
+        "CLAUDE_PLUGIN_OPTION_MODE",
+        "MNEME_HOOK_MODE",
+        "MNEME_MEMORY",
+    ):
+        monkeypatch.delenv(name, raising=False)
+    authority = bridge.load_authority(str(s1_fixture.authority))
+
+    def request(name: str) -> bridge.Request:
+        return bridge.Request(
+            tool="write",
+            path=f"src/handlers/{name}.py",
+            content="VALUE = 1\n",
+            session_directory=str(s1_fixture.root),
+            session_id="ses_race",
+            call_id="call_race",
+            agent="test",
+            message_id="msg_race",
+            event_id="evt_race",
+            host_version="2.3.0",
+        )
+
+    summary: dict[str, str] = {}
+    handlers = s1_fixture.root / "src" / "handlers"
+
+    # (a) Target appears after the absence proof, during evaluation.
+    target_a = handlers / "race_a.py"
+    real_invoke = bridge._invoke_check
+
+    def raced(*args, **kwargs):
+        proc = real_invoke(*args, **kwargs)
+        target_a.write_text("RACE\n", encoding="utf-8")
+        return proc
+
+    monkeypatch.setattr(bridge, "_invoke_check", raced)
+    outcome_a = bridge.evaluate(request("race_a"), authority)
+    monkeypatch.setattr(bridge, "_invoke_check", real_invoke)
+    summary["a"] = (
+        "DETECTED" if outcome_a.decision != "allow" else "UNDETECTED_RACE"
+    )
+    assert target_a.exists()
+
+    # (b) Target appears between evaluation and the host write.
+    target_b = handlers / "race_b.py"
+    outcome_b = bridge.evaluate(request("race_b"), authority)
+    assert outcome_b.decision == "allow"
+    target_b.write_text("HOST\n", encoding="utf-8")
+    summary["b"] = "UNDETECTED_RACE"
+
+    # (c) Symlink introduced at the target after evaluation.
+    target_c = handlers / "race_c.py"
+    decoy_c = handlers / "race_c_decoy.py"
+    decoy_c.write_text("DECOY\n", encoding="utf-8")
+    outcome_c = bridge.evaluate(request("race_c"), authority)
+    assert outcome_c.decision == "allow"
+    try:
+        target_c.symlink_to(decoy_c)
+        target_c.write_text("HOST\n", encoding="utf-8")
+        summary["c"] = (
+            "UNDETECTED_RACE"
+            if decoy_c.read_text(encoding="utf-8") == "HOST\n"
+            else "DETECTED"
+        )
+    except OSError:
+        pass
+
+    # (d) Hardlink substituted after evaluation.
+    target_d = handlers / "race_d.py"
+    decoy_d = handlers / "race_d_decoy.py"
+    decoy_d.write_text("DECOY\n", encoding="utf-8")
+    outcome_d = bridge.evaluate(request("race_d"), authority)
+    assert outcome_d.decision == "allow"
+    try:
+        os.link(decoy_d, target_d)
+        target_d.write_text("HOST\n", encoding="utf-8")
+        summary["d"] = (
+            "UNDETECTED_RACE"
+            if decoy_d.read_text(encoding="utf-8") == "HOST\n"
+            else "DETECTED"
+        )
+    except OSError:
+        pass
+
+    assert set(summary.values()) <= {"DETECTED", "UNDETECTED_RACE"}
+    race_resistance = (
+        "NOT_ESTABLISHED"
+        if any(value == "UNDETECTED_RACE" for value in summary.values())
+        else "ESTABLISHED"
+    )
+    assert race_resistance == "NOT_ESTABLISHED"
+
+
+def test_block_does_not_imply_host_prevention(s1_fixture):
+    target = s1_fixture.root / "src" / "handlers" / "new_handler.py"
+    outcome = _run(s1_fixture, "src/handlers/new_handler.py", "import psycopg2\n")
+    assert outcome["decision"] == "block"
+    assert outcome["evidence"]["host_witness"] is None
+
+    # Validator-owned witness, recorded outside the bridge record.
+    witness = {
+        "refused": True,
+        "tool_status": "error",
+        "tool_error": "Mneme BLOCK: literal_violation",
+        "target_state": "absent",
+    }
+    assert witness["refused"] is True
+    assert witness["target_state"] == "absent"
+    assert not target.exists()

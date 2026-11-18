@@ -4,6 +4,10 @@ const DEFAULT_TIMEOUT_MS = 60_000
 
 type Decision = { decision?: string; reason?: string }
 
+// Non-write tools are outside the S1 surface. Diagnose each one once per
+// plugin lifetime so noncoverage is visible without intercepting or blocking.
+const notCoveredTools = new Set<string>()
+
 function pythonExecutable(): string {
   return (
     process.env.MNEME_OPENCODE_PYTHON ||
@@ -93,7 +97,18 @@ export default {
         : DEFAULT_TIMEOUT_MS
 
     await ctx.tool.hook("execute.before", async (event: any) => {
-      if (event?.tool !== "write") return
+      const tool = event?.tool
+      if (tool !== "write") {
+        const name = typeof tool === "string" && tool ? tool : "unknown"
+        if (!notCoveredTools.has(name)) {
+          notCoveredTools.add(name)
+          console.error(
+            `Mneme NOT_COVERED: tool ${name} is outside the S1 surface ` +
+              "(write only); no evaluation, authorization or protection claim.",
+          )
+        }
+        return
+      }
 
       const input = event?.input ?? {}
       let sessionDirectory: string | null = null
