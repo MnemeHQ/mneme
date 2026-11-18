@@ -344,7 +344,7 @@ Neither statement accepts this amendment.
 D5 today does not name H2a. Its D1 targeted re-run is placed in batch 3 with H2b, since both use the Codex harness.
 
 **Stop rule (new).**
-- **Positive gate.** Batch 3 starts only after **every** batch-2 path (H4a, H6a and H6b) has a passing label (`DELIVERED_TO_AGENT`, `DELIVERED_TO_USER_ONLY` or `EVIDENCE_REUSED`, §6), or after an explicit owner decision to proceed without it. A missing or unresolved result never lets batch 3 start by default.
+- **Positive gate.** Batch 3 starts only after **every** batch-2 path (H4a, H6a and H6b) has a passing label (`DELIVERED_TO_AGENT` or `DELIVERED_TO_USER_ONLY`, §6; `EVIDENCE_REUSED` is available only to H2a under D1), or after an explicit owner decision to proceed without it. A missing or unresolved result never lets batch 3 start by default.
 - **Failure.** If any batch-2 path gets a failing label (`NO_NONBLOCKING_CHANNEL`, `NOT_DELIVERED` or `DELIVERED_WITH_SIDE_EFFECT`, §6), batches 3 and 4 do **not** start. The result goes to the owner, because charter §5 then keeps the shared implementation blocked for every consumer and requires D5 to be revisited explicitly. The direction of that revisit is the owner's decision, and nothing here pre-decides it; options include a D5 amendment for that host, or removing the host from the D5 + P2 scope.
 - **Not failures** (§6). An `INCONCLUSIVE` path is re-run under D4. A `NOT_EXECUTED` arm (for example, an uninstallable pin, missing credentials or no operator) is prepared again once its precondition is met, as in A3-4, and is never counted. Until then the positive gate is not met.
 - **Later batches.** A failing label in batch 3 or 4 also goes to the owner under charter §5 before any further batch starts.
@@ -378,7 +378,7 @@ Every other remaining path has a candidate shape and, except H5a/H5b, some prior
 - H2b: unit tests;
 - H3a: documented live;
 - H5c: live at the dispatch layer;
-- H5a/H5b: no live evidence (§4 records "None"), but a code precedent for the shape (`agent_sdk/adapter.py:295-304`, charter §5).
+- H5a/H5b: no live evidence (§4 records "None"), but a code precedent for each shape: PreToolUse `additionalContext` for H5a (`agent_sdk/adapter.py:295-304`, charter §5) and UserPromptSubmit `additionalContext` for H5b (`agent_sdk/adapter.py:166-178`).
 
 A failure there is possible but not foreseen.
 
@@ -386,7 +386,7 @@ A failure there is possible but not foreseen.
 - **Wasted harness work.** Under today's order, the H2 and H5c work comes before both at-risk results, and the H3 and H5a/H5b work comes alongside H6a (batch 3) and before H4 (last). That work includes two new harnesses and operator credentials.
 - **Premature specification work.** The readiness assessment's gaps S1–S6 point at a charter amendment and clarifications, an ADR-033 section or erratum, a Q2 amendment and a risk acceptance. The probes do not depend on them (readiness §6). But if a host cannot carry a notice, Phase 2 may not go ahead in its current form (charter §5 reopens D5), and S1–S6 work, especially S5's shape binding and S6's audience, would be wasted or rewritten.
 - **Pressure on the gate.** The later a fatal result arrives, the more finished Phase 2 work exists, and the stronger the pull to relax the gate or claim more than was proven. Running the at-risk paths first lets the owner decide the D5 revisit before that work exists.
-- **An early decision either way.** If both paths pass, the rest of the gate has no foreseen blocker, and the remaining batches and spec work proceed at lower risk. If either fails, the owner faces the D5 revisit first.
+- **An early decision either way.** If every batch-2 path passes, the rest of the gate has no foreseen blocker, and the remaining batches and spec work proceed at lower risk. If either fails, the owner faces the D5 revisit first.
 
 **Cost:**
 - The two harnesses with operator dependencies come first instead of last:
