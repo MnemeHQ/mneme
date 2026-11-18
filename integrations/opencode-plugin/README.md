@@ -3,11 +3,11 @@
 Transport-only plugin for the OpenCode pre-mutation surface. It forwards `write`
 and `edit` events to the Python bridge and throws only on a `block` decision.
 
-Experimental. No support-matrix decision is recorded here; see
-[docs/integrations/opencode.md](../../docs/integrations/opencode.md). The maximum
-literal evidence claim is `EXECUTION_OBSERVED`, and on this host it is
-unreachable because OpenCode supplies no `callID` — so the claim is `none`. Host
-prevention is a separate host-side observation.
+No support-matrix decision is recorded here; see
+[docs/integrations/opencode.md](../../docs/integrations/opencode.md) for the
+canonical record. The maximum literal evidence claim is `EXECUTION_OBSERVED`, and
+on this host it is unreachable because OpenCode supplies no `callID` — so the
+claim is `none`. Host prevention is a separate host-side observation.
 
 ## Scope
 
