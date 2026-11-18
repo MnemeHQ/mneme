@@ -2785,6 +2785,64 @@ re-reviewed; `tests/test_test_policy.py`.
 
 ---
 
+---
+
+## Amendment — authorize the OpenCode E1 edit surface (2026-11-18)
+
+**Status:** PROPOSED — takes effect on the squash merge of the `[layer1-freeze]`
+PR that adds this section, after the OpenCode E1 implementation charter merges.
+
+**Sections referenced:** the Freeze Anchor **Status** clause ("No behavioral
+change to retrieval or enforcement without an explicit charter amendment") and
+[Amendment Procedure](#amendment-procedure) §3(b).
+
+**Rationale.** The E1 charter —
+`docs/plans/2026-11-18-opencode-e1-edit-charter.md` — is the bounded charter
+decision required by the Status clause and merged first, so Amendment Procedure
+§3(b) is satisfied when this amendment takes effect. E1 extends the
+already-authorized OpenCode S1 integration from verified-new-file `write` to
+existing-file `.py` `edit`. The enforcement engine, rule semantics and verdict
+trust are unchanged; the change is host-adapter mapping that reuses
+`_materialize_change`, `introduced_between` and `_invoke_check`.
+
+**Authorized change.** The OpenCode integration may gate existing-file `.py`
+`edit` events with ADR-018 introduced-delta semantics, through the canonical
+materialisation and enforcement path, limited to:
+
+- tool id `edit` with `path`, `oldString`, `newString` and optional `replaceAll`;
+- existing `.py` targets inside the selected memory's policy root;
+- `FORBID_LITERAL` only.
+
+The bridge must normalise `oldString` to `old_string`, `newString` to
+`new_string`, and `replaceAll` to `replace_all` before calling canonical
+materialisation. No other file type, tool, rule type or enforcement path is
+authorized.
+
+**Explicitly preserved.** `DecisionRetriever` behavior and outputs;
+`ConflictDetector` semantics; CLI commands, flags, exit codes and the
+`mneme.check/v1` payload; `FORBID_LITERAL` and `FORBID_NUMERIC_ABOVE` rule
+semantics; all other host adapters; canonical memory and ADRs; frozen benchmark
+corpora, expectations and scores; the support matrix. No new engine, no new rule
+type, no availability change, and no evidence-semantics change for existing
+surfaces. The existing freeze amendments and records remain unchanged.
+
+**Scope limit.** Only the surface above. Any other existing-file change, any new
+file class, `MultiEdit`/patch payloads, shell, deletion, rename or Stop/session
+enforcement requires its own charter and amendment. This amendment does not
+authorize a support-level statement and does not reopen S1.
+
+**Source references.** E1 charter at
+`docs/plans/2026-11-18-opencode-e1-edit-charter.md` (merge commit recorded at
+merge); `main` at `3ada77415306ea41b977c035e833f6cff3ec1314` as the E1 base; the
+E1 host probe recorded in the S1-A independent-validation evidence package
+(`16-e1-edit-semantics.json`, SHA-256
+`cdb7ccf0149c7fa3a4c66a82485056b40a21ba328398d91324d7c2a60b4a250d`); ADR-018.
+
+**Ordering.** The E1 implementation charter merges first; this amendment second;
+E1 implementation may merge only after both.
+
+**No support claim.** This amendment makes no support-level declaration.
+
 ## Amendment Procedure
 
 This document is frozen at `e73ff7d`. To amend it:
