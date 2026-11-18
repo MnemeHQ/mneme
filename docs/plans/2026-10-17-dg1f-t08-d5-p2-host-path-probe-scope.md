@@ -378,7 +378,7 @@ Every other remaining path has a candidate shape and, except H5a/H5b, some prior
 - H2b: unit tests;
 - H3a: documented live;
 - H5c: live at the dispatch layer;
-- H5a/H5b: no live evidence (§4 records "None"), but a code precedent for each shape: PreToolUse `additionalContext` for H5a (the fail-open branch of `pre_tool_use`, `agent_sdk/adapter.py:315-335` at this amendment's base; charter §5 cites it at `:295-304`) and UserPromptSubmit `additionalContext` for H5b (`user_prompt_submit`, `:188-198`; §4 cites it at `:166-178`).
+- H5a/H5b: no live evidence (§4 records "None"), but a code precedent for each shape: PreToolUse `additionalContext` for H5a (the fail-open branch of `pre_tool_use`, `agent_sdk/adapter.py:325-334` at this amendment's base; charter §5 cites it at `:295-304`) and UserPromptSubmit `additionalContext` for H5b (`user_prompt_submit`, `:188-198`; §4 cites it at `:166-178`).
 
 A failure there is possible but not foreseen.
 
@@ -386,7 +386,7 @@ A failure there is possible but not foreseen.
 - **Wasted harness work.** Under today's order, the H2 and H5c work comes before both at-risk results, and the H3 and H5a/H5b work comes alongside H6a (batch 3) and before H4 (last). That work includes two new harnesses and operator credentials.
 - **Premature specification work.** The readiness assessment's gaps S1–S6 point at a charter amendment and clarifications, an ADR-033 section or erratum, a Q2 amendment and a risk acceptance. The probes do not depend on them (readiness §6). But if a host cannot carry a notice, Phase 2 may not go ahead in its current form (charter §5 reopens D5), and S1–S6 work, especially S5's shape binding and S6's audience, would be wasted or rewritten.
 - **Pressure on the gate.** The later a fatal result arrives, the more finished Phase 2 work exists, and the stronger the pull to relax the gate or claim more than was proven. Running the at-risk paths first lets the owner decide the D5 revisit before that work exists.
-- **An early decision either way.** If every batch-2 path passes, the rest of the gate has no foreseen blocker, and the remaining batches and spec work proceed at lower risk. If either fails, the owner faces the D5 revisit first.
+- **An early decision either way.** If every batch-2 path passes, the rest of the gate has no foreseen blocker, and the remaining batches and spec work proceed at lower risk. If any fails, the owner faces the D5 revisit first.
 
 **Cost:**
 - The two harnesses with operator dependencies come first instead of last:
