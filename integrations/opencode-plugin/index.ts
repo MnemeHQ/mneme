@@ -121,6 +121,7 @@ export default {
 
       const decision = await runBridge(
         {
+          schema: "mneme.opencode.bridge/v1",
           tool: "write",
           input: { path: input.path, content: input.content },
           sessionDirectory,

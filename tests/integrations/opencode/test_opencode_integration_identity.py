@@ -101,6 +101,13 @@ def test_plugin_is_the_only_bridge_entry_point():
     assert source.count('ctx.tool.hook("execute.before"') == 1
 
 
+def test_plugin_and_bridge_agree_on_the_bridge_schema():
+    plugin = PLUGIN.read_text(encoding="utf-8")
+    bridge_source = BRIDGE.read_text(encoding="utf-8")
+    assert 'schema: "mneme.opencode.bridge/v1"' in plugin
+    assert 'BRIDGE_SCHEMA = "mneme.opencode.bridge/v1"' in bridge_source
+
+
 def test_documentation_preserves_noncoverage_and_witness_separation():
     source = README.read_text(encoding="utf-8")
     assert "target_parent_missing" in source

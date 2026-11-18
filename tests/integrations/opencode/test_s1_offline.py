@@ -19,7 +19,9 @@ import pytest
 from mneme.integrations.opencode import bridge
 
 BRIDGE = [sys.executable, "-m", "mneme.integrations.opencode.bridge"]
+BRIDGE_SCHEMA = "mneme.opencode.bridge/v1"
 _UNSET = object()
+_OMIT = object()
 
 
 def _snapshot(root: Path) -> dict[str, str]:
@@ -50,8 +52,9 @@ def _request(
     message_id: str | None = "msg_1",
     event_id: str | None = "evt_1",
     session_directory=_UNSET,
+    schema=BRIDGE_SCHEMA,
 ):
-    return {
+    payload = {
         "tool": tool,
         "input": {"path": path, "content": content},
         "sessionDirectory": str(root)
@@ -64,6 +67,9 @@ def _request(
         "eventID": event_id,
         "hostVersion": "2.3.0",
     }
+    if schema is not _OMIT:
+        payload["schema"] = schema
+    return payload
 
 
 def _run(
@@ -81,6 +87,7 @@ def _run(
     message_id: str | None = "msg_1",
     event_id: str | None = "evt_1",
     session_directory=_UNSET,
+    schema=BRIDGE_SCHEMA,
 ):
     child_env = dict(os.environ)
     for name in ("CLAUDE_PLUGIN_OPTION_MODE", "MNEME_HOOK_MODE"):
@@ -101,6 +108,7 @@ def _run(
         message_id=message_id,
         event_id=event_id,
         session_directory=session_directory,
+        schema=schema,
     )
     proc = subprocess.run(
         [*BRIDGE, "--authority", str(authority or fixture.authority)],
@@ -193,6 +201,34 @@ def test_empty_content_is_skip(s1_fixture):
     assert outcome["decision"] == "skip"
     assert outcome["reason"] == "empty_content"
     assert outcome["claim"] == "none"
+
+
+def test_missing_bridge_schema_is_unevaluated(s1_fixture):
+    target = s1_fixture.root / "src" / "handlers" / "new_handler.py"
+    outcome = _run(
+        s1_fixture,
+        "src/handlers/new_handler.py",
+        "import psycopg2\n",
+        schema=_OMIT,
+    )
+    assert outcome["decision"] == "unevaluated"
+    assert outcome["reason"] == "invalid_request_schema_missing"
+    assert outcome["claim"] == "none"
+    assert not target.exists()
+
+
+def test_mismatched_bridge_schema_is_unevaluated(s1_fixture):
+    target = s1_fixture.root / "src" / "handlers" / "new_handler.py"
+    outcome = _run(
+        s1_fixture,
+        "src/handlers/new_handler.py",
+        "import psycopg2\n",
+        schema="mneme.opencode.bridge/v2",
+    )
+    assert outcome["decision"] == "unevaluated"
+    assert outcome["reason"] == "invalid_request_schema_mismatch"
+    assert outcome["claim"] == "none"
+    assert not target.exists()
 
 
 def test_existing_target_is_unsupported(s1_fixture):

@@ -14,6 +14,23 @@ import pytest
 
 from mneme.integrations.opencode import bridge
 
+BRIDGE_SCHEMA = "mneme.opencode.bridge/v1"
+
+
+def valid_payload():
+    return {
+        "schema": BRIDGE_SCHEMA,
+        "tool": "write",
+        "input": {"path": "src/handlers/new_handler.py", "content": "VALUE = 1\n"},
+        "sessionDirectory": None,
+        "sessionID": "ses_test",
+        "callID": "call_1",
+        "agent": "test",
+        "messageID": "msg_1",
+        "eventID": "evt_1",
+        "hostVersion": "2.3.0",
+    }
+
 
 def request(**overrides):
     payload = {
@@ -38,11 +55,21 @@ def request(**overrides):
         None,
         [],
         {},
-        {"tool": "write"},
-        {"tool": "write", "input": []},
-        {"tool": "write", "input": {}},
-        {"tool": "write", "input": {"path": "x.py", "content": 1}},
-        {"tool": "write", "input": {"path": "x.py"}, "sessionDirectory": 1},
+        {"schema": BRIDGE_SCHEMA},
+        {"schema": BRIDGE_SCHEMA, "tool": "write"},
+        {"schema": BRIDGE_SCHEMA, "tool": "write", "input": []},
+        {"schema": BRIDGE_SCHEMA, "tool": "write", "input": {}},
+        {
+            "schema": BRIDGE_SCHEMA,
+            "tool": "write",
+            "input": {"path": "x.py", "content": 1},
+        },
+        {
+            "schema": BRIDGE_SCHEMA,
+            "tool": "write",
+            "input": {"path": "x.py"},
+            "sessionDirectory": 1,
+        },
     ],
 )
 def test_parse_request_rejects_bad_shapes(payload):
@@ -50,23 +77,41 @@ def test_parse_request_rejects_bad_shapes(payload):
         bridge.parse_request(payload)
 
 
+def test_parse_request_accepts_the_exact_bridge_schema():
+    parsed = bridge.parse_request(valid_payload())
+    assert parsed.tool == "write"
+    assert parsed.path == "src/handlers/new_handler.py"
+
+
+def test_parse_request_rejects_a_missing_schema():
+    payload = valid_payload()
+    payload.pop("schema")
+    with pytest.raises(bridge.EvaluationError, match="schema_missing"):
+        bridge.parse_request(payload)
+
+
+@pytest.mark.parametrize(
+    "schema",
+    [
+        "mneme.opencode.bridge/v2",
+        "mneme.opencode.bridge/v1 ",
+        "",
+        1,
+        True,
+    ],
+)
+def test_parse_request_rejects_a_mismatched_schema(schema):
+    payload = valid_payload()
+    payload["schema"] = schema
+    with pytest.raises(bridge.EvaluationError, match="schema_mismatch"):
+        bridge.parse_request(payload)
+
+
 def test_parse_request_preserves_host_identifiers():
-    parsed = bridge.parse_request(
-        {
-            "tool": "write",
-            "input": {"path": "x.py", "content": "VALUE = 1\n"},
-            "sessionDirectory": "/tmp/project",
-            "sessionID": "ses_1",
-            "callID": "call_1",
-            "agent": "agent",
-            "messageID": "msg_1",
-            "eventID": "evt_1",
-            "hostVersion": "2.3.0",
-        }
-    )
-    assert parsed.session_id == "ses_1"
+    parsed = bridge.parse_request(valid_payload())
+    assert parsed.session_id == "ses_test"
     assert parsed.call_id == "call_1"
-    assert parsed.agent == "agent"
+    assert parsed.agent == "test"
     assert parsed.message_id == "msg_1"
     assert parsed.event_id == "evt_1"
     assert parsed.host_version == "2.3.0"

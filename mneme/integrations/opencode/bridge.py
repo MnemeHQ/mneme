@@ -152,6 +152,11 @@ def load_authority(path: Optional[str]) -> Authority:
 def parse_request(payload: Any) -> Request:
     if not isinstance(payload, dict):
         raise EvaluationError("request_not_object")
+    schema = payload.get("schema")
+    if schema is None:
+        raise EvaluationError("schema_missing")
+    if schema != BRIDGE_SCHEMA:
+        raise EvaluationError("schema_mismatch")
     tool = payload.get("tool")
     if not isinstance(tool, str) or not tool:
         raise EvaluationError("tool_missing")
