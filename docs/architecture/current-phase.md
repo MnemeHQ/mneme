@@ -42,7 +42,7 @@ The Claude Code plugin also ships a `mneme` Skill and the `/mneme:context`, `/mn
 These surfaces have useful evidence but are not promoted to full support:
 
 - **Hermes Agent** — Experimental. Context injection and supported pre-tool blocking are proven; no blocking Stop-equivalent exists.
-- **OpenCode** — Experimental. Plugin-hook work remains incomplete; the completed compaction experiment returned a NULL verdict.
+- **OpenCode** — Experimental. An adapter ships on `main` for the terminal CLI: `.py` `write` on a verified-new file (S1) and `.py` `edit` of an existing file with introduced-delta evaluation (E1). Race resistance is `NOT_ESTABLISHED` and the evidence claim is `none` without a host `callID`. See [opencode.md](../integrations/opencode.md).
 - **Claude Managed Agents** — evidence-only **PARTIAL** result. New-file interception and multi-agent propagation are proven, but existing-file/edit materialization and completion-boundary limitations prevent support promotion.
 - **EventCatalog** — retrieval-only ADR ingestion and effectiveness validation exist, but graph enrichment remains intentionally deferred pending a jointly useful hypothesis.
 

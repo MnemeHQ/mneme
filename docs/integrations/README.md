@@ -31,7 +31,7 @@ at what level, with what evidence. The website's
 | Rules export | Cursor | [adr-import.md](adr-import.md) (corpus workflows); generator: `mneme cursor generate` |
 | CLI-based CI gates | GitHub Actions, GitLab CI | `mneme check` reference patterns |
 | Experimental | GitHub Actions trusted availability gate (ADR-033 C4) | [github-actions-c4-gate.md](github-actions-c4-gate.md); validated offline ([#680](https://github.com/MnemeHQ/mneme/pull/680)) and in an isolated lab ([#681](https://github.com/MnemeHQ/mneme/pull/681)); not enabled on Core |
-| Experimental | OpenCode | plugin-hooks approach under evaluation; compaction experiment returned a NULL verdict |
+| Experimental | OpenCode (terminal CLI) | shipped adapter: `.py` `write` (S1, #824) and existing-file `.py` `edit` (E1, #835) gated through the canonical checker; see [opencode.md](opencode.md) |
 | Experimental | Hermes Agent | P1.5 POC passed (context injection + pre-tool blocking); no blocking Stop-equivalent, see [hermes.md](hermes.md) |
 | Planned | Deep Agents filesystem tools (`write_file`/`edit_file`) | roadmap-only until a pinned Deep Agents validation passes; the [LangChain agents on LangGraph](langchain-langgraph.md) adapter governs local-filesystem-semantic tools by name contract |
 
@@ -65,8 +65,12 @@ at what level, with what evidence. The website's
   Shell commands, script-driven writes, and MCP-mediated write tools are unhandled by the adapter (fail open visibly).
 - **Paperclip**: validated on paperclipai 2026.817.0; version-specific
   placeholder-`ANTHROPIC_API_KEY` caveat documented in [paperclip.md](paperclip.md).
-- **OpenCode**: no production plugin ships. The completed compaction
-  experiment returned a NULL verdict and was closed evidence-only.
+- **OpenCode**: shipped but experimental, terminal CLI only. Pre-mutation checks
+  cover `.py` `write` on a verified-new file and `.py` `edit` of an existing file
+  (introduced-delta). Race resistance is `NOT_ESTABLISHED` — symlink/hardlink
+  substitution after evaluation can redirect a permitted edit — and the host
+  supplies no `callID`, so the evidence claim is `none`. Not a supported
+  integration. See [opencode.md](opencode.md).
 - **Hermes Agent**: POC validated against hermes-agent 0.19.0 at the plugin
   dispatch-runtime layer; `terminal` non-class-A forms, `execute_code`, and
   `process` are bypass surfaces, and no blocking Stop-equivalent exists.

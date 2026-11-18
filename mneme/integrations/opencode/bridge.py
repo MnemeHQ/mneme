@@ -1,13 +1,14 @@
-"""OpenCode S1 pre-mutation bridge.
+"""OpenCode pre-mutation bridge (S1 write, E1 edit).
 
 This module is transport plus decision mapping. It does not implement a matcher,
 resolver, diff, policy engine or verdict schema. It reuses the canonical checker
 through the shared Claude Code adapter internals, P2-first memory selection and
 the shared verdict-trust function.
 
-The bridge never mutates the target. It reads only metadata (`lstat`), invokes
-`mneme check` on a temporary carrier, and returns a JSON decision to the host
-plugin.
+The bridge never mutates the target. For `write` it proves absence with `lstat`;
+for `edit` it reads the existing target to materialise the change and evaluates
+the introduced delta (ADR-018). It invokes `mneme check` on a temporary carrier
+and returns a JSON decision to the host plugin.
 """
 
 from __future__ import annotations
