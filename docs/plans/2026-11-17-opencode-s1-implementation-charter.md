@@ -105,10 +105,14 @@ G0 caveats carried into S1:
 
 ### 4.2 Pre-validation evidence environment
 
-The final runtime image, host OS, component hashes, memory schema and target
-model are **not** implementation prerequisites. They cannot exist before the
-implementation is built. They are recorded at the pre-validation evidence gate in
-§16.2, after implementation and before any evidence claim.
+The final runtime environment (with a container or VM image identifier when one
+is used), host OS, component hashes, memory schema and target model are **not**
+implementation prerequisites. They cannot exist before the implementation is
+built. They are recorded at the pre-validation evidence gate in §16.2, after
+implementation and before any evidence claim. For S1-A, the
+[Amendment — decouple S1 validation from OpenShell](#amendment--decouple-s1-validation-from-openshell-2026-11-18)
+below clarifies the runtime fields; a container or VM image identifier is
+required only when that runtime is used.
 
 ## 5. Architecture and file boundaries
 
@@ -455,6 +459,12 @@ block implementation. Every value is recorded in the validation package:
 - sanitized evidence copies and file-state witnesses;
 - source and configuration hashes.
 
+**Superseded for S1-A (2026-11-18).** The OpenShell version and unconditional
+runtime-image digest fields above are replaced by the
+[Amendment — decouple S1 validation from OpenShell](#amendment--decouple-s1-validation-from-openshell-2026-11-18)
+below. The amendment requires the actual runtime environment and a container or
+VM image identifier only when that runtime is used.
+
 The implementation may be built and unit-tested before this gate. No checker
 execution observation, host prevention observation or validation claim may be made
 until it is satisfied.
@@ -502,10 +512,11 @@ text.
 ## Amendment — decouple S1 validation from OpenShell (2026-11-18)
 
 **Status:** PROPOSED — not authorization until merged. On merge, it supersedes
-only the OpenShell and runtime-image fields in §16.2 and applies only to
-validation runs started after it takes effect.
+only the OpenShell and runtime-image fields in §4.2 and §16.2 and applies only to
+validation packages whose first evidence record is created after it takes effect.
 
-**Amends:** §16.2 pre-validation evidence gate.
+**Amends:** §4.2 pre-validation evidence environment and §16.2 pre-validation
+evidence gate.
 
 **Rationale.** The S1 path is OpenCode `execute.before` to the Python bridge to
 the canonical Mneme checker. OpenShell is not invoked to evaluate, allow or block
@@ -518,8 +529,9 @@ they are not a technical dependency of the OpenCode integration.
 environment gate is satisfied by:
 
 - host version and host OS;
-- the actual runtime environment (bare metal, VM or container) and, only when a
-  container is used, its image digest;
+- the actual runtime environment (bare metal, VM or container) and, when a VM or
+  container is used, its image/build digest or identifier; a container digest is
+  required only for container runs;
 - Python version;
 - memory schema (`v1` or `v2`);
 - plugin, bridge and checker SHA-256;
@@ -536,23 +548,28 @@ which this amendment does not modify.
 **S1-A.** The immediate validation objective is the pinned OpenCode `2.3.0` V2
 host with DeepSeek V4.1, an independent validator, and a reproducible
 environment. Linux is preferred because the shared unrouted carrier is text-mode
-and the Windows byte-fidelity fixture is a known failure/limitation; no OpenShell
-dependency is created merely to obtain Linux.
+and the Windows fixture is skipped, leaving Windows byte fidelity unverified; no
+OpenShell dependency is created merely to obtain Linux. If Windows is used, the
+validator must record the skip and must not report byte fidelity as passed.
 
 **S1-B.** ContextOS environment validation is separate and is not authorized by
 this amendment. It requires platform access and its own environment pins,
 activation, filesystem/path, model-access and deployment-boundary validation.
 
-**Preserved findings.** The Windows byte-fidelity failure remains recorded and
-unresolved. Race resistance remains `NOT_ESTABLISHED` for any undetected case.
-The six host-identifier evidence ceiling remains, and `EXECUTION_OBSERVED` is not
-claimed when `callID` is absent. No support-level, production-readiness or Core
-change is made.
+**Preserved findings.** The Windows byte-fidelity limitation remains unresolved:
+the shared carrier is text-mode and the Windows fixture is skipped, so Windows
+byte fidelity is unverified and is not converted into a pass. The validator must
+record the platform actually used and the event/carrier/file hashes. Race
+resistance remains `NOT_ESTABLISHED` for any undetected case. The six
+host-identifier evidence ceiling remains, and `EXECUTION_OBSERVED` is not claimed
+when `callID` is absent. No support-level, production-readiness or Core change is
+made.
 
 **Not retroactive.** This amendment does not convert any prior BLOCKED or
-inconclusive validation result into PASS. It applies only to validation runs
-started after it takes effect. The previously accepted OpenShell requirement
-remains the governing text for runs before that point.
+inconclusive validation result into PASS. A validation package is governed by the
+text in effect when its first evidence record is created. Any package already
+recorded under the prior gate remains governed by the prior text; this amendment
+does not reopen, reclassify or convert it.
 
 **Freeze review.** The Layer 1 freeze S1 amendment's validation clause requires
 the pinned host, DeepSeek V4.1, setup and activation, a verified-new-file `.py`
