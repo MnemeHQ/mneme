@@ -105,10 +105,14 @@ G0 caveats carried into S1:
 
 ### 4.2 Pre-validation evidence environment
 
-The final runtime image, host OS, component hashes, memory schema and target
-model are **not** implementation prerequisites. They cannot exist before the
-implementation is built. They are recorded at the pre-validation evidence gate in
-§16.2, after implementation and before any evidence claim.
+The final runtime environment (with a container or VM image identifier when one
+is used), host OS, component hashes, memory schema and target model are **not**
+implementation prerequisites. They cannot exist before the implementation is
+built. They are recorded at the pre-validation evidence gate in §16.2, after
+implementation and before any evidence claim. For S1-A packages governed by the
+[Amendment — decouple S1 validation from OpenShell](#amendment--decouple-s1-validation-from-openshell-2026-11-18)
+below, the amendment clarifies the runtime fields; a container or VM image
+identifier is required only when that runtime is used.
 
 ## 5. Architecture and file boundaries
 
@@ -455,6 +459,13 @@ block implementation. Every value is recorded in the validation package:
 - sanitized evidence copies and file-state witnesses;
 - source and configuration hashes.
 
+**Amended for new S1-A packages (2026-11-18).** For a validation package whose
+first evidence record is created after the
+[Amendment — decouple S1 validation from OpenShell](#amendment--decouple-s1-validation-from-openshell-2026-11-18)
+below takes effect, the OpenShell version and unconditional runtime-image digest
+fields above are waived and the amendment's runtime fields apply. A package
+already recorded under the prior gate remains governed by the prior text.
+
 The implementation may be built and unit-tested before this gate. No checker
 execution observation, host prevention observation or validation claim may be made
 until it is satisfied.
@@ -494,5 +505,84 @@ amendment merges second. PR #824 may merge only after both. The one-line change
 already present in PR #824 at
 `9c35aa909396bf86325952d2da67359c02b3dec4` is not retroactively approved by this
 text.
+
+**No support claim.** This amendment makes no support-level declaration.
+
+---
+
+## Amendment — decouple S1 validation from OpenShell (2026-11-18)
+
+**Status:** PROPOSED — not authorization until merged. On merge, for packages
+whose first evidence record is created after it takes effect, it waives only the
+OpenShell version and unconditional runtime-image digest fields in §4.2 and
+§16.2 and supplies the conditional runtime pins below. Packages already recorded
+under the prior gate remain governed by the prior text.
+
+**Amends:** §4.2 pre-validation evidence environment and §16.2 pre-validation
+evidence gate.
+
+**Rationale.** The S1 path is OpenCode `execute.before` to the Python bridge to
+the canonical Mneme checker. OpenShell is not invoked to evaluate, allow or block
+the write, and the October 22 contract itself treats OpenShell gateway admission
+and infrastructure-resource governance as deferred. The OpenShell version and
+image fields in §16.2 were carried over from that optional reference experiment;
+they are not a technical dependency of the OpenCode integration.
+
+**Authorized change.** For OpenCode integration validation (S1-A), the §16.2
+environment gate is satisfied by:
+
+- host version and host OS;
+- the actual runtime environment (bare metal, VM or container) and, when a VM or
+  container is used, its image/build digest or identifier; a container digest is
+  required only for container runs;
+- Python version;
+- memory schema (`v1` or `v2`);
+- plugin, bridge and checker SHA-256;
+- DeepSeek V4.1 model identity;
+- independent validator identity and environment;
+- sanitized evidence copies and file-state witnesses;
+- source and configuration hashes.
+
+OpenShell version and OpenShell-specific reproducibility fields are **not**
+required for S1-A. They remain required only for an OpenShell experiment under
+the [October 22 OpenShell + OpenCode acceptance contract](2026-10-22-openshell-opencode-reference-integration-acceptance-contract.md),
+which this amendment does not modify.
+
+**S1-A.** The immediate validation objective is the pinned OpenCode `2.3.0` V2
+host with DeepSeek V4.1, an independent validator, and a reproducible
+environment. Linux is preferred because the shared unrouted carrier is text-mode
+and Windows byte fidelity is not demonstrated. A Windows run does not satisfy the
+I-10 equality requirement and must not be reported as byte-fidelity evidence; no
+OpenShell dependency is created merely to obtain Linux.
+
+**S1-B.** ContextOS environment validation is separate and is not authorized by
+this amendment. It requires platform access and its own environment pins,
+activation, filesystem/path, model-access and deployment-boundary validation.
+
+**Preserved findings.** The Windows byte-fidelity limitation remains unresolved:
+the shared carrier is text-mode and Windows equality is not demonstrated. A
+Windows run does not satisfy I-10 and is not converted into a pass. The validator
+must record the platform actually used and the event/carrier/file hashes. Race
+resistance remains `NOT_ESTABLISHED` for any undetected case. The six
+host-identifier evidence ceiling remains, and `EXECUTION_OBSERVED` is not claimed
+when `callID` is absent. No support-level, production-readiness or Core change is
+made.
+
+**Not retroactive.** This amendment does not convert any prior BLOCKED or
+inconclusive validation result into PASS. A validation package is governed by the
+text in effect when its first evidence record is created. Any package already
+recorded under the prior gate remains governed by the prior text; this amendment
+does not reopen, reclassify or convert it.
+
+**Freeze review.** The Layer 1 freeze S1 amendment's validation clause requires
+the pinned host, DeepSeek V4.1, setup and activation, a verified-new-file `.py`
+target, exact BLOCK/ALLOW/negative-space criteria, sanitized evidence and
+host-side file-state witnesses. It does not name OpenShell or an image digest.
+This amendment preserves every one of those requirements, so no Layer 1 freeze
+amendment is required. Retrieval and enforcement behavior, the evidence ceiling
+and the support-matrix boundary remain unchanged.
+
+**Ordering.** This documentation-only amendment must be reviewed and accepted
+before S1-A validation starts. It does not modify PR #824 or authorize a merge.
 
 **No support claim.** This amendment makes no support-level declaration.
