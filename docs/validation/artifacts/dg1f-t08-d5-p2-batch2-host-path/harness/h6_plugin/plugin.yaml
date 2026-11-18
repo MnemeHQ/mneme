@@ -1,0 +1,9 @@
+name: mneme_probe
+version: 0.0.1
+description: Harness-only T-08 batch-2 channel probe (H6a, H6b). Runs no Mneme code. Not a Mneme integration.
+provides_hooks:
+  - pre_llm_call
+  - pre_tool_call
+  - transform_tool_result
+  - post_tool_call
+  - pre_api_request
