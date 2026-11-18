@@ -217,6 +217,22 @@ def test_missing_bridge_schema_is_unevaluated(s1_fixture):
     assert not target.exists()
 
 
+def test_schema_rejection_returns_the_wire_decision_shape(s1_fixture):
+    outcome = _run(
+        s1_fixture,
+        "src/handlers/new_handler.py",
+        "import psycopg2\n",
+        schema=_OMIT,
+    )
+    assert outcome == {
+        "schema": "mneme.opencode.decision/v1",
+        "decision": "unevaluated",
+        "reason": "invalid_request_schema_missing",
+        "claim": "none",
+        "evidence": {},
+    }
+
+
 def test_mismatched_bridge_schema_is_unevaluated(s1_fixture):
     target = s1_fixture.root / "src" / "handlers" / "new_handler.py"
     outcome = _run(
@@ -957,3 +973,27 @@ def test_block_does_not_imply_host_prevention(s1_fixture):
     assert allowed["evidence"]["host_witness"] is None
     assert "refused" not in json.dumps(allowed["evidence"])
     assert allowed_target.exists()
+
+
+def test_schema_rejected_write_is_default_open_at_the_host(s1_fixture):
+    target = s1_fixture.root / "src" / "handlers" / "schema_open.py"
+    rejected = _run(
+        s1_fixture,
+        "src/handlers/schema_open.py",
+        "VALUE = 1\n",
+        schema=_OMIT,
+    )
+    assert rejected["decision"] == "unevaluated"
+    assert rejected["claim"] == "none"
+    assert rejected["evidence"] == {}
+
+    host = _FakeOpenCodeHost()
+    applied = host.apply(rejected, target, "VALUE = 1\n")
+
+    assert applied is True
+    assert host.witness == {
+        "refused": False,
+        "tool_status": "ok",
+        "target_state": "present",
+    }
+    assert target.read_text(encoding="utf-8") == "VALUE = 1\n"

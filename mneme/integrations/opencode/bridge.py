@@ -592,12 +592,13 @@ def _write_evidence(record: dict) -> None:
 
 
 def _bare_decision(outcome: Outcome) -> dict:
-    """The decision surface for transport/setup failures (no evidence)."""
+    """The wire decision surface for transport/setup failures (empty evidence)."""
     return {
         "schema": DECISION_SCHEMA,
         "decision": outcome.decision,
         "reason": outcome.reason,
         "claim": outcome.claim,
+        "evidence": {},
     }
 
 
