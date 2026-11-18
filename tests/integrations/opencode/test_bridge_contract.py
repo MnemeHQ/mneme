@@ -650,3 +650,155 @@ def test_plugin_reason_is_diagnostic_only():
     src = plugin_source()
     assert src.count("reason ===") == 1
     assert 'decision.reason === "warn_mode_violation"' in src
+
+# --- E1 edit surface: input normalisation and precondition mapping ----------
+
+SCHEMA = "mneme.opencode.bridge/v1"
+
+
+def _payload(root, path, old, new, *, replace_all=None, tool="edit"):
+    raw = {"path": path, "oldString": old, "newString": new}
+    if replace_all is not None:
+        raw["replaceAll"] = replace_all
+    return {
+        "schema": SCHEMA,
+        "tool": tool,
+        "input": raw,
+        "sessionDirectory": str(root),
+        "sessionID": "ses_test",
+        "callID": "call_1",
+        "agent": "test",
+        "messageID": "msg_1",
+        "eventID": "evt_1",
+        "hostVersion": "2.3.0",
+    }
+
+
+AUTHORITY = bridge.Authority(
+    decision_id="ADR-001",
+    decision_version_id="dver-test",
+    rule_id="ADR-001:FORBID_LITERAL:test",
+    rule_value="psycopg2",
+    rule_scope="src/handlers/**",
+)
+
+
+def _evaluate(payload):
+    return bridge.evaluate(bridge.parse_request(payload), AUTHORITY)
+
+
+def test_edit_input_is_normalised(tmp_path):
+    """E1-U1: host camelCase maps to the canonical snake_case keys."""
+    payload = _payload(tmp_path, "src/handlers/a.py", "A = 1", "A = 2", replace_all=True)
+    request = bridge.parse_request(payload)
+    assert request.tool == "edit"
+    assert request.old_string == "A = 1"
+    assert request.new_string == "A = 2"
+    assert request.replace_all is True
+
+
+def test_replace_all_defaults_to_false(tmp_path):
+    payload = _payload(tmp_path, "src/handlers/a.py", "A = 1", "A = 2")
+    assert bridge.parse_request(payload).replace_all is False
+
+
+def test_ambiguous_old_string_is_unevaluated(tmp_path):
+    """E1-U2: multiple matches without replaceAll mirror the host refusal."""
+    target = tmp_path / "src" / "handlers" / "dup.py"
+    target.parent.mkdir(parents=True)
+    target.write_text("VALUE = 1\nMIDDLE = 0\nVALUE = 1\n", encoding="utf-8")
+
+    outcome = _evaluate(_payload(tmp_path, "src/handlers/dup.py", "VALUE = 1", "VALUE = 2"))
+    assert outcome.decision == bridge.UNEVALUATED
+    assert outcome.reason == "ambiguous_old_string"
+    assert outcome.claim == bridge.NO_CLAIM
+    assert outcome.materialisation["occurrences"] == 2
+    assert outcome.materialisation["ambiguous"] is True
+    assert outcome.materialisation["replacement_count"] == 1
+
+
+def test_ambiguous_with_replace_all_proceeds(tmp_path):
+    """E1-U2b: replaceAll opts into every occurrence."""
+    target = tmp_path / "src" / "handlers" / "dup.py"
+    target.parent.mkdir(parents=True)
+    target.write_text("VALUE = 1\nMIDDLE = 0\nVALUE = 1\n", encoding="utf-8")
+
+    outcome = _evaluate(
+        _payload(tmp_path, "src/handlers/dup.py", "VALUE = 1", "VALUE = 2", replace_all=True)
+    )
+    # Memory resolution fails in a bare tmp tree, but the ambiguity gate is past.
+    assert outcome.reason != "ambiguous_old_string"
+    assert outcome.materialisation["replacement_count"] == -1
+    assert outcome.materialisation["ambiguous"] is False
+
+
+def test_missing_old_string_is_unevaluated(tmp_path):
+    """E1-U3: absent oldString maps to unevaluated, never a block."""
+    target = tmp_path / "src" / "handlers" / "present.py"
+    target.parent.mkdir(parents=True)
+    target.write_text("ALPHA = 1\n", encoding="utf-8")
+
+    outcome = _evaluate(_payload(tmp_path, "src/handlers/present.py", "ABSENT", "X"))
+    assert outcome.decision == bridge.UNEVALUATED
+    assert outcome.reason == "old_string_not_found"
+    assert outcome.claim == bridge.NO_CLAIM
+    assert outcome.materialisation["occurrences"] == 0
+
+
+def test_identical_replacement_is_skip(tmp_path):
+    """E1-U4: an empty introduced delta is a skip, not a block."""
+    target = tmp_path / "src" / "handlers" / "same.py"
+    target.parent.mkdir(parents=True)
+    target.write_text("SAME = 1\n", encoding="utf-8")
+
+    outcome = _evaluate(_payload(tmp_path, "src/handlers/same.py", "SAME = 1", "SAME = 1"))
+    assert outcome.decision == bridge.SKIP
+    assert outcome.reason == "empty_introduced_content"
+    assert outcome.claim == bridge.NO_CLAIM
+
+
+def test_non_python_target_is_unsupported(tmp_path):
+    """E1-U5: only .py targets are in scope."""
+    target = tmp_path / "notes.txt"
+    target.write_text("A = 1\n", encoding="utf-8")
+
+    outcome = _evaluate(_payload(tmp_path, "notes.txt", "A = 1", "A = 2"))
+    assert outcome.decision == bridge.UNSUPPORTED
+    assert outcome.reason == "non_python_target"
+    assert outcome.claim == bridge.NO_CLAIM
+
+
+def test_missing_target_is_unsupported(tmp_path):
+    """E1-U6: edit requires an existing target."""
+    outcome = _evaluate(_payload(tmp_path, "src/handlers/absent.py", "A", "B"))
+    assert outcome.decision == bridge.UNSUPPORTED
+    assert outcome.reason == "target_missing"
+    assert outcome.claim == bridge.NO_CLAIM
+
+
+def test_edit_without_strings_is_unevaluated(tmp_path):
+    """Incomplete edit payloads never enforce."""
+    target = tmp_path / "src" / "handlers" / "a.py"
+    target.parent.mkdir(parents=True)
+    target.write_text("A = 1\n", encoding="utf-8")
+    payload = _payload(tmp_path, "src/handlers/a.py", "A = 1", "A = 2")
+    del payload["input"]["oldString"]
+
+    outcome = _evaluate(payload)
+    assert outcome.decision == bridge.UNEVALUATED
+    assert outcome.reason == "non_complete_edit"
+
+
+def test_write_surface_unchanged(tmp_path):
+    """E1-U8: the S1 write path still maps to the same reasons."""
+    payload = {
+        "schema": SCHEMA,
+        "tool": "write",
+        "input": {"path": "src/handlers/new.py", "content": ""},
+        "sessionDirectory": str(tmp_path),
+        "sessionID": "s", "callID": "c", "agent": "a",
+        "messageID": "m", "eventID": "e", "hostVersion": "2.3.0",
+    }
+    outcome = _evaluate(payload)
+    assert outcome.decision == bridge.SKIP
+    assert outcome.reason == "empty_content"

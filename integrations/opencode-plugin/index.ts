@@ -98,13 +98,13 @@ export default {
 
     await ctx.tool.hook("execute.before", async (event: any) => {
       const tool = event?.tool
-      if (tool !== "write") {
+      if (tool !== "write" && tool !== "edit") {
         const name = typeof tool === "string" && tool ? tool : "unknown"
         if (!notCoveredTools.has(name)) {
           notCoveredTools.add(name)
           console.error(
-            `Mneme NOT_COVERED: tool ${name} is outside the S1 surface ` +
-              "(write only); no evaluation, authorization or protection claim.",
+            `Mneme NOT_COVERED: tool ${name} is outside the E1 surface ` +
+              "(write, edit); no evaluation, authorization or protection claim.",
           )
         }
         return
@@ -122,8 +122,16 @@ export default {
       const decision = await runBridge(
         {
           schema: "mneme.opencode.bridge/v1",
-          tool: "write",
-          input: { path: input.path, content: input.content },
+          tool,
+          input:
+            tool === "edit"
+              ? {
+                  path: input.path,
+                  oldString: input.oldString,
+                  newString: input.newString,
+                  replaceAll: input.replaceAll,
+                }
+              : { path: input.path, content: input.content },
           sessionDirectory,
           sessionID: event?.sessionID ?? null,
           callID: event?.callID ?? null,

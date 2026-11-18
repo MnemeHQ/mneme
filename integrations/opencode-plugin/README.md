@@ -8,16 +8,22 @@ is `EXECUTION_OBSERVED`; host prevention is a separate host-side observation.
 
 ## Scope
 
-- Verified-new-file `.py` `write` with complete content.
+- Verified-new-file `.py` `write` with complete content (S1).
+- Existing-file `.py` `edit` with `oldString` / `newString` and optional
+  `replaceAll`, evaluated on the introduced delta (E1).
 - `FORBID_LITERAL` only.
 - Canonical `mneme check` via the shared adapter internals.
 - Default-open for `unevaluated`, `skip`, `unsupported` and `setup_invalid`.
   Those outcomes are not Mneme authorization or protection.
 - `strict` mode may block a trusted complete literal `FAIL`. `warn` never blocks.
 
-Nothing else is supported: existing-file writes, non-`.py` targets, `edit`,
-patch/hunk payloads, shell, MCP/custom tools, deletion, rename, Stop, CI,
-numeric rules or waivers.
+Nothing else is supported: existing-file `write` (whole-file overwrite),
+non-`.py` targets, `MultiEdit`/patch or hunk payloads, shell, MCP/custom tools,
+deletion, rename, Stop, CI, numeric rules or waivers.
+
+For `edit`, the bridge mirrors the host's replacement rule: multiple matches
+without `replaceAll` are refused as `unevaluated` (`ambiguous_old_string`), and a
+missing `oldString` is `unevaluated` (`old_string_not_found`).
 
 ## Configuration
 
