@@ -540,9 +540,10 @@ schema, release or freeze change.
 
 #### 11a.1 What DG1-S closes
 
-DG1-S closes the accepted semantic contract and the non-enforcement
-implementation that does not depend on a trusted runtime context or on a
-waiver-aware consumer. It comprises:
+DG1-S closes the DG1A semantic contract and the non-enforcement
+implementation that does not depend on a trusted runtime context, a
+waiver-aware consumer, or the separately deferred precedence-reason feature.
+It comprises:
 
 | Slice | What DG1-S records as delivered |
 |---|---|
@@ -554,9 +555,9 @@ waiver-aware consumer. It comprises:
 | DG1B1 | decision-applicability semantics under `mneme.decision-index/v2`, including the `not_applicable` cause and explicit v1→v2 migration |
 | DG1B2a | canonical waiver records, the `waived` cause, waiver trace/findings, authority operations and read-only listing; no authoritative consumer acts on a waiver |
 
-DG1-S is complete only when every slice above is merged on `main`, the
-evidence in §11a.3 is pinned at one commit, and the closeout record required by
-§11a.4 is accepted. A merged slice alone is not a DG1-S closeout.
+DG1-S is complete only when every slice above is merged on `main`, the §13
+mapping is pinned at one commit in the closeout record, and the closeout record
+required by §11a.4 is accepted. A merged slice alone is not a DG1-S closeout.
 
 #### 11a.2 Supporting capabilities
 
@@ -568,9 +569,10 @@ and do **not** complete ADR-031 §11 resolver-result convergence:
   surface. It is non-authoritative, writes only to stderr, and does not change
   the enforced decision set, stdout, the `mneme.check/v1` payload or exit
   codes.
-- **DG1F-C2** — one lifecycle authority and the three-state
-  `GovernanceContext` used by projection, the resolver and the existing
-  lifecycle checks. It adds no new `resolve_effective` consumer.
+- **DG1F-C2** — one lifecycle authority read by projection, the resolver and
+  the existing lifecycle checks, plus the three-state `GovernanceContext`
+  used by the resolver and lifecycle checks. It adds no new
+  `resolve_effective` consumer.
 - **DG1F-C3a** — resolver-result consumption by `mneme audit`, setup
   readiness and `protect list`. These are three reporting consumers only; no
   enforcement input changes.
@@ -580,12 +582,16 @@ and do **not** complete ADR-031 §11 resolver-result convergence:
 DG1-S is evidenced by the existing ADR-031 §13 fixture mapping in
 [`docs/validation/dg1g-fixture-floor-mapping-2026-11-10.md`](../validation/dg1g-fixture-floor-mapping-2026-11-10.md),
 at a single pinned commit. The mapping's F1–F13 entries are the required
-fixtures; DG1-S adds no fixture of its own.
+fixtures; F12a is counted with F12. This amendment adds no fixture beyond that
+mapping.
 
 **F13 is resolver-only.** It pins the DG1B2a waiver semantics, including
 expiry at an explicit `as_of` and out-of-scope waivers, and does **not**
 exercise any runtime consumer acting on a waiver. F10 is the DG1-mapped
-configured-versus-observed evidence fixture. The closeout record must state
+configured-versus-execution-observed evidence fixture. F10 pins existing
+behavior only; the mapping records that the full-identity comparison for
+`relevant_enforcement_per_rule` remains a consumer obligation, and the
+closeout record must carry that caveat. The closeout record must also state
 the mapping status at its pinned commit and must not upgrade F13 into a
 runtime waiver claim.
 
@@ -604,9 +610,14 @@ record must contain:
 3. the §13 F1–F13 mapping at that commit, with test IDs, gate membership and
    the F13 resolver-only caveat;
 4. DG1 test, gate-battery and frozen-benchmark evidence at that commit,
-   including the C2/C3a golden parity and DG1B2a acceptance evidence;
-5. the non-claims and open obligations in §11a.5 and §11a.6;
-6. the independent review and owner acceptance of the record.
+   including DG1B2a acceptance evidence and, where cited, the C2/C3a golden
+   parity;
+5. the non-claims in §11a.2 and §11a.7 and the open obligations in §11a.5;
+6. the merged-versus-released status of C1a, C2, C3a and DG1B2a;
+7. the independent review and owner acceptance of the record.
+
+The record must also note that DG1B2a delivered the §12 record semantics while
+DG1B2b remains deferred.
 
 The closeout record must not declare DG1 or DG1G completion, must not
 authorize a release, and must not change runtime behavior. It does not
@@ -639,16 +650,18 @@ remain obligations for final DG1G and DG1 closeout:
   contract unless that contract changes. Each still-open consumer needs its
   own output-contract decision or its own charter and freeze amendment.
 - **The #497 governance-of-governance controls G1–G3.** G1
-  self-authorization negative, G2 authorized transition positive and G3 host
-  boundary remain open. DG1 owns canonical decision and waiver authority and
+  self-authorization negative (host side unevaluated), G2 authorized
+  transition positive (unevaluated) and G3 host boundary (partial) remain
+  open. DG1 owns canonical decision and waiver authority and
   lifecycle only; CI1 (#540) and T-08 own the host, credential, revision and
   trusted-enforcement controls.
 - **Deferred precedence-reason work.** The persisted precedence reason and
   the `precedence_lost` cause remain deferred under the 2026-11-08 erratum.
   They are not part of DG1-S and are not part of the §13 floor.
-- **Final DG1G and DG1 closeout.** The full §11 sequence, the final §13
-  fixture floor and the open controls above must be complete, or each
-  remaining evidence-gated slice must receive an explicit disposition in a
+- **Final DG1G and DG1 closeout.** The full §11 sequence and the final §13
+  fixture floor must be complete. The G1–G3 controls must be resolved or
+  explicitly dispositioned by their owners. Any evidence-gated slice that
+  never obtains a qualifying case must receive an explicit disposition in a
   later ADR-031 decision. Silence is not closure.
 
 #### 11a.6 Preserved requirements
@@ -661,7 +674,8 @@ Nothing in this amendment changes the following accepted requirements:
   neither.
 - **§8 and §8a.** The v2 schema, closed semantic key sets, declared
   `semantic_features`, the `extensions` namespace contract and the explicit
-  migration rule are unchanged. DG1-S adds no schema, feature or key.
+  migration rule are unchanged. This amendment adds no schema, feature or key;
+  DG1B1 and DG1B2a introduced only what §8 and §12 authorized.
 - **§11.** The full slice sequence and the sequencing amendment remain in
   force. DG1-S is an additional intermediate milestone; it does not replace
   DG1G or shorten the sequence.
@@ -669,7 +683,7 @@ Nothing in this amendment changes the following accepted requirements:
   operations create waivers; producers never create them; a waiver never
   mutates or deletes its target. DG1B2b remains unauthorized.
 - **§13.** The final DG1 fixture floor is unchanged. DG1-S uses the current
-  resolver-level mapping and does not satisfy §13 for final DG1. Future
+  §13 fixture mapping and does not satisfy §13 for final DG1. Future
   applicability and waiver slices add their own fixtures.
 
 #### 11a.7 Non-authorization
@@ -687,11 +701,13 @@ DG1-S does not authorize any of the following:
 - any T-08 Phase 2 change, including B1, I3, the row 3–5 behavior, or
   `boundary`/`shadowed` population;
 - any change to the G1–G3 status or ownership;
-- any new fixture, test requirement, charter or Layer 1 freeze amendment.
+- any new fixture or test requirement beyond the existing evidence floor, any
+  new charter, or any Layer 1 freeze amendment.
 
-Any such change requires its own accepted charter, its own reviewed decision
-and, where applicable, a `[layer1-freeze]` amendment. DG1-S is a closure of
-the semantic foundation only; DG1, DG1G, DG1F-C1b and DG1B2b remain open.
+Any such change requires its own reviewed decision and, where it changes
+retrieval or enforcement, its own accepted charter and `[layer1-freeze]`
+amendment. DG1-S is a closure of the semantic foundation only; DG1, DG1G,
+DG1F-C1b and DG1B2b remain open.
 
 ### 12. Waiver slot (semantics fixed now, implementation deferred)
 
