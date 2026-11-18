@@ -2750,32 +2750,38 @@ change to retrieval or enforcement without an explicit charter amendment") and
 [Amendment Procedure](#amendment-procedure) §3(b).
 
 **Rationale.** The charter amendment [PR #826](https://github.com/MnemeHQ/mneme/pull/826)
-at commit `458f2bf735c0903da3ecd2941f54df9ff63f6e95` is the bounded charter
-decision and must merge before this amendment. `tests/test_test_policy.py:122`
-requires every canonical `tests/**/test_*.py` path to appear in the gate manifest
-or `GATE_EXCLUSIONS` (`scripts/run_test_battery.py:334-350`). The S1 tests are new
-files under that charter; the one-line registration is test infrastructure, not
-enforcement behavior.
+at reviewed head `f4f1b76eb85ed251a71b79f7f63a98192331e0b0` (squash commit
+recorded at merge) is the bounded charter decision and must merge before this
+amendment, so Amendment Procedure §3(b) is satisfied when this amendment takes
+effect. `tests/test_test_policy.py:122` requires every canonical
+`tests/**/test_*.py` path to appear in the gate manifest or `GATE_EXCLUSIONS`
+(`scripts/run_test_battery.py:334-350`). The S1 tests are new files under that
+charter; the one-line registration is test infrastructure, not enforcement
+behavior.
 
 **Authorized change.** Exactly one line in `scripts/run_test_battery.py`: add
 `"tests/integrations/opencode"` to `GATE_SHIPPED_PATHS`. No other change to that
-file and no other existing file.
+file and no other existing file. This registration is valid only in a tree that
+also contains the S1 test directory; a gate directory with no `test_*.py` files
+fails `tests/test_test_policy.py`.
 
 **Explicitly preserved.** `DecisionRetriever` behavior and outputs;
 `ConflictDetector` semantics; CLI commands, flags, exit codes and the
 `mneme.check/v1` payload; `FORBID_LITERAL` and `FORBID_NUMERIC_ABOVE` rule
 semantics; all existing host adapters; canonical memory and ADRs; frozen
 benchmark corpora, expectations and scores; the support matrix. No new engine.
+The existing freeze amendments and records remain unchanged.
 
 **Scope limit.** Only this registration. Any other existing-file change requires
 its own charter and amendment. The one-line change in PR #824 at
 `9c35aa909396bf86325952d2da67359c02b3dec4` is not retroactively approved.
 
 **Source references.** Charter amendment PR
-[#826](https://github.com/MnemeHQ/mneme/pull/826) at
-`458f2bf735c0903da3ecd2941f54df9ff63f6e95`; PR
-[#824](https://github.com/MnemeHQ/mneme/pull/824) at
-`9c35aa909396bf86325952d2da67359c02b3dec4`; `tests/test_test_policy.py`.
+[#826](https://github.com/MnemeHQ/mneme/pull/826) at reviewed head
+`f4f1b76eb85ed251a71b79f7f63a98192331e0b0` (squash commit recorded at merge);
+PR [#824](https://github.com/MnemeHQ/mneme/pull/824) at reviewed head
+`9c35aa909396bf86325952d2da67359c02b3dec4`, whose remediation head will be
+re-reviewed; `tests/test_test_policy.py`.
 
 ---
 
