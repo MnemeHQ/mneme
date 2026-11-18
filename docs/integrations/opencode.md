@@ -24,14 +24,17 @@ file; `MultiEdit`/patch or hunk payloads; shell; MCP and custom tools; deletion;
 rename; Stop/session-boundary enforcement; CI and gateway admission; numeric
 rules and waivers.
 
-Two observed boundaries:
+One behavioural note:
 
-- An `edit` call after a guarded `write` is **not** intercepted. The S1-A
-  validation recorded a model rewriting a just-written file through `edit`; only a
-  `NOT_COVERED` diagnostic was produced.
 - A `warn`-mode literal failure is allowed and prints the canonical
   `Mneme WARN: warn_mode_violation` diagnostic. It is a diagnostic, not
   protection.
+
+Historical note: before E1 merged, `edit` was outside the S1 surface and produced
+a `NOT_COVERED` diagnostic. That observation belongs to the S1 record and no
+longer describes the adapter. E1 intercepts `edit`, so an existing `.py` file,
+including one created by an earlier guarded `write`, is evaluated under the
+normal preconditions.
 
 ## Limitations
 

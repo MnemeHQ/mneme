@@ -117,9 +117,10 @@ checker payload.
   MCP/custom tools, non-`.py` targets, whole-file overwrite of an existing file,
   deletion and rename. The plugin diagnoses each uncovered tool once as
   `NOT_COVERED` and does not intercept it; this is not a protection claim.
-- An `edit` call that follows a guarded `write` is outside the guarded surface.
-  Validation observed a model rewriting a just-written file through `edit`,
-  producing only a `NOT_COVERED` diagnostic.
+- Historical (S1 only): before E1 merged, `edit` was outside the surface and
+  produced a `NOT_COVERED` diagnostic. E1 now intercepts `edit`, so an existing
+  `.py` file, including one created by an earlier guarded `write`, is evaluated
+  under the normal preconditions.
 - A new file whose parent directory does not exist is `unsupported`
   (`target_parent_missing`) and proceeds under default-open. The bridge does not
   create directories.
