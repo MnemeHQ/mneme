@@ -12,6 +12,7 @@ scope: decision_index.governance_semantics
 **Status:** Accepted
 **Date:** 2026-10-07 (accepted 2026-10-08)
 **Amended:** 2026-10-13 — v2 `extensions` namespace key contract (§8a); DG1F applicability-only sequencing exception (§11)
+**Amended:** 2026-11-18 — `DG1-S` staged closure of the semantic foundation (§11a)
 **Erratum:** 2026-11-08 — `precedence_lost` / precedence-reason scheduling (§2, §3, Consequences); see [Erratum](#erratum-2026-11-08-precedence-reason-scheduling)
 **Deciders:** Theo Valmis
 
@@ -528,6 +529,169 @@ remains unchanged until separately chartered.
 No waiver representation, authority transition, CLI flag, MCP API, automatic
 context inference, new evidence persistence, schema change or benchmark
 methodology change is authorized by this sequencing amendment.
+
+### 11a. Staged closure of the semantic foundation (DG1-S) — amendment 2026-11-18
+
+This amendment adds one **intermediate milestone**, **DG1-S — Decision
+Governance Semantic Foundation**. It is additive. It does not replace or
+shorten the §11 sequence, does not satisfy the §13 closeout floor for DG1, and
+is not DG1G closeout or DG1 completion. It authorizes no runtime behavior,
+schema, release or freeze change.
+
+#### 11a.1 What DG1-S closes
+
+DG1-S closes the accepted semantic contract and the non-enforcement
+implementation that does not depend on a trusted runtime context or on a
+waiver-aware consumer. It comprises:
+
+| Slice | What DG1-S records as delivered |
+|---|---|
+| DG1A | the accepted ADR-031 contract and the v1 compatibility characterization |
+| DG1C | `resolve_effective`, the per-decision `ResolutionTrace`, and governance-integrity findings |
+| DG1E | canonical ADR-030 §7 `rule_id` through enforcement, `decision_version_id` in evidence, and fail-closed evidence identity |
+| DG1D | `resolve_change` and `DecisionChangeSet` over two supplied snapshots |
+| DG1P | ADR `date` removed as precedence authority, with the import ambiguity report |
+| DG1B1 | decision-applicability semantics under `mneme.decision-index/v2`, including the `not_applicable` cause and explicit v1→v2 migration |
+| DG1B2a | canonical waiver records, the `waived` cause, waiver trace/findings, authority operations and read-only listing; no authoritative consumer acts on a waiver |
+
+DG1-S is complete only when every slice above is merged on `main`, the
+evidence in §11a.3 is pinned at one commit, and the closeout record required by
+§11a.4 is accepted. A merged slice alone is not a DG1-S closeout.
+
+#### 11a.2 Supporting capabilities
+
+The following are delivered supporting capabilities. They may be cited in the
+DG1-S closeout record, but they are **not** part of the DG1-S semantic claim
+and do **not** complete ADR-031 §11 resolver-result convergence:
+
+- **DG1F-C1a** — the report-only `mneme check --applicability-preview`
+  surface. It is non-authoritative, writes only to stderr, and does not change
+  the enforced decision set, stdout, the `mneme.check/v1` payload or exit
+  codes.
+- **DG1F-C2** — one lifecycle authority and the three-state
+  `GovernanceContext` used by projection, the resolver and the existing
+  lifecycle checks. It adds no new `resolve_effective` consumer.
+- **DG1F-C3a** — resolver-result consumption by `mneme audit`, setup
+  readiness and `protect list`. These are three reporting consumers only; no
+  enforcement input changes.
+
+#### 11a.3 Fixture floor and evidence
+
+DG1-S is evidenced by the existing ADR-031 §13 fixture mapping in
+[`docs/validation/dg1g-fixture-floor-mapping-2026-11-10.md`](../validation/dg1g-fixture-floor-mapping-2026-11-10.md),
+at a single pinned commit. The mapping's F1–F13 entries are the required
+fixtures; DG1-S adds no fixture of its own.
+
+**F13 is resolver-only.** It pins the DG1B2a waiver semantics, including
+expiry at an explicit `as_of` and out-of-scope waivers, and does **not**
+exercise any runtime consumer acting on a waiver. F10 is the DG1-mapped
+configured-versus-observed evidence fixture. The closeout record must state
+the mapping status at its pinned commit and must not upgrade F13 into a
+runtime waiver claim.
+
+Any future DG1F-C1b or DG1B2b slice adds its own fixtures under §13. This
+section does not pre-approve those fixtures and does not make the current
+mapping sufficient for their slices.
+
+#### 11a.4 Required closeout evidence record
+
+After this amendment is accepted and merged, DG1-S closes only through a
+separate, independently reviewed, docs-only closeout evidence record. That
+record must contain:
+
+1. the exact commit (full SHA) and date on which DG1-S is claimed;
+2. a slice table naming the PR and squash SHA for every §11a.1 item;
+3. the §13 F1–F13 mapping at that commit, with test IDs, gate membership and
+   the F13 resolver-only caveat;
+4. DG1 test, gate-battery and frozen-benchmark evidence at that commit,
+   including the C2/C3a golden parity and DG1B2a acceptance evidence;
+5. the non-claims and open obligations in §11a.5 and §11a.6;
+6. the independent review and owner acceptance of the record.
+
+The closeout record must not declare DG1 or DG1G completion, must not
+authorize a release, and must not change runtime behavior. It does not
+replace any §11 or §13 requirement. No tracker or roadmap change is part of
+this amendment; those remain separate reviewed changes.
+
+#### 11a.5 Open obligations
+
+DG1 remains open after DG1-S. The following are **not** closed by DG1-S and
+remain obligations for final DG1G and DG1 closeout:
+
+- **DG1F-C1b — trusted applicability exclusion.** A persisted canonical
+  context declaration, an independently verifiable approved revision,
+  protection against unreviewed substitution, controlled context selection,
+  the fail-safe branches, blocking-seam validation, a behavioral charter and
+  the matching `[layer1-freeze]` amendment.
+- **DG1B2b — waiver-aware enforcement.** A trusted label source, a concrete
+  case requiring runtime suppression, an untimed first increment, a later
+  trusted `as_of` source for time-bound waivers, full-corpus exclusion before
+  top-K, rank-invariance evidence, an approved trusted-gate evaluator pin
+  bump, a behavioral charter and the matching `[layer1-freeze]` amendment.
+- **Remaining ADR-031 §11 resolver consumers and their dispositions.** The
+  following remain open or explicitly deferred: `protect status` and
+  `protect validate` (output-contract decision); `protect activate` and the
+  persistence protection-install check (authority write path); CI
+  evidence-matching APIs; explanation output; every enforcement input
+  (`mneme check`, hooks, CI gates and MCP) where C1b or B2b applies; and the
+  C3b authenticated memory entry point (no consumer). `audit_with_github_claim`
+  and other list-taking library APIs remain outside the convergence claim by
+  contract unless that contract changes. Each still-open consumer needs its
+  own output-contract decision or its own charter and freeze amendment.
+- **The #497 governance-of-governance controls G1–G3.** G1
+  self-authorization negative, G2 authorized transition positive and G3 host
+  boundary remain open. DG1 owns canonical decision and waiver authority and
+  lifecycle only; CI1 (#540) and T-08 own the host, credential, revision and
+  trusted-enforcement controls.
+- **Deferred precedence-reason work.** The persisted precedence reason and
+  the `precedence_lost` cause remain deferred under the 2026-11-08 erratum.
+  They are not part of DG1-S and are not part of the §13 floor.
+- **Final DG1G and DG1 closeout.** The full §11 sequence, the final §13
+  fixture floor and the open controls above must be complete, or each
+  remaining evidence-gated slice must receive an explicit disposition in a
+  later ADR-031 decision. Silence is not closure.
+
+#### 11a.6 Preserved requirements
+
+Nothing in this amendment changes the following accepted requirements:
+
+- **§7.** DG1B1, DG1B2 and any DG1F step that changes enforcement inputs
+  still require a merged behavioral charter, and the corresponding
+  `[layer1-freeze]` amendment where applicable. This amendment grants
+  neither.
+- **§8 and §8a.** The v2 schema, closed semantic key sets, declared
+  `semantic_features`, the `extensions` namespace contract and the explicit
+  migration rule are unchanged. DG1-S adds no schema, feature or key.
+- **§11.** The full slice sequence and the sequencing amendment remain in
+  force. DG1-S is an additional intermediate milestone; it does not replace
+  DG1G or shorten the sequence.
+- **§12.** Waiver semantics are unchanged. Only explicit Mneme authority
+  operations create waivers; producers never create them; a waiver never
+  mutates or deletes its target. DG1B2b remains unauthorized.
+- **§13.** The final DG1 fixture floor is unchanged. DG1-S uses the current
+  resolver-level mapping and does not satisfy §13 for final DG1. Future
+  applicability and waiver slices add their own fixtures.
+
+#### 11a.7 Non-authorization
+
+DG1-S does not authorize any of the following:
+
+- runtime exclusions or any change to which decisions reach enforcement;
+- waiver-aware enforcement, a trusted label source or a trusted `as_of`
+  source;
+- a new authoritative consumer, MCP tool, CLI enforcement flag or explanation
+  output contract;
+- a schema or semantic-feature change, a context declaration, a CLI writer
+  for applicability, or an evaluator pin change;
+- a release, a version bump or a release note;
+- any T-08 Phase 2 change, including B1, I3, the row 3–5 behavior, or
+  `boundary`/`shadowed` population;
+- any change to the G1–G3 status or ownership;
+- any new fixture, test requirement, charter or Layer 1 freeze amendment.
+
+Any such change requires its own accepted charter, its own reviewed decision
+and, where applicable, a `[layer1-freeze]` amendment. DG1-S is a closure of
+the semantic foundation only; DG1, DG1G, DG1F-C1b and DG1B2b remain open.
 
 ### 12. Waiver slot (semantics fixed now, implementation deferred)
 
