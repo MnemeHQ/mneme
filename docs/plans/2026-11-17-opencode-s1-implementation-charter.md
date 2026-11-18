@@ -109,10 +109,10 @@ The final runtime environment (with a container or VM image identifier when one
 is used), host OS, component hashes, memory schema and target model are **not**
 implementation prerequisites. They cannot exist before the implementation is
 built. They are recorded at the pre-validation evidence gate in §16.2, after
-implementation and before any evidence claim. For S1-A, the
+implementation and before any evidence claim. For S1-A packages governed by the
 [Amendment — decouple S1 validation from OpenShell](#amendment--decouple-s1-validation-from-openshell-2026-11-18)
-below clarifies the runtime fields; a container or VM image identifier is
-required only when that runtime is used.
+below, the amendment clarifies the runtime fields; a container or VM image
+identifier is required only when that runtime is used.
 
 ## 5. Architecture and file boundaries
 
@@ -459,11 +459,12 @@ block implementation. Every value is recorded in the validation package:
 - sanitized evidence copies and file-state witnesses;
 - source and configuration hashes.
 
-**Superseded for S1-A (2026-11-18).** The OpenShell version and unconditional
-runtime-image digest fields above are replaced by the
+**Amended for new S1-A packages (2026-11-18).** For a validation package whose
+first evidence record is created after the
 [Amendment — decouple S1 validation from OpenShell](#amendment--decouple-s1-validation-from-openshell-2026-11-18)
-below. The amendment requires the actual runtime environment and a container or
-VM image identifier only when that runtime is used.
+below takes effect, the OpenShell version and unconditional runtime-image digest
+fields above are waived and the amendment's runtime fields apply. A package
+already recorded under the prior gate remains governed by the prior text.
 
 The implementation may be built and unit-tested before this gate. No checker
 execution observation, host prevention observation or validation claim may be made
@@ -511,9 +512,11 @@ text.
 
 ## Amendment — decouple S1 validation from OpenShell (2026-11-18)
 
-**Status:** PROPOSED — not authorization until merged. On merge, it supersedes
-only the OpenShell and runtime-image fields in §4.2 and §16.2 and applies only to
-validation packages whose first evidence record is created after it takes effect.
+**Status:** PROPOSED — not authorization until merged. On merge, for packages
+whose first evidence record is created after it takes effect, it waives only the
+OpenShell version and unconditional runtime-image digest fields in §4.2 and
+§16.2 and supplies the conditional runtime pins below. Packages already recorded
+under the prior gate remain governed by the prior text.
 
 **Amends:** §4.2 pre-validation evidence environment and §16.2 pre-validation
 evidence gate.
@@ -548,18 +551,18 @@ which this amendment does not modify.
 **S1-A.** The immediate validation objective is the pinned OpenCode `2.3.0` V2
 host with DeepSeek V4.1, an independent validator, and a reproducible
 environment. Linux is preferred because the shared unrouted carrier is text-mode
-and the Windows fixture is skipped, leaving Windows byte fidelity unverified; no
-OpenShell dependency is created merely to obtain Linux. If Windows is used, the
-validator must record the skip and must not report byte fidelity as passed.
+and Windows byte fidelity is not demonstrated. A Windows run does not satisfy the
+I-10 equality requirement and must not be reported as byte-fidelity evidence; no
+OpenShell dependency is created merely to obtain Linux.
 
 **S1-B.** ContextOS environment validation is separate and is not authorized by
 this amendment. It requires platform access and its own environment pins,
 activation, filesystem/path, model-access and deployment-boundary validation.
 
 **Preserved findings.** The Windows byte-fidelity limitation remains unresolved:
-the shared carrier is text-mode and the Windows fixture is skipped, so Windows
-byte fidelity is unverified and is not converted into a pass. The validator must
-record the platform actually used and the event/carrier/file hashes. Race
+the shared carrier is text-mode and Windows equality is not demonstrated. A
+Windows run does not satisfy I-10 and is not converted into a pass. The validator
+must record the platform actually used and the event/carrier/file hashes. Race
 resistance remains `NOT_ESTABLISHED` for any undetected case. The six
 host-identifier evidence ceiling remains, and `EXECUTION_OBSERVED` is not claimed
 when `callID` is absent. No support-level, production-readiness or Core change is
