@@ -26,8 +26,8 @@
 | Aspect | Hermes at `0ad042aa` | Compared with Antigravity |
 |---|---|---|
 | **Selection call** | One method, `MnemeHermes._memory()` (`hermes/adapter.py:258-262`). An explicit constructor `memory=` wins, and is selected only if it `is_file()`. Otherwise it is `resolve_memory(Path(self.project_dir)).path`. | Antigravity calls `resolve_memory` per event (`antigravity/adapter.py:244`). |
-| **Start point and granularity** | `project_dir` is fixed per gate instance. The plugin builds one gate at `register` (`plugin.py:77-84`) with `project_dir` set to the process working directory (`plugin.py:53-54`). Every tool call evaluates against `gate.project_dir`. **The selection is fixed per plugin registration (or per embedder-chosen `project_dir`), and does not depend on the edit target.** | Antigravity starts at each event's `cwd`. |
-| **What consumes the selection** | **Two output paths share it:** context injection (`context_for_turn`; `ContextInjection.memory_path`; an empty injection at `:145`; the H6b path) and the three gates (`write_file`, `patch`, `terminal`; the H6a path). | Antigravity has one gate path. |
+| **Start point and granularity** | **The discovery start point is fixed; the selection is not cached.** `project_dir` is fixed per gate instance: the plugin builds one gate at `register` (`plugin.py:77-84`) with `project_dir` set to the process working directory (`plugin.py:53-54`), and every tool call evaluates against `gate.project_dir`. But the memory is **re-resolved on every invocation**: `context_for_turn` and each gate call `_memory()` independently (`adapter.py:143`, `:291`, `:417`, `:499`), using the same fixed `project_dir` or explicit override. The start point does not depend on the edit target. | Antigravity starts at each event's `cwd`. |
+| **What consumes the selection** | **Two output paths use the same resolution method, through separate calls:** context injection (`context_for_turn`; `ContextInjection.memory_path`; an empty injection at `:145`; the H6b path) and the three gates (`write_file`, `patch`, `terminal`; the H6a path). | Antigravity has one gate path. |
 | **Explicit override** | The constructor `memory=` is an explicit path, not discovery (D5 §2; Q2 O3). It is **unaffected** by P2-first, Phase 2 and this exception. **Existing gap:** charter §4 says constructor overrides record `source: explicit`, but Hermes never calls `explicit_selection` (`memory_selection.py:97-100`), so no such record exists. This proposal records the gap and does not fix it. | Antigravity has no explicit path. |
 | **Reporting today** | Missing memory gives `ACTION_SKIP` with `"no project memory"` (`:295`, `:419`, `:501`). The selection reason is **not recorded anywhere**, because `GateResult.reason` reaches the embedding host (charter A2 §5.2.4 item 1; A2-6). Rows 2 and 7 leave no record. | The same: no record on Antigravity either. |
 | **Code shared with other hosts** | Hermes selects only through `resolve_memory` (`adapter.py:43-45`), and imports helpers from `claude_code.hook` (`adapter.py:46-58`). The Agent SDK and LangChain select through the Agent SDK adapter (`test_p2_first_consumer_parity.py:131-138`). **The exception therefore does not reach H5a, H5b or H5c.** An embedder that runs both Hermes and the Agent SDK or LangChain gets diverging selections in rows 4 and 5. | Antigravity also imports `claude_code.hook` helpers (`antigravity/adapter.py:72`) and selects only through `resolve_memory`. Neither host shares selection code with another adapter. |
@@ -36,8 +36,8 @@
 | **Classification** | Already **Experimental** (`docs/integrations/README.md:35`). | Listed as Native (#829 E0, separate). |
 
 **What follows for Hermes specifically:**
-1. **Hermes re-enters as a whole consumer, or not at all.** One selection feeds both H6a and H6b, so B1 on one path and the unbounded walk on the other would give one gate instance two governing memories. Re-entry needs **both H6a and H6b passing on one pin**.
-2. **Divergence is per gate instance.** For a given `project_dir`, the unbounded walk picks one memory where a B1 host might pick none (rows 4 and 5). That is the same row-4/5 divergence as Antigravity (#829 §2), and it is independent of which file is edited.
+1. **Hermes re-enters as a whole consumer, or not at all.** H6a and H6b resolve memory through separate `_memory()` calls, from the same fixed start point. If only one path moved to B1, those separate calls would use different discovery semantics (B1 on one path, the unbounded walk on the other), so one gate instance could govern its context and its gates from different memories. Re-entry needs **both H6a and H6b passing on one pin**.
+2. **Divergence follows the fixed start point.** For a given `project_dir`, each invocation's unbounded walk can pick a memory where a B1 host might pick none (rows 4 and 5). That is the same row-4/5 divergence as Antigravity (#829 §2), and it is independent of which file is edited.
 3. **The explicit `memory=` path needs no exception text,** because it is outside implicit discovery.
 4. **No E0 analogue is needed.** Hermes is already Experimental, so `hermes.md` needs only a sentence (§2).
 
@@ -109,7 +109,7 @@ The amendment PR follows this proposal wherever #829 says otherwise:
 | # | Decision | Recommendation |
 |---|---|---|
 | F1 | Add Hermes to D5 A1 (a closed list of two), on the P2-first contract | **Yes.** Same reasoning as #829 O1: no new silent skips. |
-| F2 | Hermes re-enters only as a whole consumer: H6a and H6b both pass on one pin | **Yes.** One selection feeds both paths (§1). |
+| F2 | Hermes re-enters only as a whole consumer: H6a and H6b both pass on one pin | **Yes.** Both paths resolve from the same start point through separate calls; splitting them would mix discovery semantics (§1). |
 | F3 | Supersede the #829 passages in §2.1, and adopt the §4 sequence (A5 batches 1 and 2; H7 mandatory for the freeze and bound by A4's failure rule) | **Yes.** |
 | F4 | Apply #829 §3 and this §2 together in one docs-only amendment PR | **Yes.** It avoids an intermediate state where Hermes is still mandatory. |
 
