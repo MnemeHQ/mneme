@@ -1,10 +1,13 @@
-# Mneme OpenCode S1 plugin
+# Mneme OpenCode plugin (S1 + E1)
 
-Transport-only plugin for the OpenCode S1 pre-mutation surface. It forwards a
-`write` event to the Python bridge and throws only on a `block` decision.
+Transport-only plugin for the OpenCode pre-mutation surface. It forwards `write`
+and `edit` events to the Python bridge and throws only on a `block` decision.
 
-No support-matrix decision is recorded here. The maximum literal evidence claim
-is `EXECUTION_OBSERVED`; host prevention is a separate host-side observation.
+No support-matrix decision is recorded here; see
+[docs/integrations/opencode.md](../../docs/integrations/opencode.md) for the
+canonical record. The maximum literal evidence claim is `EXECUTION_OBSERVED`, and
+on this host it is unreachable because OpenCode supplies no `callID` — so the
+claim is `none`. Host prevention is a separate host-side observation.
 
 ## Scope
 
@@ -110,22 +113,31 @@ checker payload.
 
 ## Known limitations
 
-- `edit`, patch/hunk payloads, shell, MCP/custom tools, non-`.py` targets and
-  existing files are unsupported and not evaluated. The plugin diagnoses each
-  non-`write` tool once as `NOT_COVERED` and does not intercept it; this is not
-  a protection claim.
+- Not covered and not evaluated: `MultiEdit`, patch/hunk payloads, shell,
+  MCP/custom tools, non-`.py` targets, whole-file overwrite of an existing file,
+  deletion and rename. The plugin diagnoses each uncovered tool once as
+  `NOT_COVERED` and does not intercept it; this is not a protection claim.
+- Historical (S1 only): before E1 merged, `edit` was outside the surface and
+  produced a `NOT_COVERED` diagnostic. E1 now intercepts `edit`, so an existing
+  `.py` file, including one created by an earlier guarded `write`, is evaluated
+  under the normal preconditions.
 - A new file whose parent directory does not exist is `unsupported`
   (`target_parent_missing`) and proceeds under default-open. The bridge does not
-  create directories; this remains unsupported pending separate
-  characterization.
-- The shared unrouted checker carrier is text-mode; byte equality between the
-  evaluated carrier and the host-written file must be demonstrated on the pinned
-  host. On Windows, newline translation may occur. A byte-exact carrier is a
-  separately authorized change.
+  create directories.
+- The shared unrouted checker carrier is text-mode. On Linux, LF, non-ASCII and
+  no-trailing-newline fixtures were byte-identical across event, carrier and
+  file; CRLF host-level coverage is `NOT_ESTABLISHED`. On Windows, newline
+  translation occurs and byte equality is not demonstrated.
 - The bridge cannot observe whether the host actually refused a write. Host
   prevention requires a separate host-side witness.
-- One project/session path was probed in G0; multi-session and cross-directory
-  behavior requires live validation.
+- One host/model/session shape was validated; multi-session and cross-directory
+  behavior is not claimed.
 - No race or atomicity guarantee. Race resistance is `NOT_ESTABLISHED`; a target
-  created or substituted between the absence proof, evaluation and host write is
-  a documented bypass.
+  created or substituted between the read, evaluation and host write is a
+  documented bypass, and symlink or hardlink substitution can redirect a
+  permitted edit into another file.
+- The evidence claim on this host is `none`: OpenCode supplies no `callID`, so
+  the six-identifier gate is incomplete. No identifier is synthesized.
+
+See [docs/integrations/opencode.md](../../docs/integrations/opencode.md) for the
+canonical record.
