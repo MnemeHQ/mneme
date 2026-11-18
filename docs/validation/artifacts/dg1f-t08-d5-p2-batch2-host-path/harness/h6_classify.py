@@ -34,11 +34,13 @@ this arm's own nonce counts (the observer records a hash of each match):
   pre_api_request observer, role assistant      -> echo
   pre_api_request observer, another arm's nonce -> unclassified
 
-**Observer evidence is recorded, not counted** (README D3). The default never
-counts it: ``--accept-observer-record`` applies an owner decision by
-re-classification, without a re-run. NOT_DELIVERED additionally requires
-that every request the observer saw carried a complete ``messages`` list;
-otherwise the absence of the nonce is not evidence, and the arm is
+**The host's own record covers H6b and N.** On 0.19.0 the injected context is
+persisted as the user row's ``api_content`` (README D3, refuted), so a nonce
+there is ``model_bound``. Observer evidence is supplementary and never counted
+by default; ``--accept-observer-record`` remains only for an owner decision if
+the host record is ever missing. NOT_DELIVERED additionally requires that
+every request the observer saw carried a non-empty raw ``request_messages``
+list; otherwise the absence of the nonce is not evidence, and the arm is
 INCONCLUSIVE.
 
 **Candidate T is pending owner decision D4** and is never bound unless

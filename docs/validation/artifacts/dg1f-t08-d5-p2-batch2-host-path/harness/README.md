@@ -21,7 +21,7 @@ It follows the scope's emitter, paired-control, evidence, safety and non-interfe
 | H4a candidate shape | "to be determined: `{}` plus a stderr reason, or a JSON reason field" (§4); shape discovery first (§5) | same | Both are built: A is `{}` with stderr; B is `{"reason"}` with no `decision`. **The current public page differs, see D2.** |
 | H4a path type | command hook, tool event (§3.1) | same | Unchanged. |
 | H6a surface | "`pre_tool_call` offers `block` or nothing, so a non-blocking notice may need next-turn context" (§4) | hermes-agent source at the 0.19.0 tag `v2026.7.20`: `hermes_cli/plugins.py`, `model_tools.py`, `hermes_cli/oneshot.py`, `hermes_cli/_parser.py`, `website/docs/user-guide/features/hooks.md` | **Confirmed.** `pre_tool_call` honors only `{"action": "block"\|"approve"}`. `block` vetoes the tool; `approve` escalates to human approval; any other return is ignored. **A further surface exists, see D4.** |
-| H6b surface | `pre_llm_call` `{"context"}` (§4) | same | **Confirmed.** Context is appended to the current turn's user message. **It is "ephemeral, never persisted to session DB"; see D3.** |
+| H6b surface | `pre_llm_call` `{"context"}` (§4) | same, plus `agent/turn_context.py`, `hermes_state.py` and `agent/conversation_loop.py` | **Confirmed.** Context is appended to the API copy of the current turn's user message. The sent text is persisted as that row's `api_content` (see D3). |
 | H6 path type | in-process callback (§3.1) | same | Unchanged. The control returns `None` ("no opinion"). |
 | H6 live model | D2: a live model session is needed for H6 | — | Unchanged. The live path refuses without operator-supplied credentials. |
 
@@ -33,7 +33,7 @@ The pin checks ran on 2026-11-18. They were read-only: nothing was installed or 
 |---|---|---|---|---|
 | **D1** | **The Antigravity pin `2.8.1` is not the installed host, and its availability is unconfirmed.** The installed IDE is **`2.17.0`** (`Antigravity.exe` FileVersion), with an auto-updater feed configured (`resources/app-update.yml`). The official releases page renders client-side and listed no versions to a static fetch. A public developer-forum thread reports 404s on older (1.x) download links. | `check_pins.py antigravity <exe>` → MISMATCH | H4a live arms refuse to prepare. A live `prepare` requires the installed executable, not a version string. | Owner decision: obtain `2.8.1`, or re-pin by a reviewed amendment (§7). The harness never re-pins. |
 | **D2** | **The current Antigravity hook contract differs from the 2.8.1 contract that the accepted scope and the adapter rely on.** The public hooks page says `decision` is **required** on PreToolUse output, and lists `allow` as "proceeds, delegating to the next hook or default policy". The repository's 2.8.1 notes say `"allow"` **auto-grants**. The page describes `reason` as "the explanation shown to the agent or to you for the decision", and lists no `additionalContext` or `systemMessage` for PreToolUse. | the page as read 2026-11-18 (no version stated on it); `docs/integrations/antigravity.md` "Policy" | If `decision` is required on the probed host, candidates A and B may both be rejected, and Antigravity fails closed. That gives `NO_NONBLOCKING_CHANNEL` and A4's stop rule. A candidate carrying `decision` (for example `{"decision": "allow", "reason": …}`) is **not** built, because `decision` carries permission semantics and the accepted scope excludes `allow`. | Owner decision, with D1: which host version's contract governs H4a, and whether a decision-carrying candidate may enter shape discovery. |
-| **D3** | **H6b (and H6a candidate N) context is never in the host's own session record.** On 0.19.0, `pre_llm_call` context is "ephemeral, never persisted to session DB" (`plugins.py`, the `invoke_hook` docstring). The scope's primary evidence is the nonce in a model-bound message "in the host's own session record" (§3 step 2). | the 0.19.0 source | Recorded delivery for these shapes cannot come from the session DB. The harness records a `pre_api_request` observer: a plugin callback that the host dispatches with the outgoing request. It sets `HERMES_PLUGIN_PAYLOAD_MAX_CHARS` high, so the hook payload is not truncated; the model's input is unaffected. It records whether every request carried a complete `messages` list. The observer **is not counted by default**, so such arms classify as `INCONCLUSIVE`, never a false `NOT_DELIVERED`. | Owner decision: does the host-dispatched `pre_api_request` record count as recorded delivery? If yes, re-classify with `--accept-observer-record`; no re-run is needed. |
+| **D3** | **Refuted by source: the injected context *is* in the host's own session record.** The `invoke_hook` docstring calls `pre_llm_call` context "ephemeral, never persisted to session DB", but the 0.19.0 code says otherwise. `compose_user_api_content` stamps the exact sent text onto the turn's user message as `api_content`, "persisted alongside the clean content" (`agent/turn_context.py`), and `messages.api_content` is a column (`hermes_state.py`). The stamp is skipped only in MoA mode and with `api_mode == codex_app_server`. | the 0.19.0 source | A nonce in that `role=user` row is `model_bound` in the host's own record (§3 step 2), so H6b and N need no owner decision. The `pre_api_request` observer reads the raw `request_messages` list (unsanitised; the payload cap is raised anyway). It is supplementary: never counted by default, and used only to judge whether a record is complete. | Nothing, unless a live arm runs in a mode that skips the stamp. Then the arm is `INCONCLUSIVE`, and `--accept-observer-record` exists only for an owner decision. |
 | **D4** | **hermes-agent 0.19.0 has a surface the accepted contract does not name: `transform_tool_result`.** It runs after a tool returns and before the result is appended to the conversation, and its first string return replaces the result. | `model_tools.py`, `hooks.md` at the 0.19.0 tag | It is a candidate non-blocking tool-call notice. It is included as **H6a candidate T, after the accepted wording's candidate N**. Because T rewrites a tool result, its control adds the middleware rule: the result is otherwise unchanged (§3.1). **T is never bound without the owner's decision:** `h6_classify.py path H6a` treats T as pending unless `--accept-candidate-T` is given, and while T is pending, H6a cannot fail. | Owner acceptance before T can be bound (shape binding, §3 step 5). |
 | **D5** | **`-z/--oneshot` cannot drive a two-turn session.** The source settles this. `-z` goes to `run_oneshot(prompt, model, provider, toolsets, usage_file)`, which takes no session argument, so `--continue`/`--resume` are ignored. It also forces `HERMES_YOLO_MODE=1` and `HERMES_ACCEPT_HOOKS=1` (`hermes_cli/oneshot.py`). | `hermes_cli/main.py`, `oneshot.py`, `_parser.py` at the 0.19.0 tag | The harness does not use `-z`. Every arm uses `hermes chat -Q -q <prompt>` (non-interactive single query). Candidate N's second turn uses `--resume <session_id>` with the session the plugin recorded in turn 1, and N emits only when turn 2's session equals turn 1's. If resume fails, N is `NOT_EXECUTED`. The runtime behavior of `chat -q` and `--resume` is unverified until shape discovery. | Settled by shape discovery. |
 | — | **hermes-agent `0.19.0` is installable.** `pip index versions hermes-agent` lists `0.19.0` as the newest release on the configured index. Upstream GitHub has later tags (`0.21.x`) that this index does not list. It is not installed on this machine. | `pip index versions` (metadata only) | none | The operator installs it into a dedicated environment at harness-run time. That interpreter is the one that runs the host (`python -m hermes_cli.main`), so the pin applies to the binary that actually runs. |
@@ -49,14 +49,15 @@ The pin checks ran on 2026-11-18. They were read-only: nothing was installed or 
   - the identical tool call, with the workspace path masked from the argument hash, ran cleanly in the control but not with the emitter;
   - the host demonstrably altered the annotated result (H6a T).
 
-  A failure that cannot be attributed is **`INCONCLUSIVE`, never a failing label**. Examples are a failed turn, a different model-chosen call, and a record that is not available. The controls:
+  A permission prompt that differs on a *different* call is model-chosen, and so is `INCONCLUSIVE`. A failure that cannot be attributed is **`INCONCLUSIVE`, never a failing label**. Examples are a failed turn, a different model-chosen call, and a record that is not available. The controls:
   - **H4a:** the tool executed, no host error or block, the same permission prompt as the control, and the same file bytes when the tool input was the same.
   - **H6a:** the probed tool dispatched with no error.
   - **H6b:** every planned turn completed.
 - **Absence is evidence only when the record is complete.**
   - H4a's `NOT_DELIVERED` needs a copied transcript that has been shown to carry model-bound tool results.
-  - H6's `NOT_DELIVERED` needs every observed request to carry a complete `messages` list.
+  - H6's `NOT_DELIVERED` needs every observed request to carry a non-empty raw `request_messages` list.
   - Otherwise the arm is `INCONCLUSIVE`.
+- **The session dump skips the FTS5 virtual tables and their shadow tables** (`messages_fts`, `messages_fts_trigram`). They copy message text without a role and would otherwise create unclassified locations.
 - **Developer delivery (H4a) comes only from a named reviewer's capture review.** It must be bound to the recording, give the host version shown, and give a fixed `nonce_ui_location`. A nonce seen in the agent's own reply (`agent_reply`) is an echo, never developer delivery. An echo without model-bound delivery is `INCONCLUSIVE`, whatever the developer saw.
 - **Shape discovery is pre-registered.** H4a tries candidate A, then B. H6a tries N, then T, with T pending D4. A path takes the first eligible passing candidate as its bound shape. With none passing:
   - an unresolved or pending candidate leaves the path unresolved;
@@ -86,16 +87,16 @@ The pin checks ran on 2026-11-18. They were read-only: nothing was installed or 
 | `h4a_emitter.py` | Modes `empty-stderr` (A), `reason-only` (B) and `noop` (control). It always writes exactly one JSON object to stdout, never a `decision`, and exits 0. It logs selected envelope fields, the emitted bytes, and a hash of the masked tool arguments. |
 | `h4a_arm.py` | `prepare`: the guards (in a live run: pinned root, installed executable at the pin, committed harness, no user hooks), a disposable workspace with `.agents/hooks.json`, the nonce, the prompt, and a review template. `finish`: the after-state, the copied host transcript, and the recording SHA-256. |
 | `h4a_classify.py` | `pair` and `path`. The transcript table is provisional: an unclassified location gives `INCONCLUSIVE`. Contains the review validation and the attribution rules. |
-| `h6_plugin/` | The harness Hermes plugin (`mneme_probe`). Every mode registers the same five hooks. Modes: `h6b-context`, `h6a-next-turn` (same session only), `h6a-transform` and `noop`. `pre_tool_call` never returns a directive. The observers record key paths, roles and hashes, plus whether the `messages` list was complete; never values. State persists in `out/`. |
-| `h6_arm.py` | `prepare`; `run --selftest` (the stub); `run --live` (guards, `python -m hermes_cli.main chat -Q -q`, `--resume` for N's second turn). It then backs up every SQLite session file (WAL-safe), dumps it to `session.jsonl`, and runs the leak scan. |
+| `h6_plugin/` | The harness Hermes plugin (`mneme_probe`). Every mode registers the same five hooks. Modes: `h6b-context`, `h6a-next-turn` (same session only), `h6a-transform` and `noop`. `pre_tool_call` never returns a directive. The observers record key paths, roles and hashes, never values: the `pre_api_request` observer reads the raw `request_messages`, and the argument hashes have the workspace path masked. State persists in `out/`. |
+| `h6_arm.py` | `prepare`; `run --selftest` (the stub); `run --live` (guards, `python -m hermes_cli.main chat -Q -q`, `--resume` for N's second turn; never MoA or `codex_app_server`). It then backs up every SQLite session file (WAL-safe), dumps the ordinary tables to `session.jsonl` (FTS tables skipped), and runs the leak scan. |
 | `h6_classify.py` | `pair` and `path`, separately for H6a and H6b. `--accept-observer-record` applies D3 and `--accept-candidate-T` applies D4, each only after an owner decision. |
-| `selftest/stub_antigravity.py`, `selftest/stub_hermes.py` | **Not the hosts, and never evidence.** The Hermes stub mirrors the 0.19.0 contract in §1: `chat -q`, `--resume`, ephemeral context, the directive rules and transform semantics. Its counterfactual behaviors, and the Antigravity decision-required rule (D2), are test knobs. |
-| `selftest/test_batch2_harness.py` | 44 offline tests (§6). |
+| `selftest/stub_antigravity.py`, `selftest/stub_hermes.py` | **Not the hosts, and never evidence.** The Hermes stub mirrors the 0.19.0 contract in §1: `chat -q`, `--resume`, the `api_content` stamp, the FTS5 mirror table, the raw `request_messages` and sanitised `request`, the directive rules and transform semantics. Its counterfactual behaviors, and the Antigravity decision-required rule (D2), are test knobs. |
+| `selftest/test_batch2_harness.py` | 46 offline tests (§6). |
 
 ## 5. Operator procedure (documented only; NOT authorized)
 
 From an external terminal, never inside Claude Code, with no `MNEME_*` variable set:
-1. **Resolve D1 to D4 with the owner first.** Until D1 is resolved, `h4a_arm.py prepare` refuses.
+1. **Resolve D1, D2 and D4 with the owner first.** Until D1 is resolved, `h4a_arm.py prepare` refuses.
 2. **H4a.** Run the arms in order: `h4a-A-ctl`, `h4a-A`, then `h4a-B-ctl`, `h4a-B` (B only if A did not pass). For each arm:
    - `prepare <root> <arm> --antigravity <Antigravity.exe>`;
    - a screen-recorded IDE session in that workspace with the printed prompt;
@@ -115,10 +116,11 @@ From an external terminal, never inside Claude Code, with no `MNEME_*` variable 
 python -m pytest docs/validation/artifacts/dg1f-t08-d5-p2-batch2-host-path/harness/selftest -q -p no:cacheprovider
 ```
 
-44 tests, using the stubs only. Like the H1 harness self-tests, they sit outside the repository's `testpaths` (`tests`), so CI does not collect them. They are run for the harness PR. They cover:
+46 tests, using the stubs only. Like the H1 harness self-tests, they sit outside the repository's `testpaths` (`tests`), so CI does not collect them. They are run for the harness PR. They cover:
 - **Emitters:** every mode, and misuse.
 - **H4a outcomes:** delivered to agent, user only, not delivered and side effect.
 - **H4a evidence rules:**
+  - a differing permission prompt on the identical call (side effect) or a different call (`INCONCLUSIVE`);
   - decision-required fail-closed;
   - review completeness, recording binding and pin;
   - an agent-reply echo never counting as developer delivery;
@@ -129,12 +131,15 @@ python -m pytest docs/validation/artifacts/dg1f-t08-d5-p2-batch2-host-path/harne
 - **H4a live refusals:** a version string, a pin mismatch, and arm reuse.
 - **Path summary:** `NO_NONBLOCKING_CHANNEL` and pending candidates.
 - **H6b:**
-  - ephemeral context (the D3 default, the D3 flag, and host persistence);
+  - context found in the host's `api_content` record;
+  - a skipped stamp (`INCONCLUSIVE`, and the owner-decision flag);
   - dropped context with a complete record (`NOT_DELIVERED`);
-  - missing or truncated records (`INCONCLUSIVE`).
+  - a missing raw record (`INCONCLUSIVE`);
+  - a truncated sanitised copy not affecting completeness;
+  - FTS tables never dumped.
 - **H6a:**
   - T (passes; an altered result is a side effect; a dropped return is not delivered);
-  - N across two processes, and N whose resume lands in a new session (`NOT_EXECUTED`);
+  - N across two processes, found in the host record, and N whose resume lands in a new session (`NOT_EXECUTED`);
   - T needing the D4 decision before it binds.
 - **H6 attribution and setup:**
   - a tool that was never called;

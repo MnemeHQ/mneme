@@ -5,6 +5,10 @@ usage:
   h6_arm.py run     <live_root> <arm> --selftest
   h6_arm.py run     <live_root> <arm> --live --python <py> --model <m> --provider <p>
 
+The host is never run in MoA mode or with ``api_mode == codex_app_server``:
+only outside those does 0.19.0 persist the injected context as the user row's
+``api_content`` (``agent/turn_context.py``), which is H6b's and N's host record.
+
 Arms, each with its own nonce, session, HERMES_HOME and outcome:
 
   h6b    + h6b-ctl      H6b  pre_llm_call context injection          (1 turn)
@@ -150,6 +154,17 @@ def host_env(home: Path, selftest: bool) -> dict:
     return env
 
 
+def _plain_tables(con) -> list:
+    """Ordinary tables only. FTS5 virtual tables (``messages_fts``,
+    ``messages_fts_trigram`` in ``hermes_state.py`` at the 0.19.0 tag) and their
+    shadow tables copy message text without a role, so dumping them would put
+    the nonce in role-less rows; they are skipped."""
+    rows = con.execute("select name, sql from sqlite_master where type='table'").fetchall()
+    virtual = [n for n, sql in rows if (sql or "").upper().startswith("CREATE VIRTUAL TABLE")]
+    return [n for n, _ in rows if n not in virtual and not n.startswith("sqlite_")
+            and not any(n.startswith(v + "_") for v in virtual)]
+
+
 def dump_sessions(home: Path, out: Path) -> int:
     """Back up every SQLite file under HERMES_HOME (WAL-safe) and dump all rows."""
     rows = 0
@@ -163,8 +178,7 @@ def dump_sessions(home: Path, out: Path) -> int:
             src.close()
         try:
             dst.row_factory = sqlite3.Row
-            tables = [r[0] for r in dst.execute(
-                "select name from sqlite_master where type='table'")]
+            tables = _plain_tables(dst)
             for t in tables:
                 for r in dst.execute(f'select * from "{t}"'):
                     rec = {"_db": db.name, "_table": t}

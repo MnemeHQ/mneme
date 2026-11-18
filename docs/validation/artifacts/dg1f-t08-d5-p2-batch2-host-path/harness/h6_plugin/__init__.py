@@ -22,12 +22,14 @@ callback: the control returns the host's "no opinion" value, ``None``):
 change the tool's outcome (``hermes_cli/plugins.py`` at the 0.19.0 tag).
 
 Two observers run identically in every arm and never return a value:
-- ``pre_api_request`` records whether it received a complete ``messages`` list
-  (the host truncates hook payloads above ``HERMES_PLUGIN_PAYLOAD_MAX_CHARS``)
-  and, for each string carrying a probe nonce: its key path, message role,
-  the SHA-256 of the matched nonce and of the containing string. Never values.
+- ``pre_api_request`` reads ``request_messages``, the raw, unsanitised list of
+  messages the host sends to the provider (``agent/conversation_loop.py`` at the
+  0.19.0 tag; the sanitised ``request`` copy may be truncated and is not
+  used). It records whether that list was present and non-empty, and, for each
+  string in it carrying a probe nonce: its key path, message role, the SHA-256
+  of the matched nonce and of the containing string. Never values.
 - ``post_tool_call`` records the tool, its status and error type, and hashes of
-  its arguments and untransformed result.
+  its arguments (workspace path masked) and untransformed result.
 
 State persists in ``out/plugin-state.json``, because each host invocation is a
 new process.
@@ -41,6 +43,7 @@ from pathlib import Path
 NONCE_RE = re.compile(r"MNEME-PROBE-[0-9a-f]{16}")
 PROBED_TOOLS = ("write_file", "patch")
 _OUT = Path(__file__).resolve().parents[3].parent / "out"
+_WS = _OUT.parent / "ws"
 _STATE_FILE = _OUT / "plugin-state.json"
 
 
@@ -48,6 +51,16 @@ def _sha(value) -> str:
     if not isinstance(value, str):
         value = json.dumps(value, sort_keys=True, default=str)
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
+def _args_sha(args) -> str:
+    """Hash of the tool arguments with the arm's workspace path masked, so the
+    emitter and control arms hash the same call alike."""
+    text = json.dumps(args or {}, sort_keys=True, default=str)
+    ws = str(_WS)
+    for form in {ws, ws.replace("\\", "/"), json.dumps(ws)[1:-1]}:
+        text = text.replace(form, "<WS>")
+    return _sha(text)
 
 
 class _State(dict):
@@ -131,7 +144,7 @@ def on_pre_tool_call(tool_name="", args=None, **kw):
     if mode == "h6a-next-turn" and tool_name in PROBED_TOOLS and not _state["pending_session"]:
         _state["pending_session"] = sid
     _log("pre_tool_call", mode, None, tool_name=tool_name, session_id=sid,
-         args_sha256=_sha(args or {}))
+         args_sha256=_args_sha(args))
     return None
 
 
@@ -150,16 +163,16 @@ def on_transform_tool_result(tool_name="", result=None, **kw):
 def on_post_tool_call(tool_name="", args=None, result=None, **kw):
     _log("post_tool_call", _cfg().get("mode"), None, tool_name=tool_name,
          status=kw.get("status"), error_type=kw.get("error_type"),
-         args_sha256=_sha(args or {}), result_sha256=_sha(str(result)))
+         args_sha256=_args_sha(args), result_sha256=_sha(str(result)))
     return None
 
 
 def on_pre_api_request(**kw):
-    msgs = kw.get("messages")
-    complete = isinstance(msgs, list) and not any(
-        isinstance(m, dict) and "_truncated" in m for m in msgs)
+    msgs = kw.get("request_messages")
+    complete = isinstance(msgs, list) and len(msgs) > 0
     _log("pre_api_request", _cfg().get("mode"), None, kwarg_keys=sorted(kw),
-         messages_complete=complete, nonce_locations=list(_nonce_paths(kw)))
+         messages_complete=complete,
+         nonce_locations=list(_nonce_paths(msgs, "$.request_messages")) if complete else [])
     return None
 
 

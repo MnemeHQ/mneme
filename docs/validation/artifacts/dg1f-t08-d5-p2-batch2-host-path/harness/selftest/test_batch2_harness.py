@@ -124,7 +124,16 @@ def test_h4a_stderr_shown_to_user(tmp_path, monkeypatch):
 
 def test_h4a_side_effect(tmp_path, monkeypatch):
     r = _h4a(tmp_path, monkeypatch, "B", {"permission_prompt_shown": True})
-    assert r["label"] == common.DELIVERED_WITH_SIDE_EFFECT
+    assert r["same_tool_input_as_control"] and r["label"] == common.DELIVERED_WITH_SIDE_EFFECT
+
+
+def test_h4a_prompt_difference_on_different_input_is_inconclusive(tmp_path, monkeypatch):
+    _h4a_arm(tmp_path, "h4a-B", monkeypatch, {"permission_prompt_shown": True})
+    _h4a_arm(tmp_path, "h4a-B-ctl", monkeypatch)
+    log = tmp_path / "h4a-B" / "out" / "hook-log.jsonl"
+    log.write_text(log.read_text(encoding="utf-8").replace('"args_sha256": "', '"args_sha256": "x'),
+                   encoding="utf-8")
+    assert h4a_classify.classify_pair(tmp_path, "B")["label"] == common.INCONCLUSIVE
 
 
 def test_h4a_missing_review_is_not_executed(tmp_path, monkeypatch):
@@ -245,22 +254,30 @@ def _h6_pair(root, arm):
         assert h6_arm.run(root, a, _A()) == 0
 
 
-def test_h6b_ephemeral_context_is_not_counted_by_default(tmp_path):
+def test_h6b_context_is_in_the_host_record(tmp_path):
     _h6_pair(tmp_path, "h6b")
     r = h6_classify.classify_pair(tmp_path, "h6b")
-    assert r["path"] == "H6b" and r["label"] == common.INCONCLUSIVE
-    assert r["observer_evidence"] and not any(l["category"] == "model_bound" for l in r["locations"])
+    assert r["path"] == "H6b" and r["label"] == common.DELIVERED_TO_AGENT
+    assert any(l["category"] == "model_bound" and l["role"] == "user" for l in r["locations"])
 
 
-def test_h6b_observer_counted_only_on_owner_decision(tmp_path):
+def test_h6b_without_api_content_stamp_needs_owner_decision(tmp_path, monkeypatch):
+    monkeypatch.setenv("STUB_H_NO_API_CONTENT", "1")
+    _h6_pair(tmp_path, "h6b")
+    r = h6_classify.classify_pair(tmp_path, "h6b")
+    assert r["label"] == common.INCONCLUSIVE and r["observer_evidence"]
+
+
+def test_h6b_observer_counted_only_on_owner_decision(tmp_path, monkeypatch):
+    monkeypatch.setenv("STUB_H_NO_API_CONTENT", "1")
     _h6_pair(tmp_path, "h6b")
     assert h6_classify.classify_pair(tmp_path, "h6b", True)["label"] == common.DELIVERED_TO_AGENT
 
 
-def test_h6b_persisted_context_is_host_record(tmp_path, monkeypatch):
-    monkeypatch.setenv("STUB_H_PERSIST_CONTEXT", "1")
-    _h6_pair(tmp_path, "h6b")
-    assert h6_classify.classify_pair(tmp_path, "h6b")["label"] == common.DELIVERED_TO_AGENT
+def test_fts_tables_are_not_dumped(tmp_path):
+    _h6_pair(tmp_path, "h6a-T")
+    tables = {r.get("_table") for r in common.read_jsonl(tmp_path / "h6a-T" / "out" / "session.jsonl")}
+    assert "messages" in tables and not any(t.startswith("messages_fts") for t in tables)
 
 
 def test_h6b_dropped_context_with_complete_record_is_not_delivered(tmp_path, monkeypatch):
@@ -270,13 +287,20 @@ def test_h6b_dropped_context_with_complete_record_is_not_delivered(tmp_path, mon
     assert r["observer_complete"] and r["label"] == common.NOT_DELIVERED
 
 
-@pytest.mark.parametrize("knob", ["STUB_H_API_MESSAGES", "STUB_H_TRUNCATE"])
-def test_h6b_absence_without_complete_record_is_inconclusive(tmp_path, monkeypatch, knob):
-    monkeypatch.setenv(knob, "0" if knob == "STUB_H_API_MESSAGES" else "1")
+def test_h6b_absence_without_complete_record_is_inconclusive(tmp_path, monkeypatch):
+    monkeypatch.setenv("STUB_H_API_MESSAGES", "0")
+    monkeypatch.setenv("STUB_H_DROP_CONTEXT", "1")
     monkeypatch.setenv("STUB_H_ECHO", "0")
     _h6_pair(tmp_path, "h6b")
     r = h6_classify.classify_pair(tmp_path, "h6b")
     assert r["label"] == common.INCONCLUSIVE and not r["observer_complete"]
+
+
+def test_truncated_sanitised_copy_does_not_affect_completeness(tmp_path, monkeypatch):
+    monkeypatch.setenv("STUB_H_TRUNCATE", "1")
+    _h6_pair(tmp_path, "h6b")
+    r = h6_classify.classify_pair(tmp_path, "h6b")
+    assert r["observer_complete"] and r["label"] == common.DELIVERED_TO_AGENT
 
 
 def test_h6a_transform_passes_in_host_record(tmp_path):
@@ -305,8 +329,7 @@ def test_h6a_next_turn_spans_two_processes(tmp_path):
     r = h6_classify.classify_pair(tmp_path, "h6a-N")
     hooks = common.read_jsonl(tmp_path / "h6a-N" / "out" / "hook-log.jsonl")
     assert any(h["hook"] == "pre_llm_call" and h["returned"] for h in hooks)
-    assert r["label"] == common.INCONCLUSIVE  # ephemeral context: owner decision D3
-    assert h6_classify.classify_pair(tmp_path, "h6a-N", True)["label"] == common.DELIVERED_TO_AGENT
+    assert r["label"] == common.DELIVERED_TO_AGENT  # turn-2 api_content in the host record
 
 
 def test_h6_tool_not_called_is_not_executed(tmp_path, monkeypatch):
@@ -343,8 +366,10 @@ def test_h6a_next_turn_in_a_new_session_never_emits(tmp_path, monkeypatch):
     assert r["label"] == common.NOT_EXECUTED
 
 
-def test_h6a_candidate_t_needs_owner_decision_to_bind(tmp_path):
+def test_h6a_candidate_t_needs_owner_decision_to_bind(tmp_path, monkeypatch):
+    monkeypatch.setenv("STUB_H_NO_API_CONTENT", "1")  # leaves N unresolved
     _h6_pair(tmp_path, "h6a-N")
+    monkeypatch.delenv("STUB_H_NO_API_CONTENT")
     _h6_pair(tmp_path, "h6a-T")
     for arm in ("h6a-N", "h6a-T"):
         assert h6_classify.main(["x", "pair", str(tmp_path), arm]) == 0

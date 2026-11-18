@@ -7,8 +7,11 @@ on, as read from the upstream source at tag v2026.7.20:
 - project plugins load from ./.hermes/plugins/<name>/ only with
   HERMES_ENABLE_PROJECT_PLUGINS=true and the name in plugins.enabled;
 - register_hook rejects names outside VALID_HOOKS;
-- pre_llm_call context is appended to the user message sent to the model and
-  is NOT persisted to the session DB;
+- pre_llm_call context is appended to the API copy of the user message; the
+  stored ``content`` stays clean and the sent text is persisted as the row's
+  ``api_content`` (agent/turn_context.py); FTS5 tables mirror ``content``;
+- pre_api_request receives the raw ``request_messages`` and a sanitised
+  ``request`` copy (agent/conversation_loop.py);
 - pre_tool_call honors only {"action": "block"|"approve"}; anything else is
   ignored;
 - post_tool_call is observational; transform_tool_result's first str wins and
@@ -18,14 +21,14 @@ on, as read from the upstream source at tag v2026.7.20:
   stub rejects ``-z``, which cannot resume on 0.19.0.
 
 Behavior knobs (environment, test-only):
-  STUB_H_API_MESSAGES=0      pre_api_request receives no ``messages`` kwarg
-  STUB_H_TRUNCATE=1          pre_api_request receives a truncated payload
+  STUB_H_API_MESSAGES=0      pre_api_request receives an empty ``request_messages``
+  STUB_H_TRUNCATE=1          the sanitised ``request`` copy is truncated (raw list intact)
+  STUB_H_NO_API_CONTENT=1    the api_content stamp is skipped (as in MoA mode)
   STUB_H_RESUME_NEW_SESSION=1  --resume silently starts a new session
   STUB_H_DROP_CONTEXT=1      the host calls pre_llm_call but drops its context
   STUB_H_TOOL_ERROR=1        the probed tool call errors
   STUB_H_IGNORE_TRANSFORM=1  the host calls transform_tool_result but drops its return
   STUB_H_MUTATE_RESULT=1     the host alters the transformed result (side effect)
-  STUB_H_PERSIST_CONTEXT=1   the host persists injected context (counterfactual)
   STUB_H_NO_TOOL=1           the model never calls write_file
   STUB_H_ECHO=0              the model never echoes a nonce
   STUB_H_FAIL=1              the turn exits 1
@@ -89,8 +92,15 @@ def main(argv):
     resume = argv[argv.index("--resume") + 1] if "--resume" in argv else None
     home = Path(os.environ["HERMES_HOME"])
     db = sqlite3.connect(home / "state.db")
-    db.execute("create table if not exists messages (session_id text, role text, content text)")
+    db.execute("create table if not exists messages (session_id text, role text, content text, "
+               "api_content text)")
     db.execute("create table if not exists sessions (id text)")
+    try:
+        db.execute("create virtual table if not exists messages_fts using fts5(content)")
+        db.execute("create trigger if not exists mfi after insert on messages begin "
+                   "insert into messages_fts(rowid, content) values (new.rowid, new.content); end")
+    except sqlite3.OperationalError:
+        pass  # FTS5 unavailable in this sqlite build; the host degrades the same way
     known = [r[0] for r in db.execute("select id from sessions")]
     if resume and resume not in known:
         print(f"stub: unknown session {resume}", file=sys.stderr)
@@ -111,18 +121,17 @@ def main(argv):
     if knob("STUB_H_DROP_CONTEXT") == "1":
         injected = []
     api_user = prompt + "".join("\n\n" + str(c) for c in injected)
-    db.execute("insert into messages values (?,?,?)",
-               (sid, "user", api_user if knob("STUB_H_PERSIST_CONTEXT") == "1" else prompt))
+    stamp = api_user if (api_user != prompt and knob("STUB_H_NO_API_CONTENT") != "1") else None
+    db.execute("insert into messages values (?,?,?,?)", (sid, "user", prompt, stamp))
     messages = history + [{"role": "user", "content": api_user}]
 
     def api_request():
-        if knob("STUB_H_API_MESSAGES") == "0":
-            ctx.invoke("pre_api_request", model="stub")
-        elif knob("STUB_H_TRUNCATE") == "1":
-            ctx.invoke("pre_api_request", model="stub",
-                       messages=[{"_truncated": True, "preview": "..."}])
-        else:
-            ctx.invoke("pre_api_request", model="stub", messages=list(messages))
+        raw = [] if knob("STUB_H_API_MESSAGES") == "0" else list(messages)
+        sanitised = ({"_truncated": True, "preview": "..."} if knob("STUB_H_TRUNCATE") == "1"
+                     else {"body": {"messages": list(messages)}})
+        ctx.invoke("pre_api_request", model="stub", session_id=sid,
+                   conversation_history=list(history), request_messages=raw,
+                   request=sanitised)
 
     api_request()
     if not history and "write_file" in prompt and knob("STUB_H_NO_TOOL") != "1":
@@ -149,12 +158,12 @@ def main(argv):
                     break
         if knob("STUB_H_MUTATE_RESULT") == "1":
             result += " [host-altered]"
-        db.execute("insert into messages values (?,?,?)", (sid, "tool", result))
+        db.execute("insert into messages values (?,?,?,?)", (sid, "tool", result, None))
         messages.append({"role": "tool", "content": result})
         api_request()
     seen = NONCE_RE.findall(json.dumps(messages))
     reply = seen[0] if (seen and knob("STUB_H_ECHO") != "0") else "none"
-    db.execute("insert into messages values (?,?,?)", (sid, "assistant", reply))
+    db.execute("insert into messages values (?,?,?,?)", (sid, "assistant", reply, None))
     db.commit()
     db.close()
     print(reply)

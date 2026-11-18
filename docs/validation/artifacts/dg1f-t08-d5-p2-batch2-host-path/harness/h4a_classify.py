@@ -180,7 +180,10 @@ def classify_pair(root: Path, cand: str, pin: str = None) -> dict:
     # a failed tool or a host error is host-induced only when the control made the
     # identical call cleanly; anything else is not attributable.
     if not controls["permission_prompt_as_control"]:
-        side_effects.append("permission prompt differs from the control")
+        if same_input:
+            side_effects.append("permission prompt differs from the control on the identical call")
+        else:
+            inconclusive.append("permission prompt differs on a different, model-chosen call")
     failed = [k for k in ("tool_executed", "no_host_error_or_block", "file_matches_control")
               if controls.get(k) is False]
     if failed:
