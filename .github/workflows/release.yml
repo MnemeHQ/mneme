@@ -42,3 +42,28 @@ jobs:
 
       - name: Publish distribution to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+
+      # Tell mnemehq.com a new core is out, so its agent-discovery check runs
+      # now instead of at the next daily cron (which remains the fallback).
+      # Non-fatal: a token problem must never fail a PyPI publish that has
+      # already happened, so failures surface as a warning annotation only.
+      - name: Notify mnemehq-site of the release
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.SITE_DISPATCH_TOKEN }}
+        run: |
+          set -euo pipefail
+          # The version PyPI received, read from the sdist just uploaded.
+          sdist=$(basename dist/*.tar.gz .tar.gz)
+          version=${sdist##*-}
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::warning title=Site dispatch skipped::SITE_DISPATCH_TOKEN is not set; mnemehq-site was not notified of mneme-hq $version. Its daily check will catch the release instead."
+            exit 1
+          fi
+          if ! gh api repos/MnemeHQ/mnemehq-site/dispatches \
+              -f event_type=core-released \
+              -f "client_payload[version]=$version"; then
+            echo "::warning title=Site dispatch failed::Could not send core-released for mneme-hq $version to MnemeHQ/mnemehq-site (check SITE_DISPATCH_TOKEN access). Its daily check will catch the release instead."
+            exit 1
+          fi
+          echo "Sent core-released (version $version) to MnemeHQ/mnemehq-site."
