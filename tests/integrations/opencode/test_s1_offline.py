@@ -537,6 +537,20 @@ def test_fail_is_attributed_to_the_actual_rule(two_rule_fixture):
     assert two_rule_fixture.rule_id not in violation_rule_ids
     assert _entry(outcome, two_rule_fixture.rule_id)["outcome"] == "APPLIED"
 
+    secondary_entry = _entry(outcome, secondary)
+    violation = next(
+        item
+        for item in outcome["evidence"]["violations"]
+        if item["rule_id"] == secondary
+    )
+    assert secondary_entry["outcome"] == "APPLIED"
+    assert violation["rule_type"] == "FORBID_LITERAL"
+    assert violation["kind"] == "typed_rule"
+    assert (
+        violation["decision_version_id"]
+        == secondary_entry["decision_version_id"]
+    )
+
 
 # ---------------------------------------------------------------------------
 # B3: evidence copies canonical records; identity gates the claim.

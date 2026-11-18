@@ -522,17 +522,33 @@ def evaluate(request: Request, authority: Authority) -> Outcome:
             violations=violations,
         )
     if verdict == "FAIL":
-        # Blocking is attributable to a canonical FORBID_LITERAL violation
-        # record, never to the aggregate verdict and never to the pinned rule
-        # by assumption. The authority pin is an expectation, not a filter.
+        # Blocking is attributable only to a canonical FORBID_LITERAL typed-rule
+        # violation linked to an APPLIED applicability trace with the same rule
+        # and decision version. The authority pin is an expectation, not a rule
+        # filter, so a secondary rule may still block.
+        applied_literal = {
+            (item.get("rule_id"), item.get("decision_version_id"))
+            for item in applicability
+            if isinstance(item, dict)
+            and item.get("outcome") == "APPLIED"
+            and isinstance(item.get("rule_id"), str)
+            and item["rule_id"]
+            and isinstance(item.get("decision_version_id"), str)
+            and item["decision_version_id"]
+        }
         canonical = tuple(
             item
             for item in violations
             if isinstance(item, dict)
             and item.get("rule_type") == "FORBID_LITERAL"
+            and item.get("kind") == "typed_rule"
             and item.get("severity") == "FAIL"
             and isinstance(item.get("rule_id"), str)
             and item["rule_id"]
+            and isinstance(item.get("decision_version_id"), str)
+            and item["decision_version_id"]
+            and (item["rule_id"], item["decision_version_id"])
+            in applied_literal
         )
         violated_rule_ids = tuple(
             sorted({item["rule_id"] for item in canonical})

@@ -382,6 +382,165 @@ def test_legacy_fail_without_canonical_literal_identity_does_not_block(
     assert outcome.violated_rule_ids == ()
 
 
+SECONDARY_RULE_ID = "ADR-002:FORBID_LITERAL:" + "a" * 32
+SECONDARY_VERSION_ID = "dver-" + "1" * 32
+MISMATCHED_VERSION_ID = "dver-" + "2" * 32
+
+
+def _applicability_entry(
+    fixture, rule_id, version_id, *, rule_value="psycopg2"
+):
+    return {
+        "decision_id": "ADR-002" if rule_id == SECONDARY_RULE_ID else fixture.decision_id,
+        "rule_type": "FORBID_LITERAL",
+        "rule_value": rule_value,
+        "rule_index": 0,
+        "path_scoped": True,
+        "input_path": "src/handlers/new_handler.py",
+        "outcome": "APPLIED",
+        "selector": "include_paths",
+        "reason": "include_path_matched",
+        "rule_id": rule_id,
+        "decision_version_id": version_id,
+    }
+
+
+def _literal_violation(rule_id, version_id, *, kind="typed_rule"):
+    return {
+        "decision_id": "ADR-002",
+        "decision_text": "secondary literal violation",
+        "severity": "FAIL",
+        "rule": "forbidden_secondary",
+        "trigger": "forbidden_secondary",
+        "kind": kind,
+        "rule_type": "FORBID_LITERAL",
+        "rule_id": rule_id,
+        "decision_version_id": version_id,
+    }
+
+
+def _evaluate_with_payload(fixture, monkeypatch, applicability, violations):
+    payload = {
+        "schema": "mneme.check/v1",
+        "verdict": "FAIL",
+        "mode": "strict",
+        "evaluation_complete": True,
+        "applicability": applicability,
+        "violations": violations,
+        "freshness": [],
+    }
+    proc = subprocess.CompletedProcess(
+        args=[], returncode=2, stdout=json.dumps(payload), stderr=""
+    )
+    monkeypatch.setattr(bridge, "_invoke_check", lambda *args, **kwargs: proc)
+    for name in ("CLAUDE_PLUGIN_OPTION_MODE", "MNEME_HOOK_MODE", "MNEME_MEMORY"):
+        monkeypatch.delenv(name, raising=False)
+    authority = bridge.load_authority(str(fixture.authority))
+    return bridge.evaluate(
+        request(session_directory=str(fixture.root)), authority
+    )
+
+
+def test_linked_secondary_literal_violation_blocks(s1_fixture, monkeypatch):
+    applicability = [
+        _applicability_entry(
+            s1_fixture, s1_fixture.rule_id, s1_fixture.version_id
+        ),
+        _applicability_entry(
+            s1_fixture,
+            SECONDARY_RULE_ID,
+            SECONDARY_VERSION_ID,
+            rule_value="forbidden_secondary",
+        ),
+    ]
+    outcome = _evaluate_with_payload(
+        s1_fixture,
+        monkeypatch,
+        applicability,
+        [_literal_violation(SECONDARY_RULE_ID, SECONDARY_VERSION_ID)],
+    )
+
+    assert outcome.decision == bridge.BLOCK
+    assert outcome.claim == bridge.EXECUTION_OBSERVED
+    assert outcome.violated_rule_ids == (SECONDARY_RULE_ID,)
+
+
+def test_literal_violation_without_applied_entry_is_unevaluated(
+    s1_fixture, monkeypatch
+):
+    applicability = [
+        _applicability_entry(
+            s1_fixture, s1_fixture.rule_id, s1_fixture.version_id
+        )
+    ]
+    outcome = _evaluate_with_payload(
+        s1_fixture,
+        monkeypatch,
+        applicability,
+        [_literal_violation(SECONDARY_RULE_ID, SECONDARY_VERSION_ID)],
+    )
+
+    assert outcome.decision == bridge.UNEVALUATED
+    assert outcome.reason == "fail_without_canonical_literal_violation"
+    assert outcome.claim == bridge.NO_CLAIM
+    assert outcome.violated_rule_ids == ()
+
+
+def test_literal_violation_with_mismatched_version_is_unevaluated(
+    s1_fixture, monkeypatch
+):
+    applicability = [
+        _applicability_entry(
+            s1_fixture, s1_fixture.rule_id, s1_fixture.version_id
+        ),
+        _applicability_entry(
+            s1_fixture,
+            SECONDARY_RULE_ID,
+            SECONDARY_VERSION_ID,
+            rule_value="forbidden_secondary",
+        ),
+    ]
+    outcome = _evaluate_with_payload(
+        s1_fixture,
+        monkeypatch,
+        applicability,
+        [_literal_violation(SECONDARY_RULE_ID, MISMATCHED_VERSION_ID)],
+    )
+
+    assert outcome.decision == bridge.UNEVALUATED
+    assert outcome.reason == "fail_without_canonical_literal_violation"
+    assert outcome.claim == bridge.NO_CLAIM
+    assert outcome.violated_rule_ids == ()
+
+
+def test_untyped_literal_violation_does_not_block(s1_fixture, monkeypatch):
+    applicability = [
+        _applicability_entry(
+            s1_fixture, s1_fixture.rule_id, s1_fixture.version_id
+        ),
+        _applicability_entry(
+            s1_fixture,
+            SECONDARY_RULE_ID,
+            SECONDARY_VERSION_ID,
+            rule_value="forbidden_secondary",
+        ),
+    ]
+    outcome = _evaluate_with_payload(
+        s1_fixture,
+        monkeypatch,
+        applicability,
+        [
+            _literal_violation(
+                SECONDARY_RULE_ID, SECONDARY_VERSION_ID, kind="literal"
+            )
+        ],
+    )
+
+    assert outcome.decision == bridge.UNEVALUATED
+    assert outcome.reason == "fail_without_canonical_literal_violation"
+    assert outcome.claim == bridge.NO_CLAIM
+
+
 def test_incoherent_checker_payload_is_unevaluated(s1_fixture, monkeypatch):
     payload = {
         "schema": "mneme.check/v1",
