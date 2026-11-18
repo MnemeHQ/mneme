@@ -30,7 +30,7 @@
 | **What consumes the selection** | **Two output paths share it:** context injection (`context_for_turn`; `ContextInjection.memory_path`; an empty injection at `:145`; the H6b path) and the three gates (`write_file`, `patch`, `terminal`; the H6a path). | Antigravity has one gate path. |
 | **Explicit override** | The constructor `memory=` is an explicit path, not discovery (D5 §2; Q2 O3). It is **unaffected** by P2-first, Phase 2 and this exception. **Existing gap:** charter §4 says constructor overrides record `source: explicit`, but Hermes never calls `explicit_selection` (`memory_selection.py:97-100`), so no such record exists. This proposal records the gap and does not fix it. | Antigravity has no explicit path. |
 | **Reporting today** | Missing memory gives `ACTION_SKIP` with `"no project memory"` (`:295`, `:419`, `:501`). The selection reason is **not recorded anywhere**, because `GateResult.reason` reaches the embedding host (charter A2 §5.2.4 item 1; A2-6). Rows 2 and 7 leave no record. | The same: no record on Antigravity either. |
-| **Code shared with other hosts** | Hermes imports only `resolve_memory` from the selection module, plus helpers from `claude_code.hook` (`adapter.py:43-45`). The Agent SDK and LangChain select through the Agent SDK adapter (`test_p2_first_consumer_parity.py:131-138`). **The exception therefore does not reach H5a, H5b or H5c.** An embedder that runs both Hermes and the Agent SDK or LangChain gets diverging selections in rows 4 and 5. | Antigravity shares no adapter code with another host. |
+| **Code shared with other hosts** | Hermes selects only through `resolve_memory` (`adapter.py:43-45`), and imports helpers from `claude_code.hook` (`adapter.py:46-58`). The Agent SDK and LangChain select through the Agent SDK adapter (`test_p2_first_consumer_parity.py:131-138`). **The exception therefore does not reach H5a, H5b or H5c.** An embedder that runs both Hermes and the Agent SDK or LangChain gets diverging selections in rows 4 and 5. | Antigravity also imports `claude_code.hook` helpers (`antigravity/adapter.py:72`) and selects only through `resolve_memory`. Neither host shares selection code with another adapter. |
 | **Tests** | `tests/integrations/test_p2_first_consumer_parity.py::test_hermes` (`:141-147`) is the §7.5 consumer-parity case. It exercises **only `context_for_turn`**. `tests/integrations/test_p2_first_same_selection.py::test_hermes` (`:261`) is the §7.8 "same selection, unchanged output" case: row 1 against row 2, over both `context_for_turn` and `evaluate_tool_call`. `tests/integrations/hermes/` (six files) covers the context, gate, e2e, identity, wiring and relative-path behavior. | Antigravity has its own parity case. |
 | **Evidence** | Dispatch-layer only, on hermes-agent `0.19.0`, with no live model session (`docs/integrations/hermes.md:76`). The #828 harness holds the H6 arms. D3 was refuted there (injected context is persisted as `api_content`). Candidate T stays unapproved (D4). | Antigravity has no run, and a verified `2.8.1` artifact. |
 | **Classification** | Already **Experimental** (`docs/integrations/README.md:35`). | Listed as Native (#829 E0, separate). |
@@ -59,7 +59,8 @@ Each row adds to #829's list, and nothing in it is removed. Everything below is 
 ### 2.1 Passages of the accepted #829 that this supersedes
 
 The amendment PR follows this proposal wherever #829 says otherwise:
-- `:16`, `:19` and `:102` (the exception is "Antigravity only", and "any further exception needs its own D5 amendment"): the A1 list is now **Antigravity and Hermes**. Adding Hermes is done by that reviewed D5 amendment PR.
+- `:19`, `:58` and `:102` (the exception is "Antigravity only"; "Any other consumer, OpenCode included, needs its own D5 amendment"): the A1 list is now **Antigravity and Hermes**. Adding Hermes is done by that reviewed D5 amendment PR. `:16` ("B1 … apply to every other consumer") now also excludes Hermes.
+- `:63` (the §5 gate rule "unchanged for H1, H2, H3, H5 and H6") and `:99` ("H1, H2, H3, H5 and H6 are unchanged"): **H6 is now deferred too**, so these read "H1, H2, H3 and H5".
 - `:17`, `:72`, `:114` (E5) and `:121` (§7 step 3): **batch 2 is no longer H6a and H6b.** There is no H6 live run.
 - `:64` (§5.2.5): the required gates are H1, H2, H3 and H5, plus H7.
 - `:71` (Q2 A2, "For Antigravity only"): it extends to Hermes.
@@ -78,14 +79,14 @@ The amendment PR follows this proposal wherever #829 says otherwise:
 | Step | Paths | Harness | Status |
 |---|---|---|---|
 | done | H1a, H1b, H1c | H1 harness | `PASS` (#808) |
-| **A5 batch 1** | **H2a** (D1 targeted re-run), **H2b**, **H5c** | **existing, but each needs an extension PR with offline self-tests**: H2b needs a new Stop `systemMessage` emitter in `validation/codex-cli/probe/`; H5c extends `validation/langgraph/probe/probe_m0.py` (probe scope §5) | not started |
+| **A5 batch 1** | **H2a** (D1 targeted re-run), **H2b**, **H5c** | **existing**: H2b and H5c each need an extension PR with offline self-tests (H2b a new Stop `systemMessage` emitter in `validation/codex-cli/probe/`; H5c an extension of `validation/langgraph/probe/probe_m0.py`; probe scope §5). H2a reuses the existing harness, plus rollout collection under D1. | not started |
 | **A5 batch 2** | **H3a**, **H5a**, **H5b** | new: Kiro (`--v3` driver); the Agent SDK script with operator credentials | not started |
 | **H7** | OpenCode output paths, still to be defined | to be designed | **formal requirement outstanding** (§3) |
 | deferred | H4a, H6a, H6b | #828 harness, kept | `DEFERRED (not run)`; run on concrete need |
 
 **Preconditions:**
 - **H2a's D1 targeted re-run** is valid only if the implementation keeps `codex_cli/hook.py:_context_output`'s shape unchanged, and only on the same pin (probe scope §10 D1).
-- **Pins are checked before each batch:** codex-cli `0.149.1`, Kiro `2.19.2 --v3`, and the langchain/langgraph and Agent SDK pins (§7). Whether they are still installable is unchecked (readiness P6). A re-pin needs a reviewed amendment.
+- **Pins are checked before each batch:** codex-cli `0.149.1`, Kiro `2.19.2 --v3`, and the langchain/langgraph pins (§7). The Agent SDK version and model are pinned when its harness is built (§7). Whether they are still installable is unchecked (readiness P6). A re-pin needs a reviewed amendment.
 
 **Gates:**
 - **A4's positive gate applies between batches.** A5 batch 2 starts only after every A5 batch-1 path passes, or on an owner decision.
