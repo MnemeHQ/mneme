@@ -2,7 +2,7 @@
 
 **Status: Experimental (POC complete, not a native integration).**
 
-**T-08 Phase 2 memory selection:** Hermes is a named exception (D5 Amendment A1; charter Amendment A3, PROPOSED 2026-11-18). It stays on the P2-first selection. The Phase 2 repository boundary (B1) does not apply to it, and no selection notice is host-visible on it. Its Phase 2 validation (H6a, H6b) is deferred.
+**T-08 Phase 2 memory selection:** the Phase 2 repository boundary (B1) does not apply to Hermes, and no selection notice is host-visible on it (see the T-08 shared charter, §5.3).
 
 Hermes Agent (Nous Research) exposes two plugin hooks that map onto existing
 Mneme surfaces without changing any frozen semantics:

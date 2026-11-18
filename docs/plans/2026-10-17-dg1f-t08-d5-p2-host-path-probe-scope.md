@@ -447,14 +447,16 @@ The paths stay in the §8 final gate summary under that status. Each runs only o
 | Step | Paths | Harness | Preconditions |
 |---|---|---|---|
 | done | H1a, H1b, H1c | H1 harness | `PASS` (#808) |
-| **A5 batch 1** | H2a, H2b, H5c | **Existing.** H2b needs an extension PR (a Stop `systemMessage` emitter in `validation/codex-cli/probe/`), and so does H5c (an extension of `validation/langgraph/probe/probe_m0.py`); each comes with offline self-tests (§5). H2a reuses the existing harness, plus rollout collection under D1. | **H2a:** the D1 targeted re-run is valid only with `codex_cli/hook.py:_context_output`'s shape unchanged, on the same pin. **Pins:** codex-cli `0.149.1` and the langchain/langgraph pins (§7), checked before the batch; a re-pin needs a reviewed amendment. |
-| **A5 batch 2** | H3a, H5a, H5b | **New.** Kiro (a `--v3` driver), and an Agent SDK script with operator credentials (§5). | **Pins:** Kiro `2.19.2 --v3`, checked before the batch. The Agent SDK version and model are pinned when the harness is built (§7). |
+| **A5 batch 1** | H2a, H2b, H5c | **Existing.** H2b needs an extension PR (a Stop `systemMessage` emitter in `validation/codex-cli/probe/`), and so does H5c (an extension of `validation/langgraph/probe/probe_m0.py`); each comes with offline self-tests (§5). H2a reuses the existing harness, plus rollout collection under D1. | **H2a:** the D1 targeted re-run is valid only with `codex_cli/hook.py:_context_output`'s shape unchanged, on the same pin. **Pins:** codex-cli `0.149.1` and the langchain/langgraph pins (§7), checked before the batch. Whether they can still be installed is unchecked (readiness P6). A re-pin needs a reviewed amendment. |
+| **A5 batch 2** | H3a, H5a, H5b | **New.** Kiro (a `--v3` driver), and an Agent SDK script with operator credentials (§5). | **Pins:** Kiro `2.19.2 --v3`, checked before the batch; whether it can still be installed is unchecked. The Agent SDK version and model are pinned when the harness is built (§7). |
 | **H7** | OpenCode output paths | Added by its own reviewed amendment to the charter and to this scope. | It is a formal requirement for the Phase 2 freeze (charter §5.3.3), with no exception. |
 
 **Gates and stop rules:**
 - **A4's positive gate applies between batches.** A5 batch 2 starts only after every A5 batch-1 path passes, or on an owner decision.
 - **A4's failure rule also holds H7.** A failing label in any batch goes to the owner (charter §5) before any further batch, H7 included, starts. Apart from that rule, H7 is scheduled by owner priority once it is defined, and it does not wait for A5 batches 1 and 2 to complete.
-- **A4's "Unchanged" line** ("every one of H1–H6 must pass before the Phase 2 `[layer1-freeze]` amendment") reads: **every listed gate** (H1, H2, H3, H5, and H7 once defined) must pass.
+- **A4's "Unchanged" line** ("every one of H1–H6 must pass before the Phase 2 `[layer1-freeze]` amendment") reads: **every listed gate** must pass: H1, H2, H3 and H5, and H7 (OpenCode), which must be defined and pass before the freeze.
+- **§6's gate rule** ("one `NOT_DELIVERED` … anywhere blocks the freeze amendment for all consumers") applies to **listed paths only**. A failing label on a deferred path follows charter §5.3.4's failure rule: it goes to the owner, the consumer stays on its exception, and no other consumer is blocked.
+- **§1** ("every one of twelve"), **§8** (the final summary lists "all twelve paths with their labels") and **§10 D5** read as the listed paths. The summary also shows the deferred paths, as `DEFERRED (not run)` rather than a label.
 
 **Unchanged:**
 - every path definition, candidate shape, path-type control and §6 label;

@@ -16,7 +16,7 @@ It states the ADR-033 C2a/C2b consequences of P2 precedence, and it requires an 
 
 **Amendment A2-RT (PROPOSED, 2026-11-16; if accepted, the acceptance is recorded in the merging PR record and squash commit, as for A2 in #809):** amends Amendment A2 for exactly one change, decided in the [remediation-text decision](2026-11-16-dg1f-t08-d5-p2-first-remediation-text-decision.md) (option O4). It adds to §5.2.6's "authorize only" list, and to what §5.2.8 permits, the following: the `MEMORY_PATH_MISMATCH` remediation line is chosen at emit time from whether the declared memory is a file. When it is not a file, the line names restoring the declared memory, with the exact text fixed in that decision. When it is a file, the existing line is kept. The P2-first `[layer1-freeze]` amendment covers it by superseding C2b Amendment 1 preserved items 3 and 4 and C2b charter §17.6 "stderr text", for this line only. Everything else in A2 is unchanged.
 
-**Amendment A3 (PROPOSED, 2026-11-18):** the Antigravity and Hermes experimental carve-out (§5.3). It applies the accepted proposals #829 (E1–E5) and #830 (F1–F4, with the owner's correction). **Antigravity and Hermes** (a closed list, named in D5 Amendment A1) stay on the P2-first contract during Phase 2. Their paths H4a, H6a and H6b are `DEFERRED (not run)` and never pass. Phase 2 then needs H1, H2, H3 and H5, plus H7 (OpenCode) once it is defined, with no exception. Every other gate and requirement is unchanged. Acceptance would authorize no code, test, harness, run, freeze amendment or release.
+**Amendment A3 (PROPOSED, 2026-11-18):** the Antigravity and Hermes experimental carve-out (§5.3). It applies the accepted proposals #829 (E1–E5) and #830 (F1–F4, with the owner's correction). **Antigravity and Hermes** (a closed list, named in D5 Amendment A1) stay on the P2-first contract during Phase 2. Their paths H4a, H6a and H6b are `DEFERRED (not run)` and never pass. Phase 2 then needs H1, H2, H3 and H5, and H7 (OpenCode), which must be defined and pass before the freeze, with no exception. Every other gate and requirement is unchanged. Acceptance would authorize no code, test, harness, run, freeze amendment or release.
 
 **Revision 3 (2026-10-17):** records the provenance of the D5 §5.1 owner approval (§3.4, C2, and the D5 contract), and splits H1–H6 into per-output-path probe requirements (§5).
 - C2 is applied through an owner-approved refinement of D5 §5.1, recorded in the D5 contract itself (§3.4).
@@ -484,12 +484,12 @@ The excepted consumers are **Antigravity** (`antigravity/adapter.py`) and **Herm
 
 ### 5.3.3 What this amendment supersedes in this charter
 
-The following passages read as stated here. Every other passage is unchanged.
+The following passages read as stated here. **Any other mention** of H1–H6 (for example in the A2 header, §5.2.1 or §8), of "six gates" or "twelve paths", of "every consumer at once" (§4 heading), or of a "P2-first only" scope for I4-P2F (§5.2.4 heading, A2-1) reads as the listed gates and paths, or as excluding the excepted consumers, as the case requires. Every other passage is unchanged.
 
 | Passage | Reads, under A3 |
 |---|---|
 | §2 **I1** | Applies to every §4 consumer **except the excepted consumers**. |
-| §2 **I4** ("on every host (§5 gate H1–H6)") | On every **listed** host. The excepted consumers follow §5.3.2. |
+| §2 **I4** ("on every host (§5 gate H1–H6)"); §5.2.4 heading and A2-1 ("for P2-first only") | On every **listed** host. For the excepted consumers, **I4-P2F continues beyond P2-first**, through Phase 2, until each re-enters (§5.3.2). |
 | §3.1, §3.2 (one resolver, the B1 walk) | The shared resolver has **two walk modes**: B1 for the non-excepted consumers, and the unbounded P2-first walk for the excepted consumers. `find_memory` keeps its §3.1 semantics. Neither excepted consumer calls it. |
 | §4 (consumer table) | The Antigravity and Hermes rows are **deferred: P2-first contract**. |
 | §5 (gate table; "six organizing gates"; "twelve output paths"; "this charter adds no exception"; "if any host gate cannot be met … D5 must be revisited explicitly") | **H4 and H6 move to a "deferred (experimental)" row.** The gate rule ("every listed path") is unchanged for **H1, H2, H3 and H5**, and for H7 once it is defined. "Six" and "twelve" read as "listed". "No exception" and the D5-revisit clause apply to every listed gate. **D5 Amendment A1 is that explicit revisit** for the two excepted consumers. |
@@ -497,7 +497,7 @@ The following passages read as stated here. Every other passage is unchanged.
 | §5.2.5 ("Phase 2 keeps every original prerequisite"; "all of H1–H6"; "D5 itself (§5.1, §8) is not amended") | Phase 2 needs **H1, H2, H3 and H5**, with every listed path. It also needs **H7 (OpenCode): Phase 2 cannot freeze until H7 is defined, by its own reviewed charter and probe-scope amendment, and passes**, unless the owner decides otherwise separately. "D5 itself is not amended" is superseded **for the excepted consumers only**, by D5 A1. |
 | §5.2.7 ("The H2–H6 probes proceed by adoption"), §5.2.8 ("the H1–H6 gate for Phase 2"), A2-7 ("All of H1–H6") | They read as "the listed gates". |
 | §7.1, §7.5 (offline tests) | The consumer-parity tests expect the **P2-first (unbounded) selection** for each excepted consumer. Each excepted consumer gets a case showing it stays unbounded in layouts where B1 consumers stop. **For Hermes**, `tests/integrations/test_p2_first_consumer_parity.py::test_hermes` covers only `context_for_turn`, so a **gate-path case** is added, and both paths must show the unbounded mode. The §7.8 `test_p2_first_same_selection.py` cases are unchanged. |
-| §8 (live evidence) | None for the excepted consumers. |
+| §8 (live evidence; "the channel probes for H1–H6 (§5) are the gate before the freeze amendment") | The channel probes for the **listed** gates are that gate. There is no live evidence for the excepted consumers. |
 | §9 (the Phase 2 `[layer1-freeze]` amendment) | It authorizes B1, I3 and rows 3–5 **for the non-excepted consumers only**, and preserves the excepted consumers' P2-first behavior. |
 | §10 ("Preserved") | Adds the excepted consumers' P2-first behavior. |
 | §11 C3 ("no per-host exception"), §12 step 3 ("All six gates must pass") | Except the D5 A1 exceptions. They read as "every listed gate". |

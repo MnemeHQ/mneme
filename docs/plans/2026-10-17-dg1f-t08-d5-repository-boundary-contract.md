@@ -160,6 +160,6 @@ Charter §5 says that if a host gate cannot be met, "D5 must be revisited explic
 - **§5.3** (one stop rule, every consumer at once): applies to every consumer **except these two**.
 - **§8** (a verified host-visible channel per host): applies to every host **that adopts B1**.
 
-**The list is closed.** Adding any consumer needs its own separately reviewed amendment to this contract. Owner direction excludes OpenCode. Every other condition of this contract, including §5.2 and §5.4, is unchanged for every other consumer.
+**The list is closed.** Adding any consumer needs its own separately reviewed amendment to this contract. Owner direction excludes OpenCode. Every other condition of this contract, including §5.2 and §5.4, is unchanged.
 
 **Not authorized by A1:** any implementation, test, harness, run, freeze amendment or release.
