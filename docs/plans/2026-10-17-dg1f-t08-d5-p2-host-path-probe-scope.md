@@ -378,7 +378,7 @@ Every other remaining path has a candidate shape and, except H5a/H5b, some prior
 - H2b: unit tests;
 - H3a: documented live;
 - H5c: live at the dispatch layer;
-- H5a/H5b: no live evidence (§4 records "None"), but a code precedent for each shape: PreToolUse `additionalContext` for H5a (`agent_sdk/adapter.py:295-304`, charter §5) and UserPromptSubmit `additionalContext` for H5b (`agent_sdk/adapter.py:166-178`).
+- H5a/H5b: no live evidence (§4 records "None"), but a code precedent for each shape: PreToolUse `additionalContext` for H5a (the fail-open branch of `pre_tool_use`, `agent_sdk/adapter.py:315-335` at this amendment's base; charter §5 cites it at `:295-304`) and UserPromptSubmit `additionalContext` for H5b (`user_prompt_submit`, `:188-198`; §4 cites it at `:166-178`).
 
 A failure there is possible but not foreseen.
 
