@@ -178,7 +178,7 @@ def test_non_write_tool_is_unsupported(s1_fixture):
         s1_fixture,
         "src/handlers/new_handler.py",
         "VALUE = 1\n",
-        tool="edit",
+        tool="bash",
     )
     assert outcome["decision"] == "unsupported"
     assert outcome["reason"] == "unsupported_tool"

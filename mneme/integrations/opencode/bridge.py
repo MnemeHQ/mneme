@@ -24,10 +24,13 @@ from typing import Any, Optional
 from mneme import __version__
 from mneme.integrations.claude_code.availability import classify_observation
 from mneme.integrations.claude_code.hook import (
+    MaterializeError,
     ToolEvent,
     _direct_write_memory_start,
     _invoke_check,
     assess_verdict,
+    introduced_between,
+    materialize_proposed_content,
     resolve_mode,
 )
 from mneme.integrations.memory_selection import MemorySelection, resolve_memory
@@ -41,6 +44,7 @@ EVIDENCE_SCHEMA = "mneme.opencode.evidence/v1"
 BRIDGE_VERSION = "0.1.0"
 
 TOOL = "write"
+TOOL_EDIT = "edit"
 TARGET_SUFFIX = ".py"
 
 ALLOW = "allow"
@@ -95,6 +99,9 @@ class Request:
     message_id: str
     event_id: str
     host_version: str
+    old_string: Optional[str] = None
+    new_string: Optional[str] = None
+    replace_all: bool = False
 
 
 @dataclass(frozen=True)
@@ -111,6 +118,8 @@ class Outcome:
     applicability_records: tuple[dict, ...] = ()
     violations: tuple[dict, ...] = ()
     violated_rule_ids: tuple[str, ...] = ()
+    evaluated_sha256: Optional[str] = None
+    materialisation: Optional[dict] = None
 
 
 def _sha256(value: str) -> str:
@@ -169,6 +178,15 @@ def parse_request(payload: Any) -> Request:
     content = raw_input.get("content")
     if content is not None and not isinstance(content, str):
         raise EvaluationError("content_not_string")
+    old_string = raw_input.get("oldString")
+    if old_string is not None and not isinstance(old_string, str):
+        raise EvaluationError("old_string_not_string")
+    new_string = raw_input.get("newString")
+    if new_string is not None and not isinstance(new_string, str):
+        raise EvaluationError("new_string_not_string")
+    replace_all = raw_input.get("replaceAll", raw_input.get("replace_all", False))
+    if not isinstance(replace_all, bool):
+        raise EvaluationError("replace_all_not_boolean")
     session_directory = payload.get("sessionDirectory")
     if session_directory is not None and not isinstance(session_directory, str):
         raise EvaluationError("session_directory_not_string")
@@ -183,6 +201,9 @@ def parse_request(payload: Any) -> Request:
         message_id=_text(payload.get("messageID")),
         event_id=_text(payload.get("eventID")),
         host_version=_text(payload.get("hostVersion")),
+        old_string=old_string,
+        new_string=new_string,
+        replace_all=replace_all,
     )
 
 
@@ -263,6 +284,95 @@ def resolve_target(request: Request) -> Path:
     if not resolved.parent.is_dir():
         raise UnsupportedError("target_parent_missing")
     return resolved
+
+
+def resolve_existing_target(request: Request) -> Path:
+    """Resolve an existing `.py` target for the E1 edit surface.
+
+    A relative target is resolved against the session directory and may not
+    traverse outside it. An absolute target may resolve outside the session
+    directory; the selected memory's policy root must then contain it.
+    """
+    if not request.session_directory:
+        raise EvaluationError("session_directory_unavailable")
+    root = Path(request.session_directory)
+    if not root.is_absolute():
+        raise EvaluationError("session_directory_not_absolute")
+    root = root.resolve(strict=False)
+    candidate = Path(request.path)
+    absolute_input = candidate.is_absolute()
+    if not absolute_input:
+        candidate = root / candidate
+    lexical = Path(os.path.abspath(str(candidate)))
+    if not os.path.lexists(str(lexical)):
+        raise UnsupportedError("target_missing")
+
+    inside_root = _is_within(lexical, root)
+    _reject_symlink_target(lexical, root if inside_root else None)
+
+    resolved = lexical.resolve(strict=False)
+    if not absolute_input and not _is_within(resolved, root):
+        raise EvaluationError("target_outside_session_directory")
+    if resolved.suffix != TARGET_SUFFIX:
+        raise UnsupportedError("non_python_target")
+    if not resolved.is_file():
+        raise UnsupportedError("target_not_a_file")
+    return resolved
+
+
+def _prepare_edit(request: Request, target: Path, materialisation: dict) -> str:
+    """Materialise the edit and return the introduced delta.
+
+    Records hashes and counts into ``materialisation`` before any failure so a
+    rejected edit still carries its observation.
+    """
+    old = request.old_string
+    new = request.new_string
+    if old is None or new is None:
+        raise EvaluationError("non_complete_edit")
+    if old == "":
+        raise EvaluationError("empty_old_string")
+
+    try:
+        current = target.read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as exc:
+        raise EvaluationError("unreadable_target") from exc
+
+    occurrences = current.count(old)
+    materialisation.update(
+        {
+            "current_sha256": _sha256(current),
+            "occurrences": occurrences,
+            "replacement_count": -1 if request.replace_all else 1,
+            "ambiguous": occurrences > 1 and not request.replace_all,
+        }
+    )
+    if occurrences == 0:
+        raise EvaluationError("old_string_not_found")
+    if occurrences > 1 and not request.replace_all:
+        # Mirror the host: multiple matches without replaceAll are refused.
+        raise EvaluationError("ambiguous_old_string")
+
+    event = ToolEvent(
+        tool_name="Edit",
+        file_path=str(target),
+        cwd=request.session_directory or "",
+        tool_input={
+            "file_path": str(target),
+            "old_string": old,
+            "new_string": new,
+            "replace_all": request.replace_all,
+        },
+    )
+    try:
+        proposed = materialize_proposed_content(event)
+    except MaterializeError as exc:
+        raise EvaluationError("materialize_failed") from exc
+
+    introduced = introduced_between(current, proposed)
+    materialisation["proposed_sha256"] = _sha256(proposed)
+    materialisation["evaluated_sha256"] = _sha256(introduced)
+    return introduced
 
 
 def _match_authority(memory: Path, authority: Authority) -> None:
@@ -349,7 +459,8 @@ def _evidence(
         },
         "identity": {"complete": not missing, "missing": missing},
         "target": outcome.target,
-        "content_sha256": _sha256(request.content) if request.content is not None else None,
+        "content_sha256": outcome.evaluated_sha256,
+        "materialisation": outcome.materialisation,
         "memory": {
             "path": outcome.memory,
             "schema": _memory_schema(memory),
@@ -381,6 +492,8 @@ def evaluate(request: Request, authority: Authority) -> Outcome:
     target: Optional[Path] = None
     memory: Optional[Path] = None
     selection: Optional[MemorySelection] = None
+    evaluated_sha: Optional[str] = None
+    materialisation: Optional[dict] = None
     os.environ.pop("CLAUDE_PLUGIN_OPTION_MODE", None)
     mode = resolve_mode()
 
@@ -411,28 +524,57 @@ def evaluate(request: Request, authority: Authority) -> Outcome:
             applicability_records=applicability_records,
             violations=violations,
             violated_rule_ids=violated_rule_ids,
+            evaluated_sha256=evaluated_sha,
+            materialisation=materialisation,
         )
 
-    if request.tool != TOOL:
+    if request.tool == TOOL:
+        if request.content is None:
+            return finish(UNSUPPORTED, "non_complete_content", NO_CLAIM)
+        if not request.content.strip():
+            return finish(SKIP, "empty_content", NO_CLAIM)
+        try:
+            target = resolve_target(request)
+        except UnsupportedError as exc:
+            return finish(UNSUPPORTED, str(exc), NO_CLAIM)
+        except EvaluationError as exc:
+            return finish(UNEVALUATED, str(exc), NO_CLAIM)
+        checked_content = request.content
+        event = ToolEvent(
+            tool_name=TOOL,
+            file_path=str(target),
+            cwd=request.session_directory or "",
+            tool_input={"file_path": str(target), "content": request.content},
+        )
+    elif request.tool == TOOL_EDIT:
+        try:
+            target = resolve_existing_target(request)
+        except UnsupportedError as exc:
+            return finish(UNSUPPORTED, str(exc), NO_CLAIM)
+        except EvaluationError as exc:
+            return finish(UNEVALUATED, str(exc), NO_CLAIM)
+        materialisation = {}
+        try:
+            checked_content = _prepare_edit(request, target, materialisation)
+        except EvaluationError as exc:
+            return finish(UNEVALUATED, str(exc), NO_CLAIM)
+        event = ToolEvent(
+            tool_name="Edit",
+            file_path=str(target),
+            cwd=request.session_directory or "",
+            tool_input={
+                "file_path": str(target),
+                "old_string": request.old_string or "",
+                "new_string": request.new_string or "",
+                "replace_all": request.replace_all,
+            },
+        )
+        if not checked_content.strip():
+            return finish(SKIP, "empty_introduced_content", NO_CLAIM)
+    else:
         return finish(UNSUPPORTED, "unsupported_tool", NO_CLAIM)
-    if request.content is None:
-        return finish(UNSUPPORTED, "non_complete_content", NO_CLAIM)
-    if not request.content.strip():
-        return finish(SKIP, "empty_content", NO_CLAIM)
 
-    try:
-        target = resolve_target(request)
-    except UnsupportedError as exc:
-        return finish(UNSUPPORTED, str(exc), NO_CLAIM)
-    except EvaluationError as exc:
-        return finish(UNEVALUATED, str(exc), NO_CLAIM)
-
-    event = ToolEvent(
-        tool_name=TOOL,
-        file_path=str(target),
-        cwd=request.session_directory or "",
-        tool_input={"file_path": str(target), "content": request.content},
-    )
+    evaluated_sha = _sha256(checked_content)
     try:
         selection = resolve_memory(_direct_write_memory_start(event))
     except (OSError, RuntimeError) as exc:
@@ -454,7 +596,7 @@ def evaluate(request: Request, authority: Authority) -> Outcome:
         memory,
         relative.as_posix(),
         str(target),
-        request.content,
+        checked_content,
         stderr=sys.stderr,
     )
     if proc is None:
