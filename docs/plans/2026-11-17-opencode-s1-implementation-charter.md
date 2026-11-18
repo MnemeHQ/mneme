@@ -463,13 +463,16 @@ until it is satisfied.
 
 ## Amendment — authorize the test-manifest registration (2026-11-18)
 
-**Status:** PROPOSED — not authorization. Takes effect on merge.
+**Status:** PROPOSED — not authorization until merged. On merge, it authorizes
+only the change below.
 
 **Amends:** §5 file boundaries.
 
 **Authorized change.** Exactly one line in `scripts/run_test_battery.py`: add
 `"tests/integrations/opencode"` to `GATE_SHIPPED_PATHS`. No other change to that
-file and no other existing file.
+file and no other existing file. This registration is valid only in a tree that
+also contains the S1 test directory; a gate directory with no `test_*.py` files
+fails `tests/test_test_policy.py`.
 
 **Rationale.** `tests/test_test_policy.py:122` requires every canonical
 `tests/**/test_*.py` path to appear in the gate manifest or `GATE_EXCLUSIONS`
@@ -480,6 +483,11 @@ runs the new tests in the gate and changes no enforcement behavior.
 **Preserved.** No Core, CLI, enforcer, DecisionRetriever, ConflictDetector,
 governance, ADR, canonical memory, benchmark or support-matrix change. No new
 engine. All other S1 boundaries remain.
+
+**Clarification.** The identity test file is
+`tests/integrations/opencode/test_opencode_integration_identity.py`. The name
+differs from §5's `test_integration_identity.py` only to avoid a pytest
+module-name collision; this is not a new file or scope change.
 
 **Ordering.** This amendment merges first. The matching `[layer1-freeze]`
 amendment merges second. PR #824 may merge only after both. The one-line change
