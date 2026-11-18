@@ -83,6 +83,25 @@ A `block` decision is not a host-prevention observation. The bridge always emits
 target state) must be recorded separately. The bridge never infers prevention
 from its own decision.
 
+## Diagnostics
+
+The plugin prints one diagnostic line per decision that is not a trusted clean
+allow:
+
+| Decision | Host-visible line |
+| --- | --- |
+| `block` | throws `Mneme BLOCK: <reason>`; the host reports the tool as errored |
+| `setup_invalid` | `Mneme NOT_PROTECTED: <reason>` |
+| `allow` with `reason: warn_mode_violation` | `Mneme WARN: warn_mode_violation` |
+| other non-`allow` | `Mneme <decision>: <reason>` |
+
+`decision` is the sole enforcement-control input. `reason` is read only to
+compose these diagnostics; it never authorizes, denies, downgrades or upgrades a
+decision, selects a mode, changes a claim or alters evidence. The warn line is a
+diagnostic, not protection: the write is still allowed and the claim ceiling is
+unchanged. It carries no rule identity because the plugin does not parse the
+checker payload.
+
 ## Known limitations
 
 - `edit`, patch/hunk payloads, shell, MCP/custom tools, non-`.py` targets and

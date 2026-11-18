@@ -143,6 +143,14 @@ export default {
         console.error(
           `Mneme NOT_PROTECTED: ${decision.reason ?? "authority mismatch"}`,
         )
+      } else if (
+        decision.decision === "allow" &&
+        decision.reason === "warn_mode_violation"
+      ) {
+        // Canonical warn diagnostic. `decision` remains the sole
+        // enforcement-control input; `reason` is read for this diagnostic only
+        // and never authorizes, denies, downgrades or reclassifies anything.
+        console.error("Mneme WARN: warn_mode_violation")
       } else if (decision.decision !== "allow") {
         console.error(`Mneme ${decision.decision}: ${decision.reason ?? "no reason"}`)
       }

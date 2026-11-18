@@ -9,12 +9,17 @@ from __future__ import annotations
 import dataclasses
 import json
 import subprocess
+from pathlib import Path
 
 import pytest
 
 from mneme.integrations.opencode import bridge
 
 BRIDGE_SCHEMA = "mneme.opencode.bridge/v1"
+
+PLUGIN_SOURCE = (
+    Path(__file__).resolve().parents[3] / "integrations" / "opencode-plugin" / "index.ts"
+)
 
 
 def valid_payload():
@@ -597,3 +602,51 @@ def test_incomplete_checker_payload_is_unevaluated(s1_fixture, monkeypatch):
     assert outcome.reason == "evaluation_incomplete"
     assert outcome.observation_state == "INCOMPLETE"
     assert outcome.claim == bridge.NO_CLAIM
+
+
+# --- U-19: plugin read surface ------------------------------------------------
+#
+# The plugin is TypeScript executed by the host, so these are source-contract
+# guards. They are supplementary only: the host-visible warning itself is
+# verified at runtime by independent revalidation (I-16 / RT-1..RT-4), not here.
+
+
+def plugin_source() -> str:
+    return PLUGIN_SOURCE.read_text(encoding="utf-8")
+
+
+def test_plugin_emits_canonical_warn_diagnostic():
+    """A warn-mode allow produces the canonical host-visible line."""
+    src = plugin_source()
+    assert 'decision.decision === "allow"' in src
+    assert 'decision.reason === "warn_mode_violation"' in src
+    assert 'console.error("Mneme WARN: warn_mode_violation")' in src
+
+
+def test_plugin_enforcement_control_is_decision_only():
+    """The only throw is gated on `decision === "block"`."""
+    src = plugin_source()
+    throws = [line for line in src.splitlines() if "throw new Error" in line]
+    assert len(throws) == 1
+    assert src.index(throws[0]) > src.index('decision.decision === "block"')
+    assert "reason ===" not in throws[0]
+
+
+def test_plugin_does_not_parse_decision_payload():
+    """No decision field beyond `decision` and `reason` is read."""
+    src = plugin_source()
+    for field in (
+        "decision.evidence",
+        "decision.violations",
+        "decision.applicability",
+        "decision.claim",
+        "decision.host_witness",
+    ):
+        assert field not in src
+
+
+def test_plugin_reason_is_diagnostic_only():
+    """`reason` is compared once, for the warn diagnostic, and never to gate."""
+    src = plugin_source()
+    assert src.count("reason ===") == 1
+    assert 'decision.reason === "warn_mode_violation"' in src

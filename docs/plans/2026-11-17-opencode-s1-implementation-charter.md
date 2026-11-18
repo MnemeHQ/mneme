@@ -586,3 +586,110 @@ and the support-matrix boundary remain unchanged.
 before S1-A validation starts. It does not modify PR #824 or authorize a merge.
 
 **No support claim.** This amendment makes no support-level declaration.
+
+---
+
+## Amendment — warn diagnostic and prospective CRLF closure (2026-11-18)
+
+**Status:** PROPOSED — not authorization until merged. On merge it authorizes only
+the changes below.
+
+**Amends:** §6 interfaces, §9 availability, §11 byte fidelity, §12.2 unit tests
+and §12.4 offline integration tests.
+
+**Rationale.** Independent validation of the S1-A package found that a canonical
+warn-mode violation produced no host-visible warning, and that CRLF host-level
+byte fidelity could not be exercised. The first is a defect against §7 and §9 and
+is corrected here. The second cannot be closed on the pinned host: the host's
+`write` tool content is model-mediated, and the pinned OpenCode `2.3.0` API
+exposes no direct invocation of a built-in tool. Its only file-write endpoint is
+a direct filesystem mutation, which is not a tool invocation and is excluded. The
+owner declined the custom-command fallback. CRLF host coverage is therefore
+recorded as unresolved rather than claimed.
+
+### §6 — plugin read surface
+
+**Replace** the sentence "The plugin reads only `decision`. It does not parse the
+checker payload." with:
+
+> The plugin reads `decision` as its sole enforcement-control input and does not
+> parse the checker payload. It may read `reason` for diagnostics only: the
+> existing `setup_invalid` and non-`allow` diagnostics, and the canonical
+> `warn_mode_violation` diagnostic defined in §9. `reason` must never determine
+> enforcement, select or infer a mode, compute or alter a claim, or produce,
+> suppress or modify any evidence record. No other response field is read:
+> `evidence`, `violations`, `applicability`, `claim` and `host_witness` remain
+> unread by the plugin.
+
+### §9 — visible warn diagnostic
+
+**Append** after "proceeds with a visible warning and does not block":
+
+> The visible warning is the single host-visible line
+> `Mneme WARN: warn_mode_violation`, emitted when `decision == "allow"` and
+> `reason == "warn_mode_violation"`. It carries no rule identity, because the
+> plugin must not parse the checker payload; canonical rule attribution stays in
+> the bridge evidence record and the checker output. The warning is a diagnostic,
+> not a protection or authorization claim: the write remains `allow`, the outcome
+> is not Mneme protection, and the literal claim ceiling is unaffected.
+
+### §11 and I-10 — prospective CRLF closure
+
+**Replace** I-10 in §12.4 with:
+
+> `| I-10 | .py byte fidelity | event/carrier/file hashes compared for LF, non-ASCII and no-trailing-newline host fixtures; CRLF host-level coverage is NOT_ESTABLISHED for experimental S1 and must be recorded as such, never as a pass; the offline carrier-level CRLF test remains required |`
+
+**Append** to §11:
+
+> **CRLF host-level coverage is `NOT_ESTABLISHED` for experimental S1.** The
+> model-mediated `write` surface does not reliably produce CRLF content, and the
+> pinned host exposes no API that invokes a built-in tool with caller-supplied
+> bytes. Required evidence for a CRLF host fixture is therefore waived for
+> experimental S1 only. The three remaining host classes (LF, non-ASCII, no
+> trailing newline) remain required and were demonstrated on Linux, and the
+> offline carrier-level CRLF test remains required. This is a recorded limitation,
+> not a satisfied requirement.
+
+**Prospective only.** This amendment governs evidence packages whose first record
+is created after it takes effect. It does not convert, reopen or reclassify the
+S1-A package already recorded: that package showed three successful Linux host
+cases, a passing offline CRLF carrier test, and an unresolved host-level CRLF
+limitation, and that record stands unchanged.
+
+### §12.2 and §12.4 — test rows
+
+> `| U-19 | Plugin read surface | reads decision for control and reason only for the canonical warn diagnostic; no other decision field is read |`
+
+> `| I-16 | Warn-mode visible diagnostic | exactly allow; host stderr contains exactly Mneme WARN: warn_mode_violation; no block; claim none without callID |`
+
+`I-17` (exact-CRLF host write via a controlled invocation) is **withdrawn**: no
+supported method exists on the pinned host.
+
+**Verification requirement.** The host-visible warning must be verified at runtime
+in independent revalidation, not only by source-contract assertions. It is not a
+recurring CI requirement, and no additional JavaScript test framework is
+introduced.
+
+### Freeze review
+
+No new Layer 1 freeze amendment is required. No Core, `DecisionRetriever`,
+`ConflictDetector`, CLI, enforcer, memory-selection, governance, ADR, canonical
+memory or benchmark file is touched. The plugin file is introduced by PR #824,
+not a pre-existing frozen file. Enforcement semantics are unchanged: the only
+`throw` still fires solely on `decision == "block"`. No new blocking surface, no
+new engine, no availability change and no claim change are introduced.
+
+### Preserved
+
+`race_resistance: NOT_ESTABLISHED` for all four undetected cases; `claim: none`
+when `callID` is absent, with no synthesized identifiers; `edit`, patch/hunk,
+shell, delete and rename remain unsupported and unclaimed; the evidence ceiling
+and the support-matrix boundary are unchanged. The implementation pin remains
+`11c325f48091565842e23691a5709dad0a867e5c` until the corrected head is reviewed
+and re-pinned.
+
+**Ordering.** This documentation-only amendment must be reviewed and accepted
+before the warn correction merges. It does not authorize merging PR #824 by
+itself.
+
+**No support claim.** This amendment makes no support-level declaration.

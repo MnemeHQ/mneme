@@ -314,7 +314,13 @@ def test_wrong_authority_is_setup_invalid_open(s1_fixture, tmp_path):
     assert outcome["claim"] == "none"
 
 
-def test_warn_mode_allows_with_warning(s1_fixture):
+def test_warn_mode_bridge_allows_with_violation_record(s1_fixture):
+    """Bridge-level contract for warn mode.
+
+    This asserts the decision payload only. It does NOT assert that a user sees a
+    warning: the host-visible line is emitted by the plugin and is verified at
+    runtime by independent revalidation (I-16 / RT-1).
+    """
     outcome = _run(
         s1_fixture,
         "src/handlers/new_handler.py",
