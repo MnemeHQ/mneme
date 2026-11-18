@@ -16,6 +16,8 @@ It states the ADR-033 C2a/C2b consequences of P2 precedence, and it requires an 
 
 **Amendment A2-RT (PROPOSED, 2026-11-16; if accepted, the acceptance is recorded in the merging PR record and squash commit, as for A2 in #809):** amends Amendment A2 for exactly one change, decided in the [remediation-text decision](2026-11-16-dg1f-t08-d5-p2-first-remediation-text-decision.md) (option O4). It adds to §5.2.6's "authorize only" list, and to what §5.2.8 permits, the following: the `MEMORY_PATH_MISMATCH` remediation line is chosen at emit time from whether the declared memory is a file. When it is not a file, the line names restoring the declared memory, with the exact text fixed in that decision. When it is a file, the existing line is kept. The P2-first `[layer1-freeze]` amendment covers it by superseding C2b Amendment 1 preserved items 3 and 4 and C2b charter §17.6 "stderr text", for this line only. Everything else in A2 is unchanged.
 
+**Amendment A3 (PROPOSED, 2026-11-18):** the Antigravity and Hermes experimental carve-out (§5.3). It applies the accepted proposals #829 (E1–E5) and #830 (F1–F4, with the owner's correction). **Antigravity and Hermes** (a closed list, named in D5 Amendment A1) stay on the P2-first contract during Phase 2. Their paths H4a, H6a and H6b are `DEFERRED (not run)` and never pass. Phase 2 then needs H1, H2, H3 and H5, plus H7 (OpenCode) once it is defined, with no exception. Every other gate and requirement is unchanged. Acceptance would authorize no code, test, harness, run, freeze amendment or release.
+
 **Revision 3 (2026-10-17):** records the provenance of the D5 §5.1 owner approval (§3.4, C2, and the D5 contract), and splits H1–H6 into per-output-path probe requirements (§5).
 - C2 is applied through an owner-approved refinement of D5 §5.1, recorded in the D5 contract itself (§3.4).
 - The C4 wrapper limit is stated (§3.1).
@@ -446,6 +448,92 @@ Amendment A2-RT (header) permits exactly one diagnostic change beyond this list:
 | A2-7 | Phase 2 keeps every original prerequisite, rebased onto P2-first | **Yes.** All of H1–H6 with every listed output path (§5) and its own freeze amendment are still required. §5.2.5 lists what P2-first has already done. A2 relaxes nothing for Phase 2. |
 | A2-8 | Accept the ADR-033 C2a/C2b consequences of P2 precedence (§5.2.3), the rewritten tests (§5.2.6) and the §4.1 erratum (§5.2.7) | **Yes.** They are the intended effect of P2 on the one path where ADR-033 compensated for env-first precedence. The declared memory now governs instead of producing a mismatch refusal, and SS-3 stays reachable by other routes. |
 | A2-9 | Notice emission conditions: suppress rather than reshape when the event's output does not fit the probed shape (§5.2.4 item 3) | **Yes.** Carrying the notice in another channel (for example exit-2 stderr, or warn-mode `permissionDecisionReason`) would be an unprobed shape. C5 narrows accordingly. |
+
+## 5.3 Amendment A3: Antigravity and Hermes experimental carve-out (PROPOSED)
+
+**Status: PROPOSED** (2026-11-18), for independent review and owner acceptance.
+
+**Basis:** it applies two accepted proposals. Both were accepted after independent review:
+- the [Antigravity carve-out proposal](2026-11-18-t08-d5-p2-antigravity-carve-out-proposal.md) (#829, `0ad042aa`; owner decisions E1–E5);
+- the [Hermes follow-up](2026-11-18-t08-d5-p2-hermes-carve-out-follow-up.md) (#830, `466f22d7`; owner decisions F1–F4, with the owner's correction on Hermes selection).
+
+It is coordinated with D5 Amendment A1, Q2 Amendment A2 and probe-scope Amendment A5, and is reviewed together with them.
+
+Acceptance would authorize **no** code, test, harness, live run, `[layer1-freeze]` amendment or release.
+
+### 5.3.1 Excepted consumers (a closed list)
+
+The excepted consumers are **Antigravity** (`antigravity/adapter.py`) and **Hermes** (`hermes/adapter.py`), as named in D5 Amendment A1.
+- The list is **closed**. Adding any consumer needs its own separately reviewed D5 amendment.
+- Owner direction excludes OpenCode.
+
+### 5.3.2 Contract for the excepted consumers during Phase 2
+
+- **The P2-first contract stays.** Each excepted consumer keeps the §5.2.2 P2-first contract:
+  - today's unbounded walk;
+  - rows 1, 2, 6, 7 and 8;
+  - `walk: "unbounded"`, with `boundary` and `shadowed` unpopulated (A2-5).
+
+  B1, I3 and rows 3–5 do not apply to them.
+- **Reporting continues at R-ii.** I4-P2F (§5.2.4) continues for them beyond P2-first: rows 2 and 7 are computed, but they get no record, no notice, and no new field or output (§5.2.4 items 1 and 4). The A2-3 classification of an unreadable override (selected, then today's load-failure path) also continues for them.
+- **No claims.** No host-visible notice, and no Phase 2 boundary behavior, may be claimed for either consumer. H4a, H6a and H6b are **`DEFERRED (not run)`**. That status is not one of the probe-scope §6 labels, never passes, and is never counted in a gate.
+- **Hermes specifics.**
+  - The discovery start point is the fixed `project_dir` of the gate instance (`hermes/plugin.py`, `make_gate` and `register`).
+  - The memory is **re-resolved on every invocation**: `context_for_turn` and each of the three gates call `_memory()` independently (`hermes/adapter.py:143`, `:291`, `:417`, `:499`). Nothing is cached.
+  - The explicit constructor `memory=` is unchanged (Q2 O3). Its existing gap, no `source: explicit` record (§4), is recorded, not fixed.
+
+### 5.3.3 What this amendment supersedes in this charter
+
+The following passages read as stated here. Every other passage is unchanged.
+
+| Passage | Reads, under A3 |
+|---|---|
+| §2 **I1** | Applies to every §4 consumer **except the excepted consumers**. |
+| §2 **I4** ("on every host (§5 gate H1–H6)") | On every **listed** host. The excepted consumers follow §5.3.2. |
+| §3.1, §3.2 (one resolver, the B1 walk) | The shared resolver has **two walk modes**: B1 for the non-excepted consumers, and the unbounded P2-first walk for the excepted consumers. `find_memory` keeps its §3.1 semantics. Neither excepted consumer calls it. |
+| §4 (consumer table) | The Antigravity and Hermes rows are **deferred: P2-first contract**. |
+| §5 (gate table; "six organizing gates"; "twelve output paths"; "this charter adds no exception"; "if any host gate cannot be met … D5 must be revisited explicitly") | **H4 and H6 move to a "deferred (experimental)" row.** The gate rule ("every listed path") is unchanged for **H1, H2, H3 and H5**, and for H7 once it is defined. "Six" and "twelve" read as "listed". "No exception" and the D5-revisit clause apply to every listed gate. **D5 Amendment A1 is that explicit revisit** for the two excepted consumers. |
+| §5.1 (A1) "no per-host exception" | Except the D5 A1 exceptions. |
+| §5.2.5 ("Phase 2 keeps every original prerequisite"; "all of H1–H6"; "D5 itself (§5.1, §8) is not amended") | Phase 2 needs **H1, H2, H3 and H5**, with every listed path. It also needs **H7 (OpenCode): Phase 2 cannot freeze until H7 is defined, by its own reviewed charter and probe-scope amendment, and passes**, unless the owner decides otherwise separately. "D5 itself is not amended" is superseded **for the excepted consumers only**, by D5 A1. |
+| §5.2.7 ("The H2–H6 probes proceed by adoption"), §5.2.8 ("the H1–H6 gate for Phase 2"), A2-7 ("All of H1–H6") | They read as "the listed gates". |
+| §7.1, §7.5 (offline tests) | The consumer-parity tests expect the **P2-first (unbounded) selection** for each excepted consumer. Each excepted consumer gets a case showing it stays unbounded in layouts where B1 consumers stop. **For Hermes**, `tests/integrations/test_p2_first_consumer_parity.py::test_hermes` covers only `context_for_turn`, so a **gate-path case** is added, and both paths must show the unbounded mode. The §7.8 `test_p2_first_same_selection.py` cases are unchanged. |
+| §8 (live evidence) | None for the excepted consumers. |
+| §9 (the Phase 2 `[layer1-freeze]` amendment) | It authorizes B1, I3 and rows 3–5 **for the non-excepted consumers only**, and preserves the excepted consumers' P2-first behavior. |
+| §10 ("Preserved") | Adds the excepted consumers' P2-first behavior. |
+| §11 C3 ("no per-host exception"), §12 step 3 ("All six gates must pass") | Except the D5 A1 exceptions. They read as "every listed gate". |
+
+### 5.3.4 Re-entry and failure rules
+
+- **Antigravity re-enters Phase 2** only after all of:
+  - its own H4a pass on its pin (`2.8.1`);
+  - its own `[layer1-freeze]` amendment;
+  - a reviewed consumer-parity flip.
+- **Hermes re-enters only as a whole consumer**, after all of:
+  - **both** H6a and H6b pass on one hermes-agent pin;
+  - its own `[layer1-freeze]` amendment;
+  - a reviewed parity flip.
+
+  A partial re-entry would let the separate `_memory()` calls use different discovery rules (B1 on one path, unbounded on the other).
+- **H6a candidate T** (`transform_tool_result`) stays unapproved unless the owner accepts it.
+- **Each consumer re-enters independently** of the other.
+- **Failure rule:** a failing label on a deferred path goes to the owner. The consumer stays on the exception, and no other consumer is blocked.
+
+### 5.3.5 Costs, stated plainly
+
+- The excepted consumers keep P2-first's gaps: an ancestor memory, or a planted memory above the repository boundary, still governs. L4, L5 and L6 behave as on `main` today.
+- Rows 2 and 7 are unreported on them, with no end date.
+- Selection diverges from B1 consumers in rows 4 and 5.
+- For Hermes, the divergence follows its fixed start point, independent of the edited file. An embedder that runs Hermes alongside the Agent SDK or LangChain gets diverging selections in rows 4 and 5.
+- The resolver keeps two walk modes.
+
+### 5.3.6 Not authorized by A3
+
+- code, tests (including the new parity cases), harness changes or live runs;
+- the Phase 2 `[layer1-freeze]` amendment, or any release;
+- any change to H1, H2, H3, H5 or their paths and pins;
+- any exception for OpenCode or any other consumer;
+- H6a candidate T; reclassifying Antigravity (E0, separate);
+- changing any earlier label: H1 stays `PASS`, G3 stays `PARTIAL`, and Phase 2 stays NOT READY and BLOCKED.
 
 ## 6. Characterization test first (D5 §7.4)
 

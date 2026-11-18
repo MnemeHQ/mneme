@@ -13,6 +13,8 @@ It follows the scope's emitter, paired-control, evidence, safety and non-interfe
 
 **A live run is blocked today by the discrepancies in §2.** The harness reports them and does not resolve them. Its pin checks refuse a live run until they are resolved.
 
+> **Deferred (probe-scope Amendment A5 and charter Amendment A3, PROPOSED 2026-11-18):** H4a, H6a and H6b are deferred out of the Phase 2 gate as `DEFERRED (not run)`, and never pass. This whole harness now serves deferred paths only: it is kept intact, and runs only on a concrete need. The batch-3 condition in §3 ("H4a, H6a and H6b all pass") is superseded, and no later batch depends on this harness. D3 (refuted), D4 (candidate T unapproved) and D5 stay recorded.
+
 ## 1. Accepted contract, verified before building
 
 | Item | Accepted contract (probe scope) | Verified against | Result |

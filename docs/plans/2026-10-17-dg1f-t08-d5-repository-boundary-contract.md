@@ -7,6 +7,7 @@
 **Revision 4 (2026-10-17):** answers the #537 review. It splits an absent Git marker from an existing but invalid one (L8a/L8b, §4 B1), states that D5 guarantees consistent walk termination but not identical memory selection across tools (§5.3), and completes the §5.1 consumer inventory.
 **Acceptance (2026-10-17):** adds condition §5.4 (planted Git markers) and records owner acceptance of the definition.
 **Owner-approved refinement of §5.1 (2026-10-17):** plain absence gets a structured non-PASS outcome without a per-event host notice. It was made during review of the [shared D5 + P2 implementation charter](2026-10-17-t08-d5-p2-memory-resolution-charter.md) (#542). Approved by the owner (@TheoV823) on 2026-10-17 in the owner's working session with the authoring agent, in these words: "Approve the D5 §5.1 refinement (row 8: structured non-PASS only, no per-event notice) and amend D5 in the same PR." This is recorded here and has no separate GitHub artifact. The independent reviewer's conditional support for the refinement is **not** the approval. It changes nothing else in this contract, and its acceptance status is unchanged.
+**Amendment A1 (PROPOSED, 2026-11-18):** a named exception for **Antigravity and Hermes** (§9), applying the accepted carve-out proposals #829 and #830. Those two consumers do not adopt B1 until they re-enter under charter §5.3.4. The list is closed. Nothing else in this contract changes.
 **Source anchor:** `MnemeHQ/mneme` `main` at `45cefa63`, read-only. `mneme/` is unchanged between `45cefa63` and this branch's base `68d1aaed`, so all line anchors hold.
 **Inputs:** T-08 charter §2–§8 ([charter](2026-10-15-t08-target-path-memory-resolution-charter.md)); [D6-Q1 review reconciliation](2026-10-17-dg1f-t08-d6-q1-review-reconciliation.md). The 2026-10-16 preliminary review and the 2026-10-17 Opus validation are unpublished working documents; their accepted corrections are recorded in the reconciliation note.
 
@@ -143,3 +144,22 @@ Here, "Git marker" means a `.git` directory or file. It is a candidate local pro
 | **D5 implementation authorization** | One cross-consumer charter (§5.3) plus a Layer 1 freeze amendment for `find_memory` | Q2 resolved (§5.2), a verified host-visible channel per host (§5.1), a defined planted-marker outcome (§5.4), and the L4 characterization test (§7.4) authorized and recorded | Blocked |
 
 **Next gate:** open D6/Q2 (external-memory precedence and compatibility) against the accepted boundary `R`. This acceptance does not authorize implementation, tests, experiments, ADR changes or Layer 1 freeze amendments.
+
+## 9. Amendment A1: named exception for Antigravity and Hermes (PROPOSED)
+
+**Status: PROPOSED** (2026-11-18), for independent review and owner acceptance. It is reviewed together with charter Amendment A3 (§5.3 there), Q2 Amendment A2 and probe-scope Amendment A5.
+
+**Basis:**
+- the accepted [Antigravity carve-out proposal](2026-11-18-t08-d5-p2-antigravity-carve-out-proposal.md) (#829, `0ad042aa`);
+- the accepted [Hermes follow-up](2026-11-18-t08-d5-p2-hermes-carve-out-follow-up.md) (#830, `466f22d7`).
+
+Charter §5 says that if a host gate cannot be met, "D5 must be revisited explicitly". This amendment is that explicit revisit, for two named consumers.
+
+**The exception.** Two consumers, **Antigravity** (`antigravity/adapter.py`) and **Hermes** (`hermes/adapter.py`), **do not adopt B1** until each re-enters under charter §5.3.4. Until then, each keeps the P2-first walk and makes no host-visible claim (charter §5.3.2).
+- **§5.1** (host-visible `NO_MEMORY_SELECTED`): met for these two consumers **because they do not adopt B1**, so no edit that today's walk governs becomes a skip for them. B1's §5 compatibility cost does not arise for them.
+- **§5.3** (one stop rule, every consumer at once): applies to every consumer **except these two**.
+- **§8** (a verified host-visible channel per host): applies to every host **that adopts B1**.
+
+**The list is closed.** Adding any consumer needs its own separately reviewed amendment to this contract. Owner direction excludes OpenCode. Every other condition of this contract, including §5.2 and §5.4, is unchanged for every other consumer.
+
+**Not authorized by A1:** any implementation, test, harness, run, freeze amendment or release.

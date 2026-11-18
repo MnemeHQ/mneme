@@ -15,6 +15,8 @@
 
 **Amendment A4 (PROPOSED, 2026-11-18):** changes the batch order in decision D5 (§10) and adds a stop rule; nothing else. The two paths this scope marks "At risk", **H4a** (Antigravity) and **H6a** (Hermes), move from the last batches to the next batch, with H6b joining them. The stop rule: batch 3 starts only after every batch-2 path has a passing label, or on an owner decision; a failing label goes to the owner for the D5 revisit that charter §5 requires (§4.5). Paths, shapes, controls, labels, pins, the gate rule and the one-pin-per-gate rule are unchanged. Nothing runs, and no harness is built, without a separate go-ahead.
 
+**Amendment A5 (PROPOSED, 2026-11-18):** applies the accepted carve-out proposals #829 and #830 (§4.6). **H4a, H6a and H6b are deferred** out of the batch order as `DEFERRED (not run)`, and never pass. The remaining paths run as A5 batch 1 (H2a, H2b, H5c), then A5 batch 2 (H3a, H5a, H5b), and H7 (OpenCode) is added by its own amendment. Every path definition, shape, control, label and pin, the gate rule and the one-pin-per-gate rule are unchanged. Nothing runs without a separate go-ahead.
+
 **Revision 3 (2026-10-17):** answers the #545 re-review. The emitter mechanism and the side-effect control are now specific to each **path type**: command hook on a tool event, command hook on a lifecycle event, in-process callback, and middleware (§3.1). The nonce, evidence, audience and non-interference requirements stay common. No gate, decision or D5/P2 semantics change.
 **Parent:** charter §5 (gate rule) and §12 step 3. The format follows the D6 scopes [#519](2026-10-15-dg1f-t08-d6-mneme-memory-live-scope.md) and [#527](2026-10-16-dg1f-t08-d6-c4-local-settings-scope.md).
 
@@ -423,6 +425,47 @@ Operator dependencies:
 - any charter, D5, Q2, ADR or ADR-033 amendment, or any decision on the D5 revisit;
 - the Phase 2 `[layer1-freeze]` amendment, implementation, or any change under `mneme/`;
 - any change to an earlier label: H1 stays `PASS` (#808), and G3 stays `PARTIAL` (#822);
+- any release.
+
+### 4.6 Amendment A5: deferred paths and the revised batch order (PROPOSED)
+
+**Status: PROPOSED** (2026-11-18), for independent review and owner acceptance. It is reviewed together with charter Amendment A3 (§5.3), D5 Amendment A1 and Q2 Amendment A2.
+
+**Basis:** the accepted proposals #829 (`0ad042aa`) and #830 (`466f22d7`). It **supersedes A4's batch table, A4's stop-rule scope, and #829's "batch 2 becomes H6a and H6b"**.
+
+Acceptance would authorize **no** harness PR, harness change, shape discovery, live run, evidence PR, credential use or release.
+
+**Deferred paths.** **H4a** (Antigravity), **H6a** and **H6b** (Hermes) leave the batch order. Each is **`DEFERRED (not run)`**. That status:
+- is **not** one of the §6 labels;
+- never passes;
+- is never counted in a gate.
+
+The paths stay in the §8 final gate summary under that status. Each runs only on a concrete need, under the unchanged §3–§8 method and the #828 harness (`docs/validation/artifacts/dg1f-t08-d5-p2-batch2-host-path/`), and its consumer re-enters only under charter §5.3.4. H6a candidate T stays unapproved. A4 §4.5.2's reason for running the at-risk paths first lapses for every deferred path.
+
+**Revised batch order.** Batches are named "A5 batch *n*", so they do not clash with the existing `batch2` artifact directory. Evidence records are keyed by gate (§8).
+
+| Step | Paths | Harness | Preconditions |
+|---|---|---|---|
+| done | H1a, H1b, H1c | H1 harness | `PASS` (#808) |
+| **A5 batch 1** | H2a, H2b, H5c | **Existing.** H2b needs an extension PR (a Stop `systemMessage` emitter in `validation/codex-cli/probe/`), and so does H5c (an extension of `validation/langgraph/probe/probe_m0.py`); each comes with offline self-tests (§5). H2a reuses the existing harness, plus rollout collection under D1. | **H2a:** the D1 targeted re-run is valid only with `codex_cli/hook.py:_context_output`'s shape unchanged, on the same pin. **Pins:** codex-cli `0.149.1` and the langchain/langgraph pins (§7), checked before the batch; a re-pin needs a reviewed amendment. |
+| **A5 batch 2** | H3a, H5a, H5b | **New.** Kiro (a `--v3` driver), and an Agent SDK script with operator credentials (§5). | **Pins:** Kiro `2.19.2 --v3`, checked before the batch. The Agent SDK version and model are pinned when the harness is built (§7). |
+| **H7** | OpenCode output paths | Added by its own reviewed amendment to the charter and to this scope. | It is a formal requirement for the Phase 2 freeze (charter §5.3.3), with no exception. |
+
+**Gates and stop rules:**
+- **A4's positive gate applies between batches.** A5 batch 2 starts only after every A5 batch-1 path passes, or on an owner decision.
+- **A4's failure rule also holds H7.** A failing label in any batch goes to the owner (charter §5) before any further batch, H7 included, starts. Apart from that rule, H7 is scheduled by owner priority once it is defined, and it does not wait for A5 batches 1 and 2 to complete.
+- **A4's "Unchanged" line** ("every one of H1–H6 must pass before the Phase 2 `[layer1-freeze]` amendment") reads: **every listed gate** (H1, H2, H3, H5, and H7 once defined) must pass.
+
+**Unchanged:**
+- every path definition, candidate shape, path-type control and §6 label;
+- the gate rule and the one-pin-per-gate rule;
+- the §7 pins and safety guards, and the §8 evidence rules;
+- decisions D1–D4.
+
+**Not authorized by A5:**
+- any harness or extension PR, or any run, including either A5 batch, H7 or a deferred path;
+- any change to H1, H2, H3, H5 or their pins;
+- H6a candidate T;
 - any release.
 
 ## 5. Harness: reuse and build, per host

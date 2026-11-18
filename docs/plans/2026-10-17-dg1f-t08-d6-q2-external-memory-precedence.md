@@ -16,6 +16,8 @@ It would also treat an unreadable but existing override as selected, with today'
 
 The P2 rule itself (rules 1, 2 and 4, and rule 3's classification of a missing override) and the D5 row of §10 are unchanged. Phase 2 restores every relaxed reporting clause, and rule 3's classification of an unreadable override (charter §3.3 row 7, "missing or unreadable"). The departure from "land together" cannot be undone.
 
+**Amendment A2 (PROPOSED, 2026-11-18):** pointer only. It is reviewed together with charter Amendment A3 (§5.3) and D5 Amendment A1. **For Antigravity and Hermes only**, A1's relaxed clauses continue past Phase 2 until each consumer re-enters (charter §5.3.4). Those clauses are rule 1's and rule 3's reporting clauses, the §6 "visible notice" mitigation, and §10's "same host-visible channel" prerequisite. The "land together" departure continues for them too, and so does A1's treatment of an unreadable override (charter A2-3). The P2 rules are unchanged, and nothing changes for any other consumer.
+
 **Source anchor:** `MnemeHQ/mneme` `main` at `28211f8b`, read-only.
 **Inputs:**
 - [D5 repository-boundary contract](2026-10-17-dg1f-t08-d5-repository-boundary-contract.md) (ACCEPTED, definition only);
