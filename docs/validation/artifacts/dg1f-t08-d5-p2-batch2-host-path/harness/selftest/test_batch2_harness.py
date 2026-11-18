@@ -75,7 +75,9 @@ def _h4a_arm(root, arm, monkeypatch, review_over=None):
               "host_version_shown": "2.8.1", "agent_ran_tool": ui["tool_allowed"],
               "permission_prompt_shown": ui["permission_prompt_shown"],
               "host_error_or_block_shown": any(x["kind"] == "host_error" for x in ui["shown"]),
-              "nonce_seen_in_ui": "MNEME-PROBE-" in shown, "nonce_ui_location": "", "notes": ""}
+              "nonce_seen_in_ui": "MNEME-PROBE-" in shown,
+              "nonce_ui_location": "hook_notice" if "MNEME-PROBE-" in shown else "none",
+              "notes": ""}
     review.update(review_over or {})
     common.write_json(d / "out" / "capture_review.json", review)
 
@@ -174,6 +176,45 @@ def test_h4a_live_prepare_refuses_pin_mismatch(tmp_path, monkeypatch):
     assert not (tmp_path / "h4a-A").exists()
 
 
+def test_h4a_live_prepare_refuses_a_version_string(tmp_path, monkeypatch, capsys):
+    monkeypatch.delenv("CLAUDECODE", raising=False)
+    monkeypatch.setattr(common, "antigravity_global_hooks", lambda: [])
+    assert h4a_arm.prepare(tmp_path, "h4a-A", False, "2.8.1") == 1
+    assert "must name the installed Antigravity.exe" in capsys.readouterr().err
+
+
+def test_h4a_agent_reply_is_echo_not_developer_delivery(tmp_path, monkeypatch):
+    monkeypatch.setenv("STUB_AG_REASON_TO", "none")
+    r = _h4a(tmp_path, monkeypatch, "B", {"nonce_seen_in_ui": True,
+                                           "nonce_ui_location": "agent_reply"})
+    assert r["label"] == common.INCONCLUSIVE
+
+
+def test_h4a_absence_needs_a_transcript_with_tool_results(tmp_path, monkeypatch):
+    monkeypatch.setenv("STUB_AG_STDERR_TO", "none")
+    _h4a_arm(tmp_path, "h4a-A", monkeypatch)
+    _h4a_arm(tmp_path, "h4a-A-ctl", monkeypatch)
+    for t in (tmp_path / "h4a-A" / "out").glob("transcript.*"):
+        t.unlink()
+    assert h4a_classify.classify_pair(tmp_path, "A")["label"] == common.INCONCLUSIVE
+
+
+def test_h4a_tool_failure_on_identical_input_is_side_effect(tmp_path, monkeypatch):
+    r = _h4a(tmp_path, monkeypatch, "B", {"agent_ran_tool": False})
+    assert r["same_tool_input_as_control"] is True
+    assert r["label"] == common.DELIVERED_WITH_SIDE_EFFECT
+
+
+def test_h4a_tool_failure_on_different_input_is_inconclusive(tmp_path, monkeypatch):
+    _h4a_arm(tmp_path, "h4a-B", monkeypatch, {"agent_ran_tool": False})
+    _h4a_arm(tmp_path, "h4a-B-ctl", monkeypatch)
+    log = tmp_path / "h4a-B" / "out" / "hook-log.jsonl"
+    log.write_text(log.read_text(encoding="utf-8").replace('"args_sha256": "', '"args_sha256": "x'),
+                   encoding="utf-8")
+    r = h4a_classify.classify_pair(tmp_path, "B")
+    assert r["same_tool_input_as_control"] is False and r["label"] == common.INCONCLUSIVE
+
+
 # ---------------------------------------------------------------- path summary
 
 def _c(label, accepted=True, cand="X"):
@@ -222,11 +263,20 @@ def test_h6b_persisted_context_is_host_record(tmp_path, monkeypatch):
     assert h6_classify.classify_pair(tmp_path, "h6b")["label"] == common.DELIVERED_TO_AGENT
 
 
-def test_h6b_no_record_anywhere_is_not_delivered(tmp_path, monkeypatch):
-    monkeypatch.setenv("STUB_H_API_MESSAGES", "0")
+def test_h6b_dropped_context_with_complete_record_is_not_delivered(tmp_path, monkeypatch):
+    monkeypatch.setenv("STUB_H_DROP_CONTEXT", "1")
+    _h6_pair(tmp_path, "h6b")
+    r = h6_classify.classify_pair(tmp_path, "h6b")
+    assert r["observer_complete"] and r["label"] == common.NOT_DELIVERED
+
+
+@pytest.mark.parametrize("knob", ["STUB_H_API_MESSAGES", "STUB_H_TRUNCATE"])
+def test_h6b_absence_without_complete_record_is_inconclusive(tmp_path, monkeypatch, knob):
+    monkeypatch.setenv(knob, "0" if knob == "STUB_H_API_MESSAGES" else "1")
     monkeypatch.setenv("STUB_H_ECHO", "0")
     _h6_pair(tmp_path, "h6b")
-    assert h6_classify.classify_pair(tmp_path, "h6b")["label"] == common.NOT_DELIVERED
+    r = h6_classify.classify_pair(tmp_path, "h6b")
+    assert r["label"] == common.INCONCLUSIVE and not r["observer_complete"]
 
 
 def test_h6a_transform_passes_in_host_record(tmp_path):
@@ -272,8 +322,38 @@ def test_h6_failed_turn_is_side_effect(tmp_path, monkeypatch):
     assert h6_arm.prepare(tmp_path, "h6a-T", True) == 0
     assert h6_arm.run(tmp_path, "h6a-T", _A()) == 0
     r = h6_classify.classify_pair(tmp_path, "h6a-T")
-    assert r["label"] == common.DELIVERED_WITH_SIDE_EFFECT
+    assert r["label"] == common.INCONCLUSIVE  # a failed turn is not attributable
     assert r["controls"]["turns_completed"] is False
+
+
+def test_h6a_identical_call_failing_only_with_emitter_is_side_effect(tmp_path, monkeypatch):
+    assert h6_arm.prepare(tmp_path, "h6a-T-ctl", True) == 0
+    assert h6_arm.run(tmp_path, "h6a-T-ctl", _A()) == 0
+    monkeypatch.setenv("STUB_H_TOOL_ERROR", "1")
+    assert h6_arm.prepare(tmp_path, "h6a-T", True) == 0
+    assert h6_arm.run(tmp_path, "h6a-T", _A()) == 0
+    r = h6_classify.classify_pair(tmp_path, "h6a-T")
+    assert r["label"] == common.DELIVERED_WITH_SIDE_EFFECT
+
+
+def test_h6a_next_turn_in_a_new_session_never_emits(tmp_path, monkeypatch):
+    monkeypatch.setenv("STUB_H_RESUME_NEW_SESSION", "1")
+    _h6_pair(tmp_path, "h6a-N")
+    r = h6_classify.classify_pair(tmp_path, "h6a-N", True)
+    assert r["label"] == common.NOT_EXECUTED
+
+
+def test_h6a_candidate_t_needs_owner_decision_to_bind(tmp_path):
+    _h6_pair(tmp_path, "h6a-N")
+    _h6_pair(tmp_path, "h6a-T")
+    for arm in ("h6a-N", "h6a-T"):
+        assert h6_classify.main(["x", "pair", str(tmp_path), arm]) == 0
+    assert h6_classify.main(["x", "path", str(tmp_path), "H6a"]) == 0
+    res = common.read_json(tmp_path / "outcome.H6a.json")
+    assert res["label"] == common.INCONCLUSIVE and res["bound_shape"] is None
+    assert h6_classify.main(["x", "path", str(tmp_path), "H6a", "--accept-candidate-T"]) == 0
+    res = common.read_json(tmp_path / "outcome.H6a.json")
+    assert res["label"] == common.DELIVERED_TO_AGENT and res["bound_shape"] == "T"
 
 
 def test_h6a_and_h6b_are_separate(tmp_path):
@@ -307,8 +387,7 @@ def test_h6_live_refuses_stub_and_missing_pins(tmp_path, monkeypatch):
 
     class Live(_A):
         selftest, live = False, True
-        hermes = str(h6_arm.STUB)
-        python = sys.executable
+        python = sys.executable  # hermes-agent is not installed here: pin mismatch
     assert h6_arm.run(tmp_path, "h6b", Live()) == 1
     assert not (tmp_path / "h6b" / "out" / "arm.json").exists()
 

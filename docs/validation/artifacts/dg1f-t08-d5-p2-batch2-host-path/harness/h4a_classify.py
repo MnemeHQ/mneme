@@ -35,6 +35,10 @@ MODEL_BOUND_ROLES = {"user", "tool", "function", "tool_result"}
 ECHO_ROLES = {"assistant", "model"}
 REVIEW_BOOLS = ("agent_ran_tool", "permission_prompt_shown",
                 "host_error_or_block_shown", "nonce_seen_in_ui")
+# Where the reviewer saw the nonce. "agent_reply" is the agent's own text:
+# an echo, never developer delivery (section 6, DELIVERED_TO_USER_ONLY).
+UI_LOCATIONS = ("none", "agent_reply", "hook_notice", "error_dialog", "tool_output_panel",
+                "other_host_ui")
 
 
 def _role(entry):
@@ -95,17 +99,37 @@ def _review_problems(review, arm_meta, pin) -> list:
         p.append("no screen recording bound to the arm")
     elif review.get("recording_sha256") != arm_meta.get("recording_sha256"):
         p.append("capture review is not bound to this arm's recording")
+    if review.get("nonce_ui_location") not in UI_LOCATIONS:
+        p.append(f"nonce_ui_location must be one of {UI_LOCATIONS}")
     shown = check_pins.normalize(str(review.get("host_version_shown", "")))
     if shown != pin:
         p.append(f"host version {shown or 'unrecorded'} differs from pin {pin}")
     return p
 
 
-def _controls(review, arm_meta) -> dict:
+def _controls(review) -> dict:
     return {
-        "tool_executed": bool(review.get("agent_ran_tool")) and arm_meta.get("notes_after") == "beta\n",
+        "tool_executed": review.get("agent_ran_tool") is True,
         "no_host_error_or_block": review.get("host_error_or_block_shown") is False,
     }
+
+
+def _args(hooks) -> set:
+    return {h.get("args_sha256") for h in hooks if h.get("args_sha256")}
+
+
+def transcript_shows_tool_results(out: Path) -> bool:
+    """The copied transcript is shown to carry model-bound tool results, so the
+    nonce's absence from it can be evidence (provisional table)."""
+    for t in out.glob("transcript.*"):
+        for line in t.read_text(encoding="utf-8", errors="replace").splitlines():
+            try:
+                e = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(e, dict) and _role(e) in ("tool", "function", "tool_result"):
+                return True
+    return False
 
 
 def classify_pair(root: Path, cand: str, pin: str = None) -> dict:
@@ -138,38 +162,58 @@ def classify_pair(root: Path, cand: str, pin: str = None) -> dict:
     nonce = (out / "nonce.txt").read_text(encoding="utf-8").strip()
     res["nonce"] = nonce
     leaked = common.tree_text_contains(root / ctl, nonce)
-    ctl_controls = _controls(creview, cmeta)
-    controls = _controls(review, meta)
-    controls["file_matches_control"] = meta.get("notes_after") == cmeta.get("notes_after")
+    ctl_controls = _controls(creview)
+    controls = _controls(review)
     controls["permission_prompt_as_control"] = (
         review.get("permission_prompt_shown") == creview.get("permission_prompt_shown"))
+    same_input = bool(_args(hooks)) and _args(hooks) == _args(chooks)
+    if same_input:  # section 3.1: compare file bytes only for the same tool input
+        controls["file_matches_control"] = meta.get("notes_after") == cmeta.get("notes_after")
     locs = transcript_locations(out, nonce)
     agent = any(l["category"] == "model_bound" for l in locs)
-    echo = any(l["category"] == "echo" for l in locs)
-    dev = review.get("nonce_seen_in_ui") is True
-    ok = all(controls.values())
+    ui_loc = review.get("nonce_ui_location")
+    echo = any(l["category"] == "echo" for l in locs) or ui_loc == "agent_reply"
+    dev = review.get("nonce_seen_in_ui") is True and ui_loc not in ("none", "agent_reply")
+    shows_tools = transcript_shows_tool_results(out)
+    inconclusive, side_effects = [], []
+    # Attribution (section 3 step 4): a changed permission prompt is host-induced;
+    # a failed tool or a host error is host-induced only when the control made the
+    # identical call cleanly; anything else is not attributable.
+    if not controls["permission_prompt_as_control"]:
+        side_effects.append("permission prompt differs from the control")
+    failed = [k for k in ("tool_executed", "no_host_error_or_block", "file_matches_control")
+              if controls.get(k) is False]
+    if failed:
+        if same_input and all(ctl_controls.values()):
+            side_effects.append(f"host-induced on the identical tool call: {failed}")
+        else:
+            inconclusive.append(f"control failure not attributable to the emitter: {failed}")
+    ok = not side_effects and not inconclusive
     res.update(locations=locs, controls=controls, control_arm_controls=ctl_controls,
+               same_tool_input_as_control=same_input, transcript_shows_tool_results=shows_tools,
                accepted_without_side_effect=ok, developer_also=dev if agent else "not_observed")
-    inconclusive = []
     if leaked:
         inconclusive.append(f"nonce found in the control arm: {leaked}")
     if not all(ctl_controls.values()):
         inconclusive.append("control arm failed its own path-type control")
     if any(l["category"] == "unclassified" for l in locs):
         inconclusive.append("unclassified nonce location")
-    if echo and not (agent or dev):
-        inconclusive.append("echo without recorded delivery")
-    if not agent and not dev and meta.get("transcript_copied") is None:
-        inconclusive.append("no delivery seen and no transcript collected")
+    if echo and not agent:
+        inconclusive.append("echo without model-bound delivery (whatever the developer saw)")
+    if not agent and not shows_tools:
+        inconclusive.append("transcript not collected, or not shown to carry model-bound tool "
+                            "results: absence from it is not evidence")
     if inconclusive:
-        res.update(label=common.INCONCLUSIVE, reasons=inconclusive)
+        res.update(label=common.INCONCLUSIVE, reasons=inconclusive + side_effects)
         return res
     if agent or dev:
-        label = (common.DELIVERED_WITH_SIDE_EFFECT if not ok else
+        label = (common.DELIVERED_WITH_SIDE_EFFECT if side_effects else
                  common.DELIVERED_TO_AGENT if agent else common.DELIVERED_TO_USER_ONLY)
     else:
         label = common.NOT_DELIVERED
     res["label"] = label
+    if side_effects:
+        res["reasons"] = side_effects
     return res
 
 

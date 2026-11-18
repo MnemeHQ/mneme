@@ -24,6 +24,7 @@ the hook config or the environment. Each invocation appends one line to
 ``<out_dir>/hook-log.jsonl`` with selected envelope fields (no prompt text)
 and the exact bytes emitted on stdout and stderr.
 """
+import hashlib
 import json
 import sys
 from datetime import datetime, timezone
@@ -36,6 +37,18 @@ ENVELOPE_KEYS = ("stepIdx", "conversationId", "transcriptPath", "modelName",
 def notice(nonce):
     return (f"{nonce} This is a Mneme H4a channel-probe notice. "
             "It carries no instruction and requires no action.")
+
+
+def _masked_args(args, env) -> str:
+    """Tool arguments with each workspace path masked, so the emitter and the
+    control arm (different disposable directories) hash the same call alike."""
+    text = json.dumps(args, sort_keys=True, default=str)
+    paths = env.get("workspacePaths") if isinstance(env.get("workspacePaths"), list) else []
+    for p in sorted((str(x) for x in paths), key=len, reverse=True):
+        for form in {p, p.replace("\\", "/"), json.dumps(p)[1:-1]}:
+            if form:
+                text = text.replace(form, "<WS>")
+    return text
 
 
 def main(argv) -> int:
@@ -66,6 +79,7 @@ def main(argv) -> int:
         "mode": mode,
         "envelope": {k: env.get(k) for k in ENVELOPE_KEYS if k in env},
         "tool_name": tool.get("name"),
+        "args_sha256": hashlib.sha256(_masked_args(tool.get("args"), env).encode("utf-8")).hexdigest(),
         "emitted_stdout": emitted,
         "emitted_stderr": err,
     }

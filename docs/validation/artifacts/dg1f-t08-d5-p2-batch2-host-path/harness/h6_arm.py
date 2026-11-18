@@ -3,7 +3,7 @@
 usage:
   h6_arm.py prepare <live_root> <arm> [--selftest]
   h6_arm.py run     <live_root> <arm> --selftest
-  h6_arm.py run     <live_root> <arm> --live --hermes <exe> --python <py> --model <m> --provider <p>
+  h6_arm.py run     <live_root> <arm> --live --python <py> --model <m> --provider <p>
 
 Arms, each with its own nonce, session, HERMES_HOME and outcome:
 
@@ -17,16 +17,22 @@ the shape the accepted probe scope names (section 4); T second, because
 name (README, discrepancy D4).
 
 **A live run is not authorized by this harness or its PR.** The live path
-refuses unless every section 7 guard holds: the hermes-agent pin, no
-``CLAUDECODE``, no ``MNEME_*`` variable, a disposable live root, a clean
-harness, and at least one provider-credential variable present (its value is
-never logged; the leak scan checks every evidence file). Each arm gets its
-own ``HERMES_HOME``, so no user configuration, plugin or session is loaded.
+refuses unless every section 7 guard holds: the pinned live root, the
+hermes-agent pin in ``--python`` (which is also the interpreter that runs the
+host, ``python -m hermes_cli.main``), no ``CLAUDECODE``, no ``MNEME_*``
+variable, a committed harness, and at least one provider-credential variable
+present. The host gets an allowlisted environment: system variables, the
+named credential variables and the arm's own ``HERMES_HOME``, so no user
+configuration, plugin or session is loaded. The leak scan checks every
+evidence file for the credential values.
 
-Host flags used (present in ``hermes_cli/main.py`` at the 0.19.0 tag; their
-runtime behavior is unverified until shape discovery): ``-z/--oneshot``,
-``-m/--model``, ``--provider``, and ``-c/--continue`` for candidate N's
-second turn.
+Host invocation (flags present in ``hermes_cli/_parser.py`` at the 0.19.0 tag;
+runtime behavior unverified until shape discovery): ``chat -Q -q <prompt>``
+(non-interactive single query) and, for candidate N's second turn,
+``--resume <session_id>`` with the session the plugin recorded in turn 1.
+``-z/--oneshot`` is NOT used: it ignores ``--continue``/``--resume``
+(``run_oneshot`` takes no session argument) and forces ``HERMES_YOLO_MODE=1``
+and ``HERMES_ACCEPT_HOOKS=1`` (``hermes_cli/oneshot.py``).
 """
 import argparse
 import hashlib
@@ -46,10 +52,10 @@ STUB = HERE / "selftest" / "stub_hermes.py"
 ARMS = {
     "h6b": ("H6b", "context", "h6b-context", 1),
     "h6b-ctl": ("H6b", "context", "noop", 1),
-    "h6a-T": ("H6a", "T", "h6a-transform", 1),
-    "h6a-T-ctl": ("H6a", "T", "noop", 1),
     "h6a-N": ("H6a", "N", "h6a-next-turn", 2),
     "h6a-N-ctl": ("H6a", "N", "noop", 2),
+    "h6a-T": ("H6a", "T", "h6a-transform", 1),
+    "h6a-T-ctl": ("H6a", "T", "noop", 1),
 }
 PROMPT_1 = ("Use the write_file tool to overwrite notes.txt in the current directory with "
             "exactly the single line: beta. Then, if you received any token beginning "
@@ -57,10 +63,18 @@ PROMPT_1 = ("Use the write_file tool to overwrite notes.txt in the current direc
             "verbatim; otherwise say: none.")
 PROMPT_2 = ("If you received any token beginning MNEME-PROBE- from a hook, a tool result "
             "or injected context at any point, repeat it verbatim; otherwise say: none.")
+SYSTEM_VARS = ("PATH", "PATHEXT", "SYSTEMROOT", "SYSTEMDRIVE", "COMSPEC", "WINDIR", "TEMP",
+               "TMP", "USERPROFILE", "HOMEDRIVE", "HOMEPATH", "APPDATA", "LOCALAPPDATA",
+               "LANG", "LC_ALL", "HOME")
+PAYLOAD_MAX = "10000000"  # observer sees complete messages; the model input is unaffected
 
 
 def sha256(path) -> str:
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def credential_vars() -> list:
+    return [v for v in check_pins.pins()["HERMES_CREDENTIAL_VARS"].split(",") if v]
 
 
 def prepare(root: Path, arm: str, selftest: bool) -> int:
@@ -77,9 +91,8 @@ def prepare(root: Path, arm: str, selftest: bool) -> int:
         print(f"{d} exists: a prepared or finished arm is never reused", file=sys.stderr)
         return 1
     ws, out, home = d / "ws", d / "out", d / "home"
-    out.mkdir(parents=True)
-    home.mkdir(parents=True)
-    ws.mkdir(parents=True)
+    for p in (out, home, ws):
+        p.mkdir(parents=True)
     (ws / "notes.txt").write_text("alpha\n", encoding="utf-8", newline="\n")
     shutil.copytree(HERE / "h6_plugin", ws / ".hermes" / "plugins" / "mneme_probe",
                     ignore=shutil.ignore_patterns("__pycache__"))
@@ -98,47 +111,69 @@ def prepare(root: Path, arm: str, selftest: bool) -> int:
     return 0
 
 
-def _live_problems(a) -> list:
+def harness_dirty() -> str:
+    proc = subprocess.run(["git", "-C", str(HERE), "status", "--porcelain", "--", "."],
+                          capture_output=True, text=True, check=False)
+    if proc.returncode != 0:
+        return "cannot verify the harness is committed (git status failed)"
+    return "harness has uncommitted changes" if proc.stdout.strip() else ""
+
+
+def _live_problems(root: Path, a) -> list:
     p = common.guard_env()
-    if not a.hermes or Path(a.hermes).resolve() == STUB.resolve():
-        p.append("--hermes must name the real hermes executable, never the self-test stub")
-    if not a.python:
-        p.append("--python (the interpreter hermes-agent is installed in) is required")
+    want = Path(check_pins.pins()["LIVE_ROOT_W"]).resolve()
+    if root != want:
+        p.append(f"live root {root} is not the pinned live root {want}")
+    if not a.python or not Path(a.python).is_file():
+        p.append("--python must name the interpreter hermes-agent is installed in")
     else:
         ok, msg = check_pins.check("hermes", a.python)
         if not ok:
             p.append(msg)
     if not (a.model and a.provider):
         p.append("--model and --provider are required for a live arm")
-    names = check_pins.pins()["HERMES_CREDENTIAL_VARS"].split(",")
-    if not any(os.environ.get(n) for n in names):
+    if not any(os.environ.get(n) for n in credential_vars()):
         p.append("no provider-credential variable is set (supplied by the operator only)")
-    dirty = subprocess.run(["git", "status", "--porcelain", "--", str(HERE)],
-                           capture_output=True, text=True, check=False).stdout.strip()
+    dirty = harness_dirty()
     if dirty:
-        p.append("harness has uncommitted changes; a live run uses a committed harness only")
+        p.append(dirty)
     return p
 
 
+def host_env(home: Path, selftest: bool) -> dict:
+    keep = set(SYSTEM_VARS) | set(credential_vars())
+    env = {k: v for k, v in os.environ.items() if k in keep}
+    if selftest:
+        env.update({k: v for k, v in os.environ.items() if k.startswith("STUB_H_")})
+    env.update(HERMES_HOME=str(home), HERMES_ENABLE_PROJECT_PLUGINS="true",
+               HERMES_PLUGIN_PAYLOAD_MAX_CHARS=PAYLOAD_MAX, PYTHONIOENCODING="utf-8")
+    return env
+
+
 def dump_sessions(home: Path, out: Path) -> int:
-    """Copy every SQLite file under HERMES_HOME and dump all rows as JSONL."""
+    """Back up every SQLite file under HERMES_HOME (WAL-safe) and dump all rows."""
     rows = 0
     for db in sorted(home.rglob("*.db")):
-        shutil.copyfile(db, out / f"session.{db.stem}.db")
-        con = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
+        copy = out / f"session.{db.stem}.db"
+        src = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
+        dst = sqlite3.connect(copy)
         try:
-            con.row_factory = sqlite3.Row
-            tables = [r[0] for r in con.execute(
+            src.backup(dst)
+        finally:
+            src.close()
+        try:
+            dst.row_factory = sqlite3.Row
+            tables = [r[0] for r in dst.execute(
                 "select name from sqlite_master where type='table'")]
             for t in tables:
-                for r in con.execute(f'select * from "{t}"'):
+                for r in dst.execute(f'select * from "{t}"'):
                     rec = {"_db": db.name, "_table": t}
                     rec.update({k: (r[k] if not isinstance(r[k], bytes) else "<bytes>")
                                 for k in r.keys()})
                     common.append_jsonl(out / "session.jsonl", rec)
                     rows += 1
         finally:
-            con.close()
+            dst.close()
     return rows
 
 
@@ -156,37 +191,40 @@ def run(root: Path, arm: str, a) -> int:
         if not probe.get("selftest"):
             print("a live-prepared arm cannot be run against the stub", file=sys.stderr)
             return 1
-        base = [sys.executable, str(STUB)]
-        host_version = "selftest-stub"
+        base, host_version = [sys.executable, str(STUB)], "selftest-stub"
     else:
-        problems = _live_problems(a) + (["arm was prepared for selftest"] if probe.get("selftest") else [])
+        problems = _live_problems(root, a)
+        if probe.get("selftest"):
+            problems.append("arm was prepared for selftest")
         if problems:
             print("h6 live run refused:\n  " + "\n  ".join(problems), file=sys.stderr)
             return 1
-        base = [a.hermes]
-        host_version = check_pins.hermes_version(a.python)
-    env = {k: v for k, v in os.environ.items() if not k.startswith("MNEME_")}
-    env.update(HERMES_HOME=str(home), HERMES_ENABLE_PROJECT_PLUGINS="true")
-    codes = []
+        base, host_version = [a.python, "-m", "hermes_cli.main"], check_pins.hermes_version(a.python)
+    env = host_env(home, a.selftest)
+    codes, notes = [], []
     for i, prompt in enumerate(probe["prompts"], 1):
-        cmd = base + ["-z", prompt]
+        cmd = base + ["chat", "-Q", "-q", prompt]
         if not a.selftest:
             cmd += ["-m", a.model, "--provider", a.provider]
         if i > 1:
-            cmd += ["-c"]
+            sid = (common.read_json(out / "plugin-state.json") or {}).get("sessions") or []
+            if not sid:
+                notes.append(f"turn {i} not run: no session recorded in turn 1")
+                break
+            cmd += ["--resume", sid[0]]
         proc = subprocess.run(cmd, cwd=ws, env=env, capture_output=True, text=True,
                               encoding="utf-8", errors="replace", timeout=900)
         (out / f"turn{i}.stdout").write_text(proc.stdout, encoding="utf-8", newline="\n")
         (out / f"turn{i}.stderr").write_text(proc.stderr, encoding="utf-8", newline="\n")
         codes.append(proc.returncode)
     rows = dump_sessions(home, out)
-    names = check_pins.pins()["HERMES_CREDENTIAL_VARS"].split(",")
-    notes = ws / "notes.txt"
+    nf = ws / "notes.txt"
     common.write_json(out / "arm.json", {
         "arm": arm, "finished": common.now(), "host_version": host_version,
-        "turn_exit_codes": codes, "session_rows": rows,
-        "notes_after": notes.read_text(encoding="utf-8") if notes.is_file() else None,
-        "credential_leaks": common.leak_scan(d, names),
+        "turn_exit_codes": codes, "turns_planned": len(probe["prompts"]), "notes": notes,
+        "session_rows": rows,
+        "notes_after": nf.read_text(encoding="utf-8") if nf.is_file() else None,
+        "credential_leaks": common.leak_scan(d, credential_vars()),
         "harness_sha256": {p.name: sha256(p) for p in sorted(HERE.glob("*.py"))},
     })
     print(f"ran {d}: exit codes {codes}, {rows} session rows")
@@ -200,7 +238,6 @@ def main(argv) -> int:
     ap.add_argument("arm")
     ap.add_argument("--selftest", action="store_true")
     ap.add_argument("--live", action="store_true")
-    ap.add_argument("--hermes", default="")
     ap.add_argument("--python", default="")
     ap.add_argument("--model", default="")
     ap.add_argument("--provider", default="")

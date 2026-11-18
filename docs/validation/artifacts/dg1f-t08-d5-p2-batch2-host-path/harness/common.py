@@ -112,10 +112,11 @@ def guard_live_root(root) -> list:
     r = Path(root).resolve()
     if (r / ".git").exists():
         problems.append(f"live root {r} is a Git checkout")
-    for anc in r.parents:
+    for anc in (r, *r.parents):
         for marker in LOADABLE_ABOVE:
-            if (anc / marker).exists():
-                problems.append(f"ancestor {anc} has {marker}")
+            if marker != ".git" or anc != r:
+                if (anc / marker).exists():
+                    problems.append(f"{'live root' if anc == r else 'ancestor'} {anc} has {marker}")
     return problems
 
 
@@ -154,32 +155,36 @@ def leak_scan(root, credential_vars, environ=None) -> list:
     return leaks
 
 
-def summarize_path(path_id: str, candidates: list) -> dict:
+def summarize_path(path_id: str, candidates: list, pending=()) -> dict:
     """Combine per-candidate outcomes for one path, in pre-registered order.
 
     Shape discovery (probe scope section 5) tries candidates in a fixed
-    order. The path takes the first PASSING candidate as its bound shape
-    (shape binding, section 3 step 5). With none passing, an unresolved
-    candidate (NOT_EXECUTED, INCONCLUSIVE) makes the path unresolved, to be
-    re-run first (D4). Otherwise, if no candidate was accepted by the host
-    without side effects, the path is NO_NONBLOCKING_CHANNEL (section 6).
+    order. The path takes the first PASSING eligible candidate as its bound
+    shape (shape binding, section 3 step 5). A candidate named in
+    ``pending`` awaits an owner decision and is never bound; while it is
+    pending, the path cannot fail, because that candidate might pass. With
+    no eligible candidate passing:
+    - an unresolved candidate (NOT_EXECUTED, INCONCLUSIVE) or a pending one
+      leaves the path unresolved, to be re-run or decided first;
+    - otherwise, if no candidate was accepted by the host without side
+      effects, the path is NO_NONBLOCKING_CHANNEL (section 6).
     """
-    labels = [c.get("label") for c in candidates]
-    for c in candidates:
+    eligible = [c for c in candidates if c.get("candidate") not in pending]
+    base = {"path": path_id, "bound_shape": None, "candidates": candidates,
+            "pending_owner_decision": sorted(pending), "rules": RULES}
+    for c in eligible:
         if c.get("label") in PASSING:
-            return {"path": path_id, "label": c["label"], "bound_shape": c.get("candidate"),
-                    "candidates": candidates, "rules": RULES}
+            return {**base, "label": c["label"], "bound_shape": c.get("candidate")}
+    labels = [c.get("label") for c in eligible]
     for unresolved in (NOT_EXECUTED, INCONCLUSIVE):
         if unresolved in labels:
-            return {"path": path_id, "label": unresolved, "bound_shape": None,
-                    "candidates": candidates, "rules": RULES}
-    accepted = [c for c in candidates if c.get("accepted_without_side_effect")]
-    if not candidates or not accepted:
-        label = NO_NONBLOCKING_CHANNEL
-    else:
-        label = accepted[0]["label"]
-    return {"path": path_id, "label": label, "bound_shape": None,
-            "candidates": candidates, "rules": RULES}
+            return {**base, "label": unresolved}
+    if pending:
+        return {**base, "label": INCONCLUSIVE,
+                "reasons": [f"candidate(s) {sorted(pending)} await an owner decision"]}
+    accepted = [c for c in eligible if c.get("accepted_without_side_effect")]
+    label = accepted[0]["label"] if accepted else NO_NONBLOCKING_CHANNEL
+    return {**base, "label": label}
 
 
 def mask(text: str, *paths) -> str:

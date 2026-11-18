@@ -1,6 +1,6 @@
 """Self-test stub for hermes-agent: NOT Hermes, and never evidence.
 
-usage (from h6_arm.py run --selftest only): stub_hermes.py -z <prompt> [-c]
+usage (from h6_arm.py run --selftest only): stub_hermes.py chat -Q -q <prompt> [--resume <id>]
 
 It mimics the hermes-agent 0.19.0 plugin contract that the harness depends
 on, as read from the upstream source at tag v2026.7.20:
@@ -12,10 +12,17 @@ on, as read from the upstream source at tag v2026.7.20:
 - pre_tool_call honors only {"action": "block"|"approve"}; anything else is
   ignored;
 - post_tool_call is observational; transform_tool_result's first str wins and
-  is what the session DB records.
+  is what the session DB records;
+- ``chat -q`` is a single non-interactive query; ``--resume <id>`` continues
+  that session, and without it every invocation starts a new session. The
+  stub rejects ``-z``, which cannot resume on 0.19.0.
 
 Behavior knobs (environment, test-only):
   STUB_H_API_MESSAGES=0      pre_api_request receives no ``messages`` kwarg
+  STUB_H_TRUNCATE=1          pre_api_request receives a truncated payload
+  STUB_H_RESUME_NEW_SESSION=1  --resume silently starts a new session
+  STUB_H_DROP_CONTEXT=1      the host calls pre_llm_call but drops its context
+  STUB_H_TOOL_ERROR=1        the probed tool call errors
   STUB_H_IGNORE_TRANSFORM=1  the host calls transform_tool_result but drops its return
   STUB_H_MUTATE_RESULT=1     the host alters the transformed result (side effect)
   STUB_H_PERSIST_CONTEXT=1   the host persists injected context (counterfactual)
@@ -75,15 +82,23 @@ def load_plugins(home: Path) -> Ctx:
 
 
 def main(argv):
-    prompt = argv[argv.index("-z") + 1]
-    cont = "-c" in argv
+    if "-z" in argv or argv[1:2] != ["chat"] or "-q" not in argv:
+        print("stub: only `chat -Q -q <prompt> [--resume <id>]` is supported", file=sys.stderr)
+        return 2
+    prompt = argv[argv.index("-q") + 1]
+    resume = argv[argv.index("--resume") + 1] if "--resume" in argv else None
     home = Path(os.environ["HERMES_HOME"])
     db = sqlite3.connect(home / "state.db")
     db.execute("create table if not exists messages (session_id text, role text, content text)")
     db.execute("create table if not exists sessions (id text)")
-    prior = db.execute("select id from sessions").fetchall()
-    sid = prior[-1][0] if (cont and prior) else f"s{len(prior) + 1}"
-    if not (cont and prior):
+    known = [r[0] for r in db.execute("select id from sessions")]
+    if resume and resume not in known:
+        print(f"stub: unknown session {resume}", file=sys.stderr)
+        return 1
+    if resume and knob("STUB_H_RESUME_NEW_SESSION") == "1":
+        resume = None  # counterfactual: the host silently starts a new session
+    sid = resume or f"s{len(known) + 1}"
+    if not resume:
         db.execute("insert into sessions values (?)", (sid,))
     history = [{"role": r, "content": c} for r, c in
                db.execute("select role, content from messages where session_id=?", (sid,))]
@@ -93,6 +108,8 @@ def main(argv):
                       model="stub", platform="cli")
     injected = [c["context"] if isinstance(c, dict) else c for c in ctxs
                 if isinstance(c, (dict, str))]
+    if knob("STUB_H_DROP_CONTEXT") == "1":
+        injected = []
     api_user = prompt + "".join("\n\n" + str(c) for c in injected)
     db.execute("insert into messages values (?,?,?)",
                (sid, "user", api_user if knob("STUB_H_PERSIST_CONTEXT") == "1" else prompt))
@@ -101,22 +118,28 @@ def main(argv):
     def api_request():
         if knob("STUB_H_API_MESSAGES") == "0":
             ctx.invoke("pre_api_request", model="stub")
+        elif knob("STUB_H_TRUNCATE") == "1":
+            ctx.invoke("pre_api_request", model="stub",
+                       messages=[{"_truncated": True, "preview": "..."}])
         else:
             ctx.invoke("pre_api_request", model="stub", messages=list(messages))
 
     api_request()
     if not history and "write_file" in prompt and knob("STUB_H_NO_TOOL") != "1":
         args = {"path": "notes.txt", "content": "beta\n"}
-        directive = next((r for r in ctx.invoke("pre_tool_call", tool_name="write_file", args=args)
+        directive = next((r for r in ctx.invoke("pre_tool_call", tool_name="write_file", args=args,
+                                                session_id=sid)
                           if isinstance(r, dict) and r.get("action") in ("block", "approve")), None)
-        if directive:
+        if knob("STUB_H_TOOL_ERROR") == "1":
+            result, status = json.dumps({"error": "tool failed"}), "error"
+        elif directive:
             result = json.dumps({"error": directive.get("message") or "approval required"})
             status = "blocked"
         else:
             Path("notes.txt").write_text("beta\n", encoding="utf-8", newline="\n")
             result, status = json.dumps({"success": True, "path": "notes.txt"}), "ok"
         ctx.invoke("post_tool_call", tool_name="write_file", args=args, result=result, status=status,
-                   error_type=None if status == "ok" else "blocked")
+                   error_type=None if status == "ok" else "blocked", session_id=sid)
         returned = ctx.invoke("transform_tool_result", tool_name="write_file", args=args,
                               result=result, status=status)
         if knob("STUB_H_IGNORE_TRANSFORM") != "1":

@@ -22,6 +22,7 @@ unless the installed Antigravity matches the pin.
 import argparse
 import hashlib
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -38,11 +39,13 @@ MATCHER = "write_to_file|replace_file_content|multi_replace_file_content"
 PROMPT = ("In notes.txt, replace the word alpha with beta, using your file-editing tool. "
           "Then, if you received any token beginning MNEME-PROBE- from a hook, a tool "
           "result or a system notice, repeat it verbatim; otherwise say: none.")
+# nonce_ui_location: one of h4a_classify.UI_LOCATIONS. "agent_reply" means the
+# agent's own chat text showed it: an echo, never developer delivery.
 REVIEW_TEMPLATE = {
     "reviewer": "", "recording_sha256": "", "host_version_shown": "",
     "agent_ran_tool": None, "permission_prompt_shown": None,
     "host_error_or_block_shown": None, "nonce_seen_in_ui": None,
-    "nonce_ui_location": "", "notes": "",
+    "nonce_ui_location": "none", "notes": "",
 }
 
 
@@ -58,8 +61,15 @@ def prepare(root: Path, arm: str, selftest: bool, antigravity: str) -> int:
     if not selftest:
         problems += common.guard_env()
         problems += common.antigravity_global_hooks()
-        if not antigravity:
-            problems.append("--antigravity <Antigravity.exe> is required for a live arm")
+        want = Path(check_pins.pins()["LIVE_ROOT_W"]).resolve()
+        if root != want:
+            problems.append(f"live root {root} is not the pinned live root {want}")
+        dirty = subprocess.run(["git", "-C", str(HERE), "status", "--porcelain", "--", "."],
+                               capture_output=True, text=True, check=False)
+        if dirty.returncode != 0 or dirty.stdout.strip():
+            problems.append("harness is not verifiably committed")
+        if not antigravity or not Path(antigravity).is_file():
+            problems.append("--antigravity must name the installed Antigravity.exe for a live arm")
         else:
             ok, msg = check_pins.check("antigravity", antigravity)
             if not ok:
