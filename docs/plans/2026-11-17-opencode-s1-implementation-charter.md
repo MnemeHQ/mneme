@@ -496,3 +496,73 @@ already present in PR #824 at
 text.
 
 **No support claim.** This amendment makes no support-level declaration.
+
+---
+
+## Amendment — decouple S1 validation from OpenShell (2026-11-18)
+
+**Status:** PROPOSED — not authorization until merged. On merge, it supersedes
+only the OpenShell and runtime-image fields in §16.2 and applies only to
+validation runs started after it takes effect.
+
+**Amends:** §16.2 pre-validation evidence gate.
+
+**Rationale.** The S1 path is OpenCode `execute.before` to the Python bridge to
+the canonical Mneme checker. OpenShell is not invoked to evaluate, allow or block
+the write, and the October 22 contract itself treats OpenShell gateway admission
+and infrastructure-resource governance as deferred. The OpenShell version and
+image fields in §16.2 were carried over from that optional reference experiment;
+they are not a technical dependency of the OpenCode integration.
+
+**Authorized change.** For OpenCode integration validation (S1-A), the §16.2
+environment gate is satisfied by:
+
+- host version and host OS;
+- the actual runtime environment (bare metal, VM or container) and, only when a
+  container is used, its image digest;
+- Python version;
+- memory schema (`v1` or `v2`);
+- plugin, bridge and checker SHA-256;
+- DeepSeek V4.1 model identity;
+- independent validator identity and environment;
+- sanitized evidence copies and file-state witnesses;
+- source and configuration hashes.
+
+OpenShell version and OpenShell-specific reproducibility fields are **not**
+required for S1-A. They remain required only for an OpenShell experiment under
+the [October 22 OpenShell + OpenCode acceptance contract](2026-10-22-openshell-opencode-reference-integration-acceptance-contract.md),
+which this amendment does not modify.
+
+**S1-A.** The immediate validation objective is the pinned OpenCode `2.3.0` V2
+host with DeepSeek V4.1, an independent validator, and a reproducible
+environment. Linux is preferred because the shared unrouted carrier is text-mode
+and the Windows byte-fidelity fixture is a known failure/limitation; no OpenShell
+dependency is created merely to obtain Linux.
+
+**S1-B.** ContextOS environment validation is separate and is not authorized by
+this amendment. It requires platform access and its own environment pins,
+activation, filesystem/path, model-access and deployment-boundary validation.
+
+**Preserved findings.** The Windows byte-fidelity failure remains recorded and
+unresolved. Race resistance remains `NOT_ESTABLISHED` for any undetected case.
+The six host-identifier evidence ceiling remains, and `EXECUTION_OBSERVED` is not
+claimed when `callID` is absent. No support-level, production-readiness or Core
+change is made.
+
+**Not retroactive.** This amendment does not convert any prior BLOCKED or
+inconclusive validation result into PASS. It applies only to validation runs
+started after it takes effect. The previously accepted OpenShell requirement
+remains the governing text for runs before that point.
+
+**Freeze review.** The Layer 1 freeze S1 amendment's validation clause requires
+the pinned host, DeepSeek V4.1, setup and activation, a verified-new-file `.py`
+target, exact BLOCK/ALLOW/negative-space criteria, sanitized evidence and
+host-side file-state witnesses. It does not name OpenShell or an image digest.
+This amendment preserves every one of those requirements, so no Layer 1 freeze
+amendment is required. Retrieval and enforcement behavior, the evidence ceiling
+and the support-matrix boundary remain unchanged.
+
+**Ordering.** This documentation-only amendment must be reviewed and accepted
+before S1-A validation starts. It does not modify PR #824 or authorize a merge.
+
+**No support claim.** This amendment makes no support-level declaration.
