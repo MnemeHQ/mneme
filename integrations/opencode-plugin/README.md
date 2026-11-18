@@ -73,6 +73,11 @@ complete payload, the pinned rule's canonical applicability entry, and all six
 raw host identifiers (`tool`, `sessionID`, `callID`, `agent`, `messageID`,
 `eventID`). Missing identifiers downgrade the claim to `none`.
 
+The pinned G0 event contract exposes `id` but not `callID`. The plugin forwards
+`callID: null` rather than synthesizing one from `id`; on that host the identity
+gate is therefore incomplete and the claim is `none`. Reaching
+`EXECUTION_OBSERVED` requires a host event that supplies all six identifiers.
+
 A `block` decision is not a host-prevention observation. The bridge always emits
 `host_witness: null`; a validator-owned host-side witness (tool status/error and
 target state) must be recorded separately. The bridge never infers prevention

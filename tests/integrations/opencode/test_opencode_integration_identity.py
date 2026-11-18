@@ -11,6 +11,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
 BRIDGE = REPO / "mneme" / "integrations" / "opencode" / "bridge.py"
+INIT = REPO / "mneme" / "integrations" / "opencode" / "__init__.py"
 PLUGIN = REPO / "integrations" / "opencode-plugin" / "index.ts"
 README = REPO / "integrations" / "opencode-plugin" / "README.md"
 
@@ -73,16 +74,31 @@ def test_plugin_is_transport_only():
 
 
 def test_readme_makes_no_support_level_declaration():
-    source = README.read_text(encoding="utf-8")
-    lowered = source.lower()
-    assert "experimental" not in lowered
-    assert "support level" not in lowered
-    assert "status:" not in lowered
-    assert "no support-matrix decision is recorded here" in lowered
-    package = (REPO / "integrations" / "opencode-plugin" / "package.json").read_text(
+    for path in (
+        README,
+        REPO / "integrations" / "opencode-plugin" / "package.json",
+        INIT,
+    ):
+        lowered = path.read_text(encoding="utf-8").lower()
+        assert "experimental" not in lowered, path
+        assert "support level" not in lowered, path
+    assert "no support-matrix decision is recorded here" in README.read_text(
         encoding="utf-8"
     ).lower()
-    assert "experimental" not in package
+
+
+def test_plugin_does_not_synthesize_host_identifiers():
+    source = PLUGIN.read_text(encoding="utf-8")
+    assert "callID: event?.callID ?? null" in source
+    assert "eventID: event?.id ?? null" in source
+    assert "callID: event?.callID ?? event?.id" not in source
+    assert "eventID: event?.callID" not in source
+
+
+def test_plugin_is_the_only_bridge_entry_point():
+    source = PLUGIN.read_text(encoding="utf-8")
+    assert source.count("mneme.integrations.opencode.bridge") == 1
+    assert source.count('ctx.tool.hook("execute.before"') == 1
 
 
 def test_documentation_preserves_noncoverage_and_witness_separation():

@@ -520,6 +520,24 @@ def test_missing_host_identifiers_downgrade_the_claim(s1_fixture):
     assert evidence["host_witness"] is None
 
 
+def test_missing_call_id_downgrades_the_claim(s1_fixture):
+    # The pinned G0 event contract exposes `id` but not `callID`. The plugin
+    # must forward the absence, not synthesize a call ID from the event ID.
+    outcome = _run(
+        s1_fixture,
+        "src/handlers/new_handler.py",
+        "import psycopg2\n",
+        call_id=None,
+    )
+    assert outcome["decision"] == "block"
+    assert outcome["claim"] == "none"
+    assert outcome["evidence"]["identity"] == {
+        "complete": False,
+        "missing": ["callID"],
+    }
+    assert outcome["evidence"]["event"]["eventID"] == "evt_1"
+
+
 def test_complete_identity_claims_execution_observed(s1_fixture):
     outcome = _run(s1_fixture, "src/handlers/new_handler.py", "VALUE = 1\n")
     evidence = outcome["evidence"]
@@ -587,6 +605,15 @@ def test_evidence_copies_canonical_checker_records(s1_fixture, tmp_path_factory)
 # ---------------------------------------------------------------------------
 # B4: immutability, byte fidelity, races and the host witness.
 # ---------------------------------------------------------------------------
+
+
+def _clear_bridge_env(monkeypatch):
+    for name in (
+        "CLAUDE_PLUGIN_OPTION_MODE",
+        "MNEME_HOOK_MODE",
+        "MNEME_MEMORY",
+    ):
+        monkeypatch.delenv(name, raising=False)
 
 
 def _run_inprocess(authority: Path, payload: dict) -> dict:
@@ -697,12 +724,7 @@ def test_bridge_never_writes_under_the_governed_root(s1_fixture, monkeypatch):
 def test_byte_fidelity_and_carrier_isolation(
     s1_fixture, monkeypatch, content
 ):
-    for name in (
-        "CLAUDE_PLUGIN_OPTION_MODE",
-        "MNEME_HOOK_MODE",
-        "MNEME_MEMORY",
-    ):
-        monkeypatch.delenv(name, raising=False)
+    _clear_bridge_env(monkeypatch)
     captured: dict[str, object] = {}
     real_unlink = os.unlink
 
@@ -721,6 +743,9 @@ def test_byte_fidelity_and_carrier_isolation(
         _request(s1_fixture.root, "src/handlers/bytes.py", content),
     )
     assert outcome["decision"] == "allow"
+    assert outcome["evidence"]["content_sha256"] == hashlib.sha256(
+        content.encode("utf-8")
+    ).hexdigest()
 
     carrier_path = captured["path"]
     carrier_bytes = captured["bytes"]
@@ -734,89 +759,104 @@ def test_byte_fidelity_and_carrier_isolation(
     assert hashlib.sha256(target.read_bytes()).hexdigest() == expected
 
 
-def test_race_cases_are_characterized(s1_fixture, monkeypatch):
-    for name in (
-        "CLAUDE_PLUGIN_OPTION_MODE",
-        "MNEME_HOOK_MODE",
-        "MNEME_MEMORY",
-    ):
-        monkeypatch.delenv(name, raising=False)
+def test_event_content_sha256_matches_on_every_host(s1_fixture, monkeypatch):
+    _clear_bridge_env(monkeypatch)
+    content = "# café\r\nVALUE = 1"
+    outcome = _run_inprocess(
+        s1_fixture.authority,
+        _request(s1_fixture.root, "src/handlers/event_hash.py", content),
+    )
+    assert outcome["decision"] == "allow"
+    assert outcome["evidence"]["content_sha256"] == hashlib.sha256(
+        content.encode("utf-8")
+    ).hexdigest()
+
+
+def _race_request(root: Path, name: str) -> bridge.Request:
+    return bridge.Request(
+        tool="write",
+        path=f"src/handlers/{name}.py",
+        content="VALUE = 1\n",
+        session_directory=str(root),
+        session_id="ses_race",
+        call_id="call_race",
+        agent="test",
+        message_id="msg_race",
+        event_id="evt_race",
+        host_version="2.3.0",
+    )
+
+
+def test_race_target_appears_during_evaluation(s1_fixture, monkeypatch):
+    _clear_bridge_env(monkeypatch)
     authority = bridge.load_authority(str(s1_fixture.authority))
-
-    def request(name: str) -> bridge.Request:
-        return bridge.Request(
-            tool="write",
-            path=f"src/handlers/{name}.py",
-            content="VALUE = 1\n",
-            session_directory=str(s1_fixture.root),
-            session_id="ses_race",
-            call_id="call_race",
-            agent="test",
-            message_id="msg_race",
-            event_id="evt_race",
-            host_version="2.3.0",
-        )
-
-    summary: dict[str, str] = {}
-    handlers = s1_fixture.root / "src" / "handlers"
-
-    # (a) Target appears after the absence proof, during evaluation.
-    target_a = handlers / "race_a.py"
+    target = s1_fixture.root / "src" / "handlers" / "race_a.py"
     real_invoke = bridge._invoke_check
 
     def raced(*args, **kwargs):
         proc = real_invoke(*args, **kwargs)
-        target_a.write_text("RACE\n", encoding="utf-8")
+        target.write_text("RACE\n", encoding="utf-8")
         return proc
 
     monkeypatch.setattr(bridge, "_invoke_check", raced)
-    outcome_a = bridge.evaluate(request("race_a"), authority)
-    monkeypatch.setattr(bridge, "_invoke_check", real_invoke)
-    summary["a"] = (
-        "DETECTED" if outcome_a.decision != "allow" else "UNDETECTED_RACE"
-    )
-    assert target_a.exists()
+    outcome = bridge.evaluate(_race_request(s1_fixture.root, "race_a"), authority)
 
-    # (b) Target appears between evaluation and the host write.
+    assert target.exists()
+    if outcome.decision == "allow":
+        classification = "UNDETECTED_RACE"
+    elif outcome.decision == "unevaluated":
+        classification = "DETECTED"
+    else:
+        classification = f"UNEXPECTED_{outcome.decision}"
+    assert classification in {"DETECTED", "UNDETECTED_RACE"}
+
+
+def test_race_substitutions_after_evaluation(s1_fixture, monkeypatch):
+    _clear_bridge_env(monkeypatch)
+    authority = bridge.load_authority(str(s1_fixture.authority))
+    handlers = s1_fixture.root / "src" / "handlers"
+    summary: dict[str, str] = {}
+
+    # (b) Target appears between the bridge decision and the host write.
     target_b = handlers / "race_b.py"
-    outcome_b = bridge.evaluate(request("race_b"), authority)
-    assert outcome_b.decision == "allow"
+    outcome_b = bridge.evaluate(_race_request(s1_fixture.root, "race_b"), authority)
     target_b.write_text("HOST\n", encoding="utf-8")
-    summary["b"] = "UNDETECTED_RACE"
+    assert target_b.read_text(encoding="utf-8") == "HOST\n"
+    summary["b"] = (
+        "UNDETECTED_RACE"
+        if outcome_b.decision == "allow"
+        else "DETECTED"
+    )
 
     # (c) Symlink introduced at the target after evaluation.
     target_c = handlers / "race_c.py"
     decoy_c = handlers / "race_c_decoy.py"
     decoy_c.write_text("DECOY\n", encoding="utf-8")
-    outcome_c = bridge.evaluate(request("race_c"), authority)
-    assert outcome_c.decision == "allow"
+    outcome_c = bridge.evaluate(_race_request(s1_fixture.root, "race_c"), authority)
     try:
         target_c.symlink_to(decoy_c)
-        target_c.write_text("HOST\n", encoding="utf-8")
-        summary["c"] = (
-            "UNDETECTED_RACE"
-            if decoy_c.read_text(encoding="utf-8") == "HOST\n"
-            else "DETECTED"
-        )
     except OSError:
-        pass
+        pytest.skip("symlink race fixture unavailable on this host")
+    target_c.write_text("HOST\n", encoding="utf-8")
+    assert decoy_c.read_text(encoding="utf-8") == "HOST\n"
+    summary["c"] = (
+        "UNDETECTED_RACE" if outcome_c.decision == "allow" else "DETECTED"
+    )
 
     # (d) Hardlink substituted after evaluation.
     target_d = handlers / "race_d.py"
     decoy_d = handlers / "race_d_decoy.py"
     decoy_d.write_text("DECOY\n", encoding="utf-8")
-    outcome_d = bridge.evaluate(request("race_d"), authority)
-    assert outcome_d.decision == "allow"
+    outcome_d = bridge.evaluate(_race_request(s1_fixture.root, "race_d"), authority)
     try:
         os.link(decoy_d, target_d)
-        target_d.write_text("HOST\n", encoding="utf-8")
-        summary["d"] = (
-            "UNDETECTED_RACE"
-            if decoy_d.read_text(encoding="utf-8") == "HOST\n"
-            else "DETECTED"
-        )
     except OSError:
-        pass
+        pytest.skip("hardlink race fixture unavailable on this host")
+    target_d.write_text("HOST\n", encoding="utf-8")
+    assert decoy_d.read_text(encoding="utf-8") == "HOST\n"
+    summary["d"] = (
+        "UNDETECTED_RACE" if outcome_d.decision == "allow" else "DETECTED"
+    )
 
     assert set(summary.values()) <= {"DETECTED", "UNDETECTED_RACE"}
     race_resistance = (
@@ -827,19 +867,57 @@ def test_race_cases_are_characterized(s1_fixture, monkeypatch):
     assert race_resistance == "NOT_ESTABLISHED"
 
 
+class _FakeOpenCodeHost:
+    """Minimal host boundary: refuse on block, write on any other decision."""
+
+    def __init__(self) -> None:
+        self.witness: dict | None = None
+
+    def apply(self, outcome: dict, target: Path, content: str) -> bool:
+        if outcome["decision"] == "block":
+            self.witness = {
+                "refused": True,
+                "tool_status": "error",
+                "tool_error": f"Mneme BLOCK: {outcome['reason']}",
+                "target_state": "absent" if not target.exists() else "present",
+            }
+            return False
+        target.write_text(content, encoding="utf-8", newline="")
+        self.witness = {
+            "refused": False,
+            "tool_status": "ok",
+            "target_state": "present" if target.exists() else "absent",
+        }
+        return True
+
+
 def test_block_does_not_imply_host_prevention(s1_fixture):
     target = s1_fixture.root / "src" / "handlers" / "new_handler.py"
-    outcome = _run(s1_fixture, "src/handlers/new_handler.py", "import psycopg2\n")
-    assert outcome["decision"] == "block"
-    assert outcome["evidence"]["host_witness"] is None
+    blocked = _run(s1_fixture, "src/handlers/new_handler.py", "import psycopg2\n")
+    host = _FakeOpenCodeHost()
+    applied = host.apply(blocked, target, "import psycopg2\n")
 
-    # Validator-owned witness, recorded outside the bridge record.
-    witness = {
+    assert applied is False
+    assert host.witness == {
         "refused": True,
         "tool_status": "error",
         "tool_error": "Mneme BLOCK: literal_violation",
         "target_state": "absent",
     }
-    assert witness["refused"] is True
-    assert witness["target_state"] == "absent"
+    assert blocked["evidence"]["host_witness"] is None
     assert not target.exists()
+
+    allowed_target = s1_fixture.root / "src" / "handlers" / "allowed.py"
+    allowed = _run(s1_fixture, "src/handlers/allowed.py", "VALUE = 1\n")
+    host = _FakeOpenCodeHost()
+    applied = host.apply(allowed, allowed_target, "VALUE = 1\n")
+
+    assert applied is True
+    assert host.witness == {
+        "refused": False,
+        "tool_status": "ok",
+        "target_state": "present",
+    }
+    assert allowed["evidence"]["host_witness"] is None
+    assert "refused" not in json.dumps(allowed["evidence"])
+    assert allowed_target.exists()

@@ -125,7 +125,7 @@ export default {
           input: { path: input.path, content: input.content },
           sessionDirectory,
           sessionID: event?.sessionID ?? null,
-          callID: event?.callID ?? event?.id ?? null,
+          callID: event?.callID ?? null,
           agent: event?.agent ?? null,
           messageID: event?.messageID ?? null,
           eventID: event?.id ?? null,
