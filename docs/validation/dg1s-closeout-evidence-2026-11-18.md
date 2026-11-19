@@ -174,7 +174,9 @@ record carries that caveat and does not claim more.
 
 The full test-ID list is in the mapping. This table provides at least one
 representative node ID per fixture, with its gate status, so the record is
-self-contained for the §11a.4 audit.
+self-contained for the §11a.4 audit. Some rows cite a parameterized test by
+its base ID (without `[...]`); the collected variants carry `[...]`. All 17
+rows resolve to existing tests.
 
 | Fixture | Representative node ID | Gate |
 |---|---|---|
@@ -326,12 +328,13 @@ This record does **not** claim:
 - that this record changes the G1–G3 status or ownership;
 - that this record authorizes any T-08 Phase 2 item: B1, I3, rows 3–5, or
   `boundary`/`shadowed` population;
-- that C2 adds a new `resolve_effective` consumer, or that C1a changes
-  stdout, the `mneme.check/v1` payload or exit codes;
+- that C2 adds a new `resolve_effective` consumer, or that C1a changes the
+  enforced decision set, stdout, the `mneme.check/v1` payload or exit codes;
 - that this record changes tracker #497, the roadmap, a freeze contract or
   release metadata;
-- that DG1-S authorizes runtime exclusions, schema or semantic-feature
-  changes, a release or T-08 Phase 2 changes;
+- that DG1-S authorizes runtime exclusions, any change to which decisions
+  reach enforcement, schema or semantic-feature changes, a release or T-08
+  Phase 2 changes;
 - that this record adds any fixture, test requirement, charter or Layer 1
   freeze amendment.
 
