@@ -357,8 +357,8 @@ This record does **not** claim:
 
 ## 11. Review and acceptance
 
-- **Independent review:** PR #838; the exact reviewed head and verdict are
-  recorded in that PR's conversation.
+- **Independent review:** PR #838; the exact reviewed head and verdict will
+  be recorded in that PR's conversation.
 - **Owner acceptance:** required before merge. This draft does not claim it.
 - **Effect of acceptance:** after independent review, owner acceptance and
   merge, this record is the DG1-S §11a.4 closeout evidence. DG1 and DG1G
