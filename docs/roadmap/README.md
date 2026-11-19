@@ -171,10 +171,11 @@ These are **evidence and dependency triggers, not calendar commitments**. A comp
 
 Any future release, including currently merged but unreleased DG1 slices, follows [RELEASING.md](../releases/RELEASING.md) with independent approval. Do not treat roadmap sequencing as implementation, validation or release authorization.
 
-
 ### P1.5 — DG2: deterministic decision federation (public OSS)
 
 Once DG1 semantics are stable, extend the same governance resolver across more than one known decision source or repository. Learn from existing federation designs, but federate **Mneme decision authority**, not merely files or Markdown corpora.
+
+**Start condition:** DG1-S completion permits a **read-only DG2 feasibility scope**, not federation implementation. Begin a DG2 implementation charter only on a concrete, declared multi-source decision case with pinned source revisions, authority and provenance boundaries, deterministic ambiguity handling, and an explicit review of how it composes with the still-open DG1F trusted-context/consumer obligations. The existing architecture and Layer 1 authorization process still govern any behavior change.
 
 DG2 is public OSS and must be production-capable for multi-repository software factories, not a reference model. It federates **known** decision sources deterministically:
 
