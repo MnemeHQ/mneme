@@ -361,7 +361,8 @@ This record does **not** claim:
 ## 11. Review and acceptance
 
 - **Independent review:** PR #838; final reviewed head
-  `c6f203e98c54d3e393bd8cd242c6261d264e6cf3`; verdict **READY**, no findings.
+  `c6f203e98c54d3e393bd8cd242c6261d264e6cf3`; verdict **READY** — no
+  blockers, no new findings.
 - **Owner acceptance:** recorded 2026-11-19 in PR #838.
 - **Merge:** squash `3c65915a2ff835b20bc1d6fff4dc2e2220564229`; tree
   `1e7799347d4a0f6687575886ffd96ad81351eb5f`, equal to the reviewed head.
