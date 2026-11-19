@@ -112,7 +112,7 @@ See accepted [ADR-023](../adr/ADR-023-canonical-decision-index-and-runtime-proje
 
 ### P1 — DG1: Decision governance semantics (post-D1)
 
-**DG1-S — the Decision Governance Semantic Foundation under ADR-031 §11a — is complete.** It is evidenced at pinned commit `13fae565` by the [§11a.4 closeout evidence record](../validation/dg1s-closeout-evidence-2026-11-18.md) and was merged in PR #838 as squash `3c65915a`. DG1-S is a contract milestone, not a release; DG1 remains open for trusted runtime enforcement, remaining consumer convergence and DG1G.
+**DG1-S — the Decision Governance Semantic Foundation under ADR-031 §11a — is complete.** The [§11a.4 closeout evidence record](../validation/dg1s-closeout-evidence-2026-11-18.md) is pinned at `13fae565` and merged in PR #838 as squash `3c65915a`; it records DG1-S as complete under ADR-031 §11a. DG1-S is a contract milestone, not a release; DG1 remains open for trusted runtime enforcement, remaining consumer convergence and DG1G.
 
 DG1A, DG1C, DG1E, DG1D, DG1P, DG1B1 and DG1B2a have landed: the governance contract is accepted, the effective-decision resolver matches v1 projection, canonical evidence identity is threaded through enforcement traces, snapshot-to-snapshot governance change is available, ADR `date` no longer carries precedence authority, and canonical decision applicability now resolves deterministically under `mneme.decision-index/v2`. DG1B2a added canonical waiver records and resolver-level waiver semantics; authoritative waiver-aware enforcement remains open as DG1B2b.
 
