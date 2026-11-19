@@ -2,8 +2,8 @@
 
 > **DRAFT — for independent review and owner acceptance.** This is the
 > closeout evidence record required by [ADR-031 §11a.4](../adr/ADR-031-decision-governance-semantics.md).
-> On owner acceptance and merge it closes **DG1-S only**. It does **not**
-> close DG1, DG1G or ADR-031 §11, and it is not a release.
+> After independent review, owner acceptance and merge it closes **DG1-S only**.
+> It does **not** close DG1, DG1G or ADR-031 §11, and it is not a release.
 >
 > **Pinned subject:** `MnemeHQ/mneme` `main` at
 > `13fae565557953288ffb70052f092d91601fc89d`, tree
@@ -28,8 +28,8 @@ evidence. It records:
 - the obligations that DG1-S leaves open;
 - every §11a non-claim.
 
-DG1-S closes only when the owner accepts this record. DG1 and DG1G remain
-open after that closure.
+DG1-S closes only after independent review and owner acceptance of this
+record. DG1 and DG1G remain open after that closure.
 
 ## 1. Pinned subject
 
@@ -71,11 +71,12 @@ DG1B2a was accepted under:
 - Layer 1 freeze amendment #785, squash `3594259a21f5c18bcefe6bbe8ef3caab85d88ce6`;
 - implementation #787, squash `804591ae867abba269b67fb1587e1e2efd2efdc8`.
 
-The accepted record states 81 charter §4 tests, unchanged C2/C3a goldens on
-Windows and Linux, a green gate battery, the frozen Layer 1 benchmark at 7/7,
-and that `mneme-hq==0.11.0` refuses waiver memory. Those claims are historical
-acceptance evidence. The current pinned run re-executes the same 81 tests (see
-§5), but does not re-attest the original independent review.
+The DG1B2a completion record for #787 (tracker #497) states 81 charter §4
+tests, unchanged C2/C3a goldens on Windows and Linux, a green gate battery,
+the frozen Layer 1 benchmark at 7/7, and that `mneme-hq==0.11.0` refuses
+waiver memory. Those claims are historical acceptance evidence. The current
+pinned run re-executes the same 81 tests (see §5), but does not re-attest the
+original independent review.
 
 DG1B2a delivers the §12 **record** semantics only. DG1B2b — any authoritative
 consumer acting on a waiver — remains deferred.
@@ -132,12 +133,13 @@ fixture-coverage record, not a DG1G closeout.
 
 ### 4.1 Gate membership verification
 
-The mapping cites 27 explicit `file::test` references across 11 test files.
-At the pinned commit:
+The whole mapping, not only §13, cites 27 explicit `file::test` references
+across 11 test files. At the pinned commit:
 
 - 27/27 explicit references resolve by `pytest --collect-only`; 0 missing
   (731 tests are collected across those 11 files, including parameterized
-  variants).
+  variants). This count includes the §3 G1/G3 references and the main-only
+  F10 supplementary file; it is **not** the §13 fixture-only count.
 - Across the full F1–F13 table, 13 unique test files are cited. Twelve are in
   `GATE_PATHS` and not in `GATE_EXCLUSIONS`; one,
   `tests/test_adr034_g2_1_harness.py`, is in `GATE_EXCLUSIONS` as
@@ -167,6 +169,32 @@ F10 is pinned by the DG1-mapped
 existing behavior only and does not add the full-identity comparison for
 `relevant_enforcement_per_rule`, which remains a consumer obligation. This
 record carries that caveat and does not claim more.
+
+### 4.4 Representative test IDs
+
+The full test-ID list is in the mapping. This table provides at least one
+representative node ID per fixture, with its gate status, so the record is
+self-contained for the §11a.4 audit.
+
+| Fixture | Representative node ID | Gate |
+|---|---|---|
+| F1 | `tests/test_dg1c_effective_resolver.py::test_parity_with_projection_for_adr_corpora` | `GATE_PATHS` |
+| F2 | `tests/test_adr_precedence.py::test_different_scopes_both_active` | `GATE_PATHS` |
+| F3 | `tests/test_adr_precedence.py::test_nested_scopes_coexist_no_conflict` | `GATE_PATHS` |
+| F4 | `tests/test_dg1p_date_not_authority.py::test_priority_resolves_regardless_of_date` | `GATE_PATHS` |
+| F5 | `tests/test_dg1p_date_not_authority.py::test_newer_date_never_wins_a_same_priority_tie` | `GATE_PATHS` |
+| F6 | `tests/test_dg1c_effective_resolver.py::test_repo_corpus_resolves_the_superseded_adrs_with_explicit_supersessors` | `GATE_PATHS` |
+| F7 | `tests/test_dg1c_effective_resolver.py::test_ineffective_causes_follow_lifecycle_and_never_guess` | `GATE_PATHS` |
+| F8 | `tests/test_dg1c_effective_resolver.py::test_input_order_invariance` | `GATE_PATHS` |
+| F9 | `tests/test_dg1c_effective_resolver.py::test_irrelevant_decision_invariance` | `GATE_PATHS` |
+| F10 | `tests/test_dg1g_f10_evidence_distinction.py::test_a_dg1_outputs_have_no_observation_channel` | `GATE_PATHS` |
+| F10 supplementary | `tests/test_adr034_g2_1_harness.py::test_observed_disposition` | `GATE_EXCLUSIONS` (main-only) |
+| F11 | `tests/test_dg1e_evidence_identity.py::test_runtime_rule_id_equals_persisted_rule_id` | `GATE_PATHS` |
+| F12 | `tests/test_dg1d_change_resolution.py::test_supersession_moves_governance_and_rules` | `GATE_PATHS` |
+| F12a | `tests/test_dg1b1_functional_acceptance.py::test_f1_v1_decision_is_globally_eligible` | `GATE_PATHS` |
+| F12a | `tests/test_dg1b1_functional_acceptance.py::test_f12_runtime_projection_and_enforcement_inputs_unchanged` | `GATE_PATHS` |
+| F13 | `tests/test_dg1b2a_canonical_waivers.py::test_2_time_bound_waiver_applies_only_inside_window` | `GATE_PATHS` |
+| F13 | `tests/test_dg1b2a_canonical_waivers.py::test_3_labels_not_matching_or_not_supplied_leave_decision_effective` | `GATE_PATHS` |
 
 ## 5. Validation at the pinned commit
 
@@ -263,7 +291,7 @@ DG1 closeout, not conditions of DG1-S.
 
 | Obligation | Current state | Owner / evidence |
 |---|---|---|
-| **DG1F-C1b — trusted applicability exclusion** | Deferred. No persisted canonical context declaration; no independently verifiable approved revision, anti-substitution, controlled selection or blocking-seam validation. C1a's caller labels remain preview-only. | DG1 + CI1/T-08 trust prerequisites; C1 charter §3/§5b; tracker #497 |
+| **DG1F-C1b — trusted applicability exclusion** | Deferred for the local/runtime applicability-exclusion path. No persisted canonical context declaration, controlled context selection or blocking-seam validation for that path; C1a's caller labels remain preview-only. The trusted CI gate has approved-revision and anti-substitution controls, but not the context declaration C1b requires. | DG1 + CI1/T-08 trust prerequisites; C1 charter §3/§5b; tracker #497 |
 | **DG1B2b — waiver-aware enforcement** | Not ready. Trusted labels are a hard blocker; no runtime-suppression case; evaluator pin predates v2 waiver memory; full-corpus exclusion and rank-invariance evidence absent. `as_of` is not a hard blocker for untimed waivers. | DG1 + CI R0 for the evaluator pin; [B2b readiness](../plans/2026-11-10-dg1b2b-readiness-assessment.md); tracker #497 |
 | **Remaining ADR-031 §11 resolver consumers** | Open or explicitly deferred: `protect status`/`protect validate`; `protect activate` and the persistence protection-install check; CI evidence-matching APIs; enforcement inputs (`mneme check`, hooks, CI gates, MCP) where C1b/B2b apply; explanation output; C3b. `audit_with_github_claim` and other list-taking APIs remain outside the convergence claim by contract unless that contract changes. | Per-consumer output-contract decision or charter + freeze; [tracker #497 (C3a completion record)](https://github.com/MnemeHQ/mneme/issues/497); post-C3a reconciliation §3 |
 | **G1 self-authorization negative** | CI side pinned; host side **unevaluated**. | CI1 #540 / T-08; tracker #497 |
@@ -290,9 +318,22 @@ This record does **not** claim:
 - that section-less memory is reconciled with canonical memory;
 - that `precedence_lost` exists or is scheduled;
 - that C2/C3a/B2a are released;
-- that DG1-S authorizes runtime exclusions, schema changes, a release or
-  T-08 Phase 2 changes;
-- that this record adds any fixture, test, charter or freeze amendment.
+- that a trusted `as_of` source or trusted label source exists;
+- that this record authorizes a new authoritative consumer, MCP tool, CLI
+  enforcement flag or explanation-output contract;
+- that this record authorizes a context declaration, a CLI writer for
+  applicability, an evaluator-pin change, a version bump or release notes;
+- that this record changes the G1–G3 status or ownership;
+- that this record authorizes any T-08 Phase 2 item: B1, I3, rows 3–5, or
+  `boundary`/`shadowed` population;
+- that C2 adds a new `resolve_effective` consumer, or that C1a changes
+  stdout, the `mneme.check/v1` payload or exit codes;
+- that this record changes tracker #497, the roadmap, a freeze contract or
+  release metadata;
+- that DG1-S authorizes runtime exclusions, schema or semantic-feature
+  changes, a release or T-08 Phase 2 changes;
+- that this record adds any fixture, test requirement, charter or Layer 1
+  freeze amendment.
 
 ## 10. Evidence index
 
@@ -307,15 +348,17 @@ This record does **not** claim:
 - [T-08 Phase 2 readiness](../plans/2026-11-17-t08-phase2-readiness-assessment.md)
 - [CI R0 S7 closure](ci-r0-s7-closure-2026-11-03.md)
 - [PR #837 — ADR-031 §11a](https://github.com/MnemeHQ/mneme/pull/837)
+- [PR #838 — this closeout record](https://github.com/MnemeHQ/mneme/pull/838)
 - [Tracker #497](https://github.com/MnemeHQ/mneme/issues/497)
 - [CI1 tracker #540](https://github.com/MnemeHQ/mneme/issues/540)
 
 ## 11. Review and acceptance
 
-- **Independent review:** required by ADR-031 §11a.4 and recorded in the PR
-  conversation for this record.
+- **Independent review:** PR #838; the exact reviewed head and verdict are
+  recorded in that PR's conversation.
 - **Owner acceptance:** required before merge. This draft does not claim it.
-- **Effect of acceptance:** on owner acceptance and merge, this record is the
-  DG1-S §11a.4 closeout evidence. DG1 and DG1G remain open.
+- **Effect of acceptance:** after independent review, owner acceptance and
+  merge, this record is the DG1-S §11a.4 closeout evidence. DG1 and DG1G
+  remain open.
 - **No automatic closure:** this record does not close DG1-S by itself, and it
   does not authorize any work listed in §8.
