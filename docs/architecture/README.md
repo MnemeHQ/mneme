@@ -118,6 +118,10 @@ and future architecture contracts.
 - [ADR-031](../adr/ADR-031-decision-governance-semantics.md) is
   **accepted** as the governing architecture for DG1 decision governance
   semantics (effective resolution, governance change, evidence identity).
+  **DG1-S is complete** under ADR-031 §11a: the semantic foundation is closed
+  by the [§11a.4 closeout evidence record](../validation/dg1s-closeout-evidence-2026-11-18.md)
+  (PR #838, squash `3c65915a`). DG1, DG1G and trusted runtime enforcement
+  remain open.
   DG1C has landed as the pure resolver `mneme/decision_governance.py`
   (`resolve_effective`), which reproduces the Layer 1 projection exactly on
   every state the v1 loader accepts, explains each decision, and reports
@@ -136,8 +140,11 @@ and future architecture contracts.
   decision that is already canonical in such a scope. DG1B1 decision
   applicability is persisted under `mneme.decision-index/v2`, and
   `mneme check --applicability-preview` (DG1F-C1a) renders a report-only,
-  non-authoritative preview from the resolver. Waivers (DG1B2) remain
-  evidence- and charter-gated. These slices shipped in `mneme-hq==0.11.0`.
+  non-authoritative preview from the resolver. DG1B2a delivered canonical
+  waiver records and resolver-level waiver semantics; DG1B2b waiver-aware
+  enforcement remains evidence- and charter-gated. DG1A, DG1C, DG1E, DG1D,
+  DG1P, DG1B1 and DG1F-C1a shipped in `mneme-hq==0.11.0`; DG1B2a is merged on
+  `main` but unreleased.
   On `main`, **merged but not yet released**: DG1F-C2 (#770) makes
   `decision_index.lifecycle_governs` the single lifecycle authority shared by
   projection, the resolver and the Audit, protection and evidence lifecycle
@@ -151,8 +158,9 @@ and future architecture contracts.
   `CHANGELOG.md`). Still not converged:
   `audit_with_github_claim`, `protect status/validate/activate`, evidence
   APIs and every enforcement input (`mneme check`, hooks, CI, MCP);
-  enforcement-changing applicability (C1b), waivers (DG1B2) and DG1G
-  closeout remain open.
+  enforcement-changing applicability (C1b), waiver-aware enforcement
+  (DG1B2b) and DG1G closeout remain open. The #497 G1–G3 controls remain with
+  CI1/T-08.
 - [ADR-025](../adr/ADR-025-trusted-test-execution-attestation.md) is also
   **proposed**. Trusted test-execution attestation remains reserved/deferred.
 
@@ -377,7 +385,7 @@ minimum reading set for understanding the current runtime architecture.
 | [ADR-028](../adr/ADR-028-public-decision-intent-assessment.md) | Accepted | Public API semantics for classifying decision intent. |
 | [ADR-029](../adr/ADR-029-enforcement-evidence-binding-semantics.md) | Accepted | How enforcement evidence binds to governed decisions without requiring runtime observation. |
 | [ADR-030](../adr/ADR-030-canonical-decision-persistence-version-identity-and-stable-rule-lineage.md) | Accepted | Persistence, version identity, and stable rule lineage for the canonical index. |
-| [ADR-031](../adr/ADR-031-decision-governance-semantics.md) | Accepted | DG1 semantics: which decisions are effective, what governance changed, and canonical evidence identity. Resolver, evidence identity, DG1P and DG1B1 shipped in 0.11.0. Merged, unreleased: DG1F-C2 lifecycle-authority consolidation (#770) and DG1F-C3a resolver-result consumption by `mneme audit`, setup readiness and `protect list` (#777); frozen runtime outputs and enforcement inputs unchanged, with C2's library change to the `GovernanceContext()` default. Other runtime consumers, enforcement-changing applicability (C1b) and waivers (DG1B2) remain gated. |
+| [ADR-031](../adr/ADR-031-decision-governance-semantics.md) | Accepted | DG1 semantics: which decisions are effective, what governance changed, and canonical evidence identity. **DG1-S is complete under §11a** (closeout evidence, PR #838, squash `3c65915a`). Resolver, evidence identity, DG1P and DG1B1 shipped in 0.11.0. Merged, unreleased: DG1F-C2 lifecycle-authority consolidation (#770) and DG1F-C3a resolver-result consumption by `mneme audit`, setup readiness and `protect list` (#777); frozen runtime outputs and enforcement inputs unchanged, with C2's library change to the `GovernanceContext()` default. DG1, DG1G, other runtime consumers, C1b, DG1B2b and the #497 G1–G3 controls remain open. |
 | [ADR-032](../adr/ADR-032-opt-in-product-usage-measurement.md) | Accepted | Opt-in product usage measurement boundary. Not implemented. |
 | [ADR-033](../adr/ADR-033-opt-in-fail-closed-enforcement.md) | Accepted | Opt-in fail-closed handling when enforcement cannot be evaluated (Architecture A, `mneme availability`). Shipped in 0.11.0 for Claude Code direct writes. |
 | [ADR-034](../adr/ADR-034-static-numeric-upper-bound-typed-rule.md) | Accepted | `FORBID_NUMERIC_ABOVE` static numeric upper bound for Python. Whole-file audit shipped in 0.11.0; the new-file `Write` pre-write check ships without an enforcement claim (validation not passed). |
