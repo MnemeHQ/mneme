@@ -1,6 +1,6 @@
 # CI1: trust-boundary correction and independent-validation closure plan
 
-**Status:** PROPOSED for independent review and owner acceptance. **Scope:** Core CI1 assurance, not new enforcement semantics.
+**Status:** PROPOSED, revised after Claude Opus 5.5 independent read-only review `ACCEPT WITH CHANGES` at original PR #842 head `ba8cb4cf`. Corrected head and owner Gate 0 acceptance remain pending. **Scope:** Core CI1 assurance, not new enforcement semantics.
 **Date:** 2026-11-21
 **Source pin:** `MnemeHQ/mneme` `main` at `3c65915a2ff835b20bc1d6fff4dc2e2220564229`.
 **Tracker:** [CI1 #540](https://github.com/MnemeHQ/mneme/issues/540); [DG1 #497](https://github.com/MnemeHQ/mneme/issues/497) remains separate.
@@ -8,7 +8,7 @@
 
 ## 0. Authority and non-authorization
 
-The owner authorized writing the plan and doing available read-only analysis on 2026-11-21, with later execution intended for DeepSeek. This record authorizes its own documentation-only PR, not implementation, new tests, live experiments, ruleset/variable changes, release, or a retrospective PASS. Each later gate needs separate owner approval and independent review.
+The owner authorized writing the plan and doing available read-only analysis on 2026-11-21, with later execution intended for DeepSeek. The independent Gate 0 reviewer was Claude Opus 5.5 in Claude Code, reported 2026-11-22, not DeepSeek; its verdict on `ba8cb4cf` was `ACCEPT WITH CHANGES`. See the companion assessment for report hashes, custody and the limits of the relayed evidence. This record authorizes its own documentation-only PR, not implementation, new tests, live experiments, ruleset/variable changes, release, or a retrospective PASS. Each later gate needs separate owner approval and independent review.
 
 No changes to `mneme/`, `tests/`, `scripts/ci/`, `.github/`, `.mneme/`, accepted ADRs, Layer 1 freeze, benchmark, runtime evaluator, or rulesets are part of this PR. Do not change CI1 tracker #540's historical evidence or use this document as a substitute for owner approval.
 
@@ -18,7 +18,7 @@ No changes to `mneme/`, `tests/`, `scripts/ci/`, `.github/`, `.mneme/`, accepted
 - **Enforcement scope:** ADR-017/020 (retrieval does not reduce enforcement, typed rules have explicit path applicability), and ADR-033 (availability handling).
 - **CI control:** The required `mneme trusted gate` on `main` is the C4 adapter from #679, deployed through R0 #742 with strict up-to-date and posture recorded as `closed`. Its deliberate operating classification is bounded dogfooding (#743), not unrestricted production readiness.
 - **Evidence semantics:** ADR-029 has six mandatory binding dimensions for relevant enforcement. The literal-rule CI record does not yet satisfy all six; the Verification Step 4 independent review #778 says CI reports are execution observed and identifies R-1.
-- **Closed historical work, do not reopen:** CI1 lab/C4 Gate 4 #682; Core CI R0 stages S1-S7 #742; frozen Verification Steps 2-4 #772/#776/#778; ADR-034 M4 #628 (different benchmark); T-08 P2-first #815/#818 and G3 reassessment #822 (G3 stays PARTIAL).
+- **Closed historical work, do not reopen:** CI1 lab validation / **C4 bounded closure #682**; Core CI R0 stages S1-S7 #742; frozen Verification Steps 2-4 #772/#776/#778; ADR-034 M4 #628 (different benchmark); T-08 P2-first #815/#818 and G3 reassessment #822 (G3 stays PARTIAL).
 
 Use the accepted [ADR-029](../adr/ADR-029-enforcement-evidence-binding-semantics.md), [ADR-031](../adr/ADR-031-decision-governance-semantics.md), [ADR-033](../adr/ADR-033-opt-in-fail-closed-enforcement.md), [C4 adapter](../../scripts/ci/adr033_c4_gate.py), [trusted workflow](../../.github/workflows/mneme-trusted-gate.yml), [R0 record](../validation/ci-r0-s7-closure-2026-11-03.md), and [Step 4 independent review](../validation/verification-step4-independent-review-2026-11-09.md) as the baseline. Reconcile later `main` changes before execution; this plan is pinned to the stated commit, not an assertion about future tips.
 
@@ -47,16 +47,16 @@ Every outcome must be distinguished as one of: `VERIFIED_PASS`, `VIOLATION`, `RE
 
 ### Gate 0: read-only baseline and gap disposition (this PR begins it)
 
-- Pin live repo HEAD, current approved workflow/adapter blob and hash, evaluator build, decision memory revision, ruleset status/required context/freshness and approved human bypass; separately record what is available only as a historical attestation (notably variable posture and credential access).
-- Reconcile CI1 #540, R0 #742/#743, C4 #682, Verification #761/#778, T-08 #822 and current ADRs.
+- Pin live repo HEAD, current approved workflow/adapter commit/blob/SHA-256, evaluator build, decision memory revision, ruleset status/required context/freshness, approved human bypass **and Actions policy**. Independent reviewer reported policy `12208` (created 2026-11-09; restricts `pull_request_target` to the trusted workflow), availability variable `closed`, and an agent session using administrator-capable `TheoV823` credentials; these are reviewer observations, not new host-behavior tests. Org Actions settings (403), full credential inventory and policy runtime effect remain unverified.
+- Reconcile CI1 #540, R0 #742/#743, C4 **closure #682**, **ADR-029 evidence-completeness audit #761**, independent Verification Step 4 #778, T-08 #822 and current ADRs.
 - For each issue mark `CLOSED (evidence)`, `CORRECTION REQUIRED`, `ACCEPTED LIMITATION`, or `OUT OF SCOPE`; append exact source and contrary evidence. Where exploitability is unverified write `INVESTIGATION REQUIRED`, not a verdict.
 - Independent reviewer checks the matrix. No new host probe or implementation is permitted by Gate 0.
 
-**Exit:** reviewed, source-pinned matrix; one explicit recommendation: documentation correction only, bounded engineering charter, or no change with limitation. Companion Gate 0 assessment provides the initial source-inspected draft.
+**Exit:** reviewed, source-pinned matrix; one explicit recommendation: documentation correction only, bounded engineering charter, or no change with limitation. Claude's independent review of initial PR head `ba8cb4cf` returned `ACCEPT WITH CHANGES` and **no CI defect**; its corrections are incorporated in the revised companion Gate 0 assessment. This is not an owner Gate 0 acceptance or a second independent review of the revised head. The smallest currently justified follow-up is a separately authorized **docs-only** correction to the C4 guide's over-broad report-tampering language; **no Gate 1 engineering charter is justified** on present evidence.
 
 ### Gate 1: decision and smallest correction charter (separate authorization)
 
-Only if Gate 0 finds a reproducible defect or unsupported claim: define exact changed surface, threat actor/control, accepted behavior, unchanged contracts, independent test fixture, rollback, and permission/credential prerequisites. Specify whether this is documentation, adapter, workflow/host configuration, evidence consumer, or administration. Any freeze-sensitive change needs an accepted `[layer1-freeze]` amendment before implementation. Never broaden CI authority via a test-only change.
+Only after owner Gate 0 acceptance: for a reproducible defect or unsupported claim, propose the smallest **separately authorized** correction. Current review supports a docs-only C4 guide wording correction, not a gate implementation change. If an engineering fix is later justified, define exact changed surface, threat actor/control, accepted behavior, unchanged contracts, independent test fixture, rollback, and permission/credential prerequisites. Specify whether this is documentation, adapter, workflow/host configuration, evidence consumer, or administration. Any freeze-sensitive change needs an accepted `[layer1-freeze]` amendment before implementation. Never broaden CI authority via a test-only change.
 
 **Exit:** owner accepts an independently reviewed charter (or records no code correction required).
 
@@ -68,7 +68,7 @@ Use the existing C4 adapter and `mneme.check/v1` contract. Keep evaluator/adapte
 
 ### Gate 3: preregistered independent validation (separate authorization)
 
-- Freeze implementation commit/tree, evaluation build/wheel, adapter blob, workflow blob, protected decision-memory blob, host/runtime version, ruleset IDs, posture observation, fixtures and independent scorer/checker before results.
+- Freeze implementation commit/tree, evaluation build/wheel, adapter blob, workflow blob, protected decision-memory blob, host/runtime version, ruleset IDs, **repository Actions policy ID `12208` and its exact configuration**, posture observation, fixtures and independent scorer/checker before results. Policy runtime behavior has not been verified.
 - Isolate validation author/reviewer from implementation. An independently authored checker must examine raw Git blobs, outputs, GitHub check run IDs/conclusions and host rule-suite responses; it must not import result assertions from the implementation harness.
 - Validate positive and negative controls in section 4, mark unavailable host tests `UNTESTED`, preserve original frozen results, and separate offline replay from observed merge refusal.
 - Retain a manifest of SHA-256 values, raw evidence in owner custody where needed, redacted publishable copies, test invocation, version pins and exceptions.
@@ -87,15 +87,17 @@ Independently audit checks, evidence hashes, provenance, negative space and cont
 |---|---|---|---|
 | IV-01 | Compliant, in-scope, current head | Genuine check succeeds; ordinary non-bypass merge allowed | raw report + GitHub check and pinned merge response |
 | IV-02 | Applicable prohibited edit | Genuine check VIOLATION; non-bypass merge refused | evaluator output + rule trace + GitHub response |
-| IV-03 | Self-substitution of memory/workflow/evaluator or deletion | REFUSED where trusted surface; same-PR attack cannot change governing gate | base/head/tree and rule suite |
+| IV-03 | Self-substitution of memory/workflow/evaluator or **trusted-surface** deletion | REFUSED on protected paths; same-PR attack cannot change governing gate | base/head/tree and rule suite |
 | IV-04 | Missing, malformed or incomplete evaluation | UNEVALUATED; under observed `closed` posture cannot satisfy required check | raw stdout/exit, report, check and host response |
 | IV-05 | Coherent report rewrite and pin mismatch | Record exactly what `verify-report` does and does not reject; no claim of tamper-proof subject/config verification without new contract | independent tamper probes on copies; no mutation to trusted job |
 | IV-06 | Stale PR head / advanced base | GitHub strict freshness blocks stale merge or a fresh evaluated head is required | exact base/head, check ID, rule suite, pinned merge response |
 | IV-07 | Authorized human exception vs ordinary PR | Separate `bypass` record attributed to authorized actor; unprivileged merge refusal | rule suite, authority evidence |
 | IV-08 | Reviewer-controlled independent reconstruction | Recompute expected classifications and compare with raw evaluator/adapter output | independent checker + provenance |
 | IV-09 | R6 administrative exposure | Documentary/account-control assessment; do not run agent-credential or administrative attack without separate consent and safe lab | credential-boundary attestation with precise limit |
+| IV-10 | Same-name look-alike GitHub Actions check with genuine check absent or rerun | **UNTESTED**: no assumption that same name + app ID `15368` uniquely identifies trusted workflow; live demonstration requires separate owner authorization | GitHub check run ID/workflow identity, ruleset and host behavior |
+| IV-11 | Ordinary deletion-only PR outside trusted surface, with no materialized files | **Expected PASS by current adapter design**, not a false green, so long as no other refusal/violation exists; protected-surface deletion remains REFUSED | per-file skip classes, aggregate disposition; host behavior only if authorized |
 
-Use prior accepted host evidence for an unchanged case where possible; otherwise independently reproduce only after a charter. A 200/405 HTTP code or a green job name without associated SHA, context and ruleset is insufficient. For any new test, the mandatory status and expected outcome must be frozen *before* execution. State whether the test validates report truth, gate integrity, or GitHub merge authority.
+**Execution requirement:** IV-01/02/03/04/06/07 require live PR/merge attempts if newly run, and IV-07 involves the R6 administrator credential; none are authorized by this plan. IV-05 already has independent evidence in #778 (reuse); IV-08 is offline; IV-09 documentary. IV-10 is untested and must not be described as a bypass; IV-11 follows the adapter's SKIP-only disposition, not a new live proof. Use prior accepted host evidence for unchanged cases; otherwise independently reproduce only after a charter. A 200/405 HTTP code or a green job name without associated SHA, context and ruleset is insufficient. For any new test, the mandatory status and expected outcome must be frozen *before* execution. State whether the test validates report truth, gate integrity, or GitHub merge authority.
 
 ## 5. Acceptance constraints and non-goals
 
@@ -111,8 +113,8 @@ Use prior accepted host evidence for an unchanged case where possible; otherwise
 
 1. Read this plan, the companion Gate 0 assessment, issue #540, all accepted ADRs above and the actual `main` tree. Verify that the recorded SHA still anchors the plan. Do not infer current operating conditions from a historical record.
 2. Read any open work overlapping this path (including roadmap PR #839). Keep this PR docs-only and independent; do not edit another branch or replace concurrent roadmap work.
-3. Complete Gate 0 as a **read-only** evidence review, checking exact code, current rulesets, expected behavior, published records and the independent review's R-1. Report discrepancies and a proposed disposition for each row. No live probes.
-4. Stop at the Gate 0 approval boundary. Request the owner's explicit decision on a concrete Gate 1 correction or an evidence-only closure. If a source is unavailable, mark that line `UNVERIFIED`.
+3. **Gate 0 reviewer already ran:** Claude Opus 5.5 in Claude Code performed read-only source/GET review at `ba8cb4cf`, verdict `ACCEPT WITH CHANGES`. The corrected assessment records its findings; preserve its local evidence manifest and REPORT.md, and do not confuse the review with an independently accepted revised head. No live probes.
+4. Stop at the Gate 0 approval boundary. Request the owner's explicit acceptance of the corrected Gate 0 record and preferred next action: **a separate docs-only C4 guide claim correction or evidence-only stop with acknowledged limits**. No CI engineering charter is justified now. Mark inaccessible source evidence `UNVERIFIED`.
 5. When authorized, work on one separate branch per behavioral correction, with charter/freeze/review/test gates before any trusted surface change. Use a fresh independent agent session for validation; DeepSeek implementation self-tests never count as independent review.
 
 **Suggested validation commands when authorized and applicable** (do not execute as part of plan approval): `python -m pytest tests/test_adr033_c4_ci_gate.py`, `python -m pytest tests/test_ci1_contract_matrix.py`, `python -m pytest tests/test_test_policy.py`, the repository's documented `run_test_battery` gate, and a dedicated independent report replay in a detached pinned checkout. Confirm exact environment/commands in the current test-policy docs first.
