@@ -366,8 +366,16 @@ exit by itself.
   `subject` records in a payload are treated as UNEVALUATED.
 - Unicode normalization variants of protected paths (for example NFD on macOS)
   are not matched; only case variants are.
-- The decision step runs the same script as the evaluation step, so it catches
-  an inconsistent or tampered report but not a defect shared by both.
+- The decision step runs the same script as the evaluation step, so it does not
+  catch a defect shared by both. It checks the report against the trusted pins
+  (base and head SHA, requested mode, adapter SHA-256, evaluator commit and
+  wheel SHA-256) and the trusted posture, then recomputes the aggregate and
+  disposition from the file rows. It does not bind those rows to the decision
+  memory blob or to the evaluator's raw output, so a coherently rewritten report
+  passes it (independent Verification Step 4, R-1, #778). Inside the gate this
+  is not a known PR-author path: the report is produced and checked in the same
+  trusted job, and no PR-controlled code runs in between (CI1 Gate 0 review,
+  #842). A report copied out of the job is not authenticated by this check.
 - The per-file report records path, content SHA-256 and head SHA, not the
   file's git blob id.
 - Administrative exposure (P7/P8) stays: anyone with administrator rights,
