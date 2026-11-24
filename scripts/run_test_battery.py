@@ -128,6 +128,7 @@ GATE_CORE_PATHS: tuple[str, ...] = (
     "tests/test_ci1_evaluator_preflight.py",
     "tests/test_adr033_c4_ci_gate.py",
     "tests/test_pr_feedback_renderer.py",
+    "tests/test_pr_feedback_publisher.py",
     "tests/test_smoke.py",
 )
 
