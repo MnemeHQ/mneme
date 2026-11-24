@@ -141,7 +141,8 @@ def viol(path, **kw):
 
 
 def app(path, **kw):
-    a = {"decision_id": "ADR-1", "rule_id": "ADR-1:R:1", "input_path": path, "outcome": "APPLIED",
+    a = {"decision_id": "ADR-1", "decision_version_id": "dver-1", "rule_id": "ADR-1:R:1",
+         "input_path": path, "outcome": "APPLIED",
          "rule_value": "VALUE-SENTINEL", "selector": "docs/**"}
     a.update(kw)
     return a
@@ -302,6 +303,7 @@ def test_r07_b5_matching_and_mismatched_context():
         assert_unavailable(res, H_UNAVAIL)
         assert f"context mismatch: {field}" in res[1]
         assert value not in res[1]
+        assert "Report context" not in res[1]
 
 
 # ── R08-R10 ──────────────────────────────────────────────────────────────────
@@ -593,7 +595,7 @@ def test_r14_dedup_determinism_and_caps():
     vs = [viol("docs/a.md", rule_id=f"ADR-1:R:{i}") for i in range(120)]
     code, text = go(make([viol_row(violations=vs)]))
     assert text.count("- `docs/a.md`: decision") == 100
-    assert "Detail entries omitted from this preview: 20." in text
+    assert "Detail and applicability entries omitted from this preview: 20." in text
     code, text = go(make([row(f"docs/f{i}.md", "SKIP", "deleted", status="D") for i in range(60)]))
     assert text.count("- File `docs/f") == 50 and "Rows omitted from this preview: 10" in text
     assert "SKIP: 60" in text
@@ -619,7 +621,7 @@ def test_r14_output_size_bound_with_many_wide_findings():
         rows.append(viol_row(path, violations=vs))
     code, text = go(make(rows))
     assert code == 0 and headings_in(text) == [H_VIOL]
-    assert "Detail entries omitted" in text
+    assert "Detail and applicability entries omitted" in text
     assert_safe(text)
 
 
@@ -745,8 +747,14 @@ def test_r19_every_historical_report_renders_with_context_from_itself(name):
     code, text = R.render(dump(rep), exp)
     assert code == 0
     for s in ["SENTINEL", "stderr", "adr033 c4 trusted gate", "/home/runner",
-              rep["evaluator"]["wheel_sha256"], rep["base_sha"], "::error"]:
+              rep["evaluator"]["wheel_sha256"], "::error"]:
         assert s not in text
+    assert f"- Base commit: `{rep['base_sha']}`" in text
+    assert f"- Head commit: `{rep['head_sha']}`" in text
+    assert f"- Violation mode: {rep['requested_mode']}" in text
+    assert f"- Availability posture: {rep['posture']['effective']}" in text
+    assert text.index("Report context") < text.index("### ")
+    assert text.index("### ") < text.index("Recorded adapter disposition")
     assert_safe(text)
 
 
@@ -952,14 +960,91 @@ def test_r18_partial_suppression_says_some_details_unavailable():
     assert ": Details unavailable" in text and "Some details unavailable" not in text
 
 
-def test_r10_excluded_outcome_is_shown_and_is_not_an_allow():
-    ex = app("docs/a.md", outcome="EXCLUDED")
-    text = _labels_unchanged(make([viol_row(applicability=[ex])]), H_VIOL, "failure")
-    assert "outcome `EXCLUDED`" in text
-    assert "allow" not in text.lower() and "exempt" not in text.lower()
-    so = stdout_for("PASS", "strict", [], [ex])
-    text = _labels_unchanged(make([row("docs/a.md", "VERIFIED_PASS", stdout=so)]), H_PASS, "success")
-    assert "EXCLUDED" not in text and "allow" not in text.lower()
+def _outer(r, lst):
+    r["applicability"] = lst
+    return r
+
+
+def _app_entry(**kw):
+    e = {"decision_id": "ADR-1", "rule_id": "ADR-1:R:1", "outcome": "APPLIED"}
+    e.update(kw)
+    return e
+
+
+def test_r10_mr1_excluded_outcome_shown_on_pass_row_and_is_not_an_allow():
+    r = _outer(pass_row("docs/a.md"), [_app_entry(outcome="EXCLUDED")])
+    text = _labels_unchanged(make([r]), H_PASS, "success")
+    assert "#### Reported applicability" in text
+    assert "- `docs/a.md`: decision `ADR-1`, rule `ADR-1:R:1`, outcome `EXCLUDED`" in text
+    assert "allow" not in text.lower() and "exempt" not in text.lower() and "per-rule" not in text.lower()
+    assert "Details" not in text  # no nested stdout details for PASS rows
+
+
+def test_mr1_mixed_applied_and_excluded_on_violation_row():
+    r = _outer(viol_row(), [_app_entry(), _app_entry(rule_id="ADR-1:R:2", outcome="EXCLUDED")])
+    text = _labels_unchanged(make([r]), H_VIOL, "failure")
+    assert "outcome `APPLIED`" in text and "outcome `EXCLUDED`" in text
+    assert "rule `ADR-1:R:2`" in text
+
+
+def test_mr1_missing_or_null_trace_shows_nothing_and_malformed_is_unavailable():
+    r = pass_row("docs/a.md")
+    r.pop("applicability")
+    text = _labels_unchanged(make([r]), H_PASS, "success")
+    assert "Reported applicability" not in text and "Applicability unavailable" not in text
+    text = _labels_unchanged(make([_outer(pass_row("docs/a.md"), None)]), H_PASS, "success")
+    assert "Applicability" not in text
+    text = _labels_unchanged(make([_outer(pass_row("docs/a.md"), [])]), H_PASS, "success")
+    assert "Applicability" not in text
+    for bad in ["x", {"a": 1}, [5], [{"decision_id": 7}], [{"outcome": "x" * 513}]]:
+        text = _labels_unchanged(make([_outer(pass_row("docs/a.md"), bad)]), H_PASS, "success")
+        assert "- `docs/a.md`: Applicability unavailable" in text
+    text = _labels_unchanged(make([_outer(pass_row("docs/a.md"), [_app_entry(outcome=None, rule_id="")])]),
+                             H_PASS, "success")
+    assert "rule Unavailable, outcome Unavailable" in text
+
+
+def test_mr1_applicability_counts_toward_detail_cap_and_discloses_omission():
+    r = _outer(pass_row("docs/a.md"), [_app_entry(rule_id=f"R{i}") for i in range(120)])
+    text = _labels_unchanged(make([r]), H_PASS, "success")
+    assert text.count("- `docs/a.md`: decision") == 100
+    assert "Detail and applicability entries omitted from this preview: 20." in text
+
+
+def test_mr2_incomplete_identity_is_never_collapsed():
+    for key in ("decision_version_id", "rule_id", "decision_id"):
+        v1, v2 = viol("docs/a.md"), viol("docs/a.md")
+        v1[key] = v2[key] = None
+        text = _labels_unchanged(make([viol_row(violations=[v1, v2], applicability=[])]), H_VIOL, "failure")
+        assert text.count("- `docs/a.md`: decision") == 2
+        assert "Duplicate finding records collapsed" not in text
+
+
+def test_mr3_outcome_requires_exact_triple_including_version():
+    ok = _labels_unchanged(make([viol_row()]), H_VIOL, "failure")
+    assert "outcome `APPLIED`" in ok
+    bad_ver = app("docs/a.md", decision_version_id="dver-OTHER")
+    text = _labels_unchanged(make([viol_row(applicability=[bad_ver])]), H_VIOL, "failure")
+    assert "outcome Unavailable" in text and "version `dver-1`" in text
+    no_ver = app("docs/a.md")
+    del no_ver["decision_version_id"]
+    text = _labels_unchanged(make([viol_row(applicability=[no_ver])]), H_VIOL, "failure")
+    assert "outcome Unavailable" in text
+    v = viol("docs/a.md", decision_version_id="")
+    text = _labels_unchanged(make([viol_row(violations=[v], applicability=[app("docs/a.md", decision_version_id="")])]),
+                             H_VIOL, "failure")
+    assert "version Unavailable" in text and "outcome Unavailable" in text
+    conflicting = [app("docs/a.md"), app("docs/a.md", outcome="EXCLUDED")]
+    text = _labels_unchanged(make([viol_row(applicability=conflicting)]), H_VIOL, "failure")
+    assert "outcome Unavailable" in text
+
+
+@pytest.mark.parametrize("path", ["/abs/docs/a.md", "C:/work/docs/a.md", r"c:\work\docs\a.md", r"\\srv\x\a.md", r"docs\a.md"])
+def test_mr3_absolute_paths_never_associate(path):
+    v, a = viol(path), app(path)
+    so = stdout_for("FAIL", "strict", [v], [a])
+    text = _labels_unchanged(make([row(path, "VIOLATION", stdout=so)]), H_VIOL, "failure")
+    assert "Details unavailable" in text and "decision `ADR-1`" not in text and "outcome" not in text
 
 
 def test_r20_consolidated_sentinels_in_all_suppressed_fields():
@@ -984,3 +1069,37 @@ def test_r20_consolidated_sentinels_in_all_suppressed_fields():
     assert code == 0 and headings_in(text) == [H_VIOL]
     assert "decision `ADR-1`" in text  # allowlisted fields still shown
     assert "S-" not in text
+
+
+def test_mr4_context_lines_valid_inconsistent_and_omitted_when_unavailable():
+    rep = make([pass_row()])
+    code, text = go(rep)
+    lines = text.split("\n")
+    assert lines[3] == "Report context (report-derived, not authenticated):"
+    assert lines[4] == f"- Base commit: `{rep['base_sha']}`"
+    assert lines[5] == f"- Head commit: `{rep['head_sha']}`"
+    assert lines[6:8] == ["- Violation mode: strict", "- Availability posture: closed"]
+    assert "evaluator" not in text.lower() and "blob" not in text and "scripts/ci" not in text
+    bad = make([pass_row()])
+    bad["disposition"] = "failure"
+    code, text = go(bad)
+    assert_unavailable((code, text), H_INCONS)
+    assert f"- Base commit: `{rep['base_sha']}`" in text and "Violation mode: strict" in text
+    # could-not-be-displayed (including context mismatch) carries no context block
+    exp = expected_for(rep)
+    exp["head_sha"] = "f" * 40
+    res = R.render(dump(rep), exp)
+    assert_unavailable(res, H_UNAVAIL)
+    assert "Report context" not in res[1]
+    broken = make([pass_row()])
+    del broken["query"]
+    assert "Report context" not in R.render(dump(broken), expected_for(rep))[1]
+
+
+@pytest.mark.parametrize("sha", ["abc", "A" * 40, "g" * 40, "a" * 41, "`" * 40])
+def test_mr4_non_40_lowercase_hex_sha_is_unavailable(sha):
+    rep = make([pass_row()])
+    rep["base_sha"] = sha
+    code, text = go(rep)
+    assert code == 0 and "- Base commit: Unavailable" in text
+    assert_safe(text)

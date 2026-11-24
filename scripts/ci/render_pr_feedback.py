@@ -66,6 +66,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 import unicodedata
 from pathlib import Path
@@ -190,10 +191,11 @@ def code_span(raw: str, limit: int = MAX_SPAN_CHARS) -> str:
 # ── parsing and validation ───────────────────────────────────────────────────
 
 class _Unavailable(Exception):
-    def __init__(self, heading: str, reason: str) -> None:
+    def __init__(self, heading: str, reason: str, context: dict[str, str] | None = None) -> None:
         super().__init__(reason)
         self.heading = heading
         self.reason = reason
+        self.context = context
 
 
 class _DuplicateKey(ValueError):
@@ -300,10 +302,6 @@ def _check_row(row: Any, is_file: bool) -> dict[str, Any]:
         _bad_shape()
     for key in ("stdout", "stderr_tail"):
         if key in row and not isinstance(row[key], str):
-            _bad_shape()
-    if "applicability" in row:
-        app = row["applicability"]
-        if not isinstance(app, list) or not all(isinstance(a, dict) for a in app):
             _bad_shape()
     return row
 
@@ -415,21 +413,23 @@ def _validate(report: dict[str, Any], expected: dict[str, Any]) -> dict[str, Any
     if mismatched:
         _fail("context mismatch: " + ", ".join(mismatched))
 
+    ctx = {"base": report["base_sha"], "head": report["head_sha"], "mode": mode, "posture": effective}
+
     # Consistency (suppress-only).
     classes = [r["classification"] for r in file_rows + cond_rows]
     want_counts = {c: classes.count(c) for c in FILE_CLASSES if c in classes}
     if counts != want_counts or agg["partly_unevaluated"] != (UNEVALUATED in classes):
-        raise _Unavailable(H_INCONSISTENT, "recorded counts or flags do not match the recorded rows")
+        raise _Unavailable(H_INCONSISTENT, "recorded counts or flags do not match the recorded rows", ctx)
     want_agg = aggregate_of(classes, mode)
     if agg_cls != want_agg or disp != disposition_of(want_agg, effective):
-        raise _Unavailable(H_INCONSISTENT, "recorded aggregate or disposition does not match the recorded rows")
+        raise _Unavailable(H_INCONSISTENT, "recorded aggregate or disposition does not match the recorded rows", ctx)
     if posture["fallback"] is not None and effective != "closed":
-        raise _Unavailable(H_INCONSISTENT, "recorded posture is not possible")
+        raise _Unavailable(H_INCONSISTENT, "recorded posture is not possible", ctx)
     if (agg_cls, disp) not in HEADINGS:
-        raise _Unavailable(H_INCONSISTENT, "recorded aggregate or disposition does not match the recorded rows")
+        raise _Unavailable(H_INCONSISTENT, "recorded aggregate or disposition does not match the recorded rows", ctx)
     return {"files": file_rows, "conds": cond_rows, "agg": agg_cls, "disp": disp,
             "counts": want_counts, "mode": mode, "posture": effective,
-            "fallback": posture["fallback"] is not None,
+            "fallback": posture["fallback"] is not None, "ctx": ctx,
             "partly": agg["partly_unevaluated"]}
 
 
@@ -457,6 +457,36 @@ def _detail_field(rec: dict[str, Any], key: str) -> tuple[bool, str | None]:
     return False, None
 
 
+_WIN_DRIVE = re.compile(r"^[A-Za-z]:[\\/]")
+
+
+def _is_absolute(path: str) -> bool:
+    return path.startswith(("/", "\\")) or "\\" in path or bool(_WIN_DRIVE.match(path))
+
+
+def _applicability_lines(row: dict[str, Any], label: str) -> list[str] | None:
+    """Outer adapter-produced applicability list, as reported. None = key absent
+    or null (nothing shown). Never derives a gate status from it."""
+    app = row.get("applicability")
+    if app is None:
+        return None
+    bad = [f"- {label}: Applicability unavailable"]
+    if not isinstance(app, list) or len(app) > MAX_NESTED_RECORDS:
+        return bad
+    lines = []
+    for rec in app:
+        if not isinstance(rec, dict):
+            return bad
+        bits = []
+        for name, key in (("decision", "decision_id"), ("rule", "rule_id"), ("outcome", "outcome")):
+            ok, val = _detail_field(rec, key)
+            if not ok:
+                return bad
+            bits.append(f"{name} " + (code_span(val) if val is not None else "Unavailable"))
+        lines.append(f"- {label}: " + ", ".join(bits))
+    return lines
+
+
 def _extract_details(row: dict[str, Any]) -> tuple[list[tuple], int, int] | None:
     """Return (findings, suppressed_records, duplicates) or None if the whole
     row's details are unavailable. Never inspects verdict/exit/mode/severity
@@ -481,15 +511,18 @@ def _extract_details(row: dict[str, Any]) -> tuple[list[tuple], int, int] | None
         return None
     if len(violations) + len(applicability) > MAX_NESTED_RECORDS:
         return None
-    outcomes: dict[tuple[str, str], set[str | None]] = {}
+    if _is_absolute(path):
+        return None
+    outcomes: dict[tuple[str, str, str], set[str | None]] = {}
     for rec in applicability:
         if not isinstance(rec, dict) or rec.get("input_path") != path:
             continue
         ok_d, did = _detail_field(rec, "decision_id")
+        ok_v, ver = _detail_field(rec, "decision_version_id")
         ok_r, rid = _detail_field(rec, "rule_id")
         ok_o, out = _detail_field(rec, "outcome")
-        if ok_d and ok_r and did and rid:
-            outcomes.setdefault((did, rid), set()).add(out if ok_o else None)
+        if ok_d and ok_v and ok_r and did and ver and rid:
+            outcomes.setdefault((did, ver, rid), set()).add(out if ok_o else None)
     findings: list[tuple] = []
     seen: set[tuple] = set()
     suppressed = duplicates = 0
@@ -507,15 +540,17 @@ def _extract_details(row: dict[str, Any]) -> tuple[list[tuple], int, int] | None
             suppressed += 1
             continue
         outcome = None
-        if fields[0] and fields[2]:
-            found = outcomes.get((fields[0], fields[2]), set())
+        complete = bool(fields[0] and fields[1] and fields[2])
+        if complete:
+            found = outcomes.get((fields[0], fields[1], fields[2]), set())
             if len(found) == 1:
                 outcome = next(iter(found))
         item = (*fields, outcome)
-        if item in seen:
-            duplicates += 1
-            continue
-        seen.add(item)
+        if complete:  # only a complete identity may be collapsed
+            if item in seen:
+                duplicates += 1
+                continue
+            seen.add(item)
         findings.append(item)
     return findings, suppressed, duplicates
 
@@ -526,8 +561,22 @@ def _size(line: str) -> int:
     return len(line.encode("utf-8")) + 1
 
 
-def _unavailable(heading: str, reason: str) -> tuple[int, str]:
-    lines = [TITLE, BANNER, "", "### " + heading, "", "Reason: " + reason, ""]
+_SHA40 = re.compile(r"^[0-9a-f]{40}$")
+
+
+def _context_lines(ctx: dict[str, str]) -> list[str]:
+    def sha(value: str) -> str:
+        return code_span(value) if _SHA40.match(value) else "Unavailable"
+    return ["Report context (report-derived, not authenticated):",
+            f"- Base commit: {sha(ctx['base'])}",
+            f"- Head commit: {sha(ctx['head'])}",
+            f"- Violation mode: {ctx['mode']}",
+            f"- Availability posture: {ctx['posture']}", ""]
+
+
+def _unavailable(heading: str, reason: str, ctx: dict[str, str] | None = None) -> tuple[int, str]:
+    lines = [TITLE, BANNER, ""] + (_context_lines(ctx) if ctx else [])
+    lines += ["### " + heading, "", "Reason: " + reason, ""]
     return 2, "\n".join(lines)
 
 
@@ -560,7 +609,7 @@ def _render_valid(v: dict[str, Any]) -> str:
     files, conds = v["files"], v["conds"]
     all_rows = [(r, True) for r in files] + [(r, False) for r in conds]
     present = set(v["counts"])
-    out = [TITLE, BANNER, "", "### " + HEADINGS[(v["agg"], v["disp"])], "",
+    out = [TITLE, BANNER, ""] + _context_lines(v["ctx"]) + ["### " + HEADINGS[(v["agg"], v["disp"])], "",
            f"Recorded adapter disposition: `{v['disp']}`"]
     if v["agg"] == "UNEVALUATED" and v["disp"] == SUCCESS:
         out.append("The recorded disposition reflects the open availability posture. "
@@ -612,13 +661,17 @@ def _render_valid(v: dict[str, Any]) -> str:
 
     # Details (structural, report-derived; never alters anything above).
     detail_lines: list[str] = []
+    app_lines: list[str] = []
     duplicates = 0
     for i in order:
         row, _is_file = all_rows[i]
+        label = code_span(row["path"]) if isinstance(row.get("path"), str) else "(no path)"
+        extra = _applicability_lines(row, label)
+        if extra:
+            app_lines.extend(extra)
         if row["classification"] not in DETAIL_CLASSES:
             continue
         got = _extract_details(row)
-        label = code_span(row["path"]) if isinstance(row.get("path"), str) else "(no path)"
         if got is None or not got[0]:
             detail_lines.append(f"- {label}: Details unavailable")
             continue
@@ -634,21 +687,26 @@ def _render_valid(v: dict[str, Any]) -> str:
     shown_details: list[str] = []
     budget = MAX_OUTPUT_BYTES - base_bytes - OMISSION_RESERVE_BYTES - 64
     dused = 0
-    for line in detail_lines:
-        if len(shown_details) >= MAX_SHOWN_DETAILS or dused + _size(line) > budget:
-            continue
-        shown_details.append(line)
-        dused += _size(line)
-    omitted_details = len(detail_lines) - len(shown_details)
+    shown_app: list[str] = []
+    for target, lines in ((shown_details, detail_lines), (shown_app, app_lines)):
+        for line in lines:
+            if len(shown_details) + len(shown_app) >= MAX_SHOWN_DETAILS or dused + _size(line) > budget:
+                continue
+            target.append(line)
+            dused += _size(line)
+    omitted_details = len(detail_lines) + len(app_lines) - len(shown_details) - len(shown_app)
     if detail_lines:
         out += ["", "#### Finding details",
                 "Details are report-derived and have not been re-verified."] + shown_details
+    if app_lines:
+        out += ["", "#### Reported applicability",
+                "Report-derived outcomes as recorded by the adapter; they are not a gate verdict."] + shown_app
     if omitted_rows or omitted_details or duplicates:
         out.append("")
     if omitted_rows:
         out.append(f"Rows omitted from this preview: {omitted_rows} (counts above include every row).")
     if omitted_details:
-        out.append(f"Detail entries omitted from this preview: {omitted_details}.")
+        out.append(f"Detail and applicability entries omitted from this preview: {omitted_details}.")
     if duplicates:
         out.append(f"Duplicate finding records collapsed: {duplicates}.")
     out.append("")
@@ -666,7 +724,7 @@ def render(report_bytes: bytes, expected: dict[str, Any]) -> tuple[int, str]:
             _fail("preview cannot be bounded safely")
         return 0, text
     except _Unavailable as exc:
-        return _unavailable(exc.heading, exc.reason)
+        return _unavailable(exc.heading, exc.reason, exc.context)
     except (UnicodeError, RecursionError, MemoryError):
         return _unavailable(H_UNAVAILABLE, "preview cannot be bounded safely")
 
