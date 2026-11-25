@@ -34,7 +34,8 @@ Actions and reason codes (the complete vocabulary)
 NO_WRITE      FORBIDDEN_NAME, MALFORMED_INPUT, SOURCE_MISMATCH, ATTEMPT_NOT_1,
               JOB_UNPROVEN, ARTIFACT_INVALID, PR_MISMATCH, FORK_DEFERRED,
               BASE_MOVED, BASE_UNPROVEN, STALE_RUN, BODY_TOO_LARGE,
-              COMMENTS_INCOMPLETE
+              COMMENTS_INCOMPLETE, DEFINITION_MISMATCH, POLICY_UNPROVEN,
+              POLICY_CHANGED, ORDER_UNPROVEN
 UNAVAILABLE   GATE_JOB_INCOMPLETE, REPORT_UNAVAILABLE, GATE_REPORT_DISAGREE,
               BODY_TOO_LARGE. A neutral body is planned (``write`` is CREATE or
               UPDATE after reconciliation). No report-derived claim is made.
@@ -53,6 +54,13 @@ COMMENTS_INCOMPLETE. A cancelled, skipped or timed-out gate job is not a failure
 carried forward and, once the pull request and base are established, yields
 UNAVAILABLE GATE_JOB_INCOMPLETE with a neutral body.
 
+Trust assumptions modelled (not proven) in stage A: ``observed.producer_definition``
+(path and blob SHA of the workflow definition the run used), ``observed.policy``
+(posture and version at three observations), the job and step timestamps, the
+artifact ``created_at`` and ``other_runs_complete``. In stage B each must come
+from an independent host source; stage A only models them and abstains when
+they are missing, unparseable or different from the trusted ``config``.
+
 Never synthesized: a gate verdict, UNEVALUATED, "merge blocked", "merge
 allowed" or any compliance claim. The gate job conclusion is shown separately
 from the report-derived text. Fork pull requests are NO_WRITE FORK_DEFERRED.
@@ -62,6 +70,7 @@ from __future__ import annotations
 import argparse
 import base64
 import binascii
+import datetime
 import hashlib
 import importlib.util
 import io
@@ -79,7 +88,8 @@ NO_WRITE, CREATE, UPDATE, NOOP, UNAVAILABLE, CONFLICT = (
 REASONS = frozenset({
     "FORBIDDEN_NAME", "MALFORMED_INPUT", "SOURCE_MISMATCH", "ATTEMPT_NOT_1", "JOB_UNPROVEN",
     "ARTIFACT_INVALID", "PR_MISMATCH", "FORK_DEFERRED", "BASE_MOVED", "BASE_UNPROVEN", "STALE_RUN",
-    "BODY_TOO_LARGE", "COMMENTS_INCOMPLETE", "RECEIPT_MISMATCH", "GATE_JOB_INCOMPLETE", "REPORT_UNAVAILABLE", "GATE_REPORT_DISAGREE",
+    "BODY_TOO_LARGE", "COMMENTS_INCOMPLETE", "DEFINITION_MISMATCH", "POLICY_UNPROVEN",
+    "POLICY_CHANGED", "ORDER_UNPROVEN", "RECEIPT_MISMATCH", "GATE_JOB_INCOMPLETE", "REPORT_UNAVAILABLE", "GATE_REPORT_DISAGREE",
     "OWNERSHIP_AMBIGUOUS", "EDIT_DETECTED", "RECEIPT_MISSING", "COMMENT_DELETED",
     "OK_CREATE", "OK_UPDATE", "OK_UNCHANGED"})
 
@@ -92,6 +102,8 @@ ARTIFACT_RE = re.compile(r"mneme-gate-pr([1-9][0-9]{0,9})-([0-9]+)")
 SHA40_RE = re.compile(r"[0-9a-f]{40}")
 SHA256_RE = re.compile(r"[0-9a-f]{64}")
 MARKER_RE = re.compile(r"(?!.*--)[A-Za-z0-9._/:-]{0,63}[A-Za-z0-9._/:]")
+TS_RE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z")
+REQUIRED_EVENT = "pull_request_target"
 DISPOSITION_RE = re.compile(r"Recorded adapter disposition: `(success|failure)`")
 INCOMPLETE_CONCLUSIONS = ("cancelled", "skipped", "timed_out")
 FOOTER = ("Revision-scoped advisory snapshot. Comments may be edited or become stale; edit checks occur "
@@ -119,6 +131,7 @@ MAX_ARTIFACTS = 100
 MAX_OTHER_RUNS = 1000
 MAX_COMMENTS = 1000
 MAX_EDITS = 100
+MAX_TRACE_ENTRIES = 2000
 
 
 class _Stop(Exception):
@@ -143,6 +156,16 @@ def _get(d: Any, *keys: str) -> Any:
 
 def _int(v: Any) -> bool:
     return isinstance(v, int) and not isinstance(v, bool)
+
+
+def _ts(value: Any) -> Any:
+    """Strict ISO-8601 UTC (``YYYY-MM-DDTHH:MM:SSZ``) or None."""
+    if not isinstance(value, str) or TS_RE.fullmatch(value) is None:
+        return None
+    try:
+        return datetime.datetime.strptime(value, "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError:
+        return None
 
 
 def _norm(name: str) -> str:
@@ -174,6 +197,10 @@ def _check_config(config: Any) -> dict[str, Any]:
             ok = (_int(config["repo_id"]) and isinstance(config["default_branch"], str)
                   and _int(prod["workflow_id"]) and isinstance(prod["path"], str)
                   and isinstance(prod["event"], str) and isinstance(prod["gate_job_name"], str)
+                  and isinstance(prod["evaluate_step"], str) and prod["evaluate_step"] != ""
+                  and isinstance(config["producer_definition"]["path"], str)
+                  and SHA40_RE.fullmatch(str(config["producer_definition"]["blob_sha"])) is not None
+                  and isinstance(config["policy_version"], str) and config["policy_version"] != ""
                   and all(isinstance(pins[k], str) for k in (
                       "adapter_sha256", "evaluator_commit", "evaluator_wheel_sha256", "mode", "posture"))
                   and _int(pub["actor_id"]) and isinstance(pub["marker"], str)
@@ -184,6 +211,8 @@ def _check_config(config: Any) -> dict[str, Any]:
                   and all(isinstance(n, str) for n in config.get("required_checks", []))
                   and all(_int(lim[k]) and lim[k] > 0 for k in (
                       "body_cap", "archive_compressed_max", "archive_uncompressed_max"))
+                  and config["producer_definition"]["path"] == prod["path"]
+                  and pins["mode"] in ("strict", "warn") and pins["posture"] in ("open", "closed")
                   and config["disclosure"] == "totals")
     except (KeyError, TypeError):
         ok = False
@@ -272,9 +301,14 @@ def _check_source(config: dict[str, Any], obs: dict[str, Any]) -> tuple[int, int
             and isinstance(head, str) and SHA40_RE.fullmatch(head) is not None
             and _get(run, "repository", "id") == config["repo_id"]
             and run.get("workflow_id") == prod["workflow_id"] and run.get("path") == prod["path"]
-            and run.get("event") == prod["event"] and run.get("status") == "completed")
+            and run.get("event") == prod["event"] and run.get("event") == REQUIRED_EVENT
+            and run.get("status") == "completed")
     if not good:
         raise _no_write("SOURCE_MISMATCH")
+    definition, approved = obs.get("producer_definition"), config["producer_definition"]
+    if not (isinstance(definition, dict) and definition.get("path") == approved["path"]
+            and definition.get("blob_sha") == approved["blob_sha"]):
+        raise _no_write("DEFINITION_MISMATCH")
     attempts = run.get("run_attempt_obs")
     for key in ("resolve", "before_write", "after_write"):
         v = _get(attempts, key)
@@ -285,36 +319,51 @@ def _check_source(config: dict[str, Any], obs: dict[str, Any]) -> tuple[int, int
 
 # ── 4. gate job ──────────────────────────────────────────────────────────────
 
-def _check_job(config: dict[str, Any], obs: dict[str, Any]) -> str:
-    """Return the job conclusion. Incomplete conclusions are returned, not raised."""
+def _check_job(config: dict[str, Any], obs: dict[str, Any]) -> tuple[str, dict[str, Any]]:
+    """Return (job conclusion, job). Incomplete conclusions are returned, not raised."""
     jobs = [j for j in obs["jobs"] if isinstance(j, dict) and j.get("name") == config["producer"]["gate_job_name"]]
     if len(jobs) != 1:
         raise _no_write("JOB_UNPROVEN")
-    job = jobs[0]
+    job, run = jobs[0], obs["source_run"]
     conclusion = job.get("conclusion")
-    if not _int(job.get("run_attempt")) or job["run_attempt"] != 1 or not _int(job.get("id")):
+    if (not _int(job.get("run_attempt")) or job["run_attempt"] != 1 or not _int(job.get("id"))
+            or job.get("run_id") != run.get("id") or not _int(job.get("run_id"))
+            or job.get("head_sha") != run.get("head_sha") or job.get("status") != "completed"):
         raise _no_write("JOB_UNPROVEN")
     if conclusion in INCOMPLETE_CONCLUSIONS:
-        return conclusion
+        return conclusion, job
     if conclusion not in ("success", "failure"):
         raise _no_write("JOB_UNPROVEN")
     steps = {}
-    for name in (PRESERVE_STEP, DECISION_STEP):
+    for name in (config["producer"]["evaluate_step"], PRESERVE_STEP, DECISION_STEP):
         found = [s for s in job["steps"] if s.get("name") == name]
         if len(found) != 1 or found[0].get("conclusion") not in ("success", "failure"):
             raise _no_write("JOB_UNPROVEN")
         steps[name] = found[0]["conclusion"]
+    if steps[config["producer"]["evaluate_step"]] != "success":  # the step ends with exit 0
+        raise _no_write("JOB_UNPROVEN")
     if steps[PRESERVE_STEP] != "success":  # upload failure gives no positive result
         raise _no_write("JOB_UNPROVEN")
     # Incoherent combinations are unproven, never repaired.
     if steps[DECISION_STEP] != conclusion:
         raise _no_write("JOB_UNPROVEN")
-    return conclusion
+    return conclusion, job
 
 
 # ── 5. artifact and archive ──────────────────────────────────────────────────
 
-def _check_artifact(config: dict[str, Any], obs: dict[str, Any], run_id: int, head: str) -> tuple[int, bytes]:
+def _check_upload_window(art: dict[str, Any], job: dict[str, Any]) -> None:
+    """The artifact must have been created inside the preserve step's own time window."""
+    steps = [s for s in job["steps"] if s.get("name") == PRESERVE_STEP]
+    if len(steps) != 1:
+        raise _no_write("ARTIFACT_INVALID")
+    start, end, made = _ts(steps[0].get("started_at")), _ts(steps[0].get("completed_at")), _ts(art.get("created_at"))
+    if start is None or end is None or made is None or not (start <= made <= end):
+        raise _no_write("ARTIFACT_INVALID")
+
+
+def _check_artifact(config: dict[str, Any], obs: dict[str, Any], run_id: int, head: str,
+                    job: dict[str, Any]) -> tuple[int, bytes]:
     lim = config["limits"]
     named = [a for a in obs["artifacts"] if isinstance(a.get("name"), str) and a["name"].startswith("mneme-gate-pr")]
     if len(named) != 1:
@@ -332,6 +381,7 @@ def _check_artifact(config: dict[str, Any], obs: dict[str, Any], run_id: int, he
             and _get(wr, "head_repository_id") == _get(run, "head_repository", "id")
             and isinstance(art.get("digest"), str)):
         raise _no_write("ARTIFACT_INVALID")
+    _check_upload_window(art, job)
     try:
         data = base64.b64decode(obs["artifact_zip_b64"], validate=True)
     except (binascii.Error, ValueError):
@@ -408,6 +458,43 @@ def _check_base(obs: dict[str, Any], report_bytes: bytes) -> str:
     return tip
 
 
+def _check_policy(config: dict[str, Any], obs: dict[str, Any]) -> None:
+    for key in _OBS:
+        posture, version = _get(obs, "policy", key, "posture"), _get(obs, "policy", key, "version")
+        if not isinstance(posture, str) or not isinstance(version, str) or posture == "" or version == "":
+            raise _no_write("POLICY_UNPROVEN")
+        if posture != config["pins"]["posture"] or version != config["policy_version"]:
+            raise _no_write("POLICY_CHANGED")
+
+
+def _exclusion_line(report_bytes: bytes) -> list[str]:
+    """Count reported outer EXCLUDED applicability entries (structural; no paths or IDs)."""
+    try:
+        rep_obj = json.loads(report_bytes.decode("utf-8"))
+        rows = list(rep_obj["files"]) + list(rep_obj["gate_conditions"])
+        count, present = 0, False
+        for row in rows:
+            trace = row.get("applicability")
+            if trace is None:
+                continue
+            present = True
+            if not isinstance(trace, list) or len(trace) > MAX_TRACE_ENTRIES:
+                return ["Reported exclusions: unavailable"]
+            for entry in trace:
+                if not isinstance(entry, dict):
+                    return ["Reported exclusions: unavailable"]
+                for key in ("decision_id", "rule_id", "outcome"):
+                    v = entry.get(key)
+                    if not (v is None or (isinstance(v, str) and len(v) <= 512)):
+                        return ["Reported exclusions: unavailable"]
+                count += 1 if entry.get("outcome") == "EXCLUDED" else 0
+    except (ValueError, KeyError, TypeError, AttributeError, UnicodeDecodeError, RecursionError):
+        return ["Reported exclusions: unavailable"]
+    if present and count:
+        return [f"Reported exclusions (report-derived, not an allow): {count}"]
+    return []
+
+
 # ── 12. body ─────────────────────────────────────────────────────────────────
 
 def _context_block(config: dict[str, Any], base: str, head: str, run_id: int, job: str) -> list[str]:
@@ -452,6 +539,8 @@ def _totals_only(rendered: str) -> list[str]:
 # ── 10-11. ordering and reconciliation ───────────────────────────────────────
 
 def _check_order(obs: dict[str, Any], run_id: int, run_number: int) -> None:
+    if obs.get("other_runs_complete") is not True:
+        raise _no_write("ORDER_UNPROVEN")
     for run in obs["other_runs"]:
         if run["id"] == run_id:
             if run.get("run_attempt") != 1:
@@ -500,6 +589,8 @@ def _reconcile(config: dict[str, Any], obs: dict[str, Any], run_id: int, run_num
             or hashlib.sha256(c["body"].encode("utf-8", "surrogatepass")).hexdigest() != rc["body_sha256"]
             or c["updated_at"] != rc["updated_at"]):
         return CONFLICT, "EDIT_DETECTED", None, foreign
+    if rc["run_number"] == run_number and rc["source_run_id"] != run_id:
+        return CONFLICT, "RECEIPT_MISMATCH", None, foreign
     if rc["source_run_id"] == run_id and (rc["run_number"] != run_number or rc["head_sha"] != head
                                           or rc["base_sha"] != base):
         return CONFLICT, "RECEIPT_MISMATCH", None, foreign
@@ -524,12 +615,13 @@ def _plan(config: Any, observed: Any) -> dict[str, Any]:
     cfg = _check_config(config)
     obs = _check_shape(observed, cfg)
     run_id, run_number, head = _check_source(cfg, obs)
-    job = _check_job(cfg, obs)
+    job, job_obj = _check_job(cfg, obs)
     if obs["source_run"].get("conclusion") != job:
         raise _no_write("SOURCE_MISMATCH")
-    pr_number, report = _check_artifact(cfg, obs, run_id, head)
+    pr_number, report = _check_artifact(cfg, obs, run_id, head, job_obj)
     _check_pull(cfg, obs, pr_number, head)
     tip = _check_base(obs, report)
+    _check_policy(cfg, obs)
 
     unavailable: str | None = None
     middle: list[str] = []
@@ -551,7 +643,8 @@ def _plan(config: Any, observed: Any) -> dict[str, Any]:
         elif found[0] != job:
             unavailable = "GATE_REPORT_DISAGREE"
         else:
-            middle = _totals_only(rendered) + ["", TIER_LINE]
+            excl = _exclusion_line(report)
+            middle = _totals_only(rendered) + ([""] + excl if excl else []) + ["", TIER_LINE]
 
     _check_order(obs, run_id, run_number)
     cap = cfg["limits"]["body_cap"]

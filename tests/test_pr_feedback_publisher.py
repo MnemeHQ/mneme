@@ -50,6 +50,11 @@ ACTOR = 555001
 MARKER = "mneme-ap1-feedback:v1"
 MARKER_LINE = "<!-- mneme-ap1-feedback:v1 -->"
 GATE_JOB = "mneme trusted gate"
+EVAL_STEP = "Evaluate the PR in the trusted workspace"
+DEF_PATH = ".github/workflows/mneme-trusted-gate.yml"
+DEF_BLOB = "d" * 40
+POLICY_VERSION = "policy-v1"
+T_START, T_MADE, T_END = "2026-11-24T10:00:00Z", "2026-11-24T10:00:20Z", "2026-11-24T10:00:30Z"
 REQUIRED = ["gate (PR battery)", "Scan docs/scripts for mojibake + BOM", "Validate PR execution provenance",
             "Verify install commands name mneme-hq", "mneme check --mode warn"]
 NEUTRAL = {"GATE_JOB_INCOMPLETE", "REPORT_UNAVAILABLE", "GATE_REPORT_DISAGREE", "BODY_TOO_LARGE"}
@@ -79,7 +84,9 @@ def config_for(rep, **over):
     cfg = {
         "repo_id": REPO_ID, "default_branch": "main",
         "producer": {"workflow_id": 404923975, "path": ".github/workflows/mneme-trusted-gate.yml",
-                     "event": "pull_request_target", "gate_job_name": GATE_JOB},
+                     "event": "pull_request_target", "gate_job_name": GATE_JOB,
+                     "evaluate_step": EVAL_STEP},
+        "producer_definition": {"path": DEF_PATH, "blob_sha": DEF_BLOB}, "policy_version": POLICY_VERSION,
         "pins": {"adapter_sha256": rep["adapter"]["sha256"], "evaluator_commit": rep["evaluator"]["commit"],
                  "evaluator_wheel_sha256": rep["evaluator"]["wheel_sha256"],
                  "mode": rep["requested_mode"], "posture": rep["posture"]["effective"]},
@@ -99,8 +106,9 @@ def observed_for(rep, *, job="success", report_bytes=None, entries=None, zbytes=
     pull = {"number": PR, "state": "open", "base": {"repo": {"id": REPO_ID}, "ref": "main", "sha": base},
             "head": {"repo": {"id": REPO_ID}, "sha": head}}
     ref = {"object": {"sha": base}}
-    steps = [{"number": 1, "name": "Evaluate the PR in the trusted workspace", "conclusion": "success"},
-             {"number": 2, "name": "Preserve the gate evidence", "conclusion": "success"},
+    steps = [{"number": 1, "name": EVAL_STEP, "conclusion": "success"},
+             {"number": 2, "name": "Preserve the gate evidence", "conclusion": "success",
+              "started_at": T_START, "completed_at": T_END},
              {"number": 3, "name": "Gate decision",
               "conclusion": job if job in ("success", "failure") else "cancelled"}]
     return {
@@ -109,15 +117,20 @@ def observed_for(rep, *, job="success", report_bytes=None, entries=None, zbytes=
                        "status": "completed", "conclusion": job, "run_number": RUN_NUMBER, "head_sha": head,
                        "head_repository": {"id": REPO_ID}, "pull_requests": [],
                        "run_attempt_obs": {"resolve": 1, "before_write": 1, "after_write": 1}},
-        "jobs": [{"name": GATE_JOB, "id": 9001, "run_attempt": 1, "conclusion": job, "steps": steps}],
+        "producer_definition": {"path": DEF_PATH, "blob_sha": DEF_BLOB},
+        "policy": {k: {"posture": rep["posture"]["effective"], "version": POLICY_VERSION}
+                   for k in ("resolve", "before_write", "after_write")},
+        "jobs": [{"name": GATE_JOB, "id": 9001, "run_id": RUN_ID, "head_sha": head, "status": "completed",
+                  "run_attempt": 1, "conclusion": job, "steps": steps}],
         "artifacts": [{"id": 14961731195, "name": f"mneme-gate-pr{PR}-{RUN_ID}", "size_in_bytes": len(z),
                        "digest": "sha256:" + hashlib.sha256(z).hexdigest(), "expired": False,
+                       "created_at": T_MADE,
                        "workflow_run": {"id": RUN_ID, "repository_id": REPO_ID, "head_sha": head,
                                         "head_repository_id": REPO_ID}}],
         "artifact_zip_b64": base64.b64encode(z).decode("ascii"),
         "base_ref_obs": {k: dict(ref) for k in ("resolve", "before_write", "after_write")},
         "pull_obs": {k: copy.deepcopy(pull) for k in ("resolve", "before_write", "after_write")},
-        "other_runs": [], "comments": [], "comments_complete": True, "receipt": None,
+        "other_runs": [], "other_runs_complete": True, "comments": [], "comments_complete": True, "receipt": None,
     }
 
 
@@ -540,7 +553,7 @@ def test_p07_report_base_must_equal_the_independent_tip():
 
 def test_p07_wrong_pins_or_head_in_report_are_unavailable():
     for field, val in [("adapter_sha256", "0" * 64), ("evaluator_commit", "0" * 40),
-                       ("evaluator_wheel_sha256", "0" * 64), ("mode", "warn"), ("posture", "open")]:
+                       ("evaluator_wheel_sha256", "0" * 64), ("mode", "warn")]:
         cfg, obs, _ = case()
         cfg["pins"][field] = val
         out = P.plan(cfg, obs)
@@ -634,6 +647,7 @@ def test_p10_same_run_same_body_is_noop_and_new_run_updates():
     obs2["source_run"]["id"] = RUN_ID + 1
     obs2["artifacts"][0]["name"] = f"mneme-gate-pr{PR}-{RUN_ID + 1}"
     obs2["artifacts"][0]["workflow_run"]["id"] = RUN_ID + 1
+    obs2["jobs"][0]["run_id"] = RUN_ID + 1
     obs2["receipt"]["run_number"] = RUN_NUMBER
     upd = P.plan(cfg2, obs2)
     assert upd["action"] == "UPDATE" and upd["reason"] == "OK_UPDATE" and upd["comment_id"] == 777
@@ -930,7 +944,7 @@ FORBIDDEN_ATTRS = {("os", "system"), ("os", "popen"), ("os", "environ"), ("os", 
 FORBIDDEN_ATTR_NAMES = {"import_module", "write_text", "write_bytes", "unlink", "rmdir", "mkdir", "touch",
                         "rename", "environ", "getenv", "system", "popen"}
 FORBIDDEN_NAMES = {"getenv", "environ", "system", "popen", "__import__", "eval", "exec", "compile"}
-ALLOWED_IMPORTS = {"argparse", "base64", "binascii", "hashlib", "importlib", "io", "json", "re", "sys",
+ALLOWED_IMPORTS = {"argparse", "base64", "binascii", "datetime", "hashlib", "importlib", "io", "json", "re", "sys",
                    "zipfile", "pathlib", "typing", "__future__"}
 
 
@@ -1057,6 +1071,7 @@ def test_p15_every_plan_reason_is_in_the_fixed_vocabulary():
     assert P.REASONS == {"FORBIDDEN_NAME", "MALFORMED_INPUT", "SOURCE_MISMATCH", "ATTEMPT_NOT_1", "JOB_UNPROVEN",
                          "ARTIFACT_INVALID", "PR_MISMATCH", "FORK_DEFERRED", "BASE_MOVED", "BASE_UNPROVEN",
                          "STALE_RUN", "BODY_TOO_LARGE", "COMMENTS_INCOMPLETE", "RECEIPT_MISMATCH",
+                         "DEFINITION_MISMATCH", "POLICY_UNPROVEN", "POLICY_CHANGED", "ORDER_UNPROVEN",
                          "GATE_JOB_INCOMPLETE", "REPORT_UNAVAILABLE",
                          "GATE_REPORT_DISAGREE", "OWNERSHIP_AMBIGUOUS", "EDIT_DETECTED", "RECEIPT_MISSING",
                          "COMMENT_DELETED", "OK_CREATE", "OK_UPDATE", "OK_UNCHANGED"}
@@ -1188,3 +1203,227 @@ def test_p15_marker_rejects_comment_terminators_and_trailing_dash(bad):
 def test_p15_marker_regex_accepts_the_real_marker_and_plan_records_foreign_count():
     assert P.MARKER_RE.fullmatch(MARKER)
     assert run()["foreign_marker_comments"] == 0
+
+
+# ── MR-A1: producer, job and artifact binding ────────────────────────────────
+
+def _job(o):
+    return o["jobs"][0]
+
+
+@pytest.mark.parametrize("mut,reason", [
+    (lambda o: _job(o).__setitem__("run_id", RUN_ID + 1), "JOB_UNPROVEN"),
+    (lambda o: _job(o).pop("run_id"), "JOB_UNPROVEN"),
+    (lambda o: _job(o).__setitem__("head_sha", "9" * 40), "JOB_UNPROVEN"),
+    (lambda o: _job(o).pop("head_sha"), "JOB_UNPROVEN"),
+    (lambda o: _job(o).__setitem__("status", "in_progress"), "JOB_UNPROVEN"),
+    (lambda o: _job(o).__setitem__("run_attempt", 2), "JOB_UNPROVEN"),
+    (lambda o: _job(o)["steps"][0].__setitem__("conclusion", "failure"), "JOB_UNPROVEN"),
+    (lambda o: _job(o)["steps"][0].__setitem__("conclusion", "skipped"), "JOB_UNPROVEN"),
+    (lambda o: _job(o)["steps"][0].__setitem__("conclusion", "cancelled"), "JOB_UNPROVEN"),
+    (lambda o: _job(o)["steps"].pop(0), "JOB_UNPROVEN"),
+    (lambda o: _job(o)["steps"].append(dict(_job(o)["steps"][0])), "JOB_UNPROVEN"),
+    (lambda o: o["producer_definition"].__setitem__("blob_sha", "e" * 40), "DEFINITION_MISMATCH"),
+    (lambda o: o["producer_definition"].__setitem__("path", ".github/workflows/other.yml"), "DEFINITION_MISMATCH"),
+    (lambda o: o.pop("producer_definition"), "DEFINITION_MISMATCH"),
+    (lambda o: o.__setitem__("producer_definition", "x"), "DEFINITION_MISMATCH"),
+    (lambda o: o["source_run"].__setitem__("event", "pull_request"), "SOURCE_MISMATCH"),
+    (lambda o: o["source_run"].__setitem__("event", "workflow_run"), "SOURCE_MISMATCH"),
+])
+def test_p03_p05_mr_a1_binding_failures_never_write(mut, reason):
+    cfg, obs, _ = case()
+    mut(obs)
+    no_write(P.plan(cfg, obs), reason)
+
+
+def test_p03_mr_a1_evaluate_step_name_comes_from_config():
+    cfg, obs, _ = case()
+    cfg["producer"]["evaluate_step"] = "Some other step"
+    no_write(P.plan(cfg, obs), "JOB_UNPROVEN")
+
+
+def test_p03_mr_a1_config_must_carry_definition_and_policy_version():
+    for mut in [lambda c: c.pop("producer_definition"), lambda c: c.pop("policy_version"),
+                lambda c: c["producer"].pop("evaluate_step"),
+                lambda c: c["producer_definition"].__setitem__("blob_sha", "zz"),
+                lambda c: c.__setitem__("policy_version", "")]:
+        cfg, obs, _ = case()
+        mut(cfg)
+        no_write(P.plan(cfg, obs), "MALFORMED_INPUT")
+
+
+@pytest.mark.parametrize("created", ["2026-11-24T09:59:59Z", "2026-11-24T10:00:31Z", None, "", "yesterday",
+                                     "2026-11-24 10:00:20", "2026-11-24T10:00:20+00:00", "2026-11-24T10:00:20.5Z",
+                                     "2026-13-24T10:00:20Z", 5])
+def test_p05_mr_a1_artifact_created_outside_or_unparseable_window(created):
+    cfg, obs, _ = case()
+    if created is None:
+        obs["artifacts"][0].pop("created_at")
+    else:
+        obs["artifacts"][0]["created_at"] = created
+    no_write(P.plan(cfg, obs), "ARTIFACT_INVALID")
+
+
+@pytest.mark.parametrize("field", ["started_at", "completed_at"])
+@pytest.mark.parametrize("bad", [None, "x", "2026-11-24T10:00:00"])
+def test_p05_mr_a1_preserve_step_times_must_parse(field, bad):
+    cfg, obs, _ = case()
+    step = _job(obs)["steps"][1]
+    if bad is None:
+        step.pop(field)
+    else:
+        step[field] = bad
+    no_write(P.plan(cfg, obs), "ARTIFACT_INVALID")
+
+
+def test_p05_mr_a1_window_bounds_are_inclusive_and_apply_to_incomplete_jobs():
+    for made in (T_START, T_END):
+        cfg, obs, _ = case()
+        obs["artifacts"][0]["created_at"] = made
+        assert P.plan(cfg, obs)["action"] == "CREATE"
+    cfg, obs, _ = case("B1", job="cancelled")
+    obs["artifacts"][0]["created_at"] = "2026-11-25T00:00:00Z"
+    no_write(P.plan(cfg, obs), "ARTIFACT_INVALID")
+
+
+# ── MR-A2: policy freshness and ordering completeness ────────────────────────
+
+@pytest.mark.parametrize("which", ["resolve", "before_write", "after_write"])
+def test_p07_p09_mr_a2_policy_missing_or_changed_at_any_observation(which):
+    cfg, obs, _ = case()
+    obs["policy"][which]["posture"] = "open"  # closed -> open between observations
+    no_write(P.plan(cfg, obs), "POLICY_CHANGED")
+    cfg, obs, _ = case()
+    obs["policy"][which]["version"] = "policy-v2"
+    no_write(P.plan(cfg, obs), "POLICY_CHANGED")
+    cfg, obs, _ = case()
+    del obs["policy"][which]
+    no_write(P.plan(cfg, obs), "POLICY_UNPROVEN")
+    for bad in ({}, {"posture": "closed"}, {"version": POLICY_VERSION}, {"posture": 1, "version": POLICY_VERSION}, None):
+        cfg, obs, _ = case()
+        obs["policy"][which] = bad
+        no_write(P.plan(cfg, obs), "POLICY_UNPROVEN")
+
+
+def test_p07_mr_a2_policy_block_missing_or_changed_expected_posture():
+    cfg, obs, _ = case()
+    del obs["policy"]
+    no_write(P.plan(cfg, obs), "POLICY_UNPROVEN")
+    cfg, obs, _ = case("L3")  # open posture report with matching policy is fine
+    assert P.plan(cfg, obs)["action"] == "CREATE"
+    obs["policy"]["resolve"]["posture"] = "closed"
+    no_write(P.plan(cfg, obs), "POLICY_CHANGED")
+
+
+def test_p09_mr_a2_order_must_be_declared_complete():
+    for val in (None, False, 1, "true"):
+        cfg, obs, _ = case()
+        obs["other_runs_complete"] = val
+        no_write(P.plan(cfg, obs), "ORDER_UNPROVEN")
+    cfg, obs, _ = case()
+    del obs["other_runs_complete"]
+    no_write(P.plan(cfg, obs), "ORDER_UNPROVEN")
+    cfg, obs, _ = case()
+    assert obs["other_runs"] == [] and obs["other_runs_complete"] is True
+    assert P.plan(cfg, obs)["action"] == "CREATE"  # empty and complete = latest
+
+
+def test_p09_mr_a2_older_rerun_is_allowed_but_newer_run_is_not():
+    cfg, obs, _ = case()
+    obs["other_runs"] = [{"id": 5, "run_number": RUN_NUMBER - 3, "run_attempt": 2, "status": "completed"}]
+    assert P.plan(cfg, obs)["action"] == "CREATE"
+    obs["other_runs"].append({"id": 6, "run_number": RUN_NUMBER + 1, "run_attempt": 1})
+    no_write(P.plan(cfg, obs), "STALE_RUN")
+
+
+def test_p09_p11_mr_a2_receipt_with_same_run_number_but_other_run_id_conflicts():
+    cfg, obs, first = existing()
+    obs["receipt"] = dict(obs["receipt"], source_run_id=RUN_ID + 99)
+    assert P.plan(cfg, obs) == {"action": "CONFLICT", "reason": "RECEIPT_MISMATCH"}
+
+
+# ── MR-A3: reported exclusions in the totals ─────────────────────────────────
+
+def _with_trace(trace, name="B1"):
+    rep = report_of(name)
+    rep["files"][0]["applicability"] = trace
+    return P.plan(config_for(rep), observed_for(rep))
+
+
+def _e(outcome, rid="R1"):
+    return {"decision_id": "ADR-1", "rule_id": rid, "outcome": outcome}
+
+
+def test_p02_mr_a3_pass_with_excluded_shows_count_without_ids():
+    out = _with_trace([_e("EXCLUDED")])
+    body = out["body"]
+    assert out["action"] == "CREATE"
+    assert "Reported exclusions (report-derived, not an allow): 1" in body
+    assert body.index("Partly unevaluated") < body.index("Reported exclusions") < body.index("Per-file rows")
+    assert "ADR-1" not in body and "R1" not in body
+    assert body.split("\n")[2] == PFX + "Reported PASS \u2014 evaluated scope only"
+    assert "### Reported PASS" in body
+
+
+def test_p02_mr_a3_mixed_outcomes_count_only_excluded():
+    out = _with_trace([_e("APPLIED"), _e("EXCLUDED", "R2"), _e("EXCLUDED", "R3"), _e("NOT_APPLICABLE")])
+    assert "Reported exclusions (report-derived, not an allow): 2" in out["body"]
+    out = _with_trace([_e("APPLIED")])
+    assert "Reported exclusions" not in out["body"]
+
+
+@pytest.mark.parametrize("bad", ["x", {"a": 1}, [5], [{"outcome": 7}], [{"decision_id": ["x"]}],
+                                 [{"outcome": "x" * 513}]])
+def test_p02_mr_a3_malformed_trace_is_unavailable(bad):
+    body = _with_trace(bad)["body"]
+    assert "Reported exclusions: unavailable" in body
+    assert "(report-derived, not an allow)" not in body
+
+
+def test_p02_mr_a3_no_trace_means_no_line():
+    rep = report_of("B1")
+    for r in rep["files"]:
+        r.pop("applicability", None)
+    out = P.plan(config_for(rep), observed_for(rep))
+    assert "Reported exclusions" not in out["body"]
+    assert "Reported exclusions" not in _with_trace(None)["body"]
+    assert "Reported exclusions" not in _with_trace([])["body"]
+
+
+def test_p02_mr_a3_exclusions_do_not_change_heading_status_or_gate_labels():
+    plain = run("B2")["body"]
+    rep = report_of("B2")
+    rep["files"][0]["applicability"] = [_e("EXCLUDED")]
+    out = P.plan(config_for(rep), observed_for(rep, job="failure"))["body"]
+    assert out.split("\n")[2] == plain.split("\n")[2]
+    assert "### Reported VIOLATION" in out
+    assert "separate from the report): failure" in out
+
+
+def test_p07_mr_a2_configured_posture_disagreeing_with_observed_policy_is_changed():
+    cfg, obs, _ = case()
+    cfg["pins"]["posture"] = "open"
+    no_write(P.plan(cfg, obs), "POLICY_CHANGED")
+
+
+def test_p03_mr_a1_evaluate_step_failure_is_unproven_for_both_job_shapes():
+    for name in ("B1", "B2"):
+        cfg, obs, _ = case(name)
+        _job(obs)["steps"][0]["conclusion"] = "failure"
+        no_write(P.plan(cfg, obs), "JOB_UNPROVEN")
+        assert _job(obs)["steps"][0]["name"] == "Evaluate the PR in the trusted workspace"
+        assert cfg["producer"]["evaluate_step"] == "Evaluate the PR in the trusted workspace"
+    assert P.PRESERVE_STEP == "Preserve the gate evidence" and P.DECISION_STEP == "Gate decision"
+
+
+@pytest.mark.parametrize("mut", [
+    lambda c: c["producer_definition"].__setitem__("path", ".github/workflows/other.yml"),
+    lambda c: c["pins"].__setitem__("mode", "lenient"),
+    lambda c: c["pins"].__setitem__("mode", ""),
+    lambda c: c["pins"].__setitem__("posture", "maybe"),
+    lambda c: c["pins"].__setitem__("posture", "OPEN"),
+])
+def test_p15_config_self_check_is_malformed_input(mut):
+    cfg, obs, _ = case()
+    mut(cfg)
+    no_write(P.plan(cfg, obs), "MALFORMED_INPUT")
