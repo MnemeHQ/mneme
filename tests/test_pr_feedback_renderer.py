@@ -1103,3 +1103,12 @@ def test_mr4_non_40_lowercase_hex_sha_is_unavailable(sha):
     code, text = go(rep)
     assert code == 0 and "- Base commit: Unavailable" in text
     assert_safe(text)
+
+
+def test_mr4_sha40_with_trailing_newline_is_unavailable():
+    for sha in ["a" * 40 + "\n", "a" * 40 + "\r\n", "\n" + "a" * 40]:
+        rep = make([pass_row()])
+        rep["base_sha"] = sha
+        code, text = go(rep)
+        assert code == 0 and "- Base commit: Unavailable" in text
+        assert_safe(text)

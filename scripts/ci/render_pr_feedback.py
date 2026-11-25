@@ -561,12 +561,12 @@ def _size(line: str) -> int:
     return len(line.encode("utf-8")) + 1
 
 
-_SHA40 = re.compile(r"^[0-9a-f]{40}$")
+_SHA40 = re.compile(r"[0-9a-f]{40}")
 
 
 def _context_lines(ctx: dict[str, str]) -> list[str]:
     def sha(value: str) -> str:
-        return code_span(value) if _SHA40.match(value) else "Unavailable"
+        return code_span(value) if _SHA40.fullmatch(value) else "Unavailable"
     return ["Report context (report-derived, not authenticated):",
             f"- Base commit: {sha(ctx['base'])}",
             f"- Head commit: {sha(ctx['head'])}",
