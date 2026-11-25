@@ -1,9 +1,13 @@
 # DG1-S closeout evidence record (2026-11-18)
 
-> **DRAFT — for independent review and owner acceptance.** This is the
+> **ACCEPTED 2026-11-19 — DG1-S COMPLETE under ADR-031 §11a.** This is the
 > closeout evidence record required by [ADR-031 §11a.4](../adr/ADR-031-decision-governance-semantics.md).
-> After independent review, owner acceptance and merge it closes **DG1-S only**.
-> It does **not** close DG1, DG1G or ADR-031 §11, and it is not a release.
+> Owner acceptance is recorded in [PR #838](https://github.com/MnemeHQ/mneme/pull/838);
+> the record merged as squash `3c65915a2ff835b20bc1d6fff4dc2e2220564229` at
+> tree `1e7799347d4a0f6687575886ffd96ad81351eb5f`, equal to the reviewed head
+> `c6f203e98c54d3e393bd8cd242c6261d264e6cf3`.
+> It closes **DG1-S only**. It does **not** close DG1, DG1G or ADR-031 §11,
+> and it is not a release.
 >
 > **Pinned subject:** `MnemeHQ/mneme` `main` at
 > `13fae565557953288ffb70052f092d91601fc89d`, tree
@@ -28,8 +32,8 @@ evidence. It records:
 - the obligations that DG1-S leaves open;
 - every §11a non-claim.
 
-DG1-S closes only after independent review and owner acceptance of this
-record. DG1 and DG1G remain open after that closure.
+DG1-S is complete under ADR-031 §11a as of 2026-11-19. DG1 and DG1G remain
+open.
 
 ## 1. Pinned subject
 
@@ -307,7 +311,6 @@ DG1 closeout, not conditions of DG1-S.
 This record does **not** claim:
 
 - DG1, DG1G or ADR-031 §11 completion;
-- that DG1-S is accepted before the owner accepts this record;
 - that C1b trusted applicability exists;
 - that B2b waiver-aware enforcement exists;
 - that any remaining resolver consumer is converged;
@@ -357,11 +360,13 @@ This record does **not** claim:
 
 ## 11. Review and acceptance
 
-- **Independent review:** PR #838; the exact reviewed head and verdict will
-  be recorded in that PR's conversation.
-- **Owner acceptance:** required before merge. This draft does not claim it.
-- **Effect of acceptance:** after independent review, owner acceptance and
-  merge, this record is the DG1-S §11a.4 closeout evidence. DG1 and DG1G
-  remain open.
-- **No automatic closure:** this record does not close DG1-S by itself, and it
-  does not authorize any work listed in §8.
+- **Independent review:** PR #838; final reviewed head
+  `c6f203e98c54d3e393bd8cd242c6261d264e6cf3`; verdict **READY** — no
+  blockers, no new findings.
+- **Owner acceptance:** recorded 2026-11-19 in PR #838.
+- **Merge:** squash `3c65915a2ff835b20bc1d6fff4dc2e2220564229`; tree
+  `1e7799347d4a0f6687575886ffd96ad81351eb5f`, equal to the reviewed head.
+- **Effect:** DG1-S is **COMPLETE** under ADR-031 §11a. DG1 and DG1G remain
+  open.
+- **Scope:** this record closes DG1-S only and does not authorize any work
+  listed in §8.
