@@ -24,7 +24,10 @@ Use real projects to validate whether recorded architectural decisions prevent m
 - functional completion;
 - unrequested scope expansion;
 - setup and maintenance friction;
-- whether teams retain Mneme after the initial evaluation.
+- whether teams retain Mneme after the initial evaluation;
+- AI usage and human review/rework effort, including failed attempts, where measured and consented.
+
+**Pilot value measurement:** alongside architectural compliance and functional completion, report **cost per successfully completed, architecture-compliant task** when cost observations are adequate. This is a testable engineering ROI measure, **not** an asserted Mneme cost saving; see [production governance trace #282](https://github.com/MnemeHQ/mneme/issues/282).
 
 ### P0 — Architecture Audit as an acquisition and evidence surface
 
@@ -37,6 +40,8 @@ The Audit consumes the authoritative core `assess_governability()` result. It mu
 Extend the existing benchmark discipline toward externally legible comparisons of architectural compliance across coding-agent workflows.
 
 Prefer frozen fixtures, deterministic scoring, clear treatment/control boundaries, and explicit separation of functional completion from architectural compliance.
+
+**Optional cost-of-outcome evaluation within existing P0 evidence:** for matched ungoverned vs Mneme-governed task runs, calculate `(measured AI execution cost + estimated human review/rework cost across all attempts, including unsuccessful attempts) / number of independently verified functionally complete and architecture-compliant tasks`. Report the components and their provenance separately; distinguish billed spend from modeled API-equivalent prices and human-rate estimates, include false blocks, coverage/UNEVALUATED paths, retry counts and sample sizes, and mark the metric **undefined** if no task qualifies or **unavailable** if cost data is insufficient. Do not treat PR throughput, token spending, or a prevented violation as proof of ROI; do not extend Core's decision authority or evidence semantics for fleet analytics. Reuse [#282](https://github.com/MnemeHQ/mneme/issues/282) rather than opening a new program.
 
 ### P0 — Four-layer decision-conformance validation
 
