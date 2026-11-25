@@ -112,11 +112,13 @@ See accepted [ADR-023](../adr/ADR-023-canonical-decision-index-and-runtime-proje
 
 ### P1 — DG1: Decision governance semantics (post-D1)
 
-DG1 is now partly implemented. DG1A, DG1C, DG1E, DG1D, DG1P and DG1B1 have landed: the governance contract is accepted, the effective-decision resolver matches v1 projection, canonical evidence identity is threaded through enforcement traces, snapshot-to-snapshot governance change is available, ADR `date` no longer carries precedence authority, and canonical decision applicability now resolves deterministically under `mneme.decision-index/v2`.
+**DG1-S — Decision Governance Semantic Foundation: COMPLETE on `main` (2026-11-19).** The accepted [ADR-031 §11a](../adr/ADR-031-decision-governance-semantics.md) amendment (#837) and independently reviewed [DG1-S closeout evidence](../validation/dg1s-closeout-evidence-2026-11-18.md) (#838, squash `3c65915a`) close **only the semantic foundation**, not DG1 or DG1G. All 13/13 ADR-031 §13 fixture groups are supported at the pinned closeout commit, with F13 providing resolver-level waiver evidence only.
 
-The governing architecture remains accepted [ADR-031](../adr/ADR-031-decision-governance-semantics.md). Decision applicability (DG1B1) landed under its [merged charter](../plans/2026-10-08-dg1b1-decision-applicability-charter.md) and [Layer 1 freeze amendment](../architecture/layer1-freeze-e73ff7d.md): optional exact project-local `required_labels` persist under `mneme.decision-index/v2`, an explicit v1 → v2 migration preserves global eligibility, and the shared resolver gains a `not_applicable` cause. Waivers (DG1B2) remain evidence- and target-binding-gated.
+**Delivered semantic foundation:** DG1A (contract), DG1C (effective resolution), DG1E (canonical decision/rule evidence identity), DG1D (snapshot change resolution), DG1P (no ADR-date precedence), DG1B1 (decision applicability and v2 memory), and DG1B2a (version-bound canonical waiver records, authority commands and resolver cause `waived`). **Waivers are recorded, but do not exclude decisions from authoritative enforcement.**
 
-DG1F runtime convergence is under way, in separately chartered increments. **Shipped in 0.11.0:** the report-only applicability preview (DG1F-C1a). **Merged on `main`, not yet released:** lifecycle-authority consolidation (DG1F-C2, #770: one lifecycle rule shared by projection, the resolver and the Audit, protection and evidence checks, plus a three-state governance context) and resolver-result consumption by `mneme audit`, setup readiness and `protect list` (DG1F-C3a, #777). Frozen runtime outputs and enforcement inputs are unchanged by both; C2 does change public library behavior (`GovernanceContext()` now means labels not supplied; see `CHANGELOG.md`). Still open: `audit_with_github_claim` (feasibility assessed, deferred until a consumer needs it), `protect status/validate/activate`, evidence APIs, every enforcement input, explanation output, enforcement-changing applicability (C1b), and then DG1G adversarial closeout. No runtime consumer changes which decisions it enforces until a chartered, freeze-amended increment says so.
+**Supporting capabilities:** DG1F-C1a's non-authoritative applicability preview shipped in `v0.11.0`; DG1F-C2's shared lifecycle authority and three-state `GovernanceContext` (#770), and DG1F-C3a's resolver-result consumption by `mneme audit`, setup readiness and `protect list` (#777) are merged but unreleased. C2/C3a do not change enforcement inputs or establish full ADR-031 §11 convergence.
+
+**Still open:** DG1 and DG1G (tracker [#497](https://github.com/MnemeHQ/mneme/issues/497)); C1b trusted applicability exclusion; B2b waiver-aware enforcement; the remaining §11 consumers; G1 self-authorization and G2 authorized-transition host controls (unevaluated), G3 host-boundary controls (partial, under CI1/T-08); and deferred precedence-reason semantics. All future enforcement-input changes require separate reviewed charters and Layer 1 freeze amendments under ADR-031 §7. The release process is independent; DG1-S completion does not authorize publication.
 
 DG1 defines a public, versioned semantic contract for:
 
@@ -154,9 +156,26 @@ The publication boundary is: **OSS owns decision execution; enterprise owns deci
 
 **Shared resolution contract:** as DG1 runtime convergence is accepted, CLI, hook, CI, MCP retrieval/explanation and evidence should consume one versioned authority/applicability result rather than independently interpreting documents or policy. Track exact decision/rule revision, repository binding and supported override semantics. Distinguish `ALLOW`, `DENY`, `UNEVALUATED` (or the existing contract's equivalent explicit outcomes); never turn missing context, unavailable policy, or a retrieval hint into a positive enforcement verdict. Changes to behavior remain gated by the accepted ADR and Layer 1 freeze amendment process.
 
+#### When to start the remaining DG1 phases
+
+These are **evidence and dependency triggers, not calendar commitments**. A completed DG1-S does not automatically start any implementation.
+
+| Residual work | Start condition | Current disposition |
+|---|---|---|
+| **G1–G3 host / CI trust validation** (CI1 #540, T-08) | A separately accepted, pinned test scope with host-side and trusted-revision controls; coordinate with existing CI1/T-08 gates. | G1 host side and G2 **unevaluated**; G3 **partial**. Continue under their existing owners, without relabelling a result. |
+| **DG1F-C1b trusted applicability exclusion** | A concrete need plus a reviewed canonical context-label declaration, trusted approved revision, anti-substitution protection, controlled selection and fail-safe branches; then its own charter and freeze amendment. | **Deferred**; no trusted label declaration. |
+| **DG1B2b waiver-aware enforcement** | A concrete, approved decision-version-bound waiver that must change a runtime enforcement outcome **and** trusted context/labels (shared C1b prerequisite); approve the CI evaluator pin and the separate exclusion/rank-invariance charter and freeze. | **Deferred**; B2a record semantics alone are insufficient. |
+| **Remaining §11 resolver consumers** | A specific consumer needs the authoritative resolver result or a corrected output/authority contract; decide its scope and authorize a bounded charter/freeze if behavior changes. | **Incremental, case-driven**; no parity-only implementation campaign. |
+| **DG1G / full DG1 closeout** | Full ADR-031 §11 sequence delivered or each outstanding slice explicitly dispositioned by a reviewed ADR-031 decision; §13 fixtures complete for landed slices; G1–G3 resolved or explicitly dispositioned. | **OPEN**; do not infer completion from DG1-S's 13/13. |
+| **Persisted precedence reason** | A concrete evidence case and its own v2 semantic-feature decision under the ADR-031 erratum. | **Deferred**; not in DG1-S or the §13 fixture floor. |
+
+Any future release, including currently merged but unreleased DG1 slices, follows [RELEASING.md](../releases/RELEASING.md) with independent approval. Do not treat roadmap sequencing as implementation, validation or release authorization.
+
 ### P1.5 — DG2: deterministic decision federation (public OSS)
 
 Once DG1 semantics are stable, extend the same governance resolver across more than one known decision source or repository. Learn from existing federation designs, but federate **Mneme decision authority**, not merely files or Markdown corpora.
+
+**Start condition:** DG1-S completion permits a **read-only DG2 feasibility scope**, not federation implementation. Begin a DG2 implementation charter only on a concrete, declared multi-source decision case with pinned source revisions, authority and provenance boundaries, deterministic ambiguity handling, and an explicit review of how it composes with the still-open DG1F trusted-context/consumer obligations. The existing architecture and Layer 1 authorization process still govern any behavior change.
 
 DG2 is public OSS and must be production-capable for multi-repository software factories, not a reference model. It federates **known** decision sources deterministically:
 
