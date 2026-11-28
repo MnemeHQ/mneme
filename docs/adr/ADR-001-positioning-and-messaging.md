@@ -11,7 +11,7 @@ scope: positioning
 
 ## Status
 
-Accepted — 2026-05-01 · Updated — 2026-05-03 · Amended — 2026-09-25
+Accepted — 2026-05-01 · Updated — 2026-05-03 · Amended — 2026-09-25 · Amended — 2026-11-26
 
 > Amended 2026-09-25 (positioning-only): the canonical company-level category
 > moves from "the architectural governance layer for AI-assisted development"
@@ -23,6 +23,17 @@ Accepted — 2026-05-01 · Updated — 2026-05-03 · Amended — 2026-09-25
 > No architecture, freeze, enforcement, retrieval, or integration-status
 > change. The pre-amendment category and hero direction are kept below,
 > marked as superseded, for history.
+
+> Amended 2026-11-26 (positioning-only): **Decision Engineering** is admitted
+> as discipline vocabulary, defined in ADR-014 §5: the discipline of
+> discovering, formalising, distributing, enforcing and verifying the
+> engineering decisions that AI coding agents must follow in agentic
+> software development. It is not the category. Engineering decision
+> governance is the capability the discipline produces, with its semantics
+> from ADR-031; like "governance", it is not a category either. The
+> category, messaging hierarchy, claim levels, approved phrasing and
+> acquisition claim are unchanged. No runtime behaviour, architecture,
+> freeze, enforcement, retrieval or integration-status change.
 
 ## Context
 
@@ -44,6 +55,7 @@ Terminology is fixed:
 - **Decision and control layer** — what Mneme *is*.
 - **Architecture protection / architectural drift prevention** — what Mneme does *first*. It remains the primary acquisition and distribution claim (see ADR-013).
 - **Governance** — an outcome or capability Mneme provides. It is never the category name; do not use "governance layer" as a synonym for the category.
+- **Decision Engineering** — the discipline whose supported aspects Mneme implements (ADR-014 §5), in the sense of engineering decisions that AI coding agents must follow, not business decision intelligence. It may appear on thesis and concept pages and in external thought leadership with its disambiguation; it never appears on the homepage and is never the category name. Engineering decision governance is the capability the discipline produces (ADR-031) and, like "governance", is never the category name.
 
 *Superseded 2026-09-25:* Mneme will be positioned as the architectural governance layer for AI-assisted development.
 
